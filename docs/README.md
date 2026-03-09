@@ -20,9 +20,9 @@
 
 ## 当前文档
 
-- [架构方向](./architecture/README.md)
-- [AI / Agent 方向](./ai/README.md)
-- [Golang 方向](./golang/README.md)
+- [架构方向](./architecture/)
+- [AI / Agent 方向](./ai/)
+- [Golang 方向](./golang/)
 
 ## 推荐入口
 
@@ -33,13 +33,13 @@
 ### 想从路线开始
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
-- [LLM 与 Agent 学习地图](./ai/llm-and-agent-learning-map.md)
+- [Agent 学习综合指南](./ai/agent-learning-guide.md)
 - [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 
 ### 想从面试准备开始
 
 - [架构面试准备清单](./architecture/architect-interview-prep-checklist.md)
-- [高级 Golang 面试学习资料](./golang/golang-interview-prep-guide.md)
+- [高级 Golang 面试资料完整大纲](./golang/golang-interview-outline.md)
 - [30 个高频 Golang 面试题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模

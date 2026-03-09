@@ -28,7 +28,7 @@
 
 ## 面试准备资料文档
 
-- 详细版本见：[高级 Golang 面试学习资料](./golang-interview-prep-guide.md)
+- 详细版本见：[高级 Golang 面试资料完整大纲](./golang-interview-outline.md)
 
 ## 知识地图
 

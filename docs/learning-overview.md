@@ -10,19 +10,19 @@
 
 ### 架构方向
 
-- 目录入口：[架构方向](./architecture/README.md)
+- 目录入口：[架构方向](./architecture/)
 - 核心入口：[架构师学习路线](./architecture/architect-learning-roadmap.md)
 - 适合：后端开发、技术负责人候选人、架构岗准备
 
 ### AI / Agent 方向
 
-- 目录入口：[AI / Agent 方向](./ai/README.md)
+- 目录入口：[AI / Agent 方向](./ai/)
 - 核心入口：[Agent 学习综合指南](./ai/agent-learning-guide.md)
 - 适合：希望系统入门 Agent 和 LLM 应用开发的工程师
 
 ### Golang 方向
 
-- 目录入口：[Golang 方向](./golang/README.md)
+- 目录入口：[Golang 方向](./golang/)
 - 核心入口：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 - 适合：Go 后端、高级开发、性能与面试准备
 
