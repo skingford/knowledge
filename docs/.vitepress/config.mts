@@ -6,6 +6,7 @@ export default defineConfig({
   title: '学习知识库',
   description: '涵盖 AI / Agent、架构设计、Golang 三个方向的学习资料与路线图',
 
+  base: '/knowledge/',
   lastUpdated: true,
   appearance: 'dark',
 
