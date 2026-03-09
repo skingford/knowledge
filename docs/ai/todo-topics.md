@@ -2,9 +2,7 @@
 
 ## 优先级高
 
-- Tool Calling 设计清单
 - Workflow Agent 设计模式
-- RAG 基础与落地流程
 - Eval 评测方法
 - Prompt Injection 与权限边界
 
@@ -15,6 +13,8 @@
 - 结构化输出最佳实践
 - Agent 日志与可观测性
 - 模型、工具、知识库协同方式
+- 工作流型 Agent 实战案例
+- Fine-tuning 入门边界
 
 ## 可后续补充
 
