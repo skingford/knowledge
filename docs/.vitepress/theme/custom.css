@@ -1,47 +1,382 @@
-:root {
-  --vp-c-brand-1: #10b981;
-  --vp-c-brand-2: #059669;
-  --vp-c-brand-3: #047857;
-  --vp-c-brand-soft: rgba(16, 185, 129, 0.14);
+/*
+ * 主题风格精确对照 code.claude.com
+ *
+ * 灰阶体系 (gray-050 ~ gray-950)
+ *   050: #f8f8f8   100: #ebebeb   200: #d4d4d4   300: #b8b8b8
+ *   400: #a0a0a0   500: #808080   600: #5a5a5a   700: #424242
+ *   750: #333333   800: #262626   850: #1a1a1a   900: #121212
+ *   950: #0a0a0a
+ *
+ * 品牌强调: #C46849 (terracotta)
+ */
+
+/* ================================================================
+   字体加载 —— Geist (Variable) via Fontsource CDN
+   ================================================================ */
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist:vf@latest/latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-mono:vf@latest/latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ================================================================
+   字体栈
+   ================================================================ */
+
+:root {
+  --vp-font-family-base: 'Geist', 'Noto Sans SC', ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Helvetica, Arial, sans-serif;
+  --vp-font-family-mono: 'Geist Mono', ui-monospace, SFMono-Regular,
+    'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+}
+
+/* ================================================================
+   浅色模式
+   ================================================================ */
+
+:root {
+  /* 品牌色 */
+  --vp-c-brand-1: #C46849;
+  --vp-c-brand-2: #B55D40;
+  --vp-c-brand-3: #A35237;
+  --vp-c-brand-soft: rgba(196, 104, 73, 0.1);
+
+  /* 背景 */
+  --vp-c-bg: #f8f8f8;
+  --vp-c-bg-alt: #ebebeb;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #ebebeb;
+
+  /* 灰阶 */
+  --vp-c-gray-1: #d4d4d4;
+  --vp-c-gray-2: #b8b8b8;
+  --vp-c-gray-3: #a0a0a0;
+  --vp-c-gray-soft: rgba(160, 160, 160, 0.1);
+  --vp-c-divider: #d4d4d4;
+
+  /* 文字 */
+  --vp-c-text-1: #0a0a0a;
+  --vp-c-text-2: #424242;
+  --vp-c-text-3: #808080;
+
+  /* Hero */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #0a0a0a 40%, #C46849);
+  --vp-home-hero-image-background-image: linear-gradient(135deg, rgba(196, 104, 73, 0.15), rgba(248, 248, 248, 0.05));
+  --vp-home-hero-image-filter: blur(68px);
+}
+
+/* ================================================================
+   深色模式 —— 精确对照 Claude Code
+   ================================================================ */
 
 .dark {
-  --vp-c-brand-1: #34d399;
-  --vp-c-brand-2: #10b981;
-  --vp-c-brand-3: #059669;
-  --vp-c-brand-soft: rgba(52, 211, 153, 0.16);
+  /* 品牌色 */
+  --vp-c-brand-1: #D8785A;
+  --vp-c-brand-2: #C46849;
+  --vp-c-brand-3: #B55D40;
+  --vp-c-brand-soft: rgba(216, 120, 90, 0.12);
+
+  /* 背景：gray-950 / gray-900 / gray-850 */
+  --vp-c-bg: #0a0a0a;
+  --vp-c-bg-alt: #121212;
+  --vp-c-bg-elv: #1a1a1a;
+  --vp-c-bg-soft: #1a1a1a;
+
+  /* 灰阶 */
+  --vp-c-gray-1: #262626;
+  --vp-c-gray-2: #333333;
+  --vp-c-gray-3: #424242;
+  --vp-c-gray-soft: rgba(66, 66, 66, 0.12);
+  --vp-c-divider: #262626;
+
+  /* 文字：gray-050 / gray-400 / gray-500 */
+  --vp-c-text-1: #f8f8f8;
+  --vp-c-text-2: #a0a0a0;
+  --vp-c-text-3: #808080;
+
+  /* Hero */
+  --vp-home-hero-name-background: linear-gradient(135deg, #f8f8f8 40%, #C46849);
+  --vp-home-hero-image-background-image: linear-gradient(135deg, rgba(196, 104, 73, 0.12), rgba(10, 10, 10, 0.05));
 }
 
-/* 中文排版优化 */
+/* ================================================================
+   字体渲染
+   ================================================================ */
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ================================================================
+   排版
+   ================================================================ */
+
 .vp-doc p,
 .vp-doc li {
-  line-height: 1.8;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
 }
 
 .vp-doc p {
   margin: 16px 0;
 }
 
-/* 首页 Feature 卡片 */
+.vp-doc h1 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.vp-doc h2 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.vp-doc h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* 行内代码 */
+.vp-doc :not(pre) > code {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.875em;
+  font-weight: 400;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.dark .vp-doc :not(pre) > code {
+  background-color: #1a1a1a;
+  color: #d4d4d4;
+}
+
+/* ================================================================
+   导航栏
+   ================================================================ */
+
+.VPNav {
+  backdrop-filter: blur(12px);
+}
+
+.dark .VPNav {
+  border-bottom-color: #262626;
+}
+
+.VPNavBarTitle .title {
+  font-weight: 600;
+}
+
+/* ================================================================
+   首页 Hero
+   ================================================================ */
+
+.VPHero .name {
+  font-weight: 700 !important;
+}
+
+.VPHero .text {
+  font-weight: 600 !important;
+  letter-spacing: -0.02em;
+}
+
+.VPHero .tagline {
+  letter-spacing: 0.01em;
+}
+
+.dark .VPHero .tagline {
+  color: #a0a0a0 !important;
+}
+
+/* ================================================================
+   首页 Feature 卡片
+   ================================================================ */
+
 .VPFeature {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-color: #d4d4d4 !important;
+  border-radius: 10px !important;
 }
 
 .VPFeature:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  border-color: #C46849 !important;
+}
+
+.dark .VPFeature {
+  border-color: #262626 !important;
+  background-color: #121212 !important;
 }
 
 .dark .VPFeature:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  border-color: #C46849 !important;
 }
 
-/* 代码块优化 */
-.vp-doc div[class*='language-'] {
+.VPFeature .title {
+  font-weight: 600;
+}
+
+.dark .VPFeature .details {
+  color: #a0a0a0 !important;
+}
+
+/* ================================================================
+   按钮 —— Claude 风格：深底浅按钮 / 浅底深按钮
+   ================================================================ */
+
+.VPButton.brand {
   border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 侧边栏微调 */
+.dark .VPButton.brand {
+  background-color: #f8f8f8 !important;
+  color: #0a0a0a !important;
+  border-color: #f8f8f8 !important;
+}
+
+.dark .VPButton.brand:hover {
+  background-color: #d4d4d4 !important;
+  border-color: #d4d4d4 !important;
+}
+
+.VPButton.alt {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .VPButton.alt {
+  background-color: #262626 !important;
+  color: #f8f8f8 !important;
+  border-color: #424242 !important;
+}
+
+.dark .VPButton.alt:hover {
+  background-color: #333333 !important;
+  border-color: #5a5a5a !important;
+}
+
+/* ================================================================
+   代码块
+   ================================================================ */
+
+.vp-doc div[class*='language-'] {
+  border-radius: 10px;
+}
+
+.dark .vp-doc div[class*='language-'] {
+  background-color: #121212;
+  border: 1px solid #262626;
+}
+
+/* ================================================================
+   侧边栏
+   ================================================================ */
+
 .VPSidebar {
   font-size: 14px;
+}
+
+.dark .VPSidebar {
+  border-right-color: #262626;
+}
+
+.VPSidebar .is-active {
+  font-weight: 500;
+}
+
+/* ================================================================
+   自定义容器
+   ================================================================ */
+
+.vp-doc .custom-block.tip {
+  border-color: #C46849;
+}
+
+.vp-doc .custom-block.tip .custom-block-title {
+  color: #C46849;
+}
+
+.dark .vp-doc .custom-block {
+  background-color: #121212;
+}
+
+/* ================================================================
+   表格
+   ================================================================ */
+
+.dark .vp-doc table {
+  border-color: #262626;
+}
+
+.dark .vp-doc tr {
+  border-top-color: #262626;
+}
+
+.dark .vp-doc th,
+.dark .vp-doc td {
+  border-color: #262626;
+}
+
+.dark .vp-doc tr:nth-child(2n) {
+  background-color: #121212;
+}
+
+/* ================================================================
+   滚动条（深色模式）
+   ================================================================ */
+
+.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #424242;
+}
+
+/* ================================================================
+   页脚与分割线
+   ================================================================ */
+
+.dark .VPDocFooter {
+  border-top-color: #262626;
+}
+
+.dark .VPContent .content-container {
+  border-top-color: #262626;
 }

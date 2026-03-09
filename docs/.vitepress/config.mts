@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
 export default defineConfig({
   lang: 'zh-CN',
@@ -6,6 +7,25 @@ export default defineConfig({
   description: '涵盖 AI / Agent、架构设计、Golang 三个方向的学习资料与路线图',
 
   lastUpdated: true,
+  appearance: 'dark',
+
+  head: [
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap',
+      },
+    ],
+  ],
+
+  markdown: {
+    config(md) {
+      md.use(tabsMarkdownPlugin)
+    },
+  },
 
   themeConfig: {
     nav: [
@@ -49,9 +69,7 @@ export default defineConfig({
           items: [
             { text: '方向概览', link: '/golang/' },
             { text: '高级 Golang 学习资料', link: '/golang/golang-advanced-learning-guide' },
-            { text: '能力自检资料完整大纲', link: '/golang/golang-interview-outline' },
-            { text: '30 个高频能力自检题', link: '/golang/go-top-30-interview-questions' },
-            { text: '标准能力自检回答模板', link: '/golang/go-standard-answer-templates' },
+            { text: '30+ 高频能力自检题', link: '/golang/go-top-30-interview-questions' },
             { text: '源码与原理知识点', link: '/golang/go-source-and-principle-notes' },
             { text: '能力自检高频题代码片段', link: '/golang/go-interview-code-snippets' },
             { text: '推荐书单与资源', link: '/golang/golang-recommended-resources' },
@@ -64,7 +82,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/kingford' },
+      { icon: 'github', link: 'https://github.com/skingford/knowledge' },
     ],
 
     search: {
@@ -78,6 +96,11 @@ export default defineConfig({
 
     lastUpdated: {
       text: '最后更新于',
+    },
+
+    editLink: {
+      pattern: 'https://github.com/skingford/knowledge/edit/main/docs/:path',
+      text: '在 GitHub 上编辑此页',
     },
 
     docFooter: {

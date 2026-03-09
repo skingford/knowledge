@@ -37,7 +37,7 @@
 ### 想直接看能力自检资料
 
 - 架构：[架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- Go：[高级 Golang 能力自检资料完整大纲](./golang/golang-interview-outline.md)
+- Go：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 - Go 高频题：[30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ### 想看专题补充

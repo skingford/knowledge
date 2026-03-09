@@ -39,7 +39,7 @@
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- [高级 Golang 能力自检资料完整大纲](./golang/golang-interview-outline.md)
+- [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模
