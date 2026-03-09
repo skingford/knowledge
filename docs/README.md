@@ -16,7 +16,7 @@
 - 学习路线或知识地图
 - 推荐实践项目
 - 推荐资料
-- 面试题或复盘模板
+- 能力自检题或复盘模板
 
 ## 当前文档
 
@@ -36,23 +36,23 @@
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
 - [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 
-### 想从面试准备开始
+### 想从能力自检准备开始
 
-- [架构面试准备清单](./architecture/architect-interview-prep-checklist.md)
-- [高级 Golang 面试资料完整大纲](./golang/golang-interview-outline.md)
-- [30 个高频 Golang 面试题 + 简答](./golang/go-top-30-interview-questions.md)
+- [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
+- [高级 Golang 能力自检资料完整大纲](./golang/golang-interview-outline.md)
+- [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模
 
-- `architecture/`：路线、分阶段书单、面试清单、分布式与高并发专题
+- `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
-- `golang/`：学习资料、面试资料、大纲、题库、模板、源码、代码片段、资源清单
+- `golang/`：学习资料、能力自检资料、大纲、题库、模板、源码、代码片段、资源清单
 
 ## 整理规则
 
 - 文件名使用英文语义化 kebab-case
 - 文档标题使用中文，便于直接阅读
-- 优先按“概览 -> 路线 -> 资料 -> 实践/面试”组织结构
+- 优先按“概览 -> 路线 -> 资料 -> 实践/能力自检”组织结构
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
 

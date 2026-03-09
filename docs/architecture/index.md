@@ -4,7 +4,7 @@
 
 - [架构师学习路线](./architect-learning-roadmap.md)
 - [架构师分阶段书单](./architect-booklist-by-level.md)
-- [架构面试准备清单](./architect-interview-prep-checklist.md)
+- [架构能力自检准备清单](./architect-interview-prep-checklist.md)
 - [高并发系统设计清单](./high-concurrency-system-checklist.md)
 - [分布式事务方案对比](./distributed-transaction-comparison.md)
 - [待补主题清单](./todo-topics.md)
@@ -26,4 +26,4 @@
 2. [架构师分阶段书单](./architect-booklist-by-level.md)
 3. [高并发系统设计清单](./high-concurrency-system-checklist.md)
 4. [分布式事务方案对比](./distributed-transaction-comparison.md)
-5. [架构面试准备清单](./architect-interview-prep-checklist.md)
+5. [架构能力自检准备清单](./architect-interview-prep-checklist.md)
