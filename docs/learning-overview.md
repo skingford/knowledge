@@ -17,7 +17,7 @@
 ### AI / Agent 方向
 
 - 目录入口：[AI / Agent 方向](./ai/README.md)
-- 核心入口：[LLM 与 Agent 学习地图](./ai/llm-and-agent-learning-map.md)
+- 核心入口：[Agent 学习综合指南](./ai/agent-learning-guide.md)
 - 适合：希望系统入门 Agent 和 LLM 应用开发的工程师
 
 ### Golang 方向
@@ -31,13 +31,13 @@
 ### 想先看路线图
 
 - 架构：[架构师学习路线](./architecture/architect-learning-roadmap.md)
-- AI：[Agent 入门基础与学习顺序](./ai/agent-foundations-and-learning-order.md)
+- AI：[Agent 学习综合指南](./ai/agent-learning-guide.md)
 - Go：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 
 ### 想直接看面试资料
 
 - 架构：[架构面试准备清单](./architecture/architect-interview-prep-checklist.md)
-- Go：[高级 Golang 面试学习资料](./golang/golang-interview-prep-guide.md)
+- Go：[高级 Golang 面试资料完整大纲](./golang/golang-interview-outline.md)
 - Go 高频题：[30 个高频 Golang 面试题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ### 想看专题补充
@@ -60,8 +60,7 @@
 
 ### 想快速入门 Agent 开发
 
-- 入口文档：[LLM 与 Agent 学习地图](./ai/llm-and-agent-learning-map.md)
-- 入口文档：[Agent 入门基础与学习顺序](./ai/agent-foundations-and-learning-order.md)
+- 入口文档：[Agent 学习综合指南](./ai/agent-learning-guide.md)
 - 入口文档：[7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
 - 补充文档：[Tool Calling 设计清单](./ai/tool-calling-design-checklist.md)
 - 补充文档：[RAG 基础与工作流](./ai/rag-basics-and-workflow.md)
@@ -82,19 +81,19 @@
 
 1. [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 2. [架构师学习路线](./architecture/architect-learning-roadmap.md)
-3. [7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
+3. [Agent 学习综合指南](./ai/agent-learning-guide.md)
 
 ### AI 应用开发路线
 
-1. [7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
-2. [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-3. [架构师学习路线](./architecture/architect-learning-roadmap.md)
+1. [Agent 学习综合指南](./ai/agent-learning-guide.md)
+2. [7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
+3. [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
 
 ## 当前规模
 
 - 架构方向：路线、书单、面试清单、专题文档
-- AI / Agent 方向：地图、路线、资料清单、Tool Calling、RAG
-- Golang 方向：学习资料、面试资料、大纲、题库、模板、源码、代码示例、资源清单
+- AI / Agent 方向：综合指南、学习路线、Tool Calling、RAG
+- Golang 方向：学习资料、面试大纲、题库、模板、源码、代码示例、资源清单
 
 ## 文档维护约定
 
