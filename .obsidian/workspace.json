@@ -196,6 +196,10 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/g.md",
+    "docs/a.md",
+    "docs/7.md",
+    "docs",
     "markdown-examples.md",
     "api-examples.md",
     "index.md",
@@ -209,7 +213,6 @@
     "node_modules/fsevents",
     "refund.txt",
     "package-lock.json",
-    "package.json",
     "node_modules/@iconify-json/simple-icons/README.md",
     "node_modules/@docsearch/js/README.md",
     "node_modules/@vitejs/plugin-vue/README.md",
@@ -229,9 +232,6 @@
     "node_modules/birpc/README.md",
     "node_modules/rollup/README.md",
     "node_modules/rollup/LICENSE.md",
-    "node_modules/oniguruma-parser/README.md",
-    "node_modules/entities/readme.md",
-    "node_modules/@vueuse/integrations/README.md",
     "article/Untitled.canvas",
     "article/Untitled 1.canvas"
   ]
