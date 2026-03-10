@@ -48,7 +48,9 @@
 
 ## 学习大纲
 
-### 一、语言基础深化
+### 一、语言基础深化 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [语言基础深化详解](./guide/01-language-fundamentals.md)
 
 - 变量、常量、`iota`
 - 值类型 vs 引用语义
@@ -61,7 +63,9 @@
 - 泛型 `generics`
 - 错误处理设计
 
-### 二、底层原理
+### 二、底层原理 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [底层原理详解](./guide/02-underlying-principles.md)
 
 - Slice 底层结构与扩容机制
 - Map 底层实现原理
@@ -73,7 +77,9 @@
 - 内存分配器
 - Go Memory Model
 
-### 三、并发编程
+### 三、并发编程 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [并发编程详解](./guide/03-concurrency.md)
 
 - Goroutine 基础
 - GMP 调度模型
@@ -87,7 +93,9 @@
 - Goroutine 泄漏与排查
 - 并发安全常见问题
 
-### 四、网络编程与标准库
+### 四、网络编程与标准库 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [网络编程与标准库详解](./guide/04-network-stdlib.md)
 
 - `net/http` 服务端原理
 - `http.Client` 使用与坑点
@@ -100,7 +108,9 @@
 - JSON 编解码
 - 文件与 IO
 
-### 五、工程实践
+### 五、工程实践 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [工程实践详解](./guide/05-engineering-practices.md)
 
 - 项目结构设计
 - 依赖管理 `go mod`
@@ -115,7 +125,9 @@
 - Benchmark
 - CI/CD
 
-### 六、数据库与缓存
+### 六、数据库与缓存 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [数据库与缓存详解](./guide/06-database-cache.md)
 
 - `database/sql` 使用
 - MySQL 连接池
@@ -127,7 +139,9 @@
 - 缓存一致性
 - 分库分表后的处理方式
 
-### 七、性能优化与排障
+### 七、性能优化与排障 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [性能优化与排障详解](./guide/07-performance-troubleshooting.md)
 
 - Pprof CPU 分析
 - Pprof 内存分析
@@ -141,7 +155,9 @@
 - Goroutine 泄漏排查
 - 线上问题定位思路
 
-### 八、微服务与分布式
+### 八、微服务与分布式 <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [微服务与分布式详解](./guide/08-microservices-distributed.md)
 
 - gRPC 原理与实践
 - Protobuf
@@ -156,7 +172,9 @@
 - 服务治理
 - 高可用设计
 
-### 九、源码与 Runtime
+### 九、源码与 Runtime <Badge type="tip" text="详解" />
+
+> 详细答案与代码示例见 [源码与 Runtime 详解](./guide/09-runtime-source.md)
 
 - `runtime` 包核心机制
 - Goroutine 调度源码

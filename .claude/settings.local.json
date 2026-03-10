@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /Users/kingford/kingford_bc/github.com/knowledge/docs/golang/guide/*.md)"
+    ]
+  }
+}

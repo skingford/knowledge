@@ -91,6 +91,21 @@ export default defineConfig({
             { text: '待补主题清单', link: '/golang/todo-topics' },
           ],
         },
+        {
+          text: '学习大纲详解',
+          collapsed: true,
+          items: [
+            { text: '一、语言基础深化', link: '/golang/guide/01-language-fundamentals' },
+            { text: '二、底层原理', link: '/golang/guide/02-underlying-principles' },
+            { text: '三、并发编程', link: '/golang/guide/03-concurrency' },
+            { text: '四、网络编程与标准库', link: '/golang/guide/04-network-stdlib' },
+            { text: '五、工程实践', link: '/golang/guide/05-engineering-practices' },
+            { text: '六、数据库与缓存', link: '/golang/guide/06-database-cache' },
+            { text: '七、性能优化与排障', link: '/golang/guide/07-performance-troubleshooting' },
+            { text: '八、微服务与分布式', link: '/golang/guide/08-microservices-distributed' },
+            { text: '九、源码与 Runtime', link: '/golang/guide/09-runtime-source' },
+          ],
+        },
       ],
     },
 
