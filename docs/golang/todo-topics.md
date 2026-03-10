@@ -4,8 +4,6 @@
 
 - Slice / Map / Channel 底层详解
 - GMP 调度模型拆解
-- Context 使用边界与误区
-- Pprof 排障实战
 - Go 服务性能优化 checklist
 
 ## 优先级中

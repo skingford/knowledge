@@ -71,7 +71,6 @@ export default defineConfig({
             { text: '方向概览', link: '/golang/' },
             { text: '高级 Golang 学习资料', link: '/golang/golang-advanced-learning-guide' },
             { text: '30+ 高频能力自检题', link: '/golang/go-top-30-interview-questions' },
-            { text: '源码与原理知识点', link: '/golang/go-source-and-principle-notes' },
             { text: '能力自检高频题代码片段', link: '/golang/go-interview-code-snippets' },
             { text: '推荐书单与资源', link: '/golang/golang-recommended-resources' },
             { text: 'Pprof 排障指南', link: '/golang/pprof-troubleshooting-guide' },

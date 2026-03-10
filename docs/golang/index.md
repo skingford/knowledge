@@ -3,8 +3,7 @@
 ## 当前文档
 
 - [高级 Golang 学习资料](./golang-advanced-learning-guide.md)
-- [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
-- [Golang 高频题对应的源码与原理知识点](./go-source-and-principle-notes.md)
+- [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)（含源码与原理线索）
 - [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
 - [Go 推荐书单、博客与视频资料](./golang-recommended-resources.md)
 - [Pprof 排障指南](./pprof-troubleshooting-guide.md)
@@ -23,8 +22,7 @@
 
 1. [高级 Golang 学习资料](./golang-advanced-learning-guide.md)
 2. [Go 推荐书单、博客与视频资料](./golang-recommended-resources.md)
-3. [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
-6. [Golang 高频题对应的源码与原理知识点](./go-source-and-principle-notes.md)
-7. [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
-8. [Pprof 排障指南](./pprof-troubleshooting-guide.md)
-9. [Context 使用边界](./context-usage-boundaries.md)
+3. [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)（含源码与原理线索）
+4. [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+5. [Pprof 排障指南](./pprof-troubleshooting-guide.md)
+6. [Context 使用边界](./context-usage-boundaries.md)
