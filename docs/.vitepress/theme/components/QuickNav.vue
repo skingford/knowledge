@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+
 interface Site {
   name: string
   desc: string
@@ -23,6 +25,41 @@ const onImgError = (e: Event) => {
   const fallback = img.nextElementSibling as HTMLElement
   if (fallback) fallback.style.display = 'inline'
 }
+
+const activeCategory = ref('')
+
+const getCategoryId = (title: string) =>
+  title.replace(/\s+/g, '-').toLowerCase()
+
+const scrollToCategory = (title: string) => {
+  const id = getCategoryId(title)
+  const el = document.getElementById(id)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          activeCategory.value = entry.target.id
+        }
+      }
+    },
+    { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+  )
+  document.querySelectorAll('.nav-category[id]').forEach((el) => {
+    observer!.observe(el)
+  })
+})
+
+onUnmounted(() => {
+  observer?.disconnect()
+})
 
 const categories: Category[] = [
   {
@@ -107,41 +144,68 @@ const categories: Category[] = [
 </script>
 
 <template>
-  <div class="quick-nav">
-    <div v-for="cat in categories" :key="cat.title" class="nav-category">
-      <h2 class="cat-title">
-        <span class="cat-emoji">{{ cat.emoji }}</span>
-        {{ cat.title }}
-      </h2>
-      <div class="sites-grid">
-        <a
-          v-for="site in cat.sites"
-          :key="site.name"
-          :href="site.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="site-card"
-        >
-          <div class="site-icon-wrap" :class="{ 'light-bg': site.lightBg }">
-            <img
-              :src="getFavicon(site.domain)"
-              :alt="site.name"
-              class="site-favicon"
-              @error="onImgError"
-            />
-            <span class="site-icon-fallback">{{ site.fallback }}</span>
-          </div>
-          <span class="site-name">{{ site.name }}</span>
-          <span class="site-desc">{{ site.desc }}</span>
-          <span class="site-link-icon">↗</span>
-        </a>
+  <div class="quick-nav-layout">
+    <div class="quick-nav">
+      <div v-for="cat in categories" :key="cat.title" :id="getCategoryId(cat.title)" class="nav-category">
+        <h2 class="cat-title">
+          <span class="cat-emoji">{{ cat.emoji }}</span>
+          {{ cat.title }}
+        </h2>
+        <div class="sites-grid">
+          <a
+            v-for="site in cat.sites"
+            :key="site.name"
+            :href="site.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-card"
+          >
+            <div class="site-icon-wrap" :class="{ 'light-bg': site.lightBg }">
+              <img
+                :src="getFavicon(site.domain)"
+                :alt="site.name"
+                class="site-favicon"
+                @error="onImgError"
+              />
+              <span class="site-icon-fallback">{{ site.fallback }}</span>
+            </div>
+            <span class="site-name">{{ site.name }}</span>
+            <span class="site-desc">{{ site.desc }}</span>
+            <span class="site-link-icon">↗</span>
+          </a>
+        </div>
       </div>
     </div>
+
+    <nav class="side-nav">
+      <div class="side-nav-inner">
+        <p class="side-nav-title">分类导航</p>
+        <a
+          v-for="cat in categories"
+          :key="cat.title"
+          class="side-nav-item"
+          :class="{ active: activeCategory === getCategoryId(cat.title) }"
+          href="javascript:void(0)"
+          @click="scrollToCategory(cat.title)"
+        >
+          <span class="side-nav-emoji">{{ cat.emoji }}</span>
+          <span>{{ cat.title }}</span>
+        </a>
+      </div>
+    </nav>
   </div>
 </template>
 
 <style scoped>
+.quick-nav-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
 .quick-nav {
+  flex: 1;
+  min-width: 0;
   padding: 16px 0 48px;
 }
 
@@ -170,8 +234,8 @@ const categories: Category[] = [
 
 .sites-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
 }
 
 .site-card {
@@ -258,6 +322,68 @@ const categories: Category[] = [
 .site-card:hover .site-link-icon {
   color: #c46849;
   transform: translate(1px, -1px);
+}
+
+/* Side Navigation */
+.side-nav {
+  position: sticky;
+  top: 80px;
+  width: 160px;
+  flex-shrink: 0;
+  padding-top: 16px;
+}
+
+.side-nav-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--vp-c-divider);
+  padding-left: 12px;
+}
+
+.side-nav-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vp-c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.side-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.side-nav-item:hover {
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg-elv);
+}
+
+.side-nav-item.active {
+  color: #c46849;
+  font-weight: 500;
+  background: rgba(196, 104, 73, 0.08);
+}
+
+.side-nav-emoji {
+  font-size: 14px;
+  line-height: 1;
+}
+
+@media (max-width: 960px) {
+  .side-nav {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {

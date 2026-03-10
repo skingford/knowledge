@@ -282,6 +282,29 @@ body {
   max-width: none !important;
 }
 
+/* Quick Nav page — full-width centered layout */
+.quick-nav-page .VPDoc .container {
+  max-width: 1440px !important;
+  margin: 0 auto !important;
+}
+
+.quick-nav-page .VPDoc .content {
+  max-width: none !important;
+  padding: 0 48px !important;
+}
+
+.quick-nav-page .VPDoc .content-container {
+  max-width: none !important;
+}
+
+.quick-nav-page .VPDoc .aside {
+  display: none !important;
+}
+
+.quick-nav-page .VPDoc.has-aside .content {
+  padding-right: 48px !important;
+}
+
 .claude-home {
   padding: 40px 20px 80px;
 }
