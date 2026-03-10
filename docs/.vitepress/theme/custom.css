@@ -604,6 +604,29 @@ body {
     min-width: 0;
   }
 
+  .VPDoc .content,
+  .VPDoc.has-aside .content {
+    padding: 0 16px !important;
+  }
+
+  .VPSidebarItem .link,
+  .VPSidebarItem .item,
+  .VPDocFooter .edit-link-button,
+  .VPLocalNavOutlineDropdown .menu-button,
+  .VPLocalNavOutlineDropdown .outline-link,
+  .VPLocalNavOutlineDropdown .items .link {
+    min-height: 44px;
+  }
+
+  .VPSidebarItem .link,
+  .VPDocFooter .edit-link-button,
+  .VPLocalNavOutlineDropdown .menu-button,
+  .VPLocalNavOutlineDropdown .outline-link,
+  .VPLocalNavOutlineDropdown .items .link {
+    display: flex;
+    align-items: center;
+  }
+
   .quick-nav-page .VPDoc .content,
   .quick-nav-page .VPDoc.has-aside .content {
     padding: 0 16px !important;
@@ -879,6 +902,11 @@ body {
 }
 
 @media (max-width: 480px) {
+  .VPDoc .content,
+  .VPDoc.has-aside .content {
+    padding: 0 12px !important;
+  }
+
   .quick-nav-page .VPDoc .content,
   .quick-nav-page .VPDoc.has-aside .content {
     padding: 0 12px !important;
