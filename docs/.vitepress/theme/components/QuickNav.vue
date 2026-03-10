@@ -5,6 +5,7 @@ interface Site {
   domain: string
   fallback: string
   url: string
+  lightBg?: boolean
 }
 
 interface Category {
@@ -62,6 +63,7 @@ const categories: Category[] = [
       { name: 'NotebookLM', desc: 'Google 出品，基于文档的 AI 问答与播客生成', domain: 'notebooklm.google.com', fallback: '📓', url: 'https://notebooklm.google.com' },
       { name: 'Perplexity', desc: 'AI 搜索引擎，实时联网并引用来源', domain: 'www.perplexity.ai', fallback: '🔎', url: 'https://www.perplexity.ai' },
       { name: 'Hugging Face', desc: '开源 AI 模型、数据集与 Space 社区', domain: 'huggingface.co', fallback: '🤗', url: 'https://huggingface.co' },
+      { name: 'Arena', desc: 'AI 模型能力对比与排行榜平台', domain: 'arena.ai', fallback: '🏆', url: 'https://arena.ai/', lightBg: true },
     ],
   },
   {
@@ -94,7 +96,7 @@ const categories: Category[] = [
           rel="noopener noreferrer"
           class="site-card"
         >
-          <div class="site-icon-wrap">
+          <div class="site-icon-wrap" :class="{ 'light-bg': site.lightBg }">
             <img
               :src="getFavicon(site.domain)"
               :alt="site.name"
@@ -190,6 +192,12 @@ const categories: Category[] = [
   height: 28px;
   object-fit: contain;
   border-radius: 6px;
+}
+
+.dark .site-icon-wrap.light-bg {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  padding: 3px;
 }
 
 .site-icon-fallback {
