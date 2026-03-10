@@ -4,7 +4,7 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang 三个方向的学习资料与路线图',
+  description: '涵盖 AI / Agent、架构设计、Golang、运维四个方向的学习资料与路线图',
 
   base: '/knowledge/',
   lastUpdated: true,
@@ -47,6 +47,7 @@ export default defineConfig({
       { text: 'AI / Agent', link: '/ai/' },
       { text: '架构', link: '/architecture/' },
       { text: 'Golang', link: '/golang/' },
+      { text: '运维', link: '/ops/' },
     ],
 
     sidebar: {
@@ -87,6 +88,17 @@ export default defineConfig({
             { text: '高并发系统设计清单', link: '/architecture/high-concurrency-system-checklist' },
             { text: '分布式事务方案对比', link: '/architecture/distributed-transaction-comparison' },
             { text: '待补主题清单', link: '/architecture/todo-topics' },
+          ],
+        },
+      ],
+      '/ops/': [
+        {
+          text: '运维',
+          items: [
+            { text: '方向概览', link: '/ops/' },
+            { text: 'Linux 磁盘清理与进程管理', link: '/ops/linux-disk-cleanup' },
+            { text: 'Linux 用户管理与权限', link: '/ops/linux-user-permissions' },
+            { text: '待补主题清单', link: '/ops/todo-topics' },
           ],
         },
       ],

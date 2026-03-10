@@ -17,6 +17,11 @@ const tracks = [
     description: '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。',
     href: '/golang/',
   },
+  {
+    title: '运维',
+    description: '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
+    href: '/ops/',
+  },
 ]
 
 const highlights = [
@@ -60,7 +65,7 @@ const principles = [
         <p class="claude-home__eyebrow">A focused knowledge base</p>
         <h1 class="claude-home__title">学习知识库</h1>
         <p class="claude-home__subtitle">
-          AI、架构、Golang 三条主线，按长期学习更自然的方式重组资料、路线图和自检清单。
+          AI、架构、Golang、运维四条主线，按长期学习更自然的方式重组资料、路线图和自检清单。
         </p>
         <div class="claude-home__actions">
           <a

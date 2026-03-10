@@ -77,6 +77,32 @@ const categories: Category[] = [
       { name: 'DevDocs', desc: '多语言 / 框架 API 文档聚合', domain: 'devdocs.io', fallback: '📖', url: 'https://devdocs.io' },
     ],
   },
+  {
+    title: 'Skill 资源',
+    emoji: '🧩',
+    sites: [
+      { name: 'skills.sh', desc: 'Skill 目录与发现平台，适合查找 AI Agent / Codex 可复用技能', domain: 'skills.sh', fallback: '🧠', url: 'https://skills.sh/' },
+    ],
+  },
+  {
+    title: 'AI 设计',
+    emoji: '🎨',
+    sites: [
+      { name: 'Stitch', desc: 'Google 出品的 AI UI 设计工具，适合快速生成界面草图与页面结构', domain: 'stitch.withgoogle.com', fallback: '🪡', url: 'https://stitch.withgoogle.com/' },
+      { name: 'Figma', desc: '主流协作式界面设计平台，支持设计、原型与开发交付', domain: 'figma.com', fallback: '🎯', url: 'https://www.figma.com/' },
+      { name: 'Pencil', desc: '开源界面设计与原型工具，适合快速画线框和流程页面', domain: 'pencil.evolus.vn', fallback: '✏️', url: 'https://pencil.evolus.vn/' },
+    ],
+  },
+  {
+    title: 'AI 音频',
+    emoji: '🎵',
+    sites: [
+      { name: 'Seedance 2.0', desc: '字节 Seed 团队的多模态生成工具，支持音频输入并生成带原生音频的视频内容', domain: 'seed.bytedance.com', fallback: '🌊', url: 'https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0' },
+      { name: 'Suno', desc: '主流 AI 音乐生成平台，可通过提示词快速生成歌曲、配乐与音频素材', domain: 'suno.com', fallback: '🎤', url: 'https://suno.com/' },
+      { name: 'Udio', desc: 'AI 音乐生成平台，擅长生成高完成度歌曲与旋律片段', domain: 'udio.com', fallback: '🎶', url: 'https://www.udio.com/home' },
+      { name: 'ElevenLabs', desc: 'AI 语音与音频生成平台，适合配音、旁白、语音克隆与播客场景', domain: 'elevenlabs.io', fallback: '🗣️', url: 'https://elevenlabs.io/' },
+    ],
+  },
 ]
 </script>
 

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(wc -l /Users/kingford/kingford_bc/github.com/knowledge/docs/golang/guide/*.md)",
-      "Bash(wc -l /Users/kingford/kingford_bc/github.com/knowledge/docs/ai/roadmap/*.md)"
+      "Bash(wc -l /Users/kingford/kingford_bc/github.com/knowledge/docs/ai/roadmap/*.md)",
+      "Bash(find /Users/kingford/kingford_bc/github.com/knowledge -maxdepth 2 -name \"config*\" -o -name \"vitepress\" -o -name \"vuepress\" 2>/dev/null | grep -v node_modules)"
     ]
   }
 }
