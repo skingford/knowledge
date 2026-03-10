@@ -4,7 +4,7 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang、运维四个方向的学习资料与路线图',
+  description: '涵盖 AI / Agent、架构设计、Golang、运维、工具五个方向的学习资料与路线图',
 
   base: '/knowledge/',
   lastUpdated: true,
@@ -43,11 +43,25 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '快速导航', link: '/nav' },
-      { text: '学习导航', link: '/learning-overview' },
-      { text: 'AI / Agent', link: '/ai/' },
-      { text: '架构', link: '/architecture/' },
-      { text: 'Golang', link: '/golang/' },
-      { text: '运维', link: '/ops/' },
+      {
+        text: '学习方向',
+        items: [
+          { text: '学习导航总览', link: '/learning-overview' },
+          { text: 'AI / Agent', link: '/ai/' },
+          { text: '架构', link: '/architecture/' },
+          { text: 'Golang', link: '/golang/' },
+          { text: '运维', link: '/ops/' },
+        ]
+      },
+      {
+        text: '工具',
+        items: [
+          { text: 'Vim 实用方案', link: '/tools/vim' },
+          { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
+          { text: 'Git 常用技巧', link: '/tools/git' },
+          { text: 'Mac 效率工具', link: '/tools/mac' },
+        ]
+      },
     ],
 
     sidebar: {
@@ -99,6 +113,18 @@ export default defineConfig({
             { text: 'Linux 磁盘清理与进程管理', link: '/ops/linux-disk-cleanup' },
             { text: 'Linux 用户管理与权限', link: '/ops/linux-user-permissions' },
             { text: '待补主题清单', link: '/ops/todo-topics' },
+          ],
+        },
+      ],
+      '/tools/': [
+        {
+          text: '工具',
+          items: [
+            { text: '方向概览', link: '/tools/' },
+            { text: 'Vim 实用方案', link: '/tools/vim' },
+            { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
+            { text: 'Git 常用技巧', link: '/tools/git' },
+            { text: 'Mac 效率工具', link: '/tools/mac' },
           ],
         },
       ],
