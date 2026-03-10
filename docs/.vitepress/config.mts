@@ -62,6 +62,19 @@ export default defineConfig({
             { text: '待补主题清单', link: '/ai/todo-topics' },
           ],
         },
+        {
+          text: '7 天学习路线详解',
+          collapsed: true,
+          items: [
+            { text: 'Day 1: 理解 Agent 是什么', link: '/ai/roadmap/day1-what-is-agent' },
+            { text: 'Day 2: 学会调用 LLM API', link: '/ai/roadmap/day2-llm-api' },
+            { text: 'Day 3: 学会 Tool Calling', link: '/ai/roadmap/day3-tool-calling' },
+            { text: 'Day 4: 学习 Workflow', link: '/ai/roadmap/day4-workflow' },
+            { text: 'Day 5: RAG 和 Memory', link: '/ai/roadmap/day5-rag-memory' },
+            { text: 'Day 6: 评测与安全', link: '/ai/roadmap/day6-eval-safety' },
+            { text: 'Day 7: 完整项目', link: '/ai/roadmap/day7-full-project' },
+          ],
+        },
       ],
       '/architecture/': [
         {
