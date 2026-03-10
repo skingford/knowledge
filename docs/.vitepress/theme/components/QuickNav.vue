@@ -31,34 +31,74 @@ const activeCategory = ref('')
 const getCategoryId = (title: string) =>
   title.replace(/\s+/g, '-').toLowerCase()
 
+let clickLock = ''
+let clickTimer = 0
+
 const scrollToCategory = (title: string) => {
   const id = getCategoryId(title)
   const el = document.getElementById(id)
   if (el) {
+    clickLock = id
+    activeCategory.value = id
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    clearTimeout(clickTimer)
+    clickTimer = window.setTimeout(() => { clickLock = '' }, 1000)
   }
 }
 
-let observer: IntersectionObserver | null = null
+const updateActiveOnScroll = () => {
+  if (clickLock) {
+    activeCategory.value = clickLock
+    return
+  }
+  const sections = Array.from(
+    document.querySelectorAll('.nav-category[id]')
+  ) as HTMLElement[]
+  if (!sections.length) return
+
+  const scrollY = window.scrollY
+  const windowHeight = window.innerHeight
+  const docHeight = document.documentElement.scrollHeight
+  const navOffset = 100
+
+  // Step 1: normal logic — last section whose top scrolled past navOffset
+  let current = ''
+  for (const section of sections) {
+    if (section.getBoundingClientRect().top <= navOffset) {
+      current = section.id
+    }
+  }
+
+  // Step 2: near bottom — advance one-by-one to sections that can't reach navOffset
+  const distToBottom = docHeight - scrollY - windowHeight
+  if (distToBottom < 300) {
+    const currentIdx = current ? sections.findIndex((s) => s.id === current) : -1
+    const ratio = 1 - distToBottom / 300
+    const dynamicThreshold = navOffset + ratio * (windowHeight * 0.5 - navOffset)
+    for (let i = currentIdx + 1; i < sections.length; i++) {
+      if (sections[i].getBoundingClientRect().top <= dynamicThreshold) {
+        current = sections[i].id
+      }
+    }
+  }
+
+  activeCategory.value = current || sections[0].id
+}
+
+let rafId = 0
+const onScroll = () => {
+  cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(updateActiveOnScroll)
+}
 
 onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          activeCategory.value = entry.target.id
-        }
-      }
-    },
-    { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
-  )
-  document.querySelectorAll('.nav-category[id]').forEach((el) => {
-    observer!.observe(el)
-  })
+  window.addEventListener('scroll', onScroll, { passive: true })
+  updateActiveOnScroll()
 })
 
 onUnmounted(() => {
-  observer?.disconnect()
+  window.removeEventListener('scroll', onScroll)
+  cancelAnimationFrame(rafId)
 })
 
 const categories: Category[] = [
@@ -211,6 +251,7 @@ const categories: Category[] = [
 
 .nav-category {
   margin-bottom: 40px;
+  scroll-margin-top: 80px;
 }
 
 .cat-title {
@@ -234,7 +275,7 @@ const categories: Category[] = [
 
 .sites-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 16px;
 }
 
@@ -243,6 +284,7 @@ const categories: Category[] = [
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 160px;
   padding: 16px;
   background: var(--vp-c-bg-elv);
   border: 1px solid var(--vp-c-divider);
@@ -381,6 +423,14 @@ const categories: Category[] = [
 }
 
 @media (max-width: 960px) {
+  .quick-nav-layout {
+    display: block;
+  }
+
+  .quick-nav {
+    padding-top: 8px;
+  }
+
   .side-nav {
     display: none;
   }
@@ -388,7 +438,23 @@ const categories: Category[] = [
 
 @media (max-width: 640px) {
   .sites-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .site-card {
+    min-height: 0;
+  }
+
+  .site-name {
+    font-size: 16px;
+  }
+
+  .site-desc {
+    font-size: 14px;
+  }
+
+  .cat-title {
+    font-size: 17px;
   }
 }
 
