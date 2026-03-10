@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 const tracks = [
   {
     title: 'AI / Agent',
@@ -61,10 +63,13 @@ const principles = [
           AI、架构、Golang 三条主线，按长期学习更自然的方式重组资料、路线图和自检清单。
         </p>
         <div class="claude-home__actions">
-          <a class="claude-home__button claude-home__button--primary" href="/learning-overview">
+          <a
+            class="claude-home__button claude-home__button--primary"
+            :href="withBase('/learning-overview')"
+          >
             开始浏览
           </a>
-          <a class="claude-home__button claude-home__button--secondary" href="/nav">
+          <a class="claude-home__button claude-home__button--secondary" :href="withBase('/nav')">
             快速导航
           </a>
         </div>
@@ -82,12 +87,12 @@ const principles = [
     </section>
 
     <section class="claude-home__tracks">
-      <a
-        v-for="track in tracks"
-        :key="track.title"
-        :href="track.href"
-        class="claude-home__track"
-      >
+        <a
+          v-for="track in tracks"
+          :key="track.title"
+          :href="withBase(track.href)"
+          class="claude-home__track"
+        >
         <p class="claude-home__track-index">方向</p>
         <h2 class="claude-home__track-title">{{ track.title }}</h2>
         <p class="claude-home__track-description">{{ track.description }}</p>
@@ -105,7 +110,7 @@ const principles = [
         <a
           v-for="item in highlights"
           :key="item.title"
-          :href="item.href"
+          :href="withBase(item.href)"
           class="claude-home__highlight"
         >
           <p class="claude-home__highlight-eyebrow">{{ item.eyebrow }}</p>

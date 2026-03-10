@@ -138,11 +138,6 @@ body {
   backdrop-filter: blur(14px);
 }
 
-.VPNavBar {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
 .VPNavBarTitle .title {
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -288,13 +283,13 @@ body {
 }
 
 .claude-home {
-  padding: 24px 0 56px;
+  padding: 40px 20px 80px;
 }
 
 .claude-home__hero {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-  gap: 16px;
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -311,8 +306,8 @@ body {
 
 .claude-home__hero-copy {
   min-height: 420px;
-  padding: 40px 44px;
-  border-radius: 28px;
+  padding: 56px 64px;
+  border-radius: 32px;
 }
 
 .claude-home__hero-copy::before,
@@ -338,20 +333,21 @@ body {
 }
 
 .claude-home__hero-panel {
-  padding: 24px 28px;
-  border-radius: 22px;
+  padding: 40px 48px;
+  border-radius: 32px;
 }
 
 .claude-home__eyebrow,
 .claude-home__panel-label,
 .claude-home__track-index,
-.claude-home__highlight-eyebrow {
+.claude-home__highlight-eyebrow,
+.section-landing__eyebrow {
   position: relative;
   z-index: 1;
-  margin: 0 0 12px;
-  font-size: 0.7rem;
+  margin: 0 0 16px;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--vp-c-text-3);
 }
@@ -359,7 +355,8 @@ body {
 .claude-home__title,
 .claude-home__section-heading h2,
 .claude-home__track-title,
-.claude-home__highlight-title {
+.claude-home__highlight-title,
+.section-landing__title {
   position: relative;
   z-index: 1;
   margin: 0;
@@ -367,20 +364,20 @@ body {
   color: var(--vp-c-text-1);
 }
 
-.claude-home__title {
-  max-width: 8ch;
-  font-size: clamp(2.8rem, 6.5vw, 5rem);
+.claude-home__title,
+.section-landing__title {
+  font-size: clamp(1.6rem, 7vw, 4rem);
   line-height: 0.96;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.05em;
 }
 
 .claude-home__subtitle {
   position: relative;
   z-index: 1;
-  max-width: 560px;
-  margin: 18px 0 0;
-  font-size: 0.97rem;
-  line-height: 1.8;
+  max-width: 580px;
+  margin: 24px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.9;
   color: var(--vp-c-text-2);
 }
 
@@ -389,20 +386,20 @@ body {
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
+  gap: 16px;
+  margin-top: 40px;
 }
 
 .claude-home__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 110px;
-  height: 40px;
-  padding: 0 18px;
+  min-width: 120px;
+  height: 44px;
+  padding: 0 22px;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 600;
   text-decoration: none;
   transition:
@@ -464,12 +461,12 @@ body {
 .claude-home__tracks,
 .claude-home__highlight-grid {
   display: grid;
-  gap: 14px;
+  gap: 20px;
 }
 
 .claude-home__tracks {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 16px;
+  margin-top: 24px;
 }
 
 .claude-home__track,
@@ -483,9 +480,9 @@ body {
 }
 
 .claude-home__track {
-  min-height: 200px;
-  padding: 22px 24px;
-  border-radius: 20px;
+  min-height: 220px;
+  padding: 32px 36px;
+  border-radius: 24px;
 }
 
 .claude-home__track:hover,
@@ -495,8 +492,8 @@ body {
 }
 
 .claude-home__track-title {
-  font-size: 1.35rem;
-  line-height: 1.1;
+  font-size: 1.45rem;
+  line-height: 1.15;
   letter-spacing: -0.03em;
 }
 
@@ -504,9 +501,9 @@ body {
 .claude-home__highlight-description {
   position: relative;
   z-index: 1;
-  margin: 10px 0 0;
-  font-size: 0.88rem;
-  line-height: 1.75;
+  margin: 12px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.8;
   color: var(--vp-c-text-2);
 }
 
@@ -514,27 +511,27 @@ body {
   position: relative;
   z-index: 1;
   display: inline-flex;
-  margin-top: 16px;
-  font-size: 0.85rem;
+  margin-top: 24px;
+  font-size: 0.9rem;
   color: var(--vp-c-brand-2);
   font-weight: 600;
 }
 
 .claude-home__highlights {
-  margin-top: 48px;
+  margin-top: 72px;
 }
 
 .claude-home__section-heading {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .claude-home__section-heading h2 {
   max-width: 16ch;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
-  line-height: 1.05;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.1;
   letter-spacing: -0.04em;
 }
 
@@ -543,9 +540,9 @@ body {
 }
 
 .claude-home__highlight {
-  min-height: 160px;
-  padding: 20px 22px;
-  border-radius: 18px;
+  min-height: 180px;
+  padding: 32px 36px;
+  border-radius: 24px;
 }
 
 .claude-home__highlight-title {
@@ -566,20 +563,20 @@ body {
 
 @media (max-width: 768px) {
   .claude-home {
-    padding: 20px 0 56px;
+    padding: 24px 0 64px;
   }
 
   .claude-home__hero-copy {
     min-height: auto;
-    padding: 28px 22px;
-    border-radius: 22px;
+    padding: 36px 28px;
+    border-radius: 28px;
   }
 
   .claude-home__hero-panel,
   .claude-home__track,
   .claude-home__highlight {
-    padding: 18px 20px;
-    border-radius: 16px;
+    padding: 24px 28px;
+    border-radius: 20px;
   }
 
   .claude-home__title {
@@ -598,15 +595,15 @@ body {
 
 .section-landing,
 .overview-landing {
-  padding: 16px 0 56px;
+  padding: 32px 20px 64px;
 }
 
 .section-landing__hero,
 .overview-landing__hero {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .overview-landing__hero {
@@ -615,21 +612,24 @@ body {
 
 .section-landing__copy,
 .section-landing__panel,
+.overview-landing__copy,
 .section-landing__card {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--site-panel-border);
-  border-radius: 22px;
+  border-radius: 32px;
   background: var(--site-surface);
   box-shadow: var(--site-shadow);
 }
 
 .section-landing__copy,
+.overview-landing__copy,
 .section-landing__panel {
-  padding: 28px 32px;
+  padding: 40px 48px;
 }
 
 .section-landing__copy::before,
+.overview-landing__copy::before,
 .section-landing__panel::before,
 .section-landing__card::before {
   content: '';
@@ -645,8 +645,8 @@ body {
   position: relative;
   z-index: 1;
   max-width: 56rem;
-  margin: 14px 0 0;
-  font-size: 0.95rem;
+  margin: 18px 0 0;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--vp-c-text-2);
 }
@@ -656,17 +656,17 @@ body {
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 28px;
 }
 
 .section-landing__panel-label {
   position: relative;
   z-index: 1;
-  margin: 0 0 12px;
-  font-size: 0.7rem;
+  margin: 0 0 16px;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--vp-c-text-3);
 }
@@ -685,7 +685,7 @@ body {
 
 .section-landing__scope li,
 .section-landing__timeline li {
-  padding: 10px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--vp-c-divider);
   font-size: 0.9rem;
   color: var(--vp-c-text-2);
@@ -693,33 +693,34 @@ body {
 }
 
 .section-landing__heading {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .section-landing__heading h2 {
   margin: 0;
   font-family: var(--site-serif);
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.05;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.1;
   letter-spacing: -0.04em;
   color: var(--vp-c-text-1);
 }
 
 .section-landing__docs,
 .overview-landing__section {
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .section-landing__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 20px;
 }
 
 .section-landing__card {
   display: block;
-  min-height: 160px;
-  padding: 20px 22px;
+  min-height: 180px;
+  padding: 32px 36px;
+  border-radius: 24px;
   text-decoration: none;
   transition:
     transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
@@ -795,13 +796,18 @@ body {
 @media (max-width: 768px) {
   .section-landing,
   .overview-landing {
-    padding: 8px 0 44px;
+    padding: 16px 0 56px;
   }
 
   .section-landing__copy,
-  .section-landing__panel,
+  .overview-landing__copy,
+  .section-landing__panel {
+    border-radius: 24px;
+    padding: 24px 28px;
+  }
+
   .section-landing__card {
-    border-radius: 16px;
-    padding: 18px 20px;
+    border-radius: 20px;
+    padding: 24px 28px;
   }
 }

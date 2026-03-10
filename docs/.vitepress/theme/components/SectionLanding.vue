@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 interface LinkItem {
   title: string
   description: string
@@ -25,13 +27,13 @@ defineProps<{
         <h1 class="section-landing__title">{{ title }}</h1>
         <p class="section-landing__intro">{{ intro }}</p>
         <div class="section-landing__actions">
-          <a class="claude-home__button claude-home__button--primary" :href="primary.href">
+          <a class="claude-home__button claude-home__button--primary" :href="withBase(primary.href)">
             {{ primary.title }}
           </a>
           <a
             v-if="secondary"
             class="claude-home__button claude-home__button--secondary"
-            :href="secondary.href"
+            :href="withBase(secondary.href)"
           >
             {{ secondary.title }}
           </a>
@@ -53,7 +55,12 @@ defineProps<{
       </div>
 
       <div class="section-landing__grid">
-        <a v-for="item in docs" :key="item.title" :href="item.href" class="section-landing__card">
+        <a
+          v-for="item in docs"
+          :key="item.title"
+          :href="withBase(item.href)"
+          class="section-landing__card"
+        >
           <h3>{{ item.title }}</h3>
           <p>{{ item.description }}</p>
         </a>

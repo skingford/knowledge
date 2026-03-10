@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 interface Entry {
   title: string
   description: string
@@ -29,7 +31,12 @@ defineProps<{
         <h2>按方向进入</h2>
       </div>
       <div class="section-landing__grid">
-        <a v-for="item in tracks" :key="item.title" :href="item.href" class="section-landing__card">
+        <a
+          v-for="item in tracks"
+          :key="item.title"
+          :href="withBase(item.href)"
+          class="section-landing__card"
+        >
           <h3>{{ item.title }}</h3>
           <p>{{ item.description }}</p>
         </a>
@@ -42,7 +49,12 @@ defineProps<{
         <h2>按目标选择入口</h2>
       </div>
       <div class="section-landing__grid">
-        <a v-for="item in goals" :key="item.title" :href="item.href" class="section-landing__card">
+        <a
+          v-for="item in goals"
+          :key="item.title"
+          :href="withBase(item.href)"
+          class="section-landing__card"
+        >
           <h3>{{ item.title }}</h3>
           <p>{{ item.description }}</p>
         </a>
