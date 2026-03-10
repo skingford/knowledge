@@ -196,6 +196,7 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/nav.md",
     "architect/yw.md",
     "yw.md",
     "node_modules/is-what/dist/isWeakSet.js",
@@ -231,7 +232,6 @@
     "node_modules/mitt/README.md",
     "node_modules/preact/README.md",
     "node_modules/@docsearch/react/README.md",
-    "node_modules/vitepress-plugin-tabs/README.md",
     "article/Untitled.canvas",
     "article/Untitled 1.canvas"
   ]

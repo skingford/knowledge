@@ -30,6 +30,7 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
+      { text: '快速导航', link: '/nav' },
       { text: '学习导航', link: '/learning-overview' },
       { text: 'AI / Agent', link: '/ai/' },
       { text: '架构', link: '/architecture/' },
