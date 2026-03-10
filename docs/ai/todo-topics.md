@@ -11,10 +11,11 @@
 - 多 Agent 适用场景
 - Memory 设计方法
 - 结构化输出最佳实践
-- Agent 日志与可观测性
+- Agent 日志与可观测性（概念已在知识地图覆盖，待补独立专题）
 - 模型、工具、知识库协同方式
 - 工作流型 Agent 实战案例
 - Fine-tuning 入门边界
+- 向量数据库选型对比（Milvus / pgvector / Weaviate / Qdrant）
 
 ## 可后续补充
 
@@ -34,3 +35,4 @@
 - RAG 基础 → [RAG 基础与工作流](./rag-basics-and-workflow.md)
 - Agent 学习路径与顺序 → [Agent 学习综合指南](./agent-learning-guide.md)
 - 7 天实操计划 → [7 天 Agent 学习路线](./agent-learning-roadmap.md)
+- 技术栈与工具全景（后端、存储、部署、安全、监控）→ [LLM Agent 必学知识地图](./knowledge-map.md)

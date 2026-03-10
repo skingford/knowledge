@@ -196,6 +196,12 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/learning-overview.md",
+    "docs/golang/index.md",
+    "docs/architecture/index.md",
+    "docs/ai/index.md",
+    "docs/index.md",
+    "docs/ai/knowledge-map.md",
     "docs/nav.md",
     "architect/yw.md",
     "yw.md",
@@ -226,12 +232,6 @@
     "node_modules/@algolia/autocomplete-plugin-algolia-insights/README.md",
     "node_modules/@algolia/autocomplete-core/README.md",
     "node_modules/@algolia/abtesting/README.md",
-    "node_modules/superjson/README.md",
-    "node_modules/speakingurl/README.md",
-    "node_modules/speakingurl/CHANGELOG.md",
-    "node_modules/mitt/README.md",
-    "node_modules/preact/README.md",
-    "node_modules/@docsearch/react/README.md",
     "article/Untitled.canvas",
     "article/Untitled 1.canvas"
   ]

@@ -1,102 +1,21 @@
-# 学习导航总览
+---
+layout: page
+title: false
+aside: false
+outline: false
+pageClass: claude-home-page
+---
 
-## 使用方式
-
-- 想看系统设计和架构治理，优先走 `architecture/`
-- 想学 Agent、LLM 应用和工作流，优先走 `ai/`
-- 想做 Go 进阶、性能和能力自检准备，优先走 `golang/`
-
-## 按方向进入
-
-### 架构方向
-
-- 目录入口：[架构方向](./architecture/)
-- 核心入口：[架构师学习路线](./architecture/architect-learning-roadmap.md)
-- 适合：后端开发、技术负责人候选人、架构岗准备
-
-### AI / Agent 方向
-
-- 目录入口：[AI / Agent 方向](./ai/)
-- 核心入口：[Agent 学习综合指南](./ai/agent-learning-guide.md)
-- 适合：希望系统入门 Agent 和 LLM 应用开发的工程师
-
-### Golang 方向
-
-- 目录入口：[Golang 方向](./golang/)
-- 核心入口：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-- 适合：Go 后端、高级开发、性能与能力自检准备
-
-## 按用途进入
-
-### 想先看路线图
-
-- 架构：[架构师学习路线](./architecture/architect-learning-roadmap.md)
-- AI：[Agent 学习综合指南](./ai/agent-learning-guide.md)
-- Go：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-
-### 想直接看能力自检资料
-
-- 架构：[架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- Go：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-- Go 高频题：[30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
-
-### 想看专题补充
-
-- 架构：[高并发系统设计清单](./architecture/high-concurrency-system-checklist.md)
-- AI：[Tool Calling 设计清单](./ai/tool-calling-design-checklist.md)
-- AI：[RAG 基础与工作流](./ai/rag-basics-and-workflow.md)
-- Go：[Pprof 排障指南](./golang/pprof-troubleshooting-guide.md)
-- Go：[Context 使用边界](./golang/context-usage-boundaries.md)
-
-## 按目标选择
-
-### 想提升系统设计能力
-
-- 入口文档：[架构师学习路线](./architecture/architect-learning-roadmap.md)
-- 补充文档：[高并发系统设计清单](./architecture/high-concurrency-system-checklist.md)
-- 补充文档：[分布式事务方案对比](./architecture/distributed-transaction-comparison.md)
-- 适合：后端开发、技术负责人候选人、架构岗准备
-- 重点：分布式、高可用、治理、架构演进
-
-### 想快速入门 Agent 开发
-
-- 入口文档：[Agent 学习综合指南](./ai/agent-learning-guide.md)
-- 入口文档：[7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
-- 补充文档：[Tool Calling 设计清单](./ai/tool-calling-design-checklist.md)
-- 补充文档：[RAG 基础与工作流](./ai/rag-basics-and-workflow.md)
-- 适合：希望短周期上手 AI Agent 的工程师
-- 重点：Tool Calling、Workflow、RAG、Eval
-
-### 想强化 Go 高级能力
-
-- 入口文档：[高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-- 补充文档：[Pprof 排障指南](./golang/pprof-troubleshooting-guide.md)
-- 补充文档：[Context 使用边界](./golang/context-usage-boundaries.md)
-- 适合：Go 后端、高级开发、能力自检准备
-- 重点：底层原理、并发、性能、排障、源码
-
-## 推荐阅读顺序
-
-### 后端成长路线
-
-1. [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-2. [架构师学习路线](./architecture/architect-learning-roadmap.md)
-3. [Agent 学习综合指南](./ai/agent-learning-guide.md)
-
-### AI 应用开发路线
-
-1. [Agent 学习综合指南](./ai/agent-learning-guide.md)
-2. [7 天 Agent 学习路线](./ai/agent-learning-roadmap.md)
-3. [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
-
-## 当前规模
-
-- 架构方向：路线、书单、能力自检清单、专题文档
-- AI / Agent 方向：综合指南、学习路线、Tool Calling、RAG
-- Golang 方向：学习资料、能力自检大纲、题库、模板、源码、代码示例、资源清单
-
-## 文档维护约定
-
-- 新文档优先放在 `docs/` 的对应主题子目录下，并使用英文语义化文件名
-- 标题和正文用中文，方便直接阅读和继续扩写
-- 尽量沿用统一模板：适合人群、学习目标、路线、实践、资料、复盘模板
+<OverviewLanding
+  :tracks="[
+    { title: '架构方向', href: '/architecture/', description: '适合后端开发、技术负责人候选人和架构岗准备，主线是系统设计、治理和分布式能力。' },
+    { title: 'AI / Agent 方向', href: '/ai/', description: '适合希望系统入门 Agent 和 LLM 应用开发的工程师，重点是 Agent、Tool Calling、RAG 与 workflow。' },
+    { title: 'Golang 方向', href: '/golang/', description: '适合 Go 后端和高级开发，重点覆盖语言机制、并发、性能和工程实践。' }
+  ]"
+  :goals="[
+    { title: '想先看路线图', href: '/architecture/architect-learning-roadmap', description: '先从架构路线开始，再延伸到 AI 或 Go 的专题。' },
+    { title: '想快速入门 Agent 开发', href: '/ai/agent-learning-guide', description: '先建立 Agent 全局认知，再展开 Tool Calling 和 RAG。' },
+    { title: '想强化 Go 高级能力', href: '/golang/golang-advanced-learning-guide', description: '从主线资料切入，再补性能、排障和高频题。' },
+    { title: '想做能力自检准备', href: '/architecture/architect-interview-prep-checklist', description: '架构和 Go 都提供适合阶段复盘或面试准备的清单和题目。' }
+  ]"
+/>

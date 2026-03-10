@@ -8,7 +8,7 @@ export default defineConfig({
 
   base: '/knowledge/',
   lastUpdated: true,
-  appearance: 'dark',
+  appearance: true,
 
   head: [
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
@@ -17,8 +17,20 @@ export default defineConfig({
       'link',
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap',
       },
+    ],
+    [
+      'script',
+      {},
+      `(() => {
+        const key = 'vitepress-theme-appearance'
+        const saved = localStorage.getItem(key)
+        if (!saved) {
+          localStorage.setItem(key, 'dark')
+          document.documentElement.classList.add('dark')
+        }
+      })();`,
     ],
   ],
 

@@ -15,6 +15,7 @@
 
 ## 快速导航
 
+- [LLM Agent 工程师的核心工作](#llm-agent-工程师的核心工作)
 - [为什么分成 LLM 和 Agent 两部分学](#为什么分成-llm-和-agent-两部分学)
 - [第一阶段：LLM 基础](#第一阶段llm-基础)
 - [第二阶段：Agent 核心 5 个概念](#第二阶段agent-核心-5-个概念)
@@ -24,9 +25,32 @@
 - [Eval 评测基本方法](#eval-评测基本方法)
 - [推荐学习顺序](#推荐学习顺序)
 - [推荐学习资料](#推荐学习资料)
+- [推荐技术栈](#推荐技术栈)
 - [推荐框架](#推荐框架)
 - [练手项目建议](#练手项目建议)
+- [判断是否真正入门](#判断是否真正入门)
 - [常见误区](#常见误区)
+- [实用建议](#实用建议)
+
+---
+
+## LLM Agent 工程师的核心工作
+
+**核心定位**：LLM Agent 工程师的核心不是"训练大模型"，而是"让大模型稳定地完成任务"。
+
+**典型工作内容**：
+
+- 提示词设计（Prompt Engineering）
+- 工具调用设计（Tool Calling）
+- 工作流编排（Workflow Orchestration）
+- 记忆与检索（Memory / RAG）
+- 评测与改进（Evaluation）
+- 上线部署（Deployment）
+- 成本与安全控制（Cost / Guardrails）
+
+**通俗理解**：你是在做"大模型驱动的软件系统"，而不只是聊天机器人。
+
+**关键词速览**：`Prompt` · `Tool Use` · `RAG` · `Agent Loop` · `Workflow` · `Evaluation` · `Guardrails` · `Observability`
 
 ---
 
@@ -109,6 +133,18 @@
 - 把步骤放进稳定可控的流程里
 - 用于控制状态、路由、重试、失败兜底和人工接管
 - 固定流程、状态机、人工兜底
+
+### 工程师视角：最核心的 5 件技能
+
+从"要学会做什么"的角度看，第二阶段对应 5 项工程能力：
+
+| 技能 | 核心目标 |
+|------|----------|
+| **Prompt Engineering** | 写出稳定、可控、可测试的提示词 |
+| **Tool Calling** | 让模型调用搜索、数据库、代码执行、浏览器等工具 |
+| **RAG** | 让模型基于外部知识回答，而不是纯靠参数记忆 |
+| **Workflow / Orchestration** | 多步骤任务编排，控制状态、路由、重试与兜底 |
+| **Evaluation** | 量化判断 Agent 效果是否真的变好了 |
 
 ---
 
@@ -223,6 +259,17 @@
 8. 补 Eval、Memory
 9. 最后看 Multi-agent
 
+### 两周冲刺版
+
+| 时间 | 任务 |
+|------|------|
+| 第 1-2 天 | 理解 LLM、Prompt、Tool Calling 基础 |
+| 第 3-4 天 | 调 API，做结构化输出 |
+| 第 5-7 天 | 做一个最小 RAG demo |
+| 第 8-10 天 | 加工具调用，做简单 Agent Loop |
+| 第 11-12 天 | 加日志、评估、错误处理 |
+| 第 13-14 天 | 整理成一个能展示的项目，写 README 和架构图 |
+
 ---
 
 ## 推荐学习资料
@@ -230,14 +277,30 @@
 ### 官方文档
 
 - **OpenAI Docs**：重点看 Tool Calling、Structured Outputs、Responses、Agent Patterns
-- **Anthropic Docs**：重点看 Tool Use、Building Effective Agents、Context Engineering
+- **OpenAI Cookbook**：实战示例，覆盖 RAG、Agent、评测等典型场景
+- **Anthropic Docs**：重点看 Tool Use、Building Effective Agents、Context Engineering、Prompt Engineering 文档
 - **LangGraph Docs**：很适合学习工作流型 Agent，理解状态、节点、路由、人工介入
+- **LlamaIndex Docs**：偏 RAG / 知识库方向，检索生态完整
+- **Microsoft AutoGen Docs**：多 Agent 协作框架，适合了解 multi-agent 编排模式
 - **Hugging Face**：适合补 Transformer、NLP、Embeddings、RAG 基础
+
+### RAG 与检索资源
+
+- **Pinecone / Weaviate / Qdrant 官方博客和教程**：向量数据库选型与使用实践
+- 重点不是背概念，而是知道**检索效果差通常出在哪**：切分、召回、重排、上下文拼接
+- 搜索关键词：`RAG chunking`、`reranking`、`hybrid search`、`RAG evaluation`
+
+### 评估与工程化工具
+
+- **promptfoo**：做 Prompt 和输出评测很实用，支持批量测试和版本对比
+- **LangSmith**：查看 Agent 调用链路、定位失败点，可观测性强
+- **Arize / Humanloop / Braintrust**：LLM eval 评测体系，适合进阶了解
 
 ### 视频与课程
 
 - DeepLearning.AI 的 LLM / Agent 相关短课
-- Andrej Karpathy 的 LLM / Tokenizer / Transformer 视频
+- Andrej Karpathy 的 LLM / Tokenizer / Transformer 视频：适合建立整体认知，理解底层原理
+- Jay Alammar 的图解 Transformer / Embedding 文章：适合补原理，图示清晰易懂
 - YouTube 搜索：`build ai agent from scratch`、`langgraph tutorial`、`tool calling tutorial`
 
 ### 实战建议
@@ -245,6 +308,31 @@
 - 找 GitHub 上最小可运行 Demo，自己改一遍，比只看文章有效
 - 看官方 Quickstart、Cookbook / Examples
 - "How to build agents" 类技术博客
+
+---
+
+## 推荐技术栈
+
+> 如果你想最快找到工作，根据自己的语言偏好选一条路线深入，不要两条并行。
+
+### 路线 A：Python 栈
+
+- Python + FastAPI
+- LangGraph / LlamaIndex
+- PostgreSQL + Redis
+- pgvector 或 Qdrant
+- Docker
+
+### 路线 B：TypeScript 栈
+
+- TypeScript + Node.js
+- Next.js / Express / NestJS
+- Vercel AI SDK 或 OpenAI SDK
+- LangChain JS
+- PostgreSQL + Redis
+- Docker
+
+> 如果你偏"Agent 工程"而不是"算法研究"，重点是：API 调用能力、工作流编排、检索增强、评估与调试、产品落地能力。
 
 ---
 
@@ -259,10 +347,20 @@
 
 - 生态广，但不要一开始学太杂
 
+### LlamaIndex
+
+- 偏 RAG / 知识库方向
+- 检索生态完整，适合文档问答类 Agent
+
 ### CrewAI / AutoGen
 
 - 适合了解多 Agent 协作
 - 先知道即可，不建议开局重度依赖
+
+### OpenAI Agents SDK
+
+- OpenAI 官方 Agent 框架，轻量，深度整合 OpenAI 工具生态
+- 适合已在 OpenAI 生态的项目
 
 ### DSPy
 
@@ -277,32 +375,47 @@
 
 ## 练手项目建议
 
-### 搜索 Agent
+> **核心原则**：做 3 个小项目，比看 30 篇文章更有效。每做一个项目，都主动补一块短板（提示词、检索、工具、评测、部署）。
+
+### 搜索 Agent（补：Prompt + Tool Calling）
 
 - 用户提问 -> 联网搜索 -> 总结答案
 
-### RAG Agent
+### RAG Agent（补：RAG + 知识库构建）
 
 - 读取本地文档或 PDF -> 检索 -> 回答
 
-### 办公 Agent
+### 办公 Agent（补：Workflow + 错误处理）
 
 - 天气、日历、提醒、消息发送
 
-### 数据 Agent
+### 数据 Agent（补：结构化输出 + 评测）
 
 - 查表、汇总、输出日报
 
 ### 进阶项目
 
-- 一个带长期记忆的个人助理
-- 一个能自己分解任务并调用脚本执行的 Coding / Task Agent
+- 一个带长期记忆的个人助理（补：Memory 设计）
+- 一个能自己分解任务并调用脚本执行的 Coding / Task Agent（补：Planning + Observability）
+
+---
+
+## 判断是否真正入门
+
+如果你能独立完成下面几件事，就算入门了：
+
+- [ ] 能调用大模型 API，并稳定输出 JSON
+- [ ] 能接一个搜索 / 数据库 / 网页工具给模型用
+- [ ] 能做一个基础 RAG 系统
+- [ ] 能记录 Agent 每一步调用日志
+- [ ] 能设计至少 3 组评测样例验证效果
+- [ ] 能说清楚"为什么这个 Agent 会失败"
 
 ---
 
 ## 常见误区
 
-- 只学 Prompt，不学系统设计
+- 只学 Prompt，不学工程化
 - 只追求多 Agent，不做单 Agent 落地
 - 不做评测，靠感觉判断效果
 - 把所有问题都交给模型，不做规则和边界控制
@@ -311,6 +424,20 @@
 - 工具权限不给边界
 - 没有失败兜底和人工接管
 - 不做测试，不知道 Agent 为什么失败
+- 迷信复杂 Agent，忽略简单工作流往往更稳定
+- 一上来就追最新框架，结果没做出东西
+- 只看 demo，不做评估
+- 把"模型变聪明"和"系统更可靠"混为一谈
+
+---
+
+## 实用建议
+
+- 先做能跑的小系统，再追求复杂架构
+- 优先学"可观测性 + 评估"，这是工程师和玩票用户的分水岭
+- 多看官方文档，少看搬运二手总结
+- 每学一个概念，都要落到项目里验证
+- 招聘里最加分的不是"懂多少名词"，而是"做过能展示的 Agent 项目"
 
 ---
 

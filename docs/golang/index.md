@@ -1,28 +1,39 @@
-# Golang 方向
+---
+layout: page
+title: false
+aside: false
+outline: false
+pageClass: claude-home-page
+---
 
-## 当前文档
-
-- [高级 Golang 学习资料](./golang-advanced-learning-guide.md)
-- [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)（含源码与原理线索）
-- [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
-- [Go 推荐书单、博客与视频资料](./golang-recommended-resources.md)
-- [Pprof 排障指南](./pprof-troubleshooting-guide.md)
-- [Context 使用边界](./context-usage-boundaries.md)
-- [待补主题清单](./todo-topics.md)
-
-## 收纳范围
-
-- Go 语言底层
-- 并发模型
-- 性能优化与排障
-- 服务端工程实践
-- 源码阅读与能力自检准备
-
-## 推荐阅读顺序
-
-1. [高级 Golang 学习资料](./golang-advanced-learning-guide.md)
-2. [Go 推荐书单、博客与视频资料](./golang-recommended-resources.md)
-3. [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)（含源码与原理线索）
-4. [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
-5. [Pprof 排障指南](./pprof-troubleshooting-guide.md)
-6. [Context 使用边界](./context-usage-boundaries.md)
+<SectionLanding
+  eyebrow="Golang"
+  title="Golang 方向"
+  intro="从语言机制、并发与性能，到服务端工程实践和能力自检，把 Go 进阶学习从零散资料整理成一条连续路径。"
+  :primary="{ title: '高级资料', href: '/golang/golang-advanced-learning-guide', description: '先走主线。' }"
+  :secondary="{ title: '高频题', href: '/golang/go-top-30-interview-questions', description: '再做自检。' }"
+  :scope="[
+    'Go 语言底层',
+    '并发模型',
+    '性能优化与排障',
+    '服务端工程实践',
+    '源码阅读与能力自检准备'
+  ]"
+  :docs="[
+    { title: '高级 Golang 学习资料', href: '/golang/golang-advanced-learning-guide', description: '主入口文档，覆盖语言、并发、性能和工程实践。' },
+    { title: '30+ 高频 Golang 能力自检题', href: '/golang/go-top-30-interview-questions', description: '用问题驱动回顾知识盲区和底层理解。' },
+    { title: 'Golang 高频题代码片段', href: '/golang/go-interview-code-snippets', description: '配套示例代码，方便把抽象概念落到实现。' },
+    { title: 'Go 推荐书单与资料', href: '/golang/golang-recommended-resources', description: '补充阅读清单，便于继续深挖。' },
+    { title: 'Pprof 排障指南', href: '/golang/pprof-troubleshooting-guide', description: '针对性能定位和排障建立实操路径。' },
+    { title: 'Context 使用边界', href: '/golang/context-usage-boundaries', description: '厘清在 Go 服务里使用 Context 的边界和误区。' },
+    { title: '待补主题清单', href: '/golang/todo-topics', description: '查看计划补充的 Go 专题。' }
+  ]"
+  :order="[
+    '高级 Golang 学习资料',
+    'Go 推荐书单、博客与视频资料',
+    '30+ 高频 Golang 能力自检题',
+    'Golang 高频题代码片段',
+    'Pprof 排障指南',
+    'Context 使用边界'
+  ]"
+/>
