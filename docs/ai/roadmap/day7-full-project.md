@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 7：完整项目 —— 文档问答 Agent
 
 > 这是 7 天 Agent 学习路线的最后一天。我们将把 [Day 1](./day1-what-is-agent.md) 到 [Day 6](./day6-eval-safety.md) 学到的所有内容整合成一个完整的、可运行的项目。

@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 2：学会调用 LLM API
 
 > 7 天 Agent 学习路线 — 第 2 天 | [返回总览](../agent-learning-roadmap.md)

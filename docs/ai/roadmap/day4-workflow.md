@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 4：Workflow 设计 — 用流程控制代替完全自治
 
 > 目标：理解可控 Agent 的真实工程形态，掌握 Workflow、状态机、重试与兜底策略。

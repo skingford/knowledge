@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 1：什么是 Agent？
 
 ## 学习目标

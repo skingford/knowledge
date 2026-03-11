@@ -1,10 +1,11 @@
 :root {
-  --vp-font-family-base: 'Manrope', 'Noto Sans SC', ui-sans-serif, system-ui,
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --vp-font-family-base: 'SF Pro Text', 'SF Pro SC', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif;
   --vp-font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-  --site-serif: 'Noto Serif SC', Georgia, serif;
+  --site-serif: 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Source Han Serif SC',
+    'SimSun', serif;
 
   --vp-c-brand-1: #d46f4d;
   --vp-c-brand-2: #bf623f;
@@ -72,7 +73,7 @@
   --vp-c-gray-1: #3d342e;
   --vp-c-gray-2: #5a4e46;
   --vp-c-gray-3: #85766b;
-  --vp-c-divider: rgba(234, 219, 200, 0.12);
+  --vp-c-divider: rgba(234, 219, 200, 0.16);
   --vp-c-gutter: rgba(234, 219, 200, 0.1);
 
   --vp-c-text-1: #f6ede1;
@@ -117,6 +118,10 @@ body {
   background: var(--site-bg);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   overflow-x: hidden;
   color: var(--vp-c-text-1);
@@ -157,14 +162,17 @@ body:has(#VPNavScreen) {
 }
 
 .VPNavBarTitle .title {
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--site-serif);
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
 .VPNavBarMenuLink,
 .VPNavBarMenuGroup .button,
 .VPNavBarAppearance .text {
   color: var(--vp-c-text-2) !important;
+  font-weight: 550;
+  letter-spacing: 0.01em;
 }
 
 .VPNavBarMenuLink:hover,
@@ -177,13 +185,32 @@ body:has(#VPNavScreen) {
   min-width: 128px;
   border-radius: 999px !important;
   padding: 0 20px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.01em;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
   box-shadow: none !important;
 }
 
 .VPButton.medium {
   line-height: 40px !important;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 24%, transparent);
+  color: var(--vp-c-text-1);
+}
+
+:is(a, button, summary, input, select, textarea, [tabindex]):focus-visible,
+.VPButton:focus-visible,
+.claude-home__button:focus-visible,
+.claude-home__track:focus-visible,
+.claude-home__highlight:focus-visible,
+.section-landing__card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--vp-c-brand-1) 72%, white 12%);
+  outline-offset: 3px;
+}
+
+:target {
+  scroll-margin-top: calc(var(--vp-nav-height) + 24px);
 }
 
 .vp-doc {
@@ -203,8 +230,10 @@ body:has(#VPNavScreen) {
 .vp-doc h1 {
   margin-top: 8px;
   font-size: clamp(1.75rem, 3.2vw, 2.4rem);
-  line-height: 1.1;
-  letter-spacing: -0.035em;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 .vp-doc h2 {
@@ -212,23 +241,32 @@ body:has(#VPNavScreen) {
   border-top: 1px solid var(--vp-c-divider);
   padding-top: 20px;
   font-size: 1.35rem;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 .vp-doc h3 {
   font-size: 1.1rem;
-  letter-spacing: -0.015em;
+  letter-spacing: 0;
+  font-weight: 650;
 }
 
 .vp-doc p,
 .vp-doc li {
   font-size: 1rem;
-  line-height: 1.9;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
 
 .vp-doc strong {
   color: var(--vp-c-text-1);
+}
+
+.vp-doc ul > li::marker,
+.vp-doc ol > li::marker {
+  color: var(--vp-c-brand-2);
 }
 
 .vp-doc a {
@@ -504,6 +542,18 @@ body:has(#VPNavScreen) {
     radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.03), transparent 26%);
 }
 
+.dark .vp-doc h1,
+.dark .vp-doc h2,
+.dark .claude-home__title,
+.dark .claude-home__section-heading h2,
+.dark .section-landing__title,
+.dark .section-landing__heading h2,
+.dark .claude-home__track-title,
+.dark .claude-home__highlight-title,
+.dark .section-landing__card h3 {
+  color: #fbf2e8;
+}
+
 .claude-home__hero-panel {
   padding: 40px 48px;
   border-radius: 32px;
@@ -518,10 +568,11 @@ body:has(#VPNavScreen) {
   z-index: 1;
   margin: 0 0 16px;
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-weight: 650;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--vp-c-text-3);
+  opacity: 0.9;
 }
 
 .claude-home__title,
@@ -538,9 +589,11 @@ body:has(#VPNavScreen) {
 
 .claude-home__title,
 .section-landing__title {
-  font-size: clamp(1.6rem, 7vw, 4rem);
-  line-height: 0.96;
-  letter-spacing: -0.05em;
+  font-size: clamp(1.6rem, 6.4vw, 3.7rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 .claude-home__subtitle {
@@ -549,7 +602,8 @@ body:has(#VPNavScreen) {
   max-width: 580px;
   margin: 24px 0 0;
   font-size: 1.05rem;
-  line-height: 1.9;
+  line-height: 1.82;
+  letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
 
@@ -572,7 +626,8 @@ body:has(#VPNavScreen) {
   border-radius: 999px;
   border: 1px solid transparent;
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 580;
+  letter-spacing: 0.01em;
   text-decoration: none;
   transition:
     transform 0.25s ease,
@@ -653,7 +708,7 @@ body:has(#VPNavScreen) {
 
 .claude-home__track {
   min-height: 220px;
-  padding: 32px 36px;
+  padding: 30px 34px;
   border-radius: 24px;
 }
 
@@ -664,9 +719,10 @@ body:has(#VPNavScreen) {
 }
 
 .claude-home__track-title {
-  font-size: 1.45rem;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  font-size: 1.38rem;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 700;
 }
 
 .claude-home__track-description,
@@ -675,7 +731,8 @@ body:has(#VPNavScreen) {
   z-index: 1;
   margin: 12px 0 0;
   font-size: 0.92rem;
-  line-height: 1.8;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
 
@@ -701,10 +758,10 @@ body:has(#VPNavScreen) {
 }
 
 .claude-home__section-heading h2 {
-  max-width: 16ch;
   font-size: clamp(1.8rem, 4vw, 2.8rem);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .claude-home__highlight-grid {
@@ -713,14 +770,15 @@ body:has(#VPNavScreen) {
 
 .claude-home__highlight {
   min-height: 180px;
-  padding: 32px 36px;
+  padding: 30px 34px;
   border-radius: 24px;
 }
 
 .claude-home__highlight-title {
-  font-size: 1.15rem;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  font-size: 1.12rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
 @media (max-width: 1100px) {
@@ -866,7 +924,8 @@ body:has(#VPNavScreen) {
   max-width: 56rem;
   margin: 18px 0 0;
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.78;
+  letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
 
@@ -884,8 +943,8 @@ body:has(#VPNavScreen) {
   z-index: 1;
   margin: 0 0 16px;
   font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-weight: 650;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--vp-c-text-3);
 }
@@ -919,9 +978,10 @@ body:has(#VPNavScreen) {
   margin: 0;
   font-family: var(--site-serif);
   font-size: clamp(1.8rem, 4vw, 2.6rem);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
   color: var(--vp-c-text-1);
+  text-wrap: balance;
 }
 
 .section-landing__docs,
@@ -938,7 +998,7 @@ body:has(#VPNavScreen) {
 .section-landing__card {
   display: block;
   min-height: 180px;
-  padding: 32px 36px;
+  padding: 30px 34px;
   border-radius: 24px;
   text-decoration: none;
   transition:
@@ -957,7 +1017,9 @@ body:has(#VPNavScreen) {
   margin: 0;
   font-family: var(--site-serif);
   font-size: 1.15rem;
-  line-height: 1.2;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  font-weight: 700;
   color: var(--vp-c-text-1);
 }
 
@@ -966,7 +1028,8 @@ body:has(#VPNavScreen) {
   z-index: 1;
   margin: 10px 0 0;
   font-size: 0.88rem;
-  line-height: 1.75;
+  line-height: 1.72;
+  letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
 
@@ -1056,5 +1119,27 @@ body:has(#VPNavScreen) {
   .section-landing__card {
     padding-left: 20px;
     padding-right: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .claude-home__button:hover,
+  .claude-home__track:hover,
+  .claude-home__highlight:hover,
+  .section-landing__card:hover {
+    transform: none;
   }
 }

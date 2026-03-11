@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 5：RAG 与记忆系统
 
 > 7 天 Agent 学习路线 — 第 5 天

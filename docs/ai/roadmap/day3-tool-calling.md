@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 3：Tool Calling / Function Calling
 
 ## 今日目标

@@ -172,7 +172,6 @@ export const sections: SectionConfig[] = [
         { title: 'Go 推荐书单与资料', href: '/golang/golang-recommended-resources', description: '补充阅读清单，便于继续深挖。' },
         { title: 'Pprof 排障指南', href: '/golang/pprof-troubleshooting-guide', description: '针对性能定位和排障建立实操路径。' },
         { title: 'Context 使用边界', href: '/golang/context-usage-boundaries', description: '厘清在 Go 服务里使用 Context 的边界和误区。' },
-        { title: '待补主题清单', href: '/golang/todo-topics', description: '查看计划补充的 Go 专题。' },
       ],
       order: [
         '高级 Golang 学习资料',
@@ -194,7 +193,6 @@ export const sections: SectionConfig[] = [
           { text: '推荐书单与资源', link: '/golang/golang-recommended-resources' },
           { text: 'Pprof 排障指南', link: '/golang/pprof-troubleshooting-guide' },
           { text: 'Context 使用边界', link: '/golang/context-usage-boundaries' },
-          { text: '待补主题清单', link: '/golang/todo-topics' },
         ],
       },
       {
@@ -210,6 +208,24 @@ export const sections: SectionConfig[] = [
           { text: '七、性能优化与排障', link: '/golang/guide/07-performance-troubleshooting' },
           { text: '八、微服务与分布式', link: '/golang/guide/08-microservices-distributed' },
           { text: '九、源码与 Runtime', link: '/golang/guide/09-runtime-source' },
+        ],
+      },
+      {
+        text: '网络编程与标准库拆分专题',
+        collapsed: true,
+        items: [
+          { text: 'HTTP 服务端、客户端与 TCP/UDP', link: '/golang/guide/04-http-server-client-tcp-udp' },
+          { text: '连接池、超时、重试与限流', link: '/golang/guide/04-connection-timeout-retry-rate-limit' },
+          { text: '中间件、JSON 编解码与文件 IO', link: '/golang/guide/04-middleware-json-io' },
+        ],
+      },
+      {
+        text: '工程实践拆分专题',
+        collapsed: true,
+        items: [
+          { text: '项目结构、依赖管理、日志与配置', link: '/golang/guide/05-project-layout-deps-logging-config' },
+          { text: '错误码、中间件与代码规范', link: '/golang/guide/05-error-middleware-code-style' },
+          { text: '测试、Benchmark 与 CI/CD', link: '/golang/guide/05-testing-benchmark-cicd' },
         ],
       },
       {

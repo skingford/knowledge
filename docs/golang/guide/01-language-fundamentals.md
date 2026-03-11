@@ -179,10 +179,16 @@ func main() {
 	sub[0] = 99
 	fmt.Println("origin:", origin) // [1 99 3 4 5]
 
+	// 不限制 cap 时，append 可能覆盖原底层数组后续元素
+	original := []int{0, 1, 2, 3, 4}
+	s := original[1:3] // len=2, cap=4（容量一直延伸到 original 末尾）
+	s = append(s, 99)  // 直接写入底层数组索引 3
+	fmt.Println("original after append:", original) // [0 1 2 99 4]
+
 	// 安全切片：限制 cap 避免意外修改
-	safe := origin[1:3:3] // len=2, cap=2，append 时必定扩容
+	safe := original[1:3:3] // len=2, cap=2，append 时必定扩容
 	safe = append(safe, 100)
-	fmt.Println("origin after safe append:", origin) // 不受影响
+	fmt.Println("original after safe append:", original) // 保持不变
 
 	// === Map ===
 	m := map[string]int{
@@ -216,6 +222,92 @@ func main() {
 - Slice 三要素：指针、len、cap；用 `s[low:high:max]` 三下标切片可限制 cap，防止意外共享
 - Map 读取务必用 `v, ok := m[key]` 模式区分"键不存在"和"值为零值"
 - nil slice 可以 append，nil map 可以读但不能写（会 panic）
+
+### Slice 的坑：`append` 可能污染原底层数组
+
+切片最容易踩坑的点，不是读写共享本身，而是很多人以为 `append` 一定会返回一块新的内存。这个理解是错的。`append` 只有在容量不够时才会扩容；只要当前 `cap` 还够，它就会直接复用当前底层数组。
+
+#### 1. 不指定 `max` 时，`append` 可能覆盖后续元素
+
+当你写：
+
+```go
+original := []int{0, 1, 2, 3, 4}
+s := original[1:3]
+```
+
+此时：
+
+- `s` 的内容是 `[1, 2]`
+- `len(s) == 2`
+- `cap(s) == 4`
+
+原因是二下标切片 `original[1:3]` 的容量默认会从 `low` 一直延伸到底层数组末尾，也就是还能“看见”后面的 `3, 4`。
+
+这时如果执行：
+
+```go
+s = append(s, 99)
+```
+
+Go 会发现：
+
+- 当前 `len=2`
+- 当前 `cap=4`
+- 还有可用空间
+
+于是它不会分配新内存，而是直接把 `99` 写入底层数组中索引 `3` 的位置。结果就是原切片对应的底层数据被改了：
+
+```go
+fmt.Println(original) // [0 1 2 99 4]
+```
+
+这就是为什么很多 Go bug 看起来像“我明明只改了子切片，为什么原数据被污染了”。
+
+#### 2. 三指切片的保护作用：主动锁死容量
+
+如果你写成：
+
+```go
+safe := original[1:3:3]
+```
+
+这就是 The Three-Index Slice，也就是三下标切片 `s[low:high:max]`。
+
+这里的含义是：
+
+- `low = 1`
+- `high = 3`
+- `max = 3`
+
+所以：
+
+- `len = high - low = 2`
+- `cap = max - low = 2`
+
+也就是说，你人为把这个子切片的容量锁死成了和长度一样大。这样一来：
+
+```go
+safe = append(safe, 100)
+```
+
+Go 会发现：
+
+- `len=2`
+- `cap=2`
+- 容量已满
+
+为了完成 `append`，它只能申请一块新的内存，把原来的 `[1, 2]` 拷贝过去，再追加 `100`。这样新的 `safe` 就和 `original` 脱离关系了，原切片不会被覆盖：
+
+```go
+fmt.Println(original) // [0 1 2 3 4]
+```
+
+#### 3. 最佳实践
+
+- 当你只是想暴露某个子区间给下游读取或局部处理，但不希望对方 `append` 时污染原数据，优先使用三下标切片限制容量。
+- 当你明确需要隔离副作用时，直接复制一份新切片比依赖调用方自觉更安全：`cloned := append([]int(nil), original[1:3]...)`。
+- 只要子切片后面还有剩余容量，就要默认认为 `append` 可能改写原底层数组。
 
 ---
 

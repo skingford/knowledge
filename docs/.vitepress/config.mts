@@ -44,15 +44,6 @@ export default defineConfig({
 
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    [
-      'link',
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap',
-      },
-    ],
     ['meta', { name: 'theme-color', content: '#d46f4d' }],
     ['meta', { property: 'og:site_name', content: '学习知识库' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],

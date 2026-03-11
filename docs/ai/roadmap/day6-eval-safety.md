@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # Day 6：评测与安全
 
 > 7 天 Agent 学习路线第 6 天，目标：不要把 Demo 当产品。
