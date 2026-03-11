@@ -139,6 +139,19 @@ body {
   backdrop-filter: blur(14px);
 }
 
+.VPNavScreen {
+  background: color-mix(in srgb, var(--vp-c-bg) 96%, transparent) !important;
+  backdrop-filter: blur(18px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+html:has(.VPNavScreen),
+body:has(.VPNavScreen) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .VPNavBarTitle .title {
   font-weight: 700;
   letter-spacing: -0.02em;

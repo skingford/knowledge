@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="学习知识库封面图">
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#171311" />
+      <stop offset="55%" stop-color="#231f1a" />
+      <stop offset="100%" stop-color="#3a342d" />
+    </linearGradient>
+    <radialGradient id="glow" cx="20%" cy="10%" r="80%">
+      <stop offset="0%" stop-color="#f08d68" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#f08d68" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+
+  <g opacity="0.8">
+    <circle cx="1040" cy="120" r="180" fill="#f08d68" opacity="0.08" />
+    <circle cx="920" cy="520" r="220" fill="#d46f4d" opacity="0.08" />
+  </g>
+
+  <rect x="72" y="72" width="1056" height="486" rx="32" fill="rgba(255,251,245,0.04)" stroke="rgba(255,251,245,0.12)" />
+
+  <text x="96" y="172" fill="#f08d68" font-family="Manrope, 'Noto Sans SC', sans-serif" font-size="28" font-weight="700" letter-spacing="4">
+    A FOCUSED KNOWLEDGE BASE
+  </text>
+  <text x="96" y="286" fill="#f6ede1" font-family="'Noto Serif SC', serif" font-size="86" font-weight="700">
+    学习知识库
+  </text>
+  <text x="96" y="360" fill="#c5b8a9" font-family="'Noto Sans SC', sans-serif" font-size="34">
+    AI / Agent、架构设计、Golang、运维、工具
+  </text>
+  <text x="96" y="414" fill="#c5b8a9" font-family="'Noto Sans SC', sans-serif" font-size="34">
+    路线图、专题资料、能力自检入口
+  </text>
+
+  <g transform="translate(96 470)">
+    <rect width="224" height="52" rx="26" fill="#f4ede3" />
+    <text x="32" y="34" fill="#1c1714" font-family="Manrope, 'Noto Sans SC', sans-serif" font-size="24" font-weight="800">
+      skingford.github.io
+    </text>
+  </g>
+</svg>

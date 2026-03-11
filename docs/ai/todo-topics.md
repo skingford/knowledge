@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # AI / Agent 方向待补主题
 
 ## 已完成

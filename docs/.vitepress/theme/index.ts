@@ -1,4 +1,4 @@
-import DefaultTheme from 'vitepress/theme'
+import DefaultTheme from 'vitepress/theme-without-fonts'
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 import './custom.css'
 import QuickNav from './components/QuickNav.vue'
