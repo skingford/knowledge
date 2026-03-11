@@ -1994,7 +1994,7 @@ func main() {
   - `//go:build` 标签必须在文件第一行（或紧跟 `// Copyright` 注释之后），且与 `package` 声明之间有一个空行。
   - 新旧语法共存时，`gofmt` 会自动同步两种格式；Go 1.17+ 建议只写新语法。
   - 文件名约定的优先级低于显式标签——如果 `file_linux.go` 中有 `//go:build darwin`，则只在 darwin 编译。
-  - 使用 `go list -tags debug -f '{{.GoFiles}}' .` 可以查看特定标签下会编译哪些文件。
+  - 使用 <code v-pre>go list -tags debug -f '{{.GoFiles}}' .</code> 可以查看特定标签下会编译哪些文件。
 
 ---
 
