@@ -170,7 +170,7 @@ export const sections: SectionConfig[] = [
         '从语言机制、并发与性能，到服务端工程实践和能力自检，把 Go 进阶学习从零散资料整理成一条连续路径。',
       primary: { title: '高级资料', href: '/golang/golang-advanced-learning-guide', description: '先走主线。' },
       secondary: { title: '高频题', href: '/golang/go-top-30-interview-questions', description: '再做自检。' },
-      scope: ['Go 语言底层', '并发模型', '性能优化与排障', '服务端工程实践', '源码阅读与能力自检准备'],
+      scope: ['Go 语言底层', '并发模型', '性能优化与排障', '服务端工程实践', '源码阅读与能力自检准备', '设计模式与安全', '容器化与云原生', '代码生成与元编程'],
       docs: [
         { title: '高级 Golang 学习资料', href: '/golang/golang-advanced-learning-guide', description: '主入口文档，覆盖语言、并发、性能和工程实践。' },
         { title: '30+ 高频 Golang 能力自检题', href: '/golang/go-top-30-interview-questions', description: '用问题驱动回顾知识盲区和底层理解。' },
@@ -199,6 +199,7 @@ export const sections: SectionConfig[] = [
           { text: '推荐书单与资源', link: '/golang/golang-recommended-resources' },
           { text: 'Pprof 排障指南', link: '/golang/pprof-troubleshooting-guide' },
           { text: 'Context 使用边界', link: '/golang/context-usage-boundaries' },
+          { text: 'Go 版本特性总结', link: '/golang/go-version-features' },
         ],
       },
       {
@@ -214,6 +215,13 @@ export const sections: SectionConfig[] = [
           { text: '七、性能优化与排障', link: '/golang/guide/07-performance-troubleshooting' },
           { text: '八、微服务与分布式', link: '/golang/guide/08-microservices-distributed' },
           { text: '九、源码与 Runtime', link: '/golang/guide/09-runtime-source' },
+        ],
+      },
+      {
+        text: '并发编程拆分专题',
+        collapsed: true,
+        items: [
+          { text: '高级并发模式', link: '/golang/guide/03-advanced-concurrency-patterns' },
         ],
       },
       {
@@ -248,6 +256,16 @@ export const sections: SectionConfig[] = [
           { text: '项目结构、依赖管理、日志与配置', link: '/golang/guide/05-project-layout-deps-logging-config' },
           { text: '错误码、中间件与代码规范', link: '/golang/guide/05-error-middleware-code-style' },
           { text: '测试、Benchmark 与 CI/CD', link: '/golang/guide/05-testing-benchmark-cicd' },
+        ],
+      },
+      {
+        text: '进阶专题',
+        collapsed: true,
+        items: [
+          { text: '设计模式与惯用法', link: '/golang/guide/10-design-patterns-idioms' },
+          { text: '安全编程实践', link: '/golang/guide/10-security-practices' },
+          { text: '容器化与云原生', link: '/golang/guide/10-containerization-cloud-native' },
+          { text: '代码生成与元编程', link: '/golang/guide/10-codegen-metaprogramming' },
         ],
       },
       {

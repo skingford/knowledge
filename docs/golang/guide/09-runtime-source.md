@@ -21,6 +21,7 @@ search: false
 
 ## 快速导航
 
+- [0. 如何阅读 Go 源码](#_0-如何阅读-go-源码)
 - [1. runtime 包核心机制](#_1-runtime-包核心机制)
 - [2. Goroutine 调度源码](#_2-goroutine-调度源码)
 - [3. Channel 源码](#_3-channel-源码)
@@ -29,6 +30,124 @@ search: false
 - [6. net/http 源码](#_6-net-http-源码)
 - [7. Context 源码](#_7-context-源码)
 - [8. GC 相关源码入口](#_8-gc-相关源码入口)
+
+---
+
+## 0. 如何阅读 Go 源码
+
+在深入 runtime 之前，先掌握阅读源码的方法和工具，能事半功倍。
+
+### 源码获取方式
+
+```bash
+# 方式一：克隆仓库
+git clone https://github.com/golang/go
+cd go
+git checkout go1.23.0  # 切到稳定版本
+
+# 方式二：在线查看（推荐入门）
+# https://cs.opensource.google/go
+# 支持全局搜索、跳转定义、查看引用
+```
+
+**推荐阅读的 Go 版本**：建议从最新稳定版（如 Go 1.23）开始。runtime 代码在不同版本间会有重构，选择与你本地 `go version` 一致的版本，方便对照调试。
+
+### 目录结构导览
+
+```
+src/
+├── runtime/          # 核心运行时：调度器、GC、内存分配、Channel、Map
+│   ├── proc.go       # G-M-P 调度器核心
+│   ├── chan.go        # Channel 实现
+│   ├── map.go         # Map 实现
+│   ├── mgc.go        # GC 入口和触发逻辑
+│   ├── malloc.go     # 内存分配器
+│   ├── stack.go      # 栈管理和栈增长
+│   └── asm_amd64.s   # 汇编实现（上下文切换、系统调用等）
+├── sync/             # 同步原语：Mutex、WaitGroup、Once、Pool
+├── net/              # 网络库：TCP/UDP、HTTP
+├── context/          # Context 实现
+└── internal/         # 内部包，不对外暴露
+```
+
+### 入口查找方法
+
+当你想知道某个 Go 操作对应的 runtime 函数时，可以通过汇编反查：
+
+```bash
+# 方式一：用 go tool objdump 查看二进制中的函数调用
+go build -o myapp main.go
+go tool objdump -s "main.main" myapp
+
+# 方式二：用 -gcflags="-S" 直接查看编译生成的汇编
+go build -gcflags="-S" main.go 2>&1 | head -50
+
+# 方式三：用 go tool compile 查看 SSA 中间表示
+go tool compile -S main.go
+```
+
+例如，`ch <- val` 会被编译为 `runtime.chansend1`，`m[key]` 会被编译为 `runtime.mapaccess1`，通过汇编输出可以快速定位到源码入口。
+
+### 调试工具
+
+使用 [Delve](https://github.com/go-delve/delve) 可以断点调试 runtime 函数，直接观察执行流程：
+
+```bash
+# 安装 delve
+go install github.com/go-delve/delve/cmd/dlv@latest
+
+# 调试 runtime 需要跳过版本检查
+dlv debug --check-go-version=false main.go
+
+# 在 delve 交互界面中
+(dlv) break runtime.newproc1    # 断点设在创建 goroutine 的函数
+(dlv) break runtime.chansend    # 断点设在 channel 发送
+(dlv) continue                  # 运行到断点
+(dlv) goroutines                # 查看所有 goroutine
+(dlv) goroutine 1 bt            # 查看 goroutine 1 的调用栈
+```
+
+### 阅读技巧
+
+- **先读注释和文档**：runtime 中的核心函数（如 `schedule`、`findRunnable`）都有详细的英文注释，描述了设计意图和不变量
+- **关注编译器指令**：遇到 `//go:nosplit`（禁止栈增长）、`//go:linkname`（链接到其他包的私有函数）、`//go:noescape`（告诉编译器参数不逃逸）等指令时，理解它们的含义有助于看懂代码约束
+- **跳过汇编细节**：`asm_amd64.s` 等汇编文件实现了底层上下文切换，初次阅读时只需知道它做什么（如 `gogo` 恢复 G 的寄存器），不必逐条理解
+- **画调用链和状态机**：边读边画 `schedule() → findRunnable() → execute()` 这样的调用链图，帮助建立全局视角
+
+### 代码示例：运行时自省
+
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"unsafe"
+)
+
+// 查看当前 Go 版本，用于对应源码版本
+func main() {
+	fmt.Println("Go 版本:", runtime.Version())
+	fmt.Println("GOARCH:", runtime.GOARCH)
+	fmt.Println("GOOS:", runtime.GOOS)
+
+	// 获取调用栈，帮助理解函数调用链
+	pcs := make([]uintptr, 10)
+	n := runtime.Callers(0, pcs)
+	frames := runtime.CallersFrames(pcs[:n])
+	for {
+		frame, more := frames.Next()
+		fmt.Printf("函数: %s\n  文件: %s:%d\n", frame.Function, frame.File, frame.Line)
+		if !more {
+			break
+		}
+	}
+
+	// 查看 slice header 的内存布局，验证源码中 runtime.slice 结构
+	s := make([]int, 3, 5)
+	fmt.Printf("\nSlice Header 大小: %d 字节\n", unsafe.Sizeof(s))
+}
+```
 
 ---
 
@@ -149,6 +268,43 @@ goexit() → goexit1()            // G 执行完毕，回到调度循环
 schedule()                       // 重新进入调度
 ```
 
+### 关键调用链详解
+
+**创建 Goroutine**：
+
+```
+go func() → runtime.newproc() → runtime.newproc1()
+  → 从 P 的本地空闲队列或全局队列获取 g 结构体
+  → 初始化 g 的栈和上下文（gostartcallfn）
+  → 放入 P 的本地运行队列（runqput）
+```
+
+`newproc1` 会优先复用 `_Gdead` 状态的 g 结构体（从 `gFree` 列表中取），避免频繁分配内存。如果没有可复用的，才会新分配一个 g 和它的栈空间。
+
+**调度循环**：
+
+```
+runtime.schedule() → runtime.findRunnable()
+  → 先查本地队列（runqget）
+  → 再查全局队列（globrunqget）—— 每 61 次调度会优先检查全局队列，防止饥饿
+  → 检查网络轮询器（netpoll）—— 获取已就绪的网络 IO goroutine
+  → 再从其他 P 偷（runqsteal → runqgrab）—— 偷走目标 P 本地队列一半的 G
+  → 找到 g 后执行 runtime.execute() → runtime.gogo()（汇编，恢复寄存器上下文）
+```
+
+**抢占**：
+
+```
+sysmon 线程 → retake() → preemptone()
+  → Go 1.14 之前：协作式抢占，依赖函数调用时的栈检查
+  → Go 1.14+ ：基于信号的异步抢占（sigPreempt）
+    → 向目标 M 发送 SIGURG 信号
+    → 信号处理函数中将 G 的 PC/SP 保存，跳转到 asyncPreempt
+    → G 被标记为可抢占，交还给调度器
+```
+
+基于信号的异步抢占解决了 `for {}` 死循环无法被抢占的问题——即使 goroutine 没有函数调用，也能被中断。
+
 ### 观测调度行为
 
 ```go
@@ -263,6 +419,28 @@ chanrecv(c *hchan, ep unsafe.Pointer, block bool):
   4. 如果缓冲区为空
      → 创建 sudog，挂到 recvq
      → gopark() 挂起当前 G
+```
+
+### 关键调用链总结
+
+```
+发送:
+  ch <- val → runtime.chansend1() → runtime.chansend()
+    → 有等待的接收者？直接 send（goready 唤醒接收者）
+    → 缓冲区有空位？拷贝到 buf
+    → 否则当前 goroutine 挂起（gopark），加入 sendq
+
+接收:
+  val := <-ch → runtime.chanrecv1() → runtime.chanrecv()
+    → 有等待的发送者？直接 recv
+    → 缓冲区有数据？从 buf 取
+    → 否则当前 goroutine 挂起，加入 recvq
+
+关闭:
+  close(ch) → runtime.closechan()
+    → 将 closed 置为 1
+    → 遍历 recvq，唤醒所有等待接收的 goroutine（它们收到零值）
+    → 遍历 sendq，唤醒所有等待发送的 goroutine（它们会 panic）
 ```
 
 ### 观察 Channel 行为
@@ -864,3 +1042,12 @@ GODEBUG=gctrace=1 go run main.go
 - **gcTrigger 的三种触发方式**：最常见的是 `gcTriggerHeap`（堆增长触发），由 `GOGC` 环境变量或 `debug.SetGCPercent` 控制。Go 1.19 引入了 `debug.SetMemoryLimit`，可以设置软内存上限，避免 OOM。
 - **两次 STW 的时长是关键指标**：`gcStart` 和 `gcMarkDone` 各有一次短暂的 STW。通过 `gctrace` 输出或 pprof 可以观测到。如果 STW 时间过长（超过几毫秒），可能是因为大量 goroutine 需要被停止。
 - **混合写屏障消除了栈重扫**：Go 1.8 之前使用 Dijkstra 写屏障，需要在标记终止时重新扫描所有 goroutine 栈。混合写屏障通过同时标灰旧指针和新指针，保证不遗漏存活对象，从而消除了栈重扫，显著缩短了 STW 时间。
+
+---
+
+## 延伸阅读
+
+- [Go 语言设计与实现 — Draveness](https://draveness.me/golang/) — 中文社区最系统的 Go 源码分析
+- [Go Under The Hood — 欧长坤](https://golang.design/under-the-hood/) — 从底层视角剖析 Go
+- [Go 源码在线浏览](https://cs.opensource.google/go) — 官方代码搜索
+- [高级并发模式](./03-advanced-concurrency-patterns.md) — ErrGroup、Singleflight 等生产级并发工具
