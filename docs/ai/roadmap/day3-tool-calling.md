@@ -618,6 +618,78 @@ if __name__ == "__main__":
 2. 最新大模型新闻 - 深度解读 - 专家对最新大模型新闻进行了详细分析...
 ```
 
+::: details TypeScript 版本（OpenAI Tool Calling）
+
+```typescript
+// npm install openai
+import OpenAI from "openai";
+
+const client = new OpenAI();
+
+// 工具定义
+const tools: OpenAI.Chat.ChatCompletionTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "获取指定城市的当前天气信息",
+      parameters: {
+        type: "object",
+        properties: {
+          city: { type: "string", description: "城市名称，如：北京、上海" },
+        },
+        required: ["city"],
+      },
+    },
+  },
+];
+
+// 工具实现
+function getWeather(city: string): string {
+  const data: Record<string, string> = { 北京: "晴 22°C", 上海: "多云 26°C" };
+  return data[city] ?? `${city}: 晴 25°C`;
+}
+
+const toolMap: Record<string, (args: any) => string> = {
+  get_weather: (args) => getWeather(args.city),
+};
+
+// Tool Calling 循环
+async function chatWithTools(userInput: string) {
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: "user", content: userInput },
+  ];
+
+  while (true) {
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+      tools,
+    });
+
+    const message = response.choices[0].message;
+    messages.push(message);
+
+    if (!message.tool_calls) {
+      console.log(`助手: ${message.content}`);
+      return message.content;
+    }
+
+    for (const toolCall of message.tool_calls) {
+      const fn = toolMap[toolCall.function.name];
+      const args = JSON.parse(toolCall.function.arguments);
+      const result = fn ? fn(args) : `未知工具: ${toolCall.function.name}`;
+      console.log(`  [工具调用] ${toolCall.function.name}(${JSON.stringify(args)}) → ${result}`);
+      messages.push({ role: "tool", tool_call_id: toolCall.id, content: result });
+    }
+  }
+}
+
+chatWithTools("北京今天天气怎么样？");
+```
+
+:::
+
 ### 讲解重点
 
 | 要点 | 说明 |
@@ -737,6 +809,164 @@ response = client.chat.completions.create(
 
 ---
 
+## 7. Anthropic Tool Calling 对比
+
+前面的示例都使用 OpenAI SDK。Anthropic (Claude) 同样支持 Tool Calling，但 API 结构有差异。掌握两家的异同，有助于在实际项目中灵活选型。
+
+### OpenAI vs Anthropic 差异对照
+
+| 维度 | OpenAI | Anthropic (Claude) |
+|------|--------|-------------------|
+| 工具定义 key | `parameters` | `input_schema` |
+| 响应中的工具调用 | `message.tool_calls` 列表 | `response.content` 中 `type="tool_use"` 的 block |
+| 工具调用 ID | `tool_call.id` | `block.id` |
+| 结果回传角色 | `role: "tool"` | `role: "user"`，内容为 `tool_result` block |
+| System Prompt | 放在 `messages` 列表中 | 作为 `system` 参数单独传 |
+
+### 代码：Anthropic 版完整 Tool Calling 循环
+
+```python
+import json
+from anthropic import Anthropic
+
+client = Anthropic()
+
+# ---- 工具定义（Anthropic 格式）----
+tools = [
+    {
+        "name": "get_weather",
+        "description": "获取指定城市的当前天气信息",
+        "input_schema": {                    # 注意：不是 parameters
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "description": "城市名称，如：北京、上海",
+                },
+            },
+            "required": ["city"],
+        },
+    }
+]
+
+
+# ---- 工具实现 ----
+def get_weather(city: str) -> str:
+    data = {"北京": "晴 22°C", "上海": "多云 26°C"}
+    return data.get(city, f"{city}: 晴 25°C")
+
+
+TOOL_MAP = {"get_weather": get_weather}
+
+
+# ---- Tool Calling 循环 ----
+def chat_with_tools(user_input: str):
+    messages = [{"role": "user", "content": user_input}]
+
+    while True:
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            system="你是一个有用的助手，可以查询天气。",
+            messages=messages,
+            tools=tools,
+        )
+
+        # 检查是否有工具调用
+        tool_use_blocks = [b for b in response.content if b.type == "tool_use"]
+
+        if not tool_use_blocks:
+            # 没有工具调用，提取文本回答
+            text = "".join(b.text for b in response.content if b.type == "text")
+            print(f"助手: {text}")
+            return text
+
+        # 执行工具调用，构建结果
+        messages.append({"role": "assistant", "content": response.content})
+
+        tool_results = []
+        for block in tool_use_blocks:
+            func = TOOL_MAP.get(block.name)
+            result = func(**block.input) if func else f"未知工具: {block.name}"
+            print(f"  [工具调用] {block.name}({block.input}) → {result}")
+            tool_results.append({
+                "type": "tool_result",
+                "tool_use_id": block.id,      # 对应 tool_use 的 id
+                "content": result,
+            })
+
+        # 注意：Anthropic 用 user 角色回传工具结果
+        messages.append({"role": "user", "content": tool_results})
+
+
+# 测试
+chat_with_tools("北京今天天气怎么样？")
+```
+
+### 讲解重点
+
+| 要点 | 说明 |
+|------|------|
+| `input_schema` | Anthropic 用 `input_schema` 而非 OpenAI 的 `parameters` |
+| `tool_use` block | 工具调用不是独立字段，而是嵌在 `response.content` 列表中 |
+| `tool_result` | 结果通过 `user` 角色发送，包含 `tool_use_id` 做关联 |
+| `stop_reason` | Anthropic 用 `"tool_use"` 表示需要工具调用，对应 OpenAI 的 `"tool_calls"` |
+
+---
+
+## 8. MCP (Model Context Protocol) 简介
+
+MCP 是 Anthropic 于 2024 年发布的开放协议，目标是**标准化 LLM 应用与外部工具/数据源的连接方式**。
+
+### 为什么需要 MCP？
+
+之前每家模型提供商的 Tool Calling 格式不同（OpenAI 用 `parameters`，Anthropic 用 `input_schema`），每换一个模型就要改工具定义。MCP 提供了一个统一的协议层：
+
+```
+LLM 应用 (Client) ←— MCP 协议 —→ MCP Server (工具/数据源)
+```
+
+### 核心概念
+
+| 概念 | 说明 |
+|------|------|
+| **MCP Server** | 提供工具和资源的服务，可以是本地进程也可以是远程服务 |
+| **MCP Client** | 调用 MCP Server 的应用（通常是你的 Agent） |
+| **Tools** | Server 暴露的可调用能力，类似 Function Calling 的函数 |
+| **Resources** | Server 暴露的数据源（文件、数据库等） |
+| **Prompts** | Server 提供的预定义提示词模板 |
+
+### 代码骨架：MCP Server
+
+```python
+from mcp.server.fastmcp import FastMCP
+
+# 创建 MCP Server
+mcp = FastMCP("天气服务")
+
+
+@mcp.tool()
+def get_weather(city: str) -> str:
+    """获取指定城市的当前天气信息"""
+    data = {"北京": "晴 22°C", "上海": "多云 26°C"}
+    return data.get(city, f"{city}: 晴 25°C")
+
+
+@mcp.resource("config://settings")
+def get_settings() -> str:
+    """返回服务配置信息"""
+    return "支持的城市：北京、上海、广州、深圳"
+```
+
+### 讲解重点
+
+- MCP 让工具定义"写一次，到处用"，不再绑定特定模型提供商
+- Claude Desktop、Cursor、Claude Code 等工具已原生支持 MCP
+- 学习 MCP 不是替代 Tool Calling，而是在它之上建立标准化层
+- 详细文档：[MCP 官方网站](https://modelcontextprotocol.io/)
+
+---
+
 ## 今日小结
 
 | 概念 | 要记住的 |
@@ -747,6 +977,13 @@ response = client.chat.completions.create(
 | 完整循环 | `while True` → 请求 → 检查 tool_calls → 执行 → 喂回结果 → 再请求 |
 | 并行调用 | 一次响应可能有多个 tool_calls，用 `tool_call_id` 一一对应 |
 
+## 延伸阅读
+
+- [OpenAI: Function Calling Guide](https://platform.openai.com/docs/guides/function-calling) — 官方 Tool Calling 文档
+- [Anthropic: Tool Use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) — Claude 的工具调用指南
+- [MCP 官方文档](https://modelcontextprotocol.io/) — Model Context Protocol 规范与教程
+- [Tool Calling 设计清单](../tool-calling-design-checklist.md) — 本系列的工具调用最佳实践
+
 ## 明日预告
 
-**Day 4** 我们将学习 **ReAct 模式与多步推理**，让 Agent 具备"思考-行动-观察"的能力循环，处理更复杂的任务。
+**Day 4** 我们将学习 **Workflow 设计**，用固定流程 + 有限自主的方式让 Agent 的行为变得可控、可观测、可调试。

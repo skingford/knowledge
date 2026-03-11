@@ -895,6 +895,12 @@ if __name__ == "__main__":
 3. **失败是正常的** — 设计时就要考虑重试、降级、兜底
 4. **人在回路中** — 对于不确定的决策，让人来把关
 
+## 延伸阅读
+
+- [Anthropic: Building Effective Agents - Workflow Patterns](https://docs.anthropic.com/en/docs/build-with-claude/agent) — 工作流型 Agent 的设计模式（Prompt Chaining、Routing、Orchestrator-Workers 等）
+- [LangGraph Quickstart](https://langchain-ai.github.io/langgraph/tutorials/introduction/) — 用图结构编排 Agent 工作流
+- [OpenAI: Orchestrating Agents](https://platform.openai.com/docs/guides/agents) — Agent 编排最佳实践
+
 ### 明日预告
 
 Day 5 我们将学习 RAG 和 Memory，让 Agent 能利用外部知识库来回答问题。

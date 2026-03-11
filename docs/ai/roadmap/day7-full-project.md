@@ -34,6 +34,8 @@ doc-qa-agent/
 ├── documents/        # 待索引的示例文档
 │   ├── sample1.md
 │   └── sample2.md
+├── .env.example      # 环境变量模板
+├── Dockerfile        # 容器化部署
 └── requirements.txt  # 依赖
 ```
 
@@ -1069,11 +1071,62 @@ if __name__ == "__main__":
 ## 7. requirements.txt —— 依赖
 
 ```txt
-openai==1.82.0
-chromadb==0.6.3
+openai>=1.82.0
+chromadb>=0.6.3
 ```
 
+> 版本号为最低推荐版本（截至 2025-05），使用 `>=` 允许自动获取兼容的更新版本。如遇 API 不兼容，可用 `==` 锁定具体版本。
+
 > 只需要两个核心依赖。`chromadb` 会自动安装嵌入相关的底层库。
+
+---
+
+## 8. .env.example —— 环境变量模板
+
+```bash
+# OpenAI API Key（必填）
+OPENAI_API_KEY=sk-your-key-here
+
+# 如果使用代理或自定义端点，取消注释并填写：
+# OPENAI_BASE_URL=https://your-proxy.com/v1
+
+# 如果使用 Langfuse 可观测性（可选）：
+# LANGFUSE_PUBLIC_KEY=pk-...
+# LANGFUSE_SECRET_KEY=sk-...
+# LANGFUSE_HOST=https://cloud.langfuse.com
+```
+
+> 把 `.env.example` 复制为 `.env`，填入真实的 API Key。记得把 `.env` 加入 `.gitignore`，永远不要提交密钥到代码仓库。
+
+---
+
+## 9. Dockerfile —— 容器化部署
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 安装依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制项目文件
+COPY . .
+
+# 运行入口
+CMD ["python", "main.py"]
+```
+
+构建和运行：
+
+```bash
+# 构建镜像
+docker build -t doc-qa-agent .
+
+# 运行容器（传入 API Key）
+docker run -it --env-file .env doc-qa-agent
+```
 
 ---
 
@@ -1340,6 +1393,69 @@ async def chat(request: ChatRequest):
 
 运行：`uvicorn api:app --reload`
 
+### 5. 接入可观测性 (Observability)
+
+Agent 上线后，"出了问题能不能快速定位"比"功能多不多"更重要。可观测性的核心是：**每次请求都能追溯到每一步做了什么、花了多长时间、消耗了多少 token**。
+
+**方案 A：结构化日志（零依赖）**
+
+在不引入第三方服务的情况下，用结构化 JSON 日志也能实现基础的可观测性：
+
+```python
+import json
+import time
+import logging
+
+logger = logging.getLogger("agent.trace")
+
+def trace_step(step_name: str, func, *args, **kwargs):
+    """追踪单个步骤的执行时间和结果"""
+    start = time.time()
+    try:
+        result = func(*args, **kwargs)
+        logger.info(json.dumps({
+            "step": step_name,
+            "status": "success",
+            "latency_ms": round((time.time() - start) * 1000, 2),
+        }, ensure_ascii=False))
+        return result
+    except Exception as e:
+        logger.error(json.dumps({
+            "step": step_name,
+            "status": "error",
+            "error": str(e),
+            "latency_ms": round((time.time() - start) * 1000, 2),
+        }, ensure_ascii=False))
+        raise
+```
+
+**方案 B：接入 Langfuse（推荐）**
+
+[Langfuse](https://langfuse.com) 是一个开源的 LLM 可观测性平台，可以自部署或使用云服务：
+
+```python
+# pip install langfuse
+from langfuse.openai import openai  # 替换 OpenAI 导入即可自动追踪
+
+# 设置环境变量
+# LANGFUSE_PUBLIC_KEY=pk-...
+# LANGFUSE_SECRET_KEY=sk-...
+# LANGFUSE_HOST=https://cloud.langfuse.com  # 或你的自部署地址
+
+# 之后所有 openai.chat.completions.create() 调用都会自动记录到 Langfuse
+# 包括：输入/输出内容、token 用量、延迟、工具调用等
+```
+
+其他可观测性工具：[LangSmith](https://smith.langchain.com/)（LangChain 生态）、[Arize Phoenix](https://github.com/Arize-AI/phoenix)（开源）。
+
+### 6. 支持多模型提供商
+
+当前项目使用 OpenAI SDK。如需支持 Anthropic Claude，可以：
+
+1. 在 `config.py` 中添加 `provider` 字段（`"openai"` 或 `"anthropic"`）
+2. 在 `agent.py` 中根据 provider 切换 SDK 调用方式
+3. Day 2 和 Day 3 的 Anthropic 示例展示了两家 API 的核心差异
+
 ---
 
 ## 总结
@@ -1365,3 +1481,10 @@ async def chat(request: ChatRequest):
 - 部署为线上服务
 
 **记住**：好的 Agent 不是"能聊天"，而是"能可靠地完成任务"。工程化能力比模型能力更决定最终效果。
+
+## 延伸阅读
+
+- [Langfuse](https://langfuse.com/) — 开源 LLM 可观测性平台，支持 Tracing、评测和 Prompt 管理
+- [LangSmith](https://smith.langchain.com/) — LangChain 生态的调试和监控平台
+- [FastAPI 官方教程](https://fastapi.tiangolo.com/tutorial/) — 将 Agent 部署为 API 服务
+- [Agent 学习综合指南](../agent-learning-guide.md) — 后续进阶学习的完整路径

@@ -435,6 +435,104 @@ if __name__ == "__main__":
 | Token 用量 | `response.usage.total_tokens` | `response.usage.input_tokens` + `output_tokens` |
 | 模型名称 | `gpt-4o` | `claude-sonnet-4-20250514` |
 
+### TypeScript 版本
+
+::: details TypeScript 版本（OpenAI）
+
+```typescript
+// npm install openai
+import OpenAI from "openai";
+import * as readline from "readline";
+
+const client = new OpenAI(); // 默认读取 OPENAI_API_KEY 环境变量
+
+const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+  { role: "system", content: "你是一个友好的 AI 助手。回答要简洁清晰。" },
+];
+
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+async function chat() {
+  console.log("聊天已开始（输入 quit 退出）\n");
+
+  const ask = () => {
+    rl.question("你: ", async (input) => {
+      if (!input.trim() || ["quit", "exit", "q"].includes(input.trim().toLowerCase())) {
+        console.log("再见！");
+        rl.close();
+        return;
+      }
+
+      messages.push({ role: "user", content: input.trim() });
+
+      const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages,
+        temperature: 0.7,
+        max_tokens: 1024,
+      });
+
+      const content = response.choices[0].message.content ?? "";
+      messages.push({ role: "assistant", content });
+      console.log(`\n助手: ${content}\n  (tokens: ${response.usage?.total_tokens})\n`);
+      ask();
+    });
+  };
+  ask();
+}
+
+chat();
+```
+
+:::
+
+::: details TypeScript 版本（Anthropic）
+
+```typescript
+// npm install @anthropic-ai/sdk
+import Anthropic from "@anthropic-ai/sdk";
+import * as readline from "readline";
+
+const client = new Anthropic(); // 默认读取 ANTHROPIC_API_KEY 环境变量
+
+const messages: Anthropic.MessageParam[] = [];
+
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+async function chat() {
+  console.log("聊天已开始（输入 quit 退出）\n");
+
+  const ask = () => {
+    rl.question("你: ", async (input) => {
+      if (!input.trim() || ["quit", "exit", "q"].includes(input.trim().toLowerCase())) {
+        console.log("再见！");
+        rl.close();
+        return;
+      }
+
+      messages.push({ role: "user", content: input.trim() });
+
+      const response = await client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: "你是一个友好的 AI 助手。回答要简洁清晰。",
+        messages,
+      });
+
+      const content = response.content[0].type === "text" ? response.content[0].text : "";
+      messages.push({ role: "assistant", content });
+      console.log(`\n助手: ${content}\n  (tokens: ${response.usage.input_tokens + response.usage.output_tokens})\n`);
+      ask();
+    });
+  };
+  ask();
+}
+
+chat();
+```
+
+:::
+
 ### 讲解重点
 
 - **对话历史管理是核心**：`messages` 列表就是模型的全部记忆，你不传就没有上下文
@@ -518,6 +616,13 @@ chunk.choices[0].finish_reason       # 最后一个 chunk 才有值 "stop"
 | 结构化输出 | `response_format` + JSON Schema = 可靠的结构化数据 |
 | 多轮对话 | 本质就是维护一个 messages 列表 |
 | 流式输出 | `stream=True` + 遍历 chunk，提升用户体验 |
+
+## 延伸阅读
+
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference/chat) — Chat Completions API 完整参考
+- [Anthropic API Reference](https://docs.anthropic.com/en/api/messages) — Messages API 完整参考
+- [OpenAI: Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs) — 结构化输出的详细指南
+- [Anthropic: Prompt Engineering](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview) — Claude 的提示词工程指南
 
 ## 明日预告
 

@@ -472,4 +472,10 @@ if __name__ == "__main__":
 4. Agent 和普通聊天机器人最本质的区别是什么？
 5. Agent 的四大组成部分各自负责什么？
 
-> **下一步**：Day 2 将深入学习 Prompt Engineering 和多轮对话管理，这是构建可靠 Agent 的基础。
+## 延伸阅读
+
+- [Anthropic: Building Effective Agents](https://docs.anthropic.com/en/docs/build-with-claude/agent) — 官方 Agent 构建指南，深入理解 Agent 架构
+- [OpenAI: A Practical Guide to Building Agents](https://platform.openai.com/docs/guides/agents) — OpenAI 的 Agent 实践指南
+- [Agent 学习综合指南](../agent-learning-guide.md) — 本系列的完整概念参考
+
+> **下一步**：Day 2 将学习 LLM API 调用，包括认证机制、参数控制、结构化输出和多轮对话管理。

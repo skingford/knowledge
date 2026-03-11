@@ -92,6 +92,20 @@ print("文本 0 vs 文本 2（语义无关）:", cosine_similarity(embeddings[0]
 | 余弦相似度 | 值域 [-1, 1]，越接近 1 越相似 |
 | 批量调用 | `client.embeddings.create(input=[text1, text2, ...])` 支持批量，减少请求次数 |
 
+### 其他 Embedding 方案
+
+本文使用 OpenAI `text-embedding-3-small` 演示，但生产环境中有多种选择：
+
+| 方案 | 特点 | 适用场景 |
+|------|------|----------|
+| OpenAI `text-embedding-3-large` | 精度更高，3072 维 | 对检索精度要求高的场景 |
+| `BAAI/bge-m3` (开源) | 多语言、免费、可本地部署 | 数据隐私敏感、成本敏感场景 |
+| Cohere `embed-v3` | 支持多语言，有搜索/分类专用模式 | 多语言检索 |
+| `sentence-transformers` (开源) | 丰富的预训练模型，完全本地运行 | 离线环境、自定义微调 |
+| Voyage AI | Anthropic 生态推荐的嵌入模型 | 使用 Claude 的项目 |
+
+> 选择建议：学习阶段用 OpenAI 最方便；生产环境考虑成本和数据隐私时，开源方案（`bge-m3`、`sentence-transformers`）值得评估。
+
 ---
 
 ## 2. Chunking 切块
@@ -302,6 +316,63 @@ for r in reranked:
 | 权重分配 | `vector_weight=0.7, keyword_weight=0.3` 是常见起点，根据场景调整 |
 | 关键词匹配的价值 | 向量检索可能漏掉精确术语匹配，关键词补位 |
 | 生产级方案 | 推荐用 Cohere Rerank API 或开源的 `bge-reranker`，效果远超手写规则 |
+
+### 生产级 Rerank 方案
+
+上面的关键词加权只是入门方案。生产环境推荐使用专用的 Rerank 模型，它们用 Cross-Encoder 对 query-doc 对做精细语义打分，效果远超手写规则。
+
+**方案 1：Cohere Rerank API**
+
+```python
+# pip install cohere
+import cohere
+
+co = cohere.Client("your-cohere-api-key")
+
+def cohere_rerank(query: str, documents: list[str], top_n: int = 3) -> list[dict]:
+    """使用 Cohere Rerank API 做精排"""
+    response = co.rerank(
+        model="rerank-v3.5",
+        query=query,
+        documents=documents,
+        top_n=top_n,
+    )
+    return [
+        {"index": r.index, "document": documents[r.index], "score": r.relevance_score}
+        for r in response.results
+    ]
+```
+
+**方案 2：开源 bge-reranker（本地运行）**
+
+```python
+# pip install sentence-transformers
+from sentence_transformers import CrossEncoder
+
+# 下载模型（首次运行会自动下载，约 1GB）
+reranker = CrossEncoder("BAAI/bge-reranker-v2-m3")
+
+def local_rerank(query: str, documents: list[str], top_n: int = 3) -> list[dict]:
+    """使用开源 bge-reranker 做本地精排"""
+    pairs = [[query, doc] for doc in documents]
+    scores = reranker.predict(pairs)
+    ranked = sorted(
+        [{"document": doc, "score": float(s)} for doc, s in zip(documents, scores)],
+        key=lambda x: x["score"],
+        reverse=True,
+    )
+    return ranked[:top_n]
+```
+
+**方案对比：**
+
+| 方案 | 优点 | 缺点 |
+|------|------|------|
+| 手写关键词加权 | 零成本、零延迟 | 精度有限，无法理解语义 |
+| Cohere Rerank API | 效果好、接入简单 | 有 API 费用，依赖网络 |
+| bge-reranker（本地） | 免费、数据不出本地 | 需要 GPU 加速，首次下载模型较大 |
+
+> 建议路径：学习阶段用手写方案理解原理 → 小项目用 Cohere API 快速验证 → 生产环境根据数据隐私和成本需求选择。
 
 ---
 
@@ -764,7 +835,14 @@ System Prompt + 上下文 + 问题 → LLM
 | 记忆管理 | 滑动窗口保近期，摘要存远期 |
 | RAG 流程 | 索引 → 检索 → Rerank → 注入上下文 → 生成 |
 
+## 延伸阅读
+
+- [Pinecone: RAG 教程](https://www.pinecone.io/learn/retrieval-augmented-generation/) — 向量数据库视角的 RAG 完整指南
+- [ChromaDB 文档](https://docs.trychroma.com/) — 本文使用的向量数据库
+- [OpenAI: Embedding Guide](https://platform.openai.com/docs/guides/embeddings) — 官方 Embedding 使用指南
+- [RAG 基础与工作流](../rag-basics-and-workflow.md) — 本系列的 RAG 深入参考
+
 ## 下一步
 
-- Day 6 将学习 Agent 工具调用与规划能力
+- Day 6 将学习评测与安全，包括答案质量评估、幻觉检测、Prompt Injection 防御和成本控制
 - 深入了解 RAG 理论请阅读：[RAG 基础与工作流](../rag-basics-and-workflow.md)
