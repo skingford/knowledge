@@ -196,6 +196,9 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/golang/guide/08-mq-transaction-governance-ha.md",
+    "docs/golang/guide/08-observability-resilience.md",
+    "docs/golang/guide/08-rpc-discovery-config.md",
     "docs/public/robots.txt",
     "docs/public/og-image.svg",
     "docs/public/favicon.svg",
@@ -226,14 +229,11 @@
     "docs/ai/roadmap/day5-rag-memory.md",
     "docs/ai/roadmap/day4-workflow.md",
     "docs/ai/roadmap/day3-tool-calling.md",
-    "docs/ai/roadmap/day2-llm-api.md",
-    "docs/ai/roadmap/day1-what-is-agent.md",
     "docs/ai/roadmap",
     "node_modules/is-what/dist/isWeakSet.js",
     "node_modules/is-what/dist/isWeakSet.d.ts",
     "node_modules/is-what/dist/isWeakMap.js",
     "node_modules/is-what/dist/isWeakMap.d.ts",
-    "node_modules/is-what/dist/isUndefined.js",
     "article/Untitled.canvas",
     "article/Untitled 1.canvas"
   ]

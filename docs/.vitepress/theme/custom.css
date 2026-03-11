@@ -132,22 +132,26 @@ body {
   background: transparent;
 }
 
-.VPNav,
+.VPNavBar,
 .VPLocalNav {
   background: color-mix(in srgb, var(--vp-c-bg) 82%, transparent) !important;
   border-bottom: 1px solid var(--vp-c-divider) !important;
   backdrop-filter: blur(14px);
 }
 
+.VPNav {
+  border-bottom: none !important;
+}
+
 .VPNavScreen {
-  background: color-mix(in srgb, var(--vp-c-bg) 96%, transparent) !important;
-  backdrop-filter: blur(18px);
+  background-color: var(--vp-c-bg) !important;
+  z-index: 100 !important;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
-html:has(.VPNavScreen),
-body:has(.VPNavScreen) {
+html:has(#VPNavScreen),
+body:has(#VPNavScreen) {
   overflow: hidden;
   overscroll-behavior: none;
 }
@@ -271,12 +275,119 @@ body:has(.VPNavScreen) {
   border-radius: 0 18px 18px 0;
 }
 
-.VPSidebar,
 .VPDocAsideOutline .content,
 .VPDocAsideCarbonAds,
 .VPDocFooter,
 .VPFooter {
   background: transparent !important;
+}
+
+/* 桌面端 sidebar 透明，融入页面背景 */
+@media (min-width: 960px) {
+  .VPSidebar {
+    background: transparent !important;
+  }
+}
+
+/* 移动端 sidebar 作为遮罩层，必须不透明 */
+@media (max-width: 959px) {
+  .VPSidebar {
+    top: calc(var(--vp-nav-height) + 8px) !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    width: calc(100vw - 80px) !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--site-panel-border) !important;
+    background-color: var(--vp-c-bg-soft) !important;
+    background-image: linear-gradient(160deg, rgba(212, 111, 77, 0.05) 0%, transparent 50%) !important;
+    box-shadow: var(--site-shadow) !important;
+    overflow: hidden !important;
+  }
+
+  /* 顶部品牌色装饰条 */
+  .VPSidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-3));
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+  }
+
+  /* 背景光晕装饰 */
+  .VPSidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle at top right, rgba(212, 111, 77, 0.1), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* section 标题（如"架构"） */
+  .VPSidebar .VPSidebarItem.level-0 > .item .text {
+    position: relative;
+    z-index: 1;
+    padding: 0 4px !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--vp-c-brand-1) !important;
+  }
+
+  /* 所有导航链接项统一加内边距 */
+  .VPSidebar .VPSidebarItem.level-1 > .item .link,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link {
+    position: relative;
+    z-index: 1;
+    padding: 2px 10px !important;
+    margin: 1px 0 !important;
+    border-radius: 10px;
+    transition: background 0.18s ease;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1 > .item .link .text,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link .text {
+    padding: 5px 0 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1 > .item .link:hover,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link:hover {
+    background: color-mix(in srgb, var(--vp-c-brand-1) 7%, transparent);
+  }
+
+  /* 选中项：有内边距的高亮块 */
+  .VPSidebar .VPSidebarItem.level-1.is-active > .item .link,
+  .VPSidebar .VPSidebarItem.level-2.is-active > .item .link {
+    background: color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent) !important;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1.is-active > .item .link .text,
+  .VPSidebar .VPSidebarItem.level-2.is-active > .item .link .text {
+    font-weight: 600 !important;
+    color: var(--vp-c-brand-1) !important;
+  }
+
+  /* 可折叠的子分组标题 */
+  .VPSidebar .VPSidebarItem.level-0.collapsible > .item {
+    padding: 6px 4px !important;
+    margin-top: 4px !important;
+    border-top: 1px solid var(--vp-c-divider);
+  }
+
+  .VPSidebar .VPSidebarItem.level-0:first-child > .item {
+    border-top: none !important;
+    margin-top: 0 !important;
+  }
 }
 
 .VPSidebar {
@@ -646,7 +757,7 @@ body:has(.VPNavScreen) {
   }
 
   .claude-home {
-    padding: 24px 0 64px;
+    padding: 24px 16px 64px;
   }
 
   .claude-home__hero-copy {
@@ -894,7 +1005,7 @@ body:has(.VPNavScreen) {
 @media (max-width: 768px) {
   .section-landing,
   .overview-landing {
-    padding: 16px 0 56px;
+    padding: 16px 16px 56px;
   }
 
   .section-landing__copy,

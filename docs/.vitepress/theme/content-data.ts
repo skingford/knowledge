@@ -212,6 +212,15 @@ export const sections: SectionConfig[] = [
           { text: '九、源码与 Runtime', link: '/golang/guide/09-runtime-source' },
         ],
       },
+      {
+        text: '微服务与分布式拆分专题',
+        collapsed: true,
+        items: [
+          { text: 'RPC、注册发现与配置', link: '/golang/guide/08-rpc-discovery-config' },
+          { text: '追踪、容错与重试', link: '/golang/guide/08-observability-resilience' },
+          { text: 'MQ、事务、治理与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
+        ],
+      },
     ],
   },
   {
