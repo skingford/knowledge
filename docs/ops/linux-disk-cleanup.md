@@ -219,3 +219,8 @@ pm2 set pm2-logrotate:retain 7
 | `tldr` | 命令速查（man 简化版） | `npm install -g tldr` |
 | `lazydocker` | Docker TUI 管理 | Go 安装 |
 | `btop` | 系统资源综合监控 | `apt install btop` |
+
+## 延伸阅读
+
+- 需要补用户和权限体系：读 [Linux 用户管理与权限实战](./linux-user-permissions.md)
+- 想看后续计划扩展的运维专题：读 [运维方向待补主题](./todo-topics.md)
