@@ -126,7 +126,7 @@ export const sections: SectionConfig[] = [
         { title: '架构能力自检准备清单', href: '/architecture/architect-interview-prep-checklist', description: '用判断项梳理系统设计和架构治理能力。' },
         { title: '高并发系统设计清单', href: '/architecture/high-concurrency-system-checklist', description: '把常见高并发设计问题拆成一组可检查项。' },
         { title: '分布式事务方案对比', href: '/architecture/distributed-transaction-comparison', description: '快速对比常见事务方案的边界与取舍。' },
-        { title: '组织架构与业务系统设计方案', href: '/architecture/organization-structure-and-business-system-design', description: '闭包表原理详解、树模型对比、权限过滤、聚合查询、组织迁移与工程化落地。' },
+        { title: '组织架构与业务系统设计方案', href: '/architecture/organization-structure-and-business-system-design', description: '闭包表原理、PG ltree、CTE 递归等替代方案对比，覆盖权限过滤、聚合查询与工程化落地。' },
         { title: '运动 APP 出海架构与管理完全指南', href: '/architecture/global-fitness-app-architecture-and-management-guide', description: '覆盖全球化运动 App 的架构、合规、支付、运维与面试准备。' },
         { title: '待补主题清单', href: '/architecture/todo-topics', description: '查看后续计划补充的专题。' },
       ],
