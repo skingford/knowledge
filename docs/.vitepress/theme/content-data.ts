@@ -219,6 +219,14 @@ export const sections: SectionConfig[] = [
         ],
       },
       {
+        text: '底层原理拆分专题',
+        collapsed: true,
+        items: [
+          { text: '逃逸分析、栈与堆', link: '/golang/guide/02-escape-analysis' },
+          { text: '切片并发陷阱与工程化取舍', link: '/golang/guide/02-concurrent-slice-patterns' },
+        ],
+      },
+      {
         text: '网络编程与标准库拆分专题',
         collapsed: true,
         items: [

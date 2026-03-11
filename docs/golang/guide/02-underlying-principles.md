@@ -302,18 +302,17 @@ func main() {
 
 ## 5. 内存逃逸分析
 
-Go 编译器在编译期通过逃逸分析（Escape Analysis）决定变量分配在栈上还是堆上。栈分配成本极低（移动 SP 指针即可），堆分配需要 GC 参与回收，所以减少逃逸 = 减少 GC 压力 = 提升性能。
+Go 编译器在编译期通过逃逸分析（Escape Analysis）决定变量分配在栈上还是堆上。栈分配成本极低，堆分配需要 GC 参与回收，所以减少逃逸 = 减少 GC 压力 = 提升性能。
 
-常见逃逸场景：
+典型逃逸场景包括：
 
-- 函数返回局部变量的指针
+- 返回局部变量指针
+- 接口装箱（`interface{}` / `any`）
+- 闭包捕获外部变量
+- Slice / Map 大小在编译期不可知或过大
 - 变量被发送到 Channel
-- 变量赋值给接口类型（编译器无法确定大小）
-- 闭包引用外部变量
-- Slice/Map 的容量在编译期不可知或过大
-- `fmt.Println` 等接受 `interface{}` 参数的函数
 
-使用 `-gcflags="-m"` 查看逃逸分析结果。
+基础示例：
 
 ```go
 package main
@@ -366,21 +365,15 @@ func main() {
 go build -gcflags="-m -m" main.go
 ```
 
-输出示例（关键行）：
 
-```
-./main.go:7:2: v escapes to heap:
-./main.go:7:2:   flow: ~r0 = &v:
-./main.go:25:2: x escapes to heap:
-./main.go:25:2:   flow: {storage for x} = &x:
-```
+**延伸专题：**
 
-**讲解重点：**
+- [逃逸分析、栈与堆：Go 编译器如何决定内存分配](./02-escape-analysis.md)
+- [切片并发陷阱：Append、锁、Channel 与工程化取舍](./02-concurrent-slice-patterns.md)
 
-- 逃逸分析是编译期行为，不影响运行时语义，只影响分配位置和 GC 压力
-- `-gcflags="-m"` 看简要结果，`-gcflags="-m -m"` 看详细逃逸原因；在 CI 中可以用来检测性能敏感路径的意外逃逸
-- 减少逃逸的常用手段：避免不必要的指针返回、用具体类型代替 interface{}、预分配 Slice 容量、避免大结构体传指针给逃逸路径
-- `sync.Pool` 的设计目的之一就是复用堆对象，减少 GC 压力
+::: tip 阅读建议
+如果你当前正在看 GC、分配器和内存模型，这一页只保留主线结论即可；需要深入时再跳到对应专题页。
+:::
 
 ---
 
