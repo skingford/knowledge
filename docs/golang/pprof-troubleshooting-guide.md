@@ -1,3 +1,8 @@
+---
+title: Pprof 排障指南
+description: Go pprof 排障指南，帮助定位 CPU、内存、锁竞争和 Goroutine 相关性能问题。
+---
+
 # Pprof 排障指南
 
 ## 适合人群

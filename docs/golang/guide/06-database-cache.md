@@ -1,3 +1,9 @@
+---
+title: 数据库与缓存
+description: Go 数据库与缓存专题，涵盖 database/sql、MySQL、Redis、事务与缓存一致性实践。
+search: false
+---
+
 # 数据库与缓存
 
 ## 适合人群

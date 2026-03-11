@@ -1,3 +1,9 @@
+---
+title: 底层原理
+description: Go 底层原理专题，涵盖 Slice、Map、Channel、内存逃逸、GC、分配器与内存模型。
+search: false
+---
+
 # 底层原理
 
 ## 适合人群

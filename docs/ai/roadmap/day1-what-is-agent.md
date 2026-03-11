@@ -1,4 +1,6 @@
 ---
+title: Day 1：什么是 Agent？
+description: Agent 学习路线第 1 天，理解 LLM、Prompt、Tool Calling 与 Agent 的基本组成和边界。
 search: false
 ---
 

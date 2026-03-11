@@ -1,4 +1,6 @@
 ---
+title: Day 4：Workflow 设计
+description: Agent 学习路线第 4 天，聚焦 Workflow、状态机、重试机制与可控 Agent 流程设计。
 search: false
 ---
 

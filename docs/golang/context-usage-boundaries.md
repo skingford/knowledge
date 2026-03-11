@@ -1,3 +1,8 @@
+---
+title: Context 使用边界
+description: Go context 使用边界与误区总结，帮助厘清超时、取消、传值与 Goroutine 生命周期管理。
+---
+
 # Context 使用边界
 
 ## 适合人群

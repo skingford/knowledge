@@ -1,3 +1,9 @@
+---
+title: 测试、Benchmark 与 CI/CD
+description: Go 质量保障专题，覆盖单元测试、集成测试、基准测试与 CI CD 自动化交付。
+search: false
+---
+
 # 测试、Benchmark 与 CI/CD
 
 这一页覆盖交付闭环：从单元测试、Mock、集成测试，到基准测试和 CI/CD，形成完整的工程质量保障链路。

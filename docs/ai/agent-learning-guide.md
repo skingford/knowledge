@@ -1,3 +1,8 @@
+---
+title: Agent 学习综合指南
+description: 面向工程师的 Agent 学习主线，覆盖 LLM、Tool Calling、RAG、Workflow、Eval 与实践路径。
+---
+
 # Agent 学习综合指南
 
 ## 适合人群

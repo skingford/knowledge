@@ -1,4 +1,6 @@
 ---
+title: AI / Agent 方向待补主题
+description: AI / Agent 方向的待补专题清单，记录已完成主题与后续计划扩展内容。
 search: false
 ---
 

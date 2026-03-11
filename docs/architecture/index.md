@@ -2,6 +2,7 @@
 layout: page
 title: false
 description: 架构方向学习入口，覆盖系统设计路线、书单、自检清单、高并发与分布式事务专题。
+search: false
 aside: false
 outline: false
 pageClass: claude-home-page

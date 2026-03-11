@@ -196,6 +196,8 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/golang/guide/01-string-byte-best-practices.md",
+    "docs/golang/guide/01-slice-append-pitfalls.md",
     "docs/golang/guide/05-testing-benchmark-cicd.md",
     "docs/golang/guide/05-error-middleware-code-style.md",
     "docs/golang/guide/05-project-layout-deps-logging-config.md",
@@ -232,8 +234,6 @@
     "docs/golang/guide/07-performance-troubleshooting.md",
     "docs/golang/guide/06-database-cache.md",
     "docs/golang/guide/05-engineering-practices.md",
-    "docs/golang/guide/04-network-stdlib.md",
-    "docs/golang/guide/03-concurrency.md",
     "article/Untitled.canvas",
     "article/Untitled 1.canvas"
   ]

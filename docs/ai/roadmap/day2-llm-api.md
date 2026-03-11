@@ -1,4 +1,6 @@
 ---
+title: Day 2：学会调用 LLM API
+description: Agent 学习路线第 2 天，掌握 LLM API 调用、提示词设计、参数控制与结构化输出基础。
 search: false
 ---
 

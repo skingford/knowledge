@@ -1,3 +1,9 @@
+---
+title: 性能优化与排障
+description: Go 性能优化与排障专题，系统整理 pprof、trace、内存、CPU 与线上问题定位方法。
+search: false
+---
+
 # 性能优化与排障
 
 ## 适合人群

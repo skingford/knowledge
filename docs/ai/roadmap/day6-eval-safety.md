@@ -1,4 +1,6 @@
 ---
+title: Day 6：评测与安全
+description: Agent 学习路线第 6 天，覆盖评测方法、安全边界、提示注入与产品化前的质量控制。
 search: false
 ---
 

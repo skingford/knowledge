@@ -2,6 +2,7 @@
 layout: page
 title: false
 description: 工具方向入口，收录 Vim、iTerm2、Git 和 Mac 开发效率工具的实用配置与技巧。
+search: false
 aside: false
 outline: false
 pageClass: claude-home-page

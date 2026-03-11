@@ -1,4 +1,6 @@
 ---
+title: Day 5：RAG 与记忆系统
+description: Agent 学习路线第 5 天，理解 RAG、Embedding、Chunking、Retrieval 与短期长期记忆设计。
 search: false
 ---
 

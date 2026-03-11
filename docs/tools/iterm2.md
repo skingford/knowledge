@@ -1,3 +1,8 @@
+---
+title: iTerm2 配置指南
+description: iTerm2 配置指南，整理常用外观、快捷键、Shell 集成与终端效率优化方案。
+---
+
 # iTerm2 配置指南
 
 从安装配色到 Shell 集成，打造高效美观的终端工作环境。

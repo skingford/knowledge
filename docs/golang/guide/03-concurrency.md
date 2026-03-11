@@ -1,3 +1,9 @@
+---
+title: 并发编程
+description: Go 并发编程专题，系统整理 Goroutine、Channel、Mutex、Context 与调度模型实践。
+search: false
+---
+
 # 并发编程
 
 ## 适合人群

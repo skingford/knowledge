@@ -211,6 +211,14 @@ export const sections: SectionConfig[] = [
         ],
       },
       {
+        text: '语言基础拆分专题',
+        collapsed: true,
+        items: [
+          { text: 'Slice 的坑与三指切片', link: '/golang/guide/01-slice-append-pitfalls' },
+          { text: 'String 与 []byte 最佳实践', link: '/golang/guide/01-string-byte-best-practices' },
+        ],
+      },
+      {
         text: '网络编程与标准库拆分专题',
         collapsed: true,
         items: [

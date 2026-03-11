@@ -1,3 +1,8 @@
+---
+title: 7 天 Agent 学习路线
+description: 7 天节奏的 Agent 实战学习路线，从模型调用、工具使用到 RAG、Workflow 和完整项目。
+---
+
 # 7 天 Agent 学习路线
 
 > 概念、资料、框架等完整内容见 [Agent 学习综合指南](./agent-learning-guide.md)，本文聚焦 7 天实操安排。

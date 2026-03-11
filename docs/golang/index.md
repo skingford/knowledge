@@ -2,6 +2,7 @@
 layout: page
 title: false
 description: Golang 学习入口，覆盖语言机制、并发、性能、工程实践、排障与能力自检内容。
+search: false
 aside: false
 outline: false
 pageClass: claude-home-page

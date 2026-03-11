@@ -1,4 +1,6 @@
 ---
+title: Day 3：Tool Calling / Function Calling
+description: Agent 学习路线第 3 天，系统理解 Tool Calling 原理、工具描述方式与函数调用流程。
 search: false
 ---
 

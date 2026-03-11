@@ -1,4 +1,6 @@
 ---
+title: Day 7：完整项目
+description: Agent 学习路线第 7 天，通过文档问答 Agent 项目把 Tool Calling、RAG、Workflow 与 Eval 串起来。
 search: false
 ---
 

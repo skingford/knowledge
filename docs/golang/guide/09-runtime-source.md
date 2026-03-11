@@ -1,3 +1,9 @@
+---
+title: 源码与 Runtime
+description: Go runtime 与源码阅读专题，聚焦调度、GC、Channel、内存分配与底层实现理解。
+search: false
+---
+
 # 源码与 Runtime
 
 ## 适合人群

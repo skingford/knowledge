@@ -1,6 +1,7 @@
 ---
 title: RPC、注册发现与配置
-description: Go 微服务通信基础，涵盖 gRPC、Protobuf、服务注册发现和配置中心。
+description: Go 微服务通信基础专题，涵盖 gRPC、Protobuf、服务注册发现和配置中心。
+search: false
 ---
 
 # 微服务与分布式：RPC、注册发现与配置

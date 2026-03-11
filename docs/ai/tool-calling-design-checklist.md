@@ -1,3 +1,8 @@
+---
+title: Tool Calling 设计清单
+description: Tool Calling 设计检查清单，聚焦工具描述、参数设计、容错处理与 Agent 调用稳定性。
+---
+
 # Tool Calling 设计清单
 
 ## 适合人群

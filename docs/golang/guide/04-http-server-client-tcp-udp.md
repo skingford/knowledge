@@ -1,3 +1,9 @@
+---
+title: HTTP 服务端、客户端与 TCP/UDP
+description: Go 网络编程基础专题，覆盖 net/http 服务端模型、http.Client 配置与 TCP UDP 基础。
+search: false
+---
+
 # HTTP 服务端、客户端与 TCP/UDP
 
 聚焦 Go 网络编程基础能力：先理解 `net/http` 服务端模型，再掌握 `http.Client` 的配置与常见陷阱，最后补齐 TCP / UDP 编程基础。
@@ -421,4 +427,3 @@ func main() {
 3. **Deadline vs Timeout**：`net.Conn.SetReadDeadline` 是设置绝对截止时间，不是相对超时。每次操作后需要重新设置，否则后续操作可能立即超时。
 
 ---
-

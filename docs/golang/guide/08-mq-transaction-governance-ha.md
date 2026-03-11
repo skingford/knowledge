@@ -1,6 +1,7 @@
 ---
 title: 消息队列、事务、治理与高可用
-description: Go 分布式系统进阶，涵盖 Kafka、Saga、Outbox、服务治理和高可用设计。
+description: Go 分布式系统进阶专题，涵盖 Kafka、Saga、Outbox、服务治理和高可用设计。
+search: false
 ---
 
 # 微服务与分布式：消息队列、事务、治理与高可用

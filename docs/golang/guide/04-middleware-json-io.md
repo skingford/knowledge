@@ -1,3 +1,9 @@
+---
+title: 中间件、JSON 编解码与文件 IO
+description: Go 标准库工程专题，整理中间件设计、JSON 编解码细节与文件 IO 处理实践。
+search: false
+---
+
 # 中间件、JSON 编解码与文件 IO
 
 这一页收拢标准库里偏工程侧的常用能力，包括中间件组织、JSON 编解码细节，以及文件与 IO 处理。

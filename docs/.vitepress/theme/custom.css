@@ -209,6 +209,11 @@ body:has(#VPNavScreen) {
   outline-offset: 3px;
 }
 
+/* VitePress local search already highlights the search bar via :focus-within. */
+.VPLocalSearchBox .search-input:focus-visible {
+  outline: none;
+}
+
 :target {
   scroll-margin-top: calc(var(--vp-nav-height) + 24px);
 }
