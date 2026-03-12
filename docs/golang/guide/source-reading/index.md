@@ -102,6 +102,78 @@ Go 标准库核心包关系图
   │   math/rand/v2            ← ChaCha8/PCG 随机数生成器         │
   │                                                              │
   └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 工具链与调优 ──────────────────────┐
+  │                                                              │
+  │   embed                   ← //go:embed 编译时资源嵌入        │
+  │   flag                    ← FlagSet 子命令模式               │
+  │   net/url                 ← URL 结构化解析 + 安全拼接        │
+  │   runtime/pprof           ← CPU/Heap/Goroutine 性能剖析      │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 底层基础与编码 ────────────────────┐
+  │                                                              │
+  │   encoding/binary         ← 字节序（Big/LittleEndian）+ Varint│
+  │   compress/gzip           ← DEFLATE（LZ77+Huffman）流式压缩  │
+  │   path/filepath           ← WalkDir + 跨平台路径处理         │
+  │   unicode/utf8            ← rune/byte 模型 + DecodeRune      │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 工程工具与数据结构 ─────────────────┐
+  │                                                              │
+  │   text/template           ← Parse/Execute + FuncMap 模板引擎 │
+  │   os/signal               ← 信号分发 + NotifyContext 优雅关闭 │
+  │   container/heap          ← 接口驱动堆 + 优先队列实现         │
+  │   time                    ← 双时钟模型 + 参考时间格式化       │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 系统能力与调试 ────────────────────┐
+  │                                                              │
+  │   io/fs                   ← FS 接口 + embed/os/fstest 统一   │
+  │   os/exec                 ← 进程创建 + 管道 + 命令注入防护   │
+  │   encoding/xml            ← 标签驱动 + 命名空间 + Token 流   │
+  │   runtime/debug           ← GC 控制 + 栈追踪 + 构建信息      │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 安全、测试与现代特性 ──────────────┐
+  │                                                              │
+  │   crypto/hmac             ← SHA256 + HMAC + 常数时间比较     │
+  │   net/http/httptest       ← ResponseRecorder + 测试服务器    │
+  │   maps/cmp/slices         ← Go 1.21+ 泛型工具包              │
+  │   archive/zip             ← ZIP 中央目录 + Zip Slip 防护     │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 数据、安全与基础结构 ──────────────┐
+  │                                                              │
+  │   encoding/csv            ← 流式读写 + ReuseRecord + BOM     │
+  │   crypto/rand             ← CSPRNG + UUID v4 + Token 生成   │
+  │   expvar                  ← /debug/vars 运行时指标暴露       │
+  │   container/list          ← 哨兵节点双链表 + LRU 缓存        │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 序列化、性能与加密 ─────────────────┐
+  │                                                              │
+  │   encoding/gob            ← 自描述流式二进制编码             │
+  │   sync.Pool               ← per-P 本地池 + victim cache      │
+  │   crypto/aes              ← AES-GCM AEAD + Nonce + 密钥派生  │
+  │   net/http/httptrace      ← DNS/TCP/TLS 钩子 + TTFB 观测    │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 追踪、算术与基础工具 ───────────────┐
+  │                                                              │
+  │   runtime/trace           ← goroutine 调度时间线 + GC 停顿   │
+  │   math/big                ← Karatsuba 乘法 + 密码学模幂运算  │
+  │   encoding/base64         ← 四种编码器 + JWT + 流式处理      │
+  │   log                     ← Mutex 保护 + Fatal/Panic 行为    │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 
 ══════════════════════════════════════════════════════════════════
 ```
@@ -139,6 +211,38 @@ Go 标准库核心包关系图
 | `regexp` | [正则引擎](./regexp) | Thompson NFA 线性保证 | ★★★☆☆ |
 | `crypto/tls` | [TLS 实现](./crypto-tls) | TLS 1.3 握手与证书链 | ★★★★☆ |
 | `math/rand/v2` | [随机数生成](./math-rand) | ChaCha8/PCG 生成器 | ★★☆☆☆ |
+| `embed` | [静态资源嵌入](./embed) | //go:embed 编译时机制 | ★★☆☆☆ |
+| `flag` | [命令行解析](./flag) | FlagSet 子命令模式 | ★★☆☆☆ |
+| `net/url` | [URL 解析](./net-url) | Query 编解码与安全拼接 | ★★☆☆☆ |
+| `runtime/pprof` | [性能剖析](./runtime-pprof) | CPU/Heap/Goroutine 采样 | ★★★☆☆ |
+| `encoding/binary` | [二进制编解码](./encoding-binary) | 字节序与 Varint 变长编码 | ★★★☆☆ |
+| `compress/gzip` | [流式压缩](./compress-gzip) | DEFLATE 算法与 HTTP 压缩 | ★★★☆☆ |
+| `path/filepath` | [路径处理](./path-filepath) | WalkDir vs Walk 性能差异 | ★★☆☆☆ |
+| `unicode/utf8` | [字符编码](./unicode-utf8) | rune/byte 内存模型与 DecodeRune | ★★★☆☆ |
+| `text/template` | [模板引擎](./text-template) | Parse/Execute 与 FuncMap 设计 | ★★★☆☆ |
+| `os/signal` | [信号处理](./os-signal) | 优雅关闭与 NotifyContext | ★★☆☆☆ |
+| `container/heap` | [优先队列](./container-heap) | 接口驱动堆 + heap.Fix 场景 | ★★★☆☆ |
+| `time` | [时间处理](./time-pkg) | 双时钟模型与格式化参考时间 | ★★☆☆☆ |
+| `io/fs` | [文件系统抽象](./io-fs) | FS 接口 + embed/os/fstest 统一模型 | ★★★☆☆ |
+| `os/exec` | [命令执行](./os-exec) | 进程创建与 I/O 管道 + 命令注入防护 | ★★★☆☆ |
+| `encoding/xml` | [XML 编解码](./encoding-xml) | 标签驱动 + Token 流式解析 | ★★★☆☆ |
+| `runtime/debug` | [调试工具](./runtime-debug) | GC 控制 + 栈追踪 + 构建信息 | ★★★☆☆ |
+| `crypto/hmac` | [哈希与消息认证](./crypto-hmac) | SHA256 + HMAC 常数时间比较 | ★★★☆☆ |
+| `net/http/httptest` | [HTTP 测试工具](./net-http-test) | ResponseRecorder + 测试服务器 | ★★☆☆☆ |
+| `maps`/`cmp`/`slices` | [泛型工具包](./maps-cmp) | Go 1.21+ 标准泛型操作 | ★★☆☆☆ |
+| `archive/zip` | [ZIP 归档](./archive-zip) | 中央目录 + Zip Slip 防护 | ★★★☆☆ |
+| `encoding/csv` | [CSV 处理](./encoding-csv) | 流式读写 + ReuseRecord + BOM | ★★☆☆☆ |
+| `crypto/rand` | [密码学随机数](./crypto-rand) | CSPRNG + UUID + Token 生成 | ★★☆☆☆ |
+| `expvar` | [可导出变量](./expvar) | /debug/vars + 运行时指标暴露 | ★★☆☆☆ |
+| `container/list` | [双向链表](./container-list) | 哨兵节点 + LRU 缓存实现 | ★★★☆☆ |
+| `encoding/gob` | [Go 原生序列化](./encoding-gob) | 自描述流式编码 + 接口注册 | ★★★☆☆ |
+| `sync.Pool` | [对象池](./sync-pool) | per-P 本地池 + victim cache | ★★★★☆ |
+| `crypto/aes` | [对称加密](./crypto-aes) | AES-GCM AEAD + 密钥派生 | ★★★☆☆ |
+| `net/http/httptrace` | [请求追踪](./net-http-trace) | DNS/TCP/TLS 各阶段钩子 + TTFB | ★★★☆☆ |
+| `runtime/trace` | [执行追踪](./runtime-trace) | goroutine 调度时间线 + GC 停顿分析 | ★★★☆☆ |
+| `math/big` | [任意精度算术](./math-big) | Karatsuba 乘法 + 密码学模幂运算 | ★★★★☆ |
+| `encoding/base64` | [Base64 编码](./encoding-base64) | 四种编码器 + JWT + 流式编解码 | ★★☆☆☆ |
+| `log` | [标准日志库](./log-pkg) | Mutex 保护 + Fatal/Panic 行为差异 | ★★☆☆☆ |
 
 ## 阅读建议
 
@@ -162,6 +266,22 @@ Go 标准库核心包关系图
 ⑧ net → sort/slices → strconv → fmt （底层原理与性能）
        ↓
 ⑨ bufio → regexp → crypto/tls → math/rand （扩展专题）
+       ↓
+⑩ embed → flag → net/url → runtime/pprof   （工具链与调优）
+       ↓
+⑪ encoding/binary → compress/gzip → path/filepath → unicode/utf8  （底层基础与编码）
+       ↓
+⑫ text/template → os/signal → container/heap → time  （工程工具与数据结构）
+       ↓
+⑬ io/fs → os/exec → encoding/xml → runtime/debug  （系统能力与调试）
+       ↓
+⑭ crypto/hmac → net/http/httptest → maps/cmp/slices → archive/zip  （安全、测试与现代特性）
+       ↓
+⑮ encoding/csv → crypto/rand → expvar → container/list  （数据、安全与基础结构）
+       ↓
+⑯ encoding/gob → sync.Pool → crypto/aes → net/http/httptrace  （序列化、性能与加密）
+       ↓
+⑰ runtime/trace → math/big → encoding/base64 → log  （追踪、算术与基础工具）
 ```
 
 ## 源码查阅工具
