@@ -350,6 +350,18 @@ Go 标准库核心包关系图
 | `go/types` | [类型检查器](./go-types) | 类型推断 + Defs/Uses + linter 构建 + x/analysis | ★★★★☆ |
 | `runtime.SetFinalizer` | [GC 终结器](./runtime-finalizer) | 泄漏检测 + CGO 资源 + KeepAlive + 弱引用模式 | ★★★☆☆ |
 | `golang.org/x/text` | [Unicode 文本](./golang-x-text) | GBK↔UTF-8 + NFC/NFKC + 语言协商 + 中文排序 | ★★★☆☆ |
+| bcrypt/Argon2id/scrypt | [密码散列](./crypto-password) | 慢哈希算法选择 + cost 调优 + 自动重散列 | ★★★★☆ |
+| `net/http` RESTful | [API 设计模式](./net-http-api) | Go 1.22 路由 + 统一错误 + 分页 + CORS | ★★★★☆ |
+| `testing/fstest` | [虚拟文件系统测试](./testing-fstest) | MapFS + TestFS 校验 + io/fs 接口注入 | ★★★☆☆ |
+| HTTP/2 | [多路复用与推送](./net-http2) | HPACK + Server Push + h2c + MaxConcurrentStreams | ★★★★☆ |
+| Go Fuzzing | [覆盖率引导模糊测试](./go-fuzzing) | testing.F + SeedCorpus + 协议 Fuzz + 语料库管理 | ★★★★☆ |
+| `net` TCP 服务器 | [自定义 TCP 协议服务器](./net-tcp-server) | 二进制帧协议 + 连接池 + TLS + 优雅关闭 | ★★★★☆ |
+| `go:generate` | [代码生成工具链](./go-generate) | stringer + mockgen + protoc + sqlc + 自定义生成器 | ★★★★☆ |
+| `database/sql` 高级 | [高级事务与批量插入](./database-sql-advanced) | Savepoint + 批量 COPY + Prepared 缓存 + RETURNING | ★★★★☆ |
+| `crypto/ed25519` | [EdDSA 签名](./crypto-ed25519) | Ed25519 密钥生成 + JWT EdDSA + TLS 证书 + seed 派生 | ★★★★☆ |
+| CGO | [C/Go 互操作](./cgo-basics) | 类型映射 + 指针规则 + 静态库集成 + Finalizer 内存管理 | ★★★★☆ |
+| `golang.org/x/oauth2` | [OAuth2 客户端](./golang-x-oauth2) | 授权码 + PKCE + Client Credentials + Token 持久化 | ★★★★☆ |
+| `testing`（高级）| [高级测试模式](./testing-advanced) | Golden File + t.Cleanup + 并行子测试 + Benchmark + TestMain | ★★★★☆ |
 
 ## 阅读建议
 
@@ -411,6 +423,12 @@ Go 标准库核心包关系图
 ㉗ crypto/ecdsa → net/http 服务端 → x/sync → unique  （签名、服务端模式与 Go 1.23 新特性）
        ↓
 ㉘ crypto/cipher → go/types → runtime.SetFinalizer → x/text  （加密模式、类型分析与国际化）
+       ↓
+㉙ bcrypt/Argon2id → RESTful API → testing/fstest → HTTP/2  （密码安全、API 设计与协议深度）
+       ↓
+㉚ Go Fuzzing → TCP 服务器 → go:generate → database/sql 高级  （测试工程、网络协议与代码生成）
+       ↓
+㉛ crypto/ed25519 → CGO → oauth2 → testing 高级  （现代密码学、C 互操作与测试工程化）
 ```
 
 ## 源码查阅工具
