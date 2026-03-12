@@ -338,6 +338,10 @@ Go 标准库核心包关系图
 | `crypto/rsa` | [RSA 非对称加密](./crypto-rsa) | OAEP/PSS + 混合加密 + RS256 JWT | ★★★★☆ |
 | `slices/maps/cmp` | [泛型标准库](./slices-maps-cmp) | pdqsort + BinarySearch + cmp.Or (Go 1.21+) | ★★★☆☆ |
 | `runtime/metrics` | [运行时指标](./runtime-metrics) | 无 STW 采集 + Float64Histogram + Prometheus 集成 | ★★★★☆ |
+| `crypto/sha256` | [hash 接口体系](./crypto-sha) | SHA-256/512 + HMAC + Merkle 树 + 内容寻址存储 | ★★★☆☆ |
+| `net/http Transport` | [连接池调优](./net-http-transport) | MaxIdleConnsPerHost + 超时级联 + 自定义 RoundTripper | ★★★★☆ |
+| `iter`（Go 1.23+）| [迭代器协议](./iter-pkg) | Seq/Seq2 + pull/push + range over func + 适配器链 | ★★★☆☆ |
+| `math/rand/v2`（Go 1.22+）| [现代随机数](./math-rand-v2) | PCG/ChaCha8 + 泛型 rand.N + 加权随机 + 抖动退避 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -393,6 +397,8 @@ Go 标准库核心包关系图
 ㉔ runtime/pprof → crypto/x509 → net/netip → unsafe  （底层、安全与现代特性）
        ↓
 ㉕ encoding/hex → crypto/rsa → slices/maps/cmp → runtime/metrics  （加密、泛型与可观测性）
+       ↓
+㉖ crypto/sha256 → net/http Transport → iter → math/rand/v2  （哈希、传输层调优与现代特性）
 ```
 
 ## 源码查阅工具
