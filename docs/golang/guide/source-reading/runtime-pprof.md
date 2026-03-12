@@ -1,214 +1,116 @@
 ---
-title: runtime/pprof 源码精读
-description: 精读 Go runtime/pprof 的剖析数据采集机制，理解 CPU/内存/goroutine profile 的实现原理与生产调优实践。
+title: runtime/pprof + net/http/pprof 源码精读
+description: 精读 Go 性能剖析工具链，掌握 CPU/内存/goroutine Profile 采集、火焰图分析与生产环境持续剖析最佳实践。
 ---
 
-# runtime/pprof：性能剖析源码精读
+# runtime/pprof + net/http/pprof：性能剖析源码精读
 
-> 核心源码：`src/runtime/pprof/pprof.go`、`src/runtime/cpuprof.go`、`src/net/http/pprof/pprof.go`
+> 核心源码：`src/runtime/pprof/pprof.go`、`src/net/http/pprof/pprof.go`
 
 ## 包结构图
 
 ```
-pprof 生态全景
+Go 性能剖析工具链
 ══════════════════════════════════════════════════════════════════
 
-  数据采集层
-  ├── runtime/pprof        ← 核心采集（写入 pprof 格式）
-  │     ├── StartCPUProfile / StopCPUProfile  ← CPU 采样
-  │     ├── WriteHeapProfile                  ← 堆内存快照
-  │     └── Lookup("goroutine"/"mutex"/...)   ← 其他 profile
+  Profile 类型（runtime/pprof）：
+  ┌──────────────────┬────────────────────────────────────────┐
+  │ Profile 名称     │ 内容                                   │
+  ├──────────────────┼────────────────────────────────────────┤
+  │ cpu              │ CPU 时间采样（每10ms一次，SIGPROF）    │
+  │ heap             │ 堆内存分配（in-use/alloc，采样率512B） │
+  │ goroutine        │ 所有 goroutine 的当前堆栈              │
+  │ allocs           │ 所有内存分配（历史，含已回收）         │
+  │ threadcreate     │ OS 线程创建堆栈                        │
+  │ block            │ 阻塞事件（channel/mutex/syscall）      │
+  │ mutex            │ mutex 竞争堆栈                         │
+  └──────────────────┴────────────────────────────────────────┘
+
+  采集方式：
+  ├── 文件采集（runtime/pprof）
+  │    pprof.StartCPUProfile(f) → ... → pprof.StopCPUProfile()
+  │    pprof.WriteHeapProfile(f)
   │
-  └── net/http/pprof        ← HTTP 接口（import _ 注册）
-        ├── /debug/pprof/           ← 列表页
-        ├── /debug/pprof/profile    ← CPU profile（30s 采样）
-        ├── /debug/pprof/heap       ← 堆内存 profile
-        ├── /debug/pprof/goroutine  ← goroutine 栈
-        ├── /debug/pprof/mutex      ← 锁竞争
-        ├── /debug/pprof/block      ← 阻塞（channel/select）
-        └── /debug/pprof/allocs     ← 内存分配（包含已释放）
+  └── HTTP 接口（net/http/pprof）
+       _ "net/http/pprof"  ← 仅需 import，自动注册路由
+       GET /debug/pprof/           ← 总览页面
+       GET /debug/pprof/goroutine  ← goroutine dump
+       GET /debug/pprof/heap       ← 堆内存
+       GET /debug/pprof/profile?seconds=30 ← CPU 30秒采样
 
-  分析工具层
-  ├── go tool pprof          ← 命令行交互分析
-  │     ├── top / top10      ← 热点函数
-  │     ├── list <func>      ← 源码行级标注
-  │     ├── web              ← 打开火焰图（svg）
-  │     └── -http=:8080      ← Web UI 可视化
-  └── go tool trace          ← 执行追踪（更细粒度）
+  分析工具：
+  go tool pprof cpu.prof              ← 交互式分析
+  go tool pprof -http=:8081 cpu.prof  ← 浏览器火焰图
+  go tool pprof http://host/debug/pprof/heap  ← 远程分析
 
 ══════════════════════════════════════════════════════════════════
 ```
 
 ---
 
-## 一、CPU Profile 采集原理
-
-```
-CPU Profile 工作机制（SIGPROF 采样）
-══════════════════════════════════════════════════════════════════
-
-  StartCPUProfile(w)
-       │
-       ├── 设置 ITIMER_PROF（默认 100Hz = 10ms 采样一次）
-       ├── 注册 SIGPROF 信号处理器
-       └── 启动后台 goroutine 写 pprof 数据
-
-  每 10ms：
-       OS 发送 SIGPROF 信号
-            ↓
-       runtime.sigprofNonGo / sigprofHandler
-            ├── 暂停当前 goroutine（采样点）
-            ├── 调用 runtime.callers() 获取调用栈
-            │       → 最多 64 帧（可配置）
-            └── 写入 cpuprof.log（环形缓冲区）
-
-  StopCPUProfile()
-       ├── 清除定时器和信号处理
-       └── 将 cpuprof.log 编码为 pprof protobuf 格式写入 w
-
-  pprof 格式：
-  ├── 调用栈 → 压缩存储（地址 → 函数名 + 行号）
-  └── 采样计数（times=出现次数 → 换算为 CPU 时间）
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 二、Heap Profile 采集原理
-
-```
-Heap Profile 数据来源
-══════════════════════════════════════════════════════════════════
-
-  runtime.MemProfileRate（默认 512KB）
-       │
-       └── 每分配 ~512KB，记录一次调用栈 + 已分配/已释放计数
-
-  WriteHeapProfile(w)
-       │
-       ├── runtime.MemProfile(records, inuseZero)
-       │       → 读取 runtime 内部的 MemProfileRecord 表
-       │       → 每条记录：调用栈 + AllocBytes/FreeBytes/AllocObjects/FreeObjects
-       │
-       └── 编码为 pprof 格式输出
-
-  Profile 类型：
-  ├── heap（default）   → 当前在用内存（inuse_space）
-  ├── allocs           → 所有历史分配（含已释放）
-  └── inuse_objects    → 当前在用对象数（不含大小）
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 三、Goroutine Profile
+## 一、核心实现
 
 ```go
-// 获取所有 goroutine 的调用栈
-p := pprof.Lookup("goroutine")
-p.WriteTo(w, 1) // debug=1: 文本格式，debug=2: 详细文本，debug=0: pprof 格式
+// src/runtime/pprof/pprof.go（简化）
 
-// runtime.Stack（简单版本，无需 pprof）
-buf := make([]byte, 1<<20)
-n := runtime.Stack(buf, true) // true=所有 goroutine
-fmt.Printf("%s", buf[:n])
-```
+// CPU Profile：通过 SIGPROF 信号定时采样
+func StartCPUProfile(w io.Writer) error {
+    // 写入 pprof 格式头部
+    // 通知 runtime 开启 SIGPROF 定时器（默认 100Hz = 每10ms）
+    // runtime 在 SIGPROF 中断时记录当前 goroutine 的调用栈
+    return runtime.SetCPUProfileRate(100) // 100 次/秒
+}
 
-```
-Goroutine profile 输出示例
-══════════════════════════════════════════════════════════════════
-
-  goroutine 1 [running]:
-  main.main()
-          /app/main.go:42 +0x5e
-
-  goroutine 6 [chan receive, 30 minutes]:
-  main.worker(0xc000018060)
-          /app/worker.go:15 +0x8a
-
-  goroutine 8 [select]:
-  net.(*netFD).connect(...)
-          /usr/local/go/src/net/fd_unix.go:121 +0x1d5
-
-  状态说明：
-  ├── running     → 正在运行
-  ├── chan receive → 等待 channel 接收
-  ├── chan send    → 等待 channel 发送
-  ├── select      → 阻塞在 select
-  ├── syscall     → 系统调用中
-  ├── sleep       → time.Sleep
-  └── IO wait     → 等待网络 I/O
-
-══════════════════════════════════════════════════════════════════
+// Heap Profile：基于采样的内存分析
+// runtime 在每分配 MemProfileRate（默认512KB）字节时记录一次调用栈
+// WriteHeapProfile 输出当前内存 in-use 对象的聚合调用栈
+func WriteHeapProfile(w io.Writer) error {
+    return writeHeapProto(w, memProfile(), defaultSampleRate)
+}
 ```
 
 ---
 
-## 四、代码示例
+## 二、代码示例
 
-### 程序内嵌 pprof（生产推荐）
+### HTTP pprof 端点（生产最常用）
 
 ```go
 import (
     "net/http"
-    _ "net/http/pprof" // 仅 import，自动注册 /debug/pprof/ 路由
+    _ "net/http/pprof" // 副作用：自动注册 /debug/pprof/ 路由
 )
 
 func main() {
-    // 在独立端口启动 pprof HTTP 服务（不暴露到外网！）
+    // pprof 单独监听（避免暴露给公网）
     go func() {
-        log.Println(http.ListenAndServe("localhost:6060", nil))
+        log.Println("pprof 监听 :6060")
+        log.Fatal(http.ListenAndServe("localhost:6060", nil))
     }()
 
-    // 正常业务逻辑...
-    runServer()
+    // 正常业务服务
+    http.ListenAndServe(":8080", businessHandler())
 }
+
+// 使用：
+// CPU 剖析（30秒）：
+//   go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
+// 堆内存：
+//   go tool pprof http://localhost:6060/debug/pprof/heap
+// Goroutine dump：
+//   curl http://localhost:6060/debug/pprof/goroutine?debug=2
 ```
 
-```bash
-# 采集 30 秒 CPU profile
-go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
-
-# 采集堆内存快照
-go tool pprof http://localhost:6060/debug/pprof/heap
-
-# 查看 goroutine 堆栈
-curl http://localhost:6060/debug/pprof/goroutine?debug=2
-
-# 采集锁竞争（需先开启）
-# runtime.SetMutexProfileFraction(1)
-go tool pprof http://localhost:6060/debug/pprof/mutex
-```
-
-### 基准测试中的 Profile
+### 文件采集 CPU Profile
 
 ```go
-// go test -bench=BenchmarkXxx -cpuprofile=cpu.out -memprofile=mem.out
-func BenchmarkProcess(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        process(data)
-    }
-}
-```
+import (
+    "os"
+    "runtime/pprof"
+)
 
-```bash
-# 分析 CPU
-go tool pprof cpu.out
-(pprof) top10        # 查看 top 10 耗时函数
-(pprof) list process # 查看 process 函数源码行级耗时
-(pprof) web          # 打开 SVG 火焰图（需安装 graphviz）
-
-# Web UI 分析（推荐）
-go tool pprof -http=:8080 cpu.out
-```
-
-### 手动采集 profile（集成测试 / 脚本）
-
-```go
-func profileCPU(duration time.Duration, filename string) error {
-    f, err := os.Create(filename)
+func profileCPU(duration time.Duration, fn func()) error {
+    f, err := os.Create("cpu.prof")
     if err != nil {
         return err
     }
@@ -217,78 +119,141 @@ func profileCPU(duration time.Duration, filename string) error {
     if err := pprof.StartCPUProfile(f); err != nil {
         return err
     }
-    defer pprof.StopCPUProfile()
+    defer pprof.StopCPUProfile() // ⚠️ 必须调用，否则 prof 文件不完整
 
-    // 执行要分析的代码
-    time.Sleep(duration) // 实际应运行业务代码
+    // 运行待分析的函数
+    timer := time.NewTimer(duration)
+    done := make(chan struct{})
+    go func() {
+        fn()
+        close(done)
+    }()
+
+    select {
+    case <-timer.C:
+    case <-done:
+    }
     return nil
 }
 
-func profileHeap(filename string) error {
-    f, err := os.Create(filename)
+// 使用：
+// profileCPU(30*time.Second, func() { heavyWork() })
+// go tool pprof -http=:8081 cpu.prof
+```
+
+### 堆内存与 Allocs Profile
+
+```go
+func captureHeapProfile(path string) error {
+    f, err := os.Create(path)
     if err != nil {
         return err
     }
     defer f.Close()
 
-    runtime.GC() // 采集前强制 GC，使结果更准确
+    // 强制 GC 后采集（排除垃圾对象干扰）
+    runtime.GC()
     return pprof.WriteHeapProfile(f)
 }
+
+// allocs profile：记录所有历史分配（包含已被 GC 回收的）
+func captureAllocsProfile(path string) error {
+    f, err := os.Create(path)
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+
+    return pprof.Lookup("allocs").WriteTo(f, 0)
+}
+
+// 分析差值：发现内存泄漏
+// go tool pprof -base before.prof after.prof http://...
 ```
 
-### 开启锁竞争和阻塞 profile
+### 开启 Block 和 Mutex Profile
 
 ```go
-func init() {
-    // 锁竞争 profile（1=100% 采样，N=1/N 采样）
-    runtime.SetMutexProfileFraction(1)
+func enableBlockMutexProfile() {
+    // Block profile：记录 goroutine 阻塞事件
+    // 参数=1：采样每个阻塞事件（生产中建议 100 以降低开销）
+    runtime.SetBlockProfileRate(100)
 
-    // 阻塞 profile（ns 为采样阈值，1=全部阻塞事件）
-    runtime.SetBlockProfileRate(1)
+    // Mutex profile：记录 mutex 竞争
+    runtime.SetMutexProfileFraction(100)
+
+    // 采集：
+    // go tool pprof http://localhost:6060/debug/pprof/block
+    // go tool pprof http://localhost:6060/debug/pprof/mutex
 }
 ```
 
-### 内存泄漏定位流程
+### 自定义 Profile（业务 Profile）
+
+```go
+// 自定义 Profile：追踪业务特定资源（如 DB 连接）
+var dbConnProfile = pprof.NewProfile("db_connections")
+
+func trackDBConn(conn *sql.Conn) {
+    // 记录获取连接时的调用栈（skip=1 跳过本函数）
+    dbConnProfile.Add(conn, 1)
+}
+
+func releaseDBConn(conn *sql.Conn) {
+    dbConnProfile.Remove(conn)
+}
+
+// 查看：http://localhost:6060/debug/pprof/db_connections?debug=1
+```
+
+### 生产持续剖析（Continuous Profiling）
+
+```go
+// 定期采集并上传（用于 Pyroscope/Parca 等持续剖析平台）
+func continuousProfiling(ctx context.Context, uploadFn func(name string, data []byte)) {
+    ticker := time.NewTicker(60 * time.Second)
+    defer ticker.Stop()
+
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case <-ticker.C:
+            // 采集 30s CPU profile
+            var buf bytes.Buffer
+            pprof.StartCPUProfile(&buf)
+            time.Sleep(30 * time.Second)
+            pprof.StopCPUProfile()
+            uploadFn("cpu", buf.Bytes())
+
+            // 采集当前堆 profile
+            buf.Reset()
+            runtime.GC()
+            pprof.WriteHeapProfile(&buf)
+            uploadFn("heap", buf.Bytes())
+        }
+    }
+}
+```
+
+### pprof 分析工作流
 
 ```bash
-# 1. 采集两次 heap profile（间隔一段时间）
-curl -o heap1.out http://localhost:6060/debug/pprof/heap
-# ... 等待一段时间 ...
-curl -o heap2.out http://localhost:6060/debug/pprof/heap
+# 1. 采集 CPU profile（30秒）
+go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
 
-# 2. 对比两个 profile（找增量）
-go tool pprof -base heap1.out heap2.out
+# 2. 交互式分析命令
+(pprof) top10          # 按 CPU 时间排序前10
+(pprof) top10 -cum     # 按累计时间排序（含被调函数）
+(pprof) list funcName  # 查看具体函数行级耗时
+(pprof) web            # 生成调用图（需 graphviz）
 
-# 3. 查看增长最快的分配点
-(pprof) top
-(pprof) list <函数名>
-```
+# 3. 火焰图（推荐）
+go tool pprof -http=:8081 cpu.prof
+# 浏览器访问 :8081，选择 Flame Graph 视图
 
----
-
-## 五、常用 pprof 命令速查
-
-```
-go tool pprof 常用命令
-══════════════════════════════════════════════════════════════════
-
-  交互模式命令：
-  top [N]          ← 热点函数（默认 top10）
-  top -cum         ← 按累计时间排序（含调用链）
-  list <funcname>  ← 源码行级标注
-  web              ← 生成 SVG 调用图（需 graphviz）
-  weblist <func>   ← 带源码的 SVG
-  disasm <func>    ← 汇编级分析
-  peek <func>      ← 查看调用者/被调用者
-  tree             ← 文本调用树
-
-  采样类型切换（Heap profile）：
-  (pprof) sample_index=inuse_space    ← 当前占用内存（默认）
-  (pprof) sample_index=inuse_objects  ← 当前占用对象数
-  (pprof) sample_index=alloc_space    ← 历史分配总量
-  (pprof) sample_index=alloc_objects  ← 历史分配总对象数
-
-══════════════════════════════════════════════════════════════════
+# 4. 内存泄漏对比分析
+go tool pprof -base heap_before.prof heap_after.prof
 ```
 
 ---
@@ -297,9 +262,9 @@ go tool pprof 常用命令
 
 | 问题 | 要点 |
 |------|------|
-| CPU profile 是怎么采样的？ | SIGPROF 信号（100Hz），每 10ms 中断当前 goroutine 并记录调用栈 |
-| Heap profile 的 MemProfileRate 是什么？ | 控制采样频率；默认每 512KB 分配记录一次；=1 记录所有分配（开销大）|
-| net/http/pprof 如何注册路由？ | import _ 时 init() 调用 http.HandleFunc 注册 /debug/pprof/ 系列路由 |
-| goroutine profile 的 "chan receive 30 minutes" 说明什么？ | goroutine 等待 channel 已 30 分钟，可能是泄漏（无人发送，goroutine 永远阻塞）|
-| -base 参数的作用？ | 对比两个 profile 的差值，用于定位内存泄漏（只看增量部分）|
-| pprof 对生产性能影响大吗？ | CPU profile 开启时约 5-10% 开销；heap profile 默认极低；建议仅在需要时开启 |
+| CPU Profile 的采样原理？ | runtime 设置 SIGPROF 定时信号（默认 100Hz），每次信号触发时记录当前运行 goroutine 的调用栈；采集时间越长数据越准确 |
+| Heap Profile 和 Allocs Profile 的区别？ | Heap 只看当前存活对象（in-use 内存，GC 后有效）；Allocs 记录所有历史分配（含已回收），用于发现高分配率函数 |
+| 为什么 pprof 应在独立端口暴露？ | `/debug/pprof` 会暴露内存数据、goroutine 堆栈等敏感信息；应仅监听 `localhost:6060`，禁止公网访问 |
+| Block Profile 和 Mutex Profile 的开销？ | 默认不开启（rate=0）；Block rate=1 记录所有阻塞（开销大），rate=100 采样 1%（生产推荐）；Mutex 类似 |
+| `top` 和 `top -cum` 的区别？ | `top` 按 flat 时间排序（函数自身执行时间，不含子调用）；`-cum` 按 cumulative 排序（含全部子调用时间，适合找调用链瓶颈） |
+| 如何找内存泄漏？ | 间隔采集两次 heap profile → `go tool pprof -base before.prof after.prof` 查看增量 → 找增长的分配点 |

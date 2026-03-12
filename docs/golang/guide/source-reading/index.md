@@ -5,7 +5,7 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 
 # Go 源码精读总览
 
-> 源码路径：`$GOROOT/src/`（本地：`/Users/kingford/workspace/github.com/go/src/`）
+> 源码路径：`$GOROOT/src/`（版本：v1.26.1）
 
 ## 包全景图
 
@@ -228,6 +228,15 @@ Go 标准库核心包关系图
   │   os/signal               ← 优雅关闭 + SIGHUP重载 + K8s终止  │
   │                                                              │
   └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 底层、安全与现代特性 ──────────────┐
+  │                                                              │
+  │   runtime/pprof           ← CPU/堆/goroutine Profile采集     │
+  │   crypto/x509             ← 证书链验证 + 自签名CA + CSR流程  │
+  │   net/netip               ← 零分配IP地址 + 可作map key       │
+  │   unsafe                  ← 指针转换规则 + 零拷贝 + 内存布局  │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 
 ══════════════════════════════════════════════════════════════════
 ```
@@ -321,6 +330,14 @@ Go 标准库核心包关系图
 | `compress/gzip` | [流式压缩](./compress-gzip) | DEFLATE 封装 + Pool 复用 + HTTP 响应压缩 | ★★★☆☆ |
 | `unicode/utf8` | [字符编码](./unicode-utf8) | rune 解码 + 安全截断 + 编码校验修复 | ★★★☆☆ |
 | `os/signal` | [信号处理](./os-signal) | 优雅关闭 + SIGHUP 热重载 + K8s 终止流程 | ★★★☆☆ |
+| `runtime/pprof` | [性能剖析](./runtime-pprof) | CPU/堆/goroutine Profile + 火焰图 + 持续剖析 | ★★★★☆ |
+| `crypto/x509` | [证书与 PKI](./crypto-x509) | 证书链验证 + 自签名 CA + CSR 流程 | ★★★★☆ |
+| `net/netip` | [现代 IP 地址](./net-netip) | 零分配 + 可作 map key + CIDR 路由表 | ★★★☆☆ |
+| `unsafe` | [底层指针操作](./unsafe-pkg) | 6 条转换规则 + 零拷贝转换 + 内存布局优化 | ★★★★☆ |
+| `encoding/hex` | [十六进制编解码](./encoding-hex) | lookup table + 流式编解码 + HMAC 常量时间比较 | ★★☆☆☆ |
+| `crypto/rsa` | [RSA 非对称加密](./crypto-rsa) | OAEP/PSS + 混合加密 + RS256 JWT | ★★★★☆ |
+| `slices/maps/cmp` | [泛型标准库](./slices-maps-cmp) | pdqsort + BinarySearch + cmp.Or (Go 1.21+) | ★★★☆☆ |
+| `runtime/metrics` | [运行时指标](./runtime-metrics) | 无 STW 采集 + Float64Histogram + Prometheus 集成 | ★★★★☆ |
 
 ## 阅读建议
 
@@ -372,6 +389,10 @@ Go 标准库核心包关系图
 ㉒ database/sql → crypto/tls → encoding/binary → html/template  （数据库、安全与模板）
        ↓
 ㉓ net/http/httputil → compress/gzip → unicode/utf8 → os/signal  （代理、压缩与系统集成）
+       ↓
+㉔ runtime/pprof → crypto/x509 → net/netip → unsafe  （底层、安全与现代特性）
+       ↓
+㉕ encoding/hex → crypto/rsa → slices/maps/cmp → runtime/metrics  （加密、泛型与可观测性）
 ```
 
 ## 源码查阅工具
