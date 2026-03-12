@@ -342,6 +342,14 @@ Go 标准库核心包关系图
 | `net/http Transport` | [连接池调优](./net-http-transport) | MaxIdleConnsPerHost + 超时级联 + 自定义 RoundTripper | ★★★★☆ |
 | `iter`（Go 1.23+）| [迭代器协议](./iter-pkg) | Seq/Seq2 + pull/push + range over func + 适配器链 | ★★★☆☆ |
 | `math/rand/v2`（Go 1.22+）| [现代随机数](./math-rand-v2) | PCG/ChaCha8 + 泛型 rand.N + 加权随机 + 抖动退避 | ★★★☆☆ |
+| `crypto/ecdsa` | [椭圆曲线签名](./crypto-ecdsa) | P-256/P-384 + JWT ES256 + ECDH 密钥交换 | ★★★★☆ |
+| `net/http` 服务端 | [高级模式](./net-http-server) | Middleware 链 + graceful shutdown + SSE + Hijacker | ★★★★☆ |
+| `golang.org/x/sync` | [并发工具包](./golang-x-sync) | errgroup + singleflight + semaphore + pipeline | ★★★★☆ |
+| `unique`（Go 1.23+）| [字符串驻留](./unique-pkg) | Handle 弱引用 + O(1) 比较 + 遥测 Tag 优化 | ★★★☆☆ |
+| `crypto/cipher` | [分组密码模式](./crypto-cipher) | AEAD/AES-GCM/ChaCha20 + CTR 流式 + 密钥派生 | ★★★★☆ |
+| `go/types` | [类型检查器](./go-types) | 类型推断 + Defs/Uses + linter 构建 + x/analysis | ★★★★☆ |
+| `runtime.SetFinalizer` | [GC 终结器](./runtime-finalizer) | 泄漏检测 + CGO 资源 + KeepAlive + 弱引用模式 | ★★★☆☆ |
+| `golang.org/x/text` | [Unicode 文本](./golang-x-text) | GBK↔UTF-8 + NFC/NFKC + 语言协商 + 中文排序 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -399,6 +407,10 @@ Go 标准库核心包关系图
 ㉕ encoding/hex → crypto/rsa → slices/maps/cmp → runtime/metrics  （加密、泛型与可观测性）
        ↓
 ㉖ crypto/sha256 → net/http Transport → iter → math/rand/v2  （哈希、传输层调优与现代特性）
+       ↓
+㉗ crypto/ecdsa → net/http 服务端 → x/sync → unique  （签名、服务端模式与 Go 1.23 新特性）
+       ↓
+㉘ crypto/cipher → go/types → runtime.SetFinalizer → x/text  （加密模式、类型分析与国际化）
 ```
 
 ## 源码查阅工具
