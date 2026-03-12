@@ -1,206 +1,118 @@
 ---
 title: compress/gzip 源码精读
-description: 精读 compress/gzip 的流式压缩实现、DEFLATE 算法结构与 HTTP 压缩传输的最佳实践。
+description: 精读 compress/gzip 的流式压缩实现，掌握 DEFLATE 算法封装、HTTP 响应压缩、压缩等级权衡与并发压缩最佳实践。
 ---
 
-# compress/gzip：压缩 I/O 源码精读
+# compress/gzip：流式压缩源码精读
 
-> 核心源码：`src/compress/gzip/gzip.go`、`src/compress/flate/`
+> 核心源码：`src/compress/gzip/gzip.go`、`src/compress/flate/deflate.go`
 
 ## 包结构图
 
 ```
-compress 包生态
+compress/gzip 体系
 ══════════════════════════════════════════════════════════════════
 
-  compress/gzip         ← gzip 格式（含文件头/CRC32/大小校验）
-  compress/zlib         ← zlib 格式（含 Adler-32 校验，HTTP deflate 实际是这个）
-  compress/flate        ← 核心 DEFLATE 算法（LZ77 + Huffman）
-  compress/bzip2        ← bzip2（只读，无写实现）
-  compress/lzw          ← LZW（GIF/TIFF 使用）
+  gzip 文件格式（RFC 1952）：
+  ┌──────┬──────────┬─────────┬──────────┬──────┬───────┐
+  │ 头部 │  Extra   │ 文件名  │  注释    │ 数据 │ 尾部  │
+  │ 10B  │ (可选)   │ (可选)  │ (可选)   │DEFLATE│CRC32+│
+  │      │          │         │          │ 压缩  │ Size  │
+  └──────┴──────────┴─────────┴──────────┴──────┴───────┘
+  Header: {Name, Comment, OS, ModTime, Extra}
 
-  gzip 文件格式：
-  ┌──────────────────────────────────────────────────────────────┐
-  │  Header（10字节）                                             │
-  │  ├── Magic: 1f 8b                                            │
-  │  ├── Method: 08（DEFLATE）                                   │
-  │  ├── Flags: FNAME/FCOMMENT/FHCRC/FEXTRA                     │
-  │  ├── ModTime: 4字节                                          │
-  │  ├── ExtraFlags + OS                                         │
-  │  └── 可选：文件名（\0 结尾）/注释/Extra 字段                 │
-  │  Body: DEFLATE 压缩数据                                      │
-  │  Footer（8字节）                                             │
-  │  ├── CRC32: 4字节（原始数据校验）                            │
-  │  └── Size:  4字节（原始数据大小 mod 2^32）                   │
-  └──────────────────────────────────────────────────────────────┘
+  API：
+  ├── gzip.NewWriter(w io.Writer) *gzip.Writer
+  │    ├── Write(p []byte) (n int, err error)  ← 流式压缩写入
+  │    ├── Flush()  ← 刷新（生成可解压的完整块，不关闭）
+  │    └── Close()  ← 必须调用（写入尾部 CRC32 + 原始大小）
+  │
+  ├── gzip.NewReader(r io.Reader) (*gzip.Reader, error)
+  │    ├── Read(p []byte) (n int, err error)  ← 流式解压读取
+  │    ├── Reset(r io.Reader)  ← 复用 Reader（避免重新分配）
+  │    └── Header  ← 文件元信息（Name/ModTime 等）
+  │
+  └── 压缩等级（flate.BestSpeed ~ flate.BestCompression）：
+       BestSpeed(1)        → 速度优先（~400MB/s，压缩率低）
+       DefaultCompression(-1) → 默认平衡（等级6）
+       BestCompression(9)  → 压缩率优先（~30MB/s，体积最小）
+
+  相关包：
+  ├── compress/flate    ← DEFLATE 算法底层实现
+  ├── compress/zlib     ← zlib 格式（gzip 去掉文件头）
+  ├── compress/lzw      ← LZW 算法（GIF 使用）
+  └── compress/bzip2    ← bzip2（只有解压，无压缩）
 
 ══════════════════════════════════════════════════════════════════
 ```
 
 ---
 
-## 一、核心结构
+## 一、核心实现
 
 ```go
-// src/compress/gzip/gzip.go
+// src/compress/gzip/gzip.go（简化）
+
 type Writer struct {
-    Header                          // gzip 头部信息
-    w          io.Writer            // 底层输出
-    level      int                  // 压缩级别
-    compressor *flate.Writer        // DEFLATE 压缩器
-    digest     crc32.Hash           // CRC32 校验
-    size       uint32               // 已写入原始字节数
-    closed     bool
-    buf        [10]byte             // 临时缓冲
-    err        error
+    Header                // gzip 文件头元信息
+    w          io.Writer  // 底层 Writer
+    level      int        // 压缩等级
+    compressor *flate.Writer  // DEFLATE 压缩器
+    digest     crc32.Hash    // CRC32 校验（边压缩边计算）
+    size       uint32        // 原始数据大小
 }
 
-// src/compress/gzip/gunzip.go
-type Reader struct {
-    Header                          // 读取到的 gzip 头部
-    r            flate.Reader       // 底层字节读取器
-    decompressor io.ReadCloser      // DEFLATE 解压器
-    digest       uint32             // 累计 CRC32
-    size         uint32             // 已读取字节数
-    buf          [512]byte
-    err          error
-    multistream  bool               // 是否支持多流（默认 true）
-}
-```
-
----
-
-## 二、DEFLATE 算法原理
-
-```
-DEFLATE = LZ77 + Huffman 编码
-══════════════════════════════════════════════════════════════════
-
-  阶段一：LZ77 压缩（消除重复字节序列）
-  ──────────────────────────────────────
-  输入：abcabcabc
-  扫描：abc 在距离 0 出现；再次发现 abc 在距离 3 前
-  编码：abc + (distance=3, length=6) ← "回引"指针
-  输出：abc + <back-ref>
-
-  阶段二：Huffman 编码（消除统计冗余）
-  ──────────────────────────────────────
-  对 LZ77 的符号（literal/length/distance）建 Huffman 树
-  高频符号 → 短编码
-  低频符号 → 长编码
-  → 进一步压缩编码长度
-
-  压缩级别（flate 包）：
-  ├── flate.NoCompression       = 0（只封装，不压缩，最快）
-  ├── flate.BestSpeed           = 1（速度优先）
-  ├── flate.DefaultCompression  = -1（平衡，约 level 6）
-  └── flate.BestCompression     = 9（压缩率最高，最慢）
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 三、流式压缩设计
-
-```
-gzip.Writer 写入流程
-══════════════════════════════════════════════════════════════════
-
-  gzip.NewWriter(w)
-       │
-       └── 首次 Write 时写 gzip Header（懒写入）
-
-  writer.Write(data)
-       │
-       ├── 更新 CRC32：digest.Write(data)
-       ├── 更新 size += len(data)
-       └── 调用 flate.Writer.Write(data)
-               → LZ77 压缩 + Huffman 编码
-               → 写入底层 w
-
-  writer.Close()
-       │
-       ├── flate.Writer.Close()（flush 剩余数据 + 结束块）
-       ├── 写 Footer：CRC32（4字节）+ Size（4字节）
-       └── 关闭底层 w（若实现了 io.Closer）
-
-  ⚠️ 必须调用 Close()，否则：
-     ├── flate 内部缓冲未 flush
-     └── gzip Footer 未写入 → 接收方 CRC 校验失败
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 四、代码示例
-
-### 压缩文件
-
-```go
-func compressFile(src, dst string) error {
-    in, err := os.Open(src)
-    if err != nil {
-        return err
-    }
-    defer in.Close()
-
-    out, err := os.Create(dst)
-    if err != nil {
-        return err
-    }
-    defer out.Close()
-
-    // 带 bufio 减少系统调用次数
-    bw := bufio.NewWriterSize(out, 64*1024)
-    gz, err := gzip.NewWriterLevel(bw, gzip.BestSpeed)
-    if err != nil {
-        return err
-    }
-
-    if _, err := io.Copy(gz, in); err != nil {
-        return err
-    }
-    if err := gz.Close(); err != nil { // ← 关键：Flush + 写 Footer
-        return err
-    }
-    return bw.Flush()
-}
-```
-
-### 解压文件
-
-```go
-func decompressFile(src, dst string) error {
-    in, err := os.Open(src)
-    if err != nil {
-        return err
-    }
-    defer in.Close()
-
-    gr, err := gzip.NewReader(in)
-    if err != nil {
-        return err
-    }
-    defer gr.Close()
-
-    // 读取 gzip 头中的元信息
-    fmt.Printf("original file: %s, modified: %v\n",
-        gr.Name, gr.ModTime)
-
-    out, err := os.Create(dst)
-    if err != nil {
-        return err
-    }
-    defer out.Close()
-
-    _, err = io.Copy(out, gr)
+func (z *Writer) Close() error {
+    if z.closed { return nil }
+    z.closed = true
+    // 1. 刷新 DEFLATE 压缩器（写入最后一块）
+    z.compressor.Close()
+    // 2. 写入尾部：CRC32（4字节）+ 原始大小（4字节，mod 2^32）
+    var buf [8]byte
+    binary.LittleEndian.PutUint32(buf[:4], z.digest.Sum32())
+    binary.LittleEndian.PutUint32(buf[4:], z.size)
+    _, err := z.w.Write(buf[:])
     return err
 }
 ```
 
-### HTTP 响应压缩（gzip 中间件）
+---
+
+## 二、代码示例
+
+### 基础压缩与解压
+
+```go
+import "compress/gzip"
+
+// 压缩字节切片
+func compress(data []byte) ([]byte, error) {
+    var buf bytes.Buffer
+    gz := gzip.NewWriter(&buf)
+    // ⚠️ Close() 写入尾部 CRC32，必须调用
+    defer gz.Close()
+
+    if _, err := gz.Write(data); err != nil {
+        return nil, err
+    }
+    if err := gz.Close(); err != nil {
+        return nil, err
+    }
+    return buf.Bytes(), nil
+}
+
+// 解压字节切片
+func decompress(data []byte) ([]byte, error) {
+    gz, err := gzip.NewReader(bytes.NewReader(data))
+    if err != nil {
+        return nil, err
+    }
+    defer gz.Close()
+    return io.ReadAll(gz)
+}
+```
+
+### HTTP 响应 gzip 压缩中间件
 
 ```go
 type gzipResponseWriter struct {
@@ -212,9 +124,10 @@ func (w *gzipResponseWriter) Write(b []byte) (int, error) {
     return w.gz.Write(b)
 }
 
+// gzip 中间件：对支持的客户端压缩响应
 func GzipMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // 检查客户端是否支持 gzip
+        // 检查客户端是否接受 gzip
         if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
             next.ServeHTTP(w, r)
             return
@@ -228,50 +141,159 @@ func GzipMiddleware(next http.Handler) http.Handler {
         defer gz.Close()
 
         w.Header().Set("Content-Encoding", "gzip")
-        w.Header().Del("Content-Length") // 压缩后长度未知
-        next.ServeHTTP(&gzipResponseWriter{w, gz}, r)
+        w.Header().Del("Content-Length") // 压缩后大小未知
+
+        next.ServeHTTP(&gzipResponseWriter{
+            ResponseWriter: w,
+            gz:             gz,
+        }, r)
     })
 }
 ```
 
-### 内存压缩（bytes.Buffer）
+### 文件压缩（带元信息）
 
 ```go
-// 压缩到内存
-func compress(data []byte) ([]byte, error) {
-    var buf bytes.Buffer
-    gz, _ := gzip.NewWriterLevel(&buf, gzip.BestCompression)
-    if _, err := gz.Write(data); err != nil {
-        return nil, err
+// 压缩文件并保留元信息
+func compressFile(srcPath, dstPath string) error {
+    src, err := os.Open(srcPath)
+    if err != nil {
+        return err
     }
-    if err := gz.Close(); err != nil {
-        return nil, err
+    defer src.Close()
+
+    fi, _ := src.Stat()
+
+    dst, err := os.Create(dstPath)
+    if err != nil {
+        return err
     }
-    return buf.Bytes(), nil
+    defer dst.Close()
+
+    gz, _ := gzip.NewWriterLevel(dst, gzip.DefaultCompression)
+    gz.Header = gzip.Header{
+        Name:    fi.Name(),
+        ModTime: fi.ModTime(),
+        OS:      255, // 未知操作系统
+    }
+    defer gz.Close()
+
+    _, err = io.Copy(gz, src)
+    return err
 }
 
-// 从内存解压
-func decompress(data []byte) ([]byte, error) {
-    gr, err := gzip.NewReader(bytes.NewReader(data))
+// 读取 gzip 文件元信息（不解压全部内容）
+func readGzipHeader(path string) (*gzip.Header, error) {
+    f, err := os.Open(path)
     if err != nil {
         return nil, err
     }
-    defer gr.Close()
-    return io.ReadAll(gr)
+    defer f.Close()
+
+    gz, err := gzip.NewReader(f)
+    if err != nil {
+        return nil, err
+    }
+    defer gz.Close()
+
+    header := gz.Header // 仅读头部，不解压数据
+    return &header, nil
 }
 ```
 
-### 压缩 JSON API 响应
+### sync.Pool 复用 gzip.Writer（高并发优化）
 
 ```go
-func writeJSONGzip(w http.ResponseWriter, data any) error {
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Content-Encoding", "gzip")
+// gzip.Writer 初始化有内存分配开销，高并发场景用 Pool 复用
+var gzipWriterPool = sync.Pool{
+    New: func() any {
+        gz, _ := gzip.NewWriterLevel(io.Discard, gzip.BestSpeed)
+        return gz
+    },
+}
+
+func compressWithPool(w io.Writer, data []byte) error {
+    gz := gzipWriterPool.Get().(*gzip.Writer)
+    defer func() {
+        gz.Reset(io.Discard) // 重置状态
+        gzipWriterPool.Put(gz)
+    }()
+
+    gz.Reset(w) // 复用 Writer 写到新目标
+    if _, err := gz.Write(data); err != nil {
+        return err
+    }
+    return gz.Close()
+}
+```
+
+### 流式 gzip（大文件不占用内存）
+
+```go
+// 场景：边读取数据库记录边压缩输出（不缓冲全部数据）
+func streamingExport(db *sql.DB, w http.ResponseWriter) {
+    w.Header().Set("Content-Type", "application/gzip")
+    w.Header().Set("Content-Disposition", `attachment; filename="export.json.gz"`)
 
     gz := gzip.NewWriter(w)
     defer gz.Close()
 
-    return json.NewEncoder(gz).Encode(data) // 流式：边 JSON 编码边压缩
+    enc := json.NewEncoder(gz)
+
+    rows, _ := db.Query("SELECT id, data FROM records")
+    defer rows.Close()
+
+    gz.Write([]byte("["))
+    first := true
+    for rows.Next() {
+        var rec Record
+        rows.Scan(&rec.ID, &rec.Data)
+        if !first {
+            gz.Write([]byte(","))
+        }
+        enc.Encode(rec)
+        first = false
+    }
+    gz.Write([]byte("]"))
+}
+
+// 转码：gzip → zlib（不解压到内存）
+func gzipToZlib(gzReader io.Reader, zlibWriter io.Writer) error {
+    gr, err := gzip.NewReader(gzReader)
+    if err != nil {
+        return err
+    }
+    defer gr.Close()
+
+    zw := zlib.NewWriter(zlibWriter)
+    defer zw.Close()
+
+    _, err = io.Copy(zw, gr) // 流式转换，内存占用 = 缓冲区大小
+    return err
+}
+```
+
+### 压缩等级基准选择
+
+```go
+// 根据场景选择压缩等级
+func chooseLevel(scenario string) int {
+    switch scenario {
+    case "api-response":
+        // API 响应：速度优先，减少延迟
+        return gzip.BestSpeed // 等级1
+    case "static-file":
+        // 静态文件：离线压缩，最大化压缩率
+        return gzip.BestCompression // 等级9
+    case "log-archive":
+        // 日志归档：平衡（默认等级6）
+        return gzip.DefaultCompression
+    case "real-time-stream":
+        // 实时流：最快速度
+        return 1
+    default:
+        return gzip.DefaultCompression
+    }
 }
 ```
 
@@ -281,9 +303,9 @@ func writeJSONGzip(w http.ResponseWriter, data any) error {
 
 | 问题 | 要点 |
 |------|------|
-| DEFLATE 算法由哪两部分组成？ | LZ77（消除重复序列，用回引指针）+ Huffman 编码（消除统计冗余）|
-| gzip 和 zlib 的区别？ | gzip 有文件头（魔数/文件名/时间）和 CRC32 校验；zlib 头更轻量（Adler-32）；DEFLATE 是共同的压缩内核 |
-| 忘记 Close 会导致什么？ | flate 缓冲区未 flush + gzip Footer 未写入 → 接收方 CRC 校验失败，数据被认为损坏 |
-| 如何选择压缩级别？ | 网络传输：BestSpeed（1）；存储归档：BestCompression（9）；通用：DefaultCompression（-1） |
-| HTTP gzip 压缩时为什么要删 Content-Length？ | 压缩后大小未知（流式压缩），若保留原始大小会导致客户端接收错误字节数 |
-| gzip.Reader 的 Multistream 是什么？ | 允许读取多个 gzip 流拼接的文件（如 .tar.gz 中多个流）；默认开启 |
+| `gzip.Writer.Close()` 为什么必须调用？ | Close 写入 gzip 尾部（CRC32 校验值 + 原始大小），没有尾部的 gzip 文件会导致解压失败或数据验证错误 |
+| `Flush()` 和 `Close()` 的区别？ | Flush 将压缩数据刷新到底层 Writer（使接收方可以部分解压），但不关闭流；Close 写尾部并关闭，不可再写入 |
+| 如何优化高并发 HTTP gzip 压缩？ | 用 `sync.Pool` 复用 `gzip.Writer`，通过 `Reset(w)` 切换到新目标；避免每次请求都 `New()` 分配内存 |
+| gzip 和 deflate 的关系？ | gzip = deflate 压缩数据 + gzip 文件头（魔数/CRC32/文件名等）；zlib = deflate + adler32 校验；HTTP Content-Encoding 的 gzip 就是标准 gzip |
+| HTTP 响应压缩为什么要删除 `Content-Length`？ | 压缩后大小未知（流式压缩），必须删除；否则浏览器按原始大小读取数据会截断或报错 |
+| `BestSpeed` vs `BestCompression` 的性能差距？ | BestSpeed（等级1）约 300-500MB/s，压缩率约 60%；BestCompression（等级9）约 30-50MB/s，压缩率约 70%；API 场景通常用等级 1-3 |

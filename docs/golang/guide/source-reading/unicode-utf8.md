@@ -1,222 +1,198 @@
 ---
 title: unicode/utf8 源码精读
-description: 精读 unicode/utf8 包的 UTF-8 编解码实现，理解 rune/byte 的本质区别与 Go 字符串的内存模型。
+description: 精读 unicode/utf8 的编解码实现，掌握 rune 与字节的转换、字符串遍历、UTF-8 校验与多语言文本处理最佳实践。
 ---
 
 # unicode/utf8：字符编码源码精读
 
-> 核心源码：`src/unicode/utf8/utf8.go`、`src/unicode/tables.go`
+> 核心源码：`src/unicode/utf8/utf8.go`
 
 ## 包结构图
 
 ```
-unicode 相关包全景
+unicode/utf8 体系
 ══════════════════════════════════════════════════════════════════
 
-  unicode/utf8             ← UTF-8 编解码核心
-  ├── 解码：DecodeRune / DecodeRuneInString
-  ├── 编码：EncodeRune / AppendRune
-  ├── 校验：ValidString / Valid
-  ├── 统计：RuneCountInString / RuneLen
-  └── 常量：RuneError / MaxRune / UTFMax
+  UTF-8 编码规则：
+  ┌────────────────┬──────────────────────────────────────────┐
+  │ Unicode 范围   │ UTF-8 字节格式                           │
+  ├────────────────┼──────────────────────────────────────────┤
+  │ U+0000~007F    │ 0xxxxxxx              （1 字节，ASCII）  │
+  │ U+0080~07FF    │ 110xxxxx 10xxxxxx     （2 字节）         │
+  │ U+0800~FFFF    │ 1110xxxx 10xxxxxx 10xxxxxx  （3 字节）   │
+  │ U+10000~10FFFF │ 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx（4B）│
+  └────────────────┴──────────────────────────────────────────┘
+  中文字符通常 3 字节；emoji 通常 4 字节
 
-  unicode                  ← Unicode 字符属性查询
-  ├── Is(rangeTab, rune)   ← 判断字符属于哪个 Unicode 类别
-  ├── IsLetter / IsDigit / IsSpace / IsPunct ...
-  ├── ToUpper / ToLower / ToTitle
-  └── 范围表：unicode.Letter / unicode.Digit ...
+  核心函数：
+  ├── RuneLen(r rune) int              ← rune 编码后的字节数
+  ├── RuneCount(p []byte) int          ← 字节切片中的 rune 数量
+  ├── RuneCountInString(s string) int  ← 字符串中的 rune 数量
+  ├── DecodeRune(p []byte) (rune, int) ← 解码第一个 rune + 字节数
+  ├── DecodeRuneInString(s) (rune, int)← 从字符串解码第一个 rune
+  ├── DecodeLastRune(p []byte) (rune, int) ← 解码最后一个 rune
+  ├── EncodeRune(p []byte, r rune) int ← 将 rune 编码写入字节切片
+  ├── Valid(p []byte) bool             ← 校验是否合法 UTF-8
+  ├── ValidString(s string) bool       ← 校验字符串是否合法 UTF-8
+  └── ValidRune(r rune) bool           ← 校验 rune 是否合法 Unicode
 
-  unicode/utf16            ← UTF-16 编解码（Windows/Java 常用）
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 一、UTF-8 编码规则
-
-```
-UTF-8 编码表
-══════════════════════════════════════════════════════════════════
-
-  Unicode 范围              字节数    编码模板（x 为数据位）
-  ─────────────────────────────────────────────────────────────
-  U+0000   ~ U+007F        1字节    0xxxxxxx
-  U+0080   ~ U+07FF        2字节    110xxxxx 10xxxxxx
-  U+0800   ~ U+FFFF        3字节    1110xxxx 10xxxxxx 10xxxxxx
-  U+10000  ~ U+10FFFF      4字节    11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-
-  特征：
-  ├── ASCII（0~127）一字节，向后兼容
-  ├── 多字节首字节高位决定字节数（110/1110/11110）
-  ├── 续字节始终以 10 开头（可自同步，从任意位置扫描）
-  └── 最大 4 字节，覆盖全部 Unicode 码点
-
-  示例：'中' = U+4E2D
-  0x4E2D = 0100 1110 0010 1101
-  3字节：1110xxxx 10xxxxxx 10xxxxxx
-        1110 0100  10 111000  10 101101
-  = 0xE4 0xB8 0xAD
+  重要常量：
+  ├── RuneError = '\uFFFD'   ← 非法字节的替代字符（□）
+  ├── MaxRune   = '\U0010FFFF' ← Unicode 最大码点
+  └── UTFMax    = 4            ← 单个 rune 最大字节数
 
 ══════════════════════════════════════════════════════════════════
 ```
 
 ---
 
-## 二、DecodeRune 实现
+## 一、核心实现
 
 ```go
 // src/unicode/utf8/utf8.go（简化）
+
+// DecodeRune：解码字节切片的第一个 UTF-8 字符
 func DecodeRune(p []byte) (r rune, size int) {
     n := len(p)
     if n < 1 {
         return RuneError, 0
     }
     p0 := p[0]
+    x := first[p0]  // 查表：确定字节数和掩码
 
-    // 单字节（ASCII）：最快路径
-    if p0 < RuneSelf { // RuneSelf = 0x80
+    if x >= as {    // 单字节（ASCII 0~127）
         return rune(p0), 1
     }
 
-    // 确定字节数
-    var sz int
-    switch {
-    case p0 < 0xE0: sz = 2 // 110xxxxx
-    case p0 < 0xF0: sz = 3 // 1110xxxx
-    default:         sz = 4 // 11110xxx
+    sz := int(x & 7)  // 提取字节数（低3位）
+    if n < sz {
+        return RuneError, 1
     }
 
-    // 提取数据位（去掉高位标识位）
-    r = rune(p0 & (0xFF >> sz)) // 首字节有效位掩码
-    for i := 1; i < sz; i++ {
-        if p[i]&0xC0 != 0x80 { // 续字节必须 10xxxxxx
-            return RuneError, 1 // 无效 UTF-8
-        }
-        r = r<<6 | rune(p[i]&0x3F) // 拼接 6 位数据
+    // 验证后续字节必须是 10xxxxxx 格式
+    b1 := p[1]
+    if b1 < locb || hicb < b1 {
+        return RuneError, 1
     }
-    return r, sz
+    if sz == 2 {
+        return rune(p0&mask2)<<6 | rune(b1&maskx), 2
+    }
+    // ... 3、4 字节类似
 }
 ```
 
 ---
 
-## 三、Go 字符串内存模型
+## 二、代码示例
 
-```
-Go string 与 rune 的关系
-══════════════════════════════════════════════════════════════════
-
-  string 底层：
-  ┌──────────────┬──────────────┐
-  │  ptr *byte   │  len int     │
-  └──────────────┴──────────────┘
-  → 不可变的字节序列（UTF-8 编码，但不强制校验）
-  → len(s) = 字节数，不是字符数！
-
-  rune = int32，代表一个 Unicode 码点
-
-  示例：s := "Hello中文"
-  len(s) = 11（5个ASCII字节 + 中=3字节 + 文=3字节）
-  utf8.RuneCountInString(s) = 7（7个字符）
-
-  for i, r := range s {
-      // i = 字节偏移，r = rune（编译器自动 DecodeRune）
-  }
-
-  直接下标访问：
-  s[5] = 0xE4（'中'的第一字节，不是 '中' 本身！）
-  需要 rune 切片：[]rune(s)[5] = '中'（有额外分配）
-
-══════════════════════════════════════════════════════════════════
-```
-
----
-
-## 四、常用函数速查
+### 字符串遍历：字节 vs rune
 
 ```go
 import "unicode/utf8"
 
-s := "Hello, 世界"
+func compareIteration() {
+    s := "Hello, 世界! 🌍"
 
-// 字符数（rune 数）
-n := utf8.RuneCountInString(s)       // 9
+    fmt.Printf("字节数: %d\n", len(s))                        // 22
+    fmt.Printf("字符数: %d\n", utf8.RuneCountInString(s))     // 12
 
-// 字节数（内置 len，更快）
-b := len(s)                           // 13
-
-// 解码第一个 rune
-r, size := utf8.DecodeRuneInString(s) // 'H', 1
-r, size  = utf8.DecodeRuneInString(s[7:]) // '世', 3
-
-// 编码 rune → []byte
-buf := make([]byte, utf8.UTFMax)      // UTFMax = 4
-n = utf8.EncodeRune(buf, '世')        // 3, buf=[0xe4,0xb8,0x96]
-
-// 追加编码（Go 1.18+，推荐，零分配）
-dst := utf8.AppendRune([]byte{}, '界') // [0xe7,0x95,0x8c]
-
-// 校验
-utf8.ValidString("Hello")             // true
-utf8.ValidString("Hello\xFF")         // false（\xFF 不是合法 UTF-8）
-utf8.Valid([]byte{0xE4, 0xB8, 0xAD})  // true（'中'）
-
-// 单个 rune 的 UTF-8 字节数
-utf8.RuneLen('A')   // 1
-utf8.RuneLen('中')  // 3
-utf8.RuneLen('𝄞')  // 4（U+1D11E，音符）
-
-// 常量
-utf8.RuneSelf   // 0x80，>= 此值的字节开始多字节序列
-utf8.RuneError  // 0xFFFD，无效 UTF-8 的替代符
-utf8.MaxRune    // 0x10FFFF，最大有效 Unicode 码点
-utf8.UTFMax     // 4，一个 rune 最多字节数
-```
-
----
-
-## 五、代码示例
-
-### 正确遍历字符串
-
-```go
-s := "Hello, 世界"
-
-// ✅ range 遍历（推荐，编译器自动 DecodeRune）
-for i, r := range s {
-    fmt.Printf("byte[%d] = %c (U+%04X)\n", i, r, r)
-}
-// byte[0] = H (U+0048)
-// byte[7] = 世 (U+4E16)
-// byte[10] = 界 (U+754C)
-
-// ✅ 手动 DecodeRune（需要更多控制时）
-for i := 0; i < len(s); {
-    r, size := utf8.DecodeRuneInString(s[i:])
-    fmt.Printf("%c", r)
-    i += size
-}
-
-// ❌ 按字节索引访问（不安全，可能切断多字节 rune）
-for i := 0; i < len(s); i++ {
-    fmt.Printf("%c", s[i]) // 乱码！
-}
-```
-
-### 反转字符串（rune 级别）
-
-```go
-// ❌ 错误：按字节反转
-func reverseBytes(s string) string {
-    b := []byte(s)
-    for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
-        b[i], b[j] = b[j], b[i]
+    // ❌ 错误：按字节遍历会截断多字节字符
+    for i := 0; i < len(s); i++ {
+        fmt.Printf("%x ", s[i]) // 原始字节，中文会碎片化
     }
-    return string(b) // 多字节 rune 内部字节顺序也被反转，乱码
+
+    // ✅ 正确：for range 自动按 rune 迭代
+    for i, r := range s {
+        fmt.Printf("[%d]%c(%d字节) ", i, r, utf8.RuneLen(r))
+    }
+    // [0]H(1字节) [1]e(1字节) ... [7]世(3字节) [10]界(3字节) ...
+
+    // ✅ 正确：手动 DecodeRuneInString 遍历
+    for i := 0; i < len(s); {
+        r, size := utf8.DecodeRuneInString(s[i:])
+        fmt.Printf("%c", r)
+        i += size
+    }
+}
+```
+
+### 字符串截断（保证不截断多字节字符）
+
+```go
+// 按字符数截断（不按字节数）
+func truncateByRune(s string, maxRunes int) string {
+    count := 0
+    for i := range s {
+        if count == maxRunes {
+            return s[:i]
+        }
+        count++
+    }
+    return s // 字符数不足 maxRunes
 }
 
-// ✅ 正确：转为 rune 切片再反转
+// 按字节数截断（但保证 UTF-8 完整性）
+func truncateByByte(s string, maxBytes int) string {
+    if len(s) <= maxBytes {
+        return s
+    }
+    // 从截断点向前找合法 UTF-8 边界
+    for maxBytes > 0 && !utf8.RuneStart(s[maxBytes]) {
+        maxBytes--
+    }
+    return s[:maxBytes]
+}
+
+// RuneStart：判断字节是否是 rune 的起始字节
+// ASCII(0xxxxxxx) 或 多字节起始(11xxxxxx) 返回 true
+// 续字节(10xxxxxx) 返回 false
+
+// 使用
+fmt.Println(truncateByRune("Hello世界", 7))   // "Hello世"
+fmt.Println(truncateByByte("Hello世界", 8))   // "Hello世"（世=3字节，8字节边界）
+```
+
+### UTF-8 校验与修复
+
+```go
+// 校验输入是否合法 UTF-8（防止乱码写入数据库）
+func validateUTF8(s string) error {
+    if !utf8.ValidString(s) {
+        return fmt.Errorf("非法 UTF-8 编码")
+    }
+    return nil
+}
+
+// 修复非法 UTF-8：将非法字节替换为 RuneError
+func sanitizeUTF8(b []byte) []byte {
+    if utf8.Valid(b) {
+        return b // 已合法，直接返回
+    }
+
+    result := make([]byte, 0, len(b))
+    for len(b) > 0 {
+        r, size := utf8.DecodeRune(b)
+        if r == utf8.RuneError && size == 1 {
+            // 非法字节：替换为 U+FFFD（Unicode 替代字符）
+            result = utf8.AppendRune(result, utf8.RuneError)
+        } else {
+            result = append(result, b[:size]...)
+        }
+        b = b[size:]
+    }
+    return result
+}
+
+// strings.ToValidUTF8（Go 1.13+，更简洁）
+func cleanUTF8(s string) string {
+    return strings.ToValidUTF8(s, "?") // 非法字节替换为 "?"
+}
+```
+
+### 字符级操作
+
+```go
+// 反转字符串（正确处理多字节字符）
 func reverseString(s string) string {
     runes := []rune(s)
     for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -224,80 +200,92 @@ func reverseString(s string) string {
     }
     return string(runes)
 }
-// "Hello世界" → "界世olleH"
-```
 
-### 截取前 N 个字符（rune 安全）
-
-```go
-// 截取字符串前 N 个字符（不截断多字节 rune）
-func truncateRunes(s string, n int) string {
-    count := 0
-    for i := range s { // range 按 rune 迭代
-        if count == n {
-            return s[:i]
-        }
-        count++
-    }
-    return s
-}
-
-// 更高效：用 utf8 包直接操作
-func truncateRunesEfficient(s string, n int) string {
-    i := 0
-    for count := 0; count < n && i < len(s); count++ {
-        _, size := utf8.DecodeRuneInString(s[i:])
-        i += size
-    }
-    return s[:i]
-}
-```
-
-### 统计多字节字符比例（检测编码）
-
-```go
-func analyzeString(s string) {
-    total := utf8.RuneCountInString(s)
-    bytes := len(s)
-
-    fmt.Printf("字节数: %d\n", bytes)
-    fmt.Printf("字符数: %d\n", total)
-    fmt.Printf("平均字节/字符: %.2f\n", float64(bytes)/float64(total))
-    fmt.Printf("是否合法 UTF-8: %v\n", utf8.ValidString(s))
-
-    var nonASCII int
+// 统计各类字符
+func countCharTypes(s string) (ascii, cjk, emoji, other int) {
     for _, r := range s {
-        if r >= utf8.RuneSelf {
-            nonASCII++
+        switch {
+        case r < 0x80:
+            ascii++
+        case r >= 0x4E00 && r <= 0x9FFF: // CJK 统一汉字基本区
+            cjk++
+        case r >= 0x1F600 && r <= 0x1F64F: // Emoji 表情
+            emoji++
+        default:
+            other++
         }
     }
-    fmt.Printf("非 ASCII 字符数: %d\n", nonASCII)
+    return
+}
+
+// 高效拼接：用 strings.Builder + WriteRune
+func buildString(runes []rune) string {
+    var sb strings.Builder
+    sb.Grow(len(runes) * 3) // 预估每个 rune 平均 3 字节
+    for _, r := range runes {
+        sb.WriteRune(r)
+    }
+    return sb.String()
 }
 ```
 
-### unicode 包：字符属性查询
+### 编码转换（GBK → UTF-8）
+
+```go
+import "golang.org/x/text/encoding/simplifiedchinese"
+
+// GBK（Windows 中文编码）→ UTF-8
+func gbkToUTF8(gbk []byte) ([]byte, error) {
+    decoder := simplifiedchinese.GBK.NewDecoder()
+    return decoder.Bytes(gbk)
+}
+
+// UTF-8 → GBK
+func utf8ToGBK(utf8Str string) ([]byte, error) {
+    encoder := simplifiedchinese.GBK.NewEncoder()
+    return encoder.Bytes([]byte(utf8Str))
+}
+
+// 读取 GBK 文件并转换
+func readGBKFile(path string) (string, error) {
+    data, err := os.ReadFile(path)
+    if err != nil {
+        return "", err
+    }
+    utf8Data, err := gbkToUTF8(data)
+    if err != nil {
+        return "", err
+    }
+    return string(utf8Data), nil
+}
+```
+
+### 处理包含零宽字符的用户名（安全场景）
 
 ```go
 import "unicode"
 
-// 字符类别判断
-unicode.IsLetter('A')    // true
-unicode.IsLetter('中')   // true（汉字也是 Letter）
-unicode.IsDigit('5')     // true
-unicode.IsSpace(' ')     // true（还包括 \t \n \r）
-unicode.IsPunct('!')     // true
-unicode.IsUpper('A')     // true
-unicode.IsLower('a')     // true
+// 清理用户名：移除控制字符和不可见字符
+func sanitizeUsername(name string) string {
+    var sb strings.Builder
+    for _, r := range name {
+        // 跳过控制字符、零宽字符、方向控制字符
+        if unicode.IsControl(r) || unicode.Is(unicode.Cf, r) {
+            continue
+        }
+        sb.WriteRune(r)
+    }
+    return strings.TrimSpace(sb.String())
+}
 
-// 大小写转换
-unicode.ToUpper('a')     // 'A'
-unicode.ToLower('Ä')     // 'ä'（含变音符号）
-
-// 判断 CJK 字符（中日韩）
-func isCJK(r rune) bool {
-    return unicode.Is(unicode.Han, r) ||
-           unicode.Is(unicode.Hiragana, r) ||
-           unicode.Is(unicode.Katakana, r)
+// 判断字符串是否只包含可打印字符
+func isPrintable(s string) bool {
+    for _, r := range s {
+        if !unicode.IsPrint(r) {
+            return false
+        }
+    }
+    return true
 }
 ```
 
@@ -307,9 +295,9 @@ func isCJK(r rune) bool {
 
 | 问题 | 要点 |
 |------|------|
-| len(s) 和 utf8.RuneCountInString(s) 的区别？ | len 返回字节数；RuneCountInString 返回 Unicode 字符（rune）数 |
-| range string 遍历的单位是什么？ | rune（编译器自动调用 DecodeRune），i 是字节偏移而非字符索引 |
-| string 直接下标 s[i] 取到的是什么？ | 第 i 个字节（byte），不是第 i 个字符；多字节字符会被切断 |
-| RuneError 是什么？ | U+FFFD（0xFFFD），遇到无效 UTF-8 序列时 DecodeRune 返回此值 |
-| 为什么 Go 字符串是不可变的？ | 设计决策：不可变保证并发安全、可安全共享内存（string ↔ []byte 转换时也有保护）|
-| 如何安全截取 N 个字符？ | 用 range 或 DecodeRuneInString 按 rune 步进，不能直接用字节切片 |
+| `len(s)` 和 `utf8.RuneCountInString(s)` 的区别？ | `len` 返回字节数；`RuneCountInString` 返回 Unicode 字符（rune）数；中文 `len("中")=3`，`RuneCount=1` |
+| for range 字符串遍历的底层行为？ | 自动调用 `DecodeRuneInString`，每次迭代返回 `(字节偏移, rune)`；非法 UTF-8 字节返回 `RuneError`，size=1 |
+| `string` 和 `[]rune` 转换的内存开销？ | `[]rune(s)` 分配新内存并解码每个字符；对于纯 ASCII 字符串内存翻倍；大文本应用 `for range` 避免整体转换 |
+| `utf8.RuneError` 的两种含义？ | 作为返回 rune：表示解码遇到非法字节；作为 Unicode 码点：U+FFFD 替代字符（本身是合法字符） |
+| 如何正确按字节截断 UTF-8 字符串？ | 找到截断点后用 `utf8.RuneStart(s[i])` 向前找 rune 起始字节，确保不截断多字节字符中间 |
+| Go 字符串内部编码是什么？ | Go string 是任意字节序列（`[]byte` 视图）；Go 源码编译器保证字面量字符串是 UTF-8，但运行时不强制 |

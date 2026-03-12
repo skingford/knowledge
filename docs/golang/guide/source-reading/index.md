@@ -219,6 +219,15 @@ Go 标准库核心包关系图
   │   html/template           ← 上下文感知转义 + XSS防护         │
   │                                                              │
   └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 代理、压缩与系统集成 ──────────────┐
+  │                                                              │
+  │   net/http/httputil       ← ReverseProxy + DumpRequest调试   │
+  │   compress/gzip           ← DEFLATE封装 + Pool复用 + HTTP压缩 │
+  │   unicode/utf8            ← rune解码 + 安全截断 + 编码校验    │
+  │   os/signal               ← 优雅关闭 + SIGHUP重载 + K8s终止  │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 
 ══════════════════════════════════════════════════════════════════
 ```
@@ -308,6 +317,10 @@ Go 标准库核心包关系图
 | `crypto/tls` | [TLS 握手与证书](./crypto-tls) | TLS 1.3 握手 + mTLS + 证书热更新 | ★★★★☆ |
 | `encoding/binary` | [字节序与协议帧](./encoding-binary) | BigEndian/LittleEndian + 协议解析 + varint | ★★★☆☆ |
 | `html/template` | [安全模板引擎](./html-template) | 上下文感知转义 + XSS 防护 + 模板继承 | ★★★☆☆ |
+| `net/http/httputil` | [反向代理](./net-httputil) | ReverseProxy + 负载均衡 + DumpRequest 调试 | ★★★★☆ |
+| `compress/gzip` | [流式压缩](./compress-gzip) | DEFLATE 封装 + Pool 复用 + HTTP 响应压缩 | ★★★☆☆ |
+| `unicode/utf8` | [字符编码](./unicode-utf8) | rune 解码 + 安全截断 + 编码校验修复 | ★★★☆☆ |
+| `os/signal` | [信号处理](./os-signal) | 优雅关闭 + SIGHUP 热重载 + K8s 终止流程 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -357,6 +370,8 @@ Go 标准库核心包关系图
 ㉑ io 高级 → text/tabwriter → go/format → bufio 高级   （IO 高级模式与代码工具）
        ↓
 ㉒ database/sql → crypto/tls → encoding/binary → html/template  （数据库、安全与模板）
+       ↓
+㉓ net/http/httputil → compress/gzip → unicode/utf8 → os/signal  （代理、压缩与系统集成）
 ```
 
 ## 源码查阅工具
