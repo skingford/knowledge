@@ -155,6 +155,20 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+@media (max-width: 767px) {
+  .VPNavScreen {
+    height: 100dvh;
+    overflow-y: auto;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+  }
+
+  .VPNavScreen .container,
+  .VPNavScreen .VPNavScreenMenu,
+  .VPNavScreen .items {
+    min-height: max-content;
+  }
+}
+
 html:has(#VPNavScreen),
 body:has(#VPNavScreen) {
   overflow: hidden;
@@ -354,7 +368,9 @@ body:has(#VPNavScreen) {
     background-color: var(--vp-c-bg-soft) !important;
     background-image: linear-gradient(160deg, rgba(212, 111, 77, 0.05) 0%, transparent 50%) !important;
     box-shadow: var(--site-shadow) !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* 顶部品牌色装饰条 */
