@@ -174,6 +174,42 @@ Go 标准库核心包关系图
   │   log                     ← Mutex 保护 + Fatal/Panic 行为    │
   │                                                              │
   └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 网络、校验与系统元数据 ─────────────┐
+  │                                                              │
+  │   net/smtp                ← SMTP 握手 + STARTTLS + MIME      │
+  │   hash/crc32              ← slicing-by-8 + SSE4.2 硬件加速  │
+  │   os/user                 ← CGO/纯 Go 双后端 + NSS 查询      │
+  │   debug/buildinfo         ← VCS 信息嵌入 + 二进制版本审计    │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 日志、上传、会话与并发 ─────────────┐
+  │                                                              │
+  │   log/slog                ← Handler 接口 + WithAttrs + 动态 Level │
+  │   mime/multipart          ← 流式解析 + 文件上传安全验证       │
+  │   net/http/cookiejar      ← PSL 防护 + Cookie 持久化 + 爬虫  │
+  │   sync.Cond               ← Wait/Signal/Broadcast + 生产消费 │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 工具链、位运算与经典协议 ───────────┐
+  │                                                              │
+  │   go/ast + go/parser      ← AST 遍历 + 代码分析 + 代码生成   │
+  │   math/bits               ← POPCNT/BSR 指令 + 128位算术      │
+  │   archive/tar             ← 512字节块格式 + 安全解压 + Docker │
+  │   net/rpc                 ← gob 序列化 + 并发调用 vs gRPC    │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── IO 高级模式与代码工具 ─────────────┐
+  │                                                              │
+  │   io 高级组合             ← TeeReader/Pipe/SectionReader     │
+  │   text/tabwriter          ← 弹性制表符对齐 + kubectl风格输出  │
+  │   go/format               ← AST往返格式化 + 代码生成最佳实践  │
+  │   bufio 高级模式          ← 自定义SplitFunc + Peek协议嗅探    │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 
 ══════════════════════════════════════════════════════════════════
 ```
@@ -243,6 +279,22 @@ Go 标准库核心包关系图
 | `math/big` | [任意精度算术](./math-big) | Karatsuba 乘法 + 密码学模幂运算 | ★★★★☆ |
 | `encoding/base64` | [Base64 编码](./encoding-base64) | 四种编码器 + JWT + 流式编解码 | ★★☆☆☆ |
 | `log` | [标准日志库](./log-pkg) | Mutex 保护 + Fatal/Panic 行为差异 | ★★☆☆☆ |
+| `net/smtp` | [邮件发送](./net-smtp) | SMTP 握手 + STARTTLS + MIME 多部分 | ★★★☆☆ |
+| `hash/crc32` | [校验和](./hash-crc32) | slicing-by-8 + SSE4.2 硬件加速 | ★★★☆☆ |
+| `os/user` | [用户信息](./os-user) | CGO/纯 Go 双后端 + NSS 查询 | ★★☆☆☆ |
+| `debug/buildinfo` | [构建信息](./debug-buildinfo) | VCS 信息嵌入 + 二进制审计 | ★★★☆☆ |
+| `log/slog` | [结构化日志（深度）](./log-slog-deep) | Handler 接口 + WithAttrs + 动态 Level | ★★★☆☆ |
+| `mime/multipart` | [文件上传](./mime-multipart) | 流式解析 + 安全验证 + MIME 构建 | ★★★☆☆ |
+| `net/http/cookiejar` | [Cookie 管理](./net-cookiejar) | Public Suffix List + 持久化 + 爬虫 | ★★★☆☆ |
+| `sync.Cond` | [条件变量](./sync-cond) | Wait/Signal/Broadcast + for 循环惯用法 | ★★★☆☆ |
+| `go/ast`+`go/parser` | [AST 源码解析](./go-ast) | 节点遍历 + 代码分析 + 代码生成 | ★★★★☆ |
+| `math/bits` | [位操作](./math-bits) | POPCNT/BSR 指令映射 + 128位算术 | ★★★☆☆ |
+| `archive/tar` | [TAR 归档](./archive-tar) | 512字节块格式 + 安全解压 + Docker 层 | ★★★☆☆ |
+| `net/rpc` | [远程过程调用](./net-rpc) | gob 编解码 + 序列号并发 + vs gRPC | ★★★☆☆ |
+| `io`（高级） | [高级组合模式](./io-advanced) | TeeReader/Pipe/SectionReader/MultiWriter | ★★★☆☆ |
+| `text/tabwriter` | [列对齐输出](./text-tabwriter) | 弹性制表符 + kubectl 风格 + 分段 Flush | ★★☆☆☆ |
+| `go/format` | [代码格式化](./go-format) | AST 往返 + 代码生成格式化 + CI 检查 | ★★★☆☆ |
+| `bufio`（高级） | [高级缓冲 IO](./bufio-advanced) | 自定义 SplitFunc + Peek 嗅探 + 协议解析 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -282,6 +334,14 @@ Go 标准库核心包关系图
 ⑯ encoding/gob → sync.Pool → crypto/aes → net/http/httptrace  （序列化、性能与加密）
        ↓
 ⑰ runtime/trace → math/big → encoding/base64 → log  （追踪、算术与基础工具）
+       ↓
+⑱ net/smtp → hash/crc32 → os/user → debug/buildinfo  （网络、校验与系统元数据）
+       ↓
+⑲ log/slog → mime/multipart → net/http/cookiejar → sync.Cond  （日志、上传、会话与并发）
+       ↓
+⑳ go/ast+go/parser → math/bits → archive/tar → net/rpc  （工具链、位运算与经典协议）
+       ↓
+㉑ io 高级 → text/tabwriter → go/format → bufio 高级   （IO 高级模式与代码工具）
 ```
 
 ## 源码查阅工具
