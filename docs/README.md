@@ -21,6 +21,7 @@
 ## 当前文档
 
 - [架构方向](./architecture/)
+- [架构案例实战](./architecture/case-studies/)
 - [AI / Agent 方向](./ai/)
 - [Golang 方向](./golang/)
 
@@ -44,7 +45,7 @@
 
 ## 当前规模
 
-- `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题
+- `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `golang/`：学习资料、能力自检资料、大纲、题库、模板、源码、代码片段、资源清单
 
@@ -58,6 +59,6 @@
 
 ## 目录结构
 
-- `architecture/`：系统设计、架构方法、分布式与治理
+- `architecture/`：系统设计、架构方法、分布式与治理、案例实战
 - `ai/`：Agent、LLM 应用、RAG、工作流
 - `golang/`：Go 语言进阶、并发、性能、工程实践
