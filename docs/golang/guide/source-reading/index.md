@@ -210,6 +210,15 @@ Go 标准库核心包关系图
   │   bufio 高级模式          ← 自定义SplitFunc + Peek协议嗅探    │
   │                                                              │
   └──────────────────────────────────────────────────────────────┘
+              ↓
+  ┌─────────────────────────── 数据库、安全与模板 ────────────────┐
+  │                                                              │
+  │   database/sql            ← 连接池LIFO + 事务defer模式       │
+  │   crypto/tls              ← TLS握手 + mTLS + 证书热更新      │
+  │   encoding/binary         ← 字节序 + 协议帧解析 + varint     │
+  │   html/template           ← 上下文感知转义 + XSS防护         │
+  │                                                              │
+  └──────────────────────────────────────────────────────────────┘
 
 ══════════════════════════════════════════════════════════════════
 ```
@@ -295,6 +304,10 @@ Go 标准库核心包关系图
 | `text/tabwriter` | [列对齐输出](./text-tabwriter) | 弹性制表符 + kubectl 风格 + 分段 Flush | ★★☆☆☆ |
 | `go/format` | [代码格式化](./go-format) | AST 往返 + 代码生成格式化 + CI 检查 | ★★★☆☆ |
 | `bufio`（高级） | [高级缓冲 IO](./bufio-advanced) | 自定义 SplitFunc + Peek 嗅探 + 协议解析 | ★★★☆☆ |
+| `database/sql` | [连接池与事务](./database-sql) | LIFO 连接池 + defer Rollback + 自定义 Scanner | ★★★★☆ |
+| `crypto/tls` | [TLS 握手与证书](./crypto-tls) | TLS 1.3 握手 + mTLS + 证书热更新 | ★★★★☆ |
+| `encoding/binary` | [字节序与协议帧](./encoding-binary) | BigEndian/LittleEndian + 协议解析 + varint | ★★★☆☆ |
+| `html/template` | [安全模板引擎](./html-template) | 上下文感知转义 + XSS 防护 + 模板继承 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -342,6 +355,8 @@ Go 标准库核心包关系图
 ⑳ go/ast+go/parser → math/bits → archive/tar → net/rpc  （工具链、位运算与经典协议）
        ↓
 ㉑ io 高级 → text/tabwriter → go/format → bufio 高级   （IO 高级模式与代码工具）
+       ↓
+㉒ database/sql → crypto/tls → encoding/binary → html/template  （数据库、安全与模板）
 ```
 
 ## 源码查阅工具

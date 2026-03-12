@@ -192,6 +192,7 @@
   },
   "active": "beb4d60a239d0379",
   "lastOpenFiles": [
+    "docs/golang/guide/source-reading/html-template.md",
     "docs/golang/guide/source-reading/bufio-advanced.md",
     "docs/golang/guide/source-reading/go-format.md",
     "docs/golang/guide/source-reading/text-tabwriter.md",
@@ -217,7 +218,6 @@
     "docs/golang/guide/source-reading/sync-pool.md",
     "docs/golang/guide/source-reading/encoding-gob.md",
     "docs/golang/guide/source-reading/container-list.md",
-    "docs/golang/guide/source-reading/expvar.md",
     "docs/golang/guide/source-reading",
     "docs/golang/guide/05-testing-benchmark-cicd.body",
     "docs/golang/guide/05-error-middleware-code-style.body",
