@@ -362,6 +362,18 @@ Go 标准库核心包关系图
 | CGO | [C/Go 互操作](./cgo-basics) | 类型映射 + 指针规则 + 静态库集成 + Finalizer 内存管理 | ★★★★☆ |
 | `golang.org/x/oauth2` | [OAuth2 客户端](./golang-x-oauth2) | 授权码 + PKCE + Client Credentials + Token 持久化 | ★★★★☆ |
 | `testing`（高级）| [高级测试模式](./testing-advanced) | Golden File + t.Cleanup + 并行子测试 + Benchmark + TestMain | ★★★★☆ |
+| WebSocket | [服务器实现](./websocket) | HTTP Upgrade + Hub 广播 + writePump/readPump + 心跳 | ★★★★☆ |
+| Go 内存调优 | [GOMEMLIMIT 与 GC 调优](./go-memory-tuning) | GOGC/GOMEMLIMIT + 内存气球 + 泄漏检测 + Heap Profile | ★★★★★ |
+| `go/analysis` | [自定义 Linter](./go-analysis) | Analyzer + Pass + AST 遍历 + SuggestedFix + 测试框架 | ★★★★☆ |
+| `net/http` 限流 | [限流与熔断](./net-http-ratelimit) | 令牌桶/滑动窗口 + 按 IP 限流 + 断路器三态 + 弹性客户端 | ★★★★☆ |
+| gRPC-Go | [微服务通信](./grpc-go) | Unary/Stream RPC + 拦截器链 + 重试策略 + 负载均衡 | ★★★★★ |
+| Prometheus | [Go 客户端指标](./prometheus-go) | Counter/Histogram + 自定义 Collector + 独立 Registry | ★★★★☆ |
+| OpenTelemetry | [分布式追踪](./opentelemetry-go) | Span + Propagation + OTLP 导出 + HTTP/gRPC 自动插桩 | ★★★★☆ |
+| pgx v5 | [PostgreSQL 原生驱动](./pgx-driver) | pgxpool + CopyFrom + Batch + LISTEN/NOTIFY | ★★★★☆ |
+| cobra+viper | [CLI 工具框架](./cobra-viper) | 子命令树 + Flag 绑定 + viper 配置优先级 + 环境变量映射 | ★★★☆☆ |
+| go-redis v9 | [Redis 客户端](./go-redis) | 连接池 + Pipeline/TxPipeline + 分布式锁 + Cache-Aside | ★★★★☆ |
+| zap | [高性能结构化日志](./zap) | zapcore 分层 + Logger/SugaredLogger + With + AtomicLevel | ★★★☆☆ |
+| wire | [编译期依赖注入](./wire) | Provider/Injector/ProviderSet + 接口绑定 + 清理函数 | ★★★☆☆ |
 
 ## 阅读建议
 
@@ -429,6 +441,12 @@ Go 标准库核心包关系图
 ㉚ Go Fuzzing → TCP 服务器 → go:generate → database/sql 高级  （测试工程、网络协议与代码生成）
        ↓
 ㉛ crypto/ed25519 → CGO → oauth2 → testing 高级  （现代密码学、C 互操作与测试工程化）
+       ↓
+㉜ WebSocket → 内存调优 → go/analysis → 限流熔断  （实时通信、运行时优化与工程质量）
+       ↓
+㉝ gRPC-Go → Prometheus → OpenTelemetry → pgx  （微服务可观测性全栈）
+       ↓
+㉞ cobra/viper → go-redis → zap → wire  （工具链与基础设施）
 ```
 
 ## 源码查阅工具
