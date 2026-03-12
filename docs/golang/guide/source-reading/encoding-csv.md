@@ -312,7 +312,7 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

@@ -291,7 +291,7 @@ func (h *OTelHandler) Handle(ctx context.Context, r slog.Record) error {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

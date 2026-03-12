@@ -308,7 +308,7 @@ func (s *Scheduler) Run(ctx context.Context) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

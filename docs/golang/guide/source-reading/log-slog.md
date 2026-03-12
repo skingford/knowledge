@@ -322,7 +322,7 @@ if logger.Enabled(ctx, slog.LevelDebug) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

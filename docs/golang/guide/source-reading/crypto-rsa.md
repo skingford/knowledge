@@ -301,7 +301,7 @@ func verifyJWT(pubKey *rsa.PublicKey, token string) (*JWTClaims, error) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

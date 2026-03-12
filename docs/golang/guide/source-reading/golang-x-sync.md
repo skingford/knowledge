@@ -334,7 +334,7 @@ func pipeline(ctx context.Context, inputs []string) error {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

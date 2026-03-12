@@ -299,7 +299,7 @@ fmt.Println(errors.Is(err, ErrClientError)) // true
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

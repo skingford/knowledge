@@ -320,7 +320,7 @@ func encryptWithPassword(password string, plaintext []byte) ([]byte, error) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

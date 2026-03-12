@@ -240,7 +240,7 @@ func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

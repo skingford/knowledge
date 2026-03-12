@@ -11,14 +11,16 @@ const sectionNavItems = sections.map((section) => ({
 }))
 
 const sidebar = Object.fromEntries(
-  sections.map((section) => [section.base, section.sidebar]),
+  [...sections]
+    .sort((a, b) => b.base.length - a.base.length)
+    .map((section) => [section.base, section.sidebar]),
 )
 
 export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang、运维、工具五个方向的学习资料与路线图',
+  description: '涵盖 AI / Agent、架构设计、Golang、Go 源码阅读、运维与工具的学习资料、路线图与专题索引',
 
   base: '/knowledge/',
   srcExclude: ['README.md', 'TEMPLATE.md'],

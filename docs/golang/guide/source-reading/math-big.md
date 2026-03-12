@@ -241,7 +241,7 @@ func fastFactorial(n int) *big.Int {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

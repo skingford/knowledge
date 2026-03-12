@@ -258,7 +258,7 @@ go tool pprof -base heap_before.prof heap_after.prof
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

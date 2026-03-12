@@ -382,7 +382,7 @@ func signRequest(priv ed25519.PrivateKey, keyID, method, path string, body []byt
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

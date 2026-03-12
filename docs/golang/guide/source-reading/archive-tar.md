@@ -340,7 +340,7 @@ func extractSpecificFile(tarPath, targetName string) ([]byte, error) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

@@ -355,7 +355,7 @@ func createTarGz(dir, dst string) error {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

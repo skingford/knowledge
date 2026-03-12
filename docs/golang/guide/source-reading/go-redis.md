@@ -423,7 +423,7 @@ func (c *UserCache) GetUserWithNullCache(ctx context.Context, userID int64) (*Us
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

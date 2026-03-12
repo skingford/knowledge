@@ -336,7 +336,7 @@ func mb(bytes uint64) float64 { return float64(bytes) / 1024 / 1024 }
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

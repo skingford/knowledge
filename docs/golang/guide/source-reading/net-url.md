@@ -294,7 +294,7 @@ func validateURL(rawURL string) (*url.URL, error) {
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|

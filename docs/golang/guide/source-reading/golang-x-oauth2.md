@@ -390,7 +390,7 @@ func deviceFlowLogin(ctx context.Context, config *oauth2.Config) (*oauth2.Token,
 
 ---
 
-## 面试要点
+## 核心要点
 
 | 问题 | 要点 |
 |------|------|
