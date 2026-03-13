@@ -88,10 +88,10 @@ vocabulary:
 
 重点要能讲明白这些点：
 
-- GMP 调度模型
-- Channel 底层实现
-- `context` 的超时、取消传播机制
-- goroutine 泄漏的识别和治理
+- **GMP 调度模型**：G（goroutine）、M（OS 线程）、P（逻辑处理器）。P 绑定本地队列，M 从 P 获取 G 执行；当 M 阻塞时，P 会转移给空闲 M，保证并发度不降。
+- **Channel 底层实现**：底层是带锁的环形缓冲区 + 发送/接收等待队列。无缓冲 channel 是同步交换，有缓冲是异步队列。关闭后读取返回零值。
+- **`context` 超时与取消传播**：`context.WithTimeout` 创建定时取消上下文，子 context 会随父 context 一起取消，实现链路级超时传播。
+- **goroutine 泄漏识别与治理**：`pprof` 查看 goroutine 数量趋势；常见原因是 channel 无人读/写、HTTP 请求未设超时。治理靠 `context` 控制生命周期 + `select` 监听 `ctx.Done()`。
 
 结合支付语境理解时，可以这样表述：
 
@@ -101,11 +101,11 @@ vocabulary:
 
 建议重点复习：
 
-- GC 三色标记
-- STW 对尾延迟的影响
-- 逃逸分析
-- `pprof` / `trace` 的使用
-- `sync.Pool` 的适用边界
+- **GC 三色标记**：白色（未扫描）、灰色（已发现、待扫描子引用）、黑色（已扫描完成）。并发标记阶段通过写屏障维护三色不变式，避免漏标。
+- **STW 对尾延迟的影响**：GC 的 Mark Termination 阶段会短暂 STW，高频 GC 导致 P99 抖动。优化方向：减少堆分配 → 降低 GC 频率 → 缩短 STW。
+- **逃逸分析**：编译器决定变量分配在栈还是堆。`go build -gcflags="-m"` 查看逃逸情况，避免不必要的堆分配（如返回局部变量指针、interface 装箱）。
+- **`pprof` / `trace`**：`pprof` 用于 CPU/内存/goroutine 采样分析；`trace` 用于可视化调度延迟、GC 暂停、goroutine 阻塞等运行时行为。
+- **`sync.Pool` 适用边界**：适合高频创建/销毁的临时对象（如 buffer、编解码器），不适合有状态的对象。Pool 中的对象可能在任意 GC 后被回收，不保证持久性。
 
 ### 3. 优化实战要点
 
@@ -223,33 +223,43 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
 
 > 核心方案是”版本号 + 状态机 + 数据库行锁”三道防线，确保即使多条通知并发到达，状态也只能沿着合法方向前进，不会回退或跳跃。
 
+**图 1：支付单状态流转**
+
 ```mermaid
 stateDiagram-v2
+    direction LR
+    state "成功（终态）" as Success
+    state "失败（终态）" as Failure
+
     [*] --> 初始化
     初始化 --> 支付中
-    支付中 --> 成功
-    支付中 --> 失败
-    成功 --> [*]: 终态，不可变
-    失败 --> [*]: 终态，不可变
+    支付中 --> Success
+    支付中 --> Failure
 ```
+
+上图只描述“状态允许如何流转”，不描述通知处理顺序。
+
+**图 2：并发通知下的幂等处理流程**
 
 ```mermaid
 sequenceDiagram
-    participant N1 as 通知1-支付中
-    participant N2 as 通知2-成功
-    participant N3 as 通知3-成功
+    participant N1 as 通知1
+    participant N2 as 通知2
+    participant N3 as 通知3
     participant DB as 数据库
 
-    N1->>DB: CAS v1, 状态=支付中
+    N1->>DB: CAS v1, 更新为支付中
     DB-->>N1: OK, v2
-    N2->>DB: CAS v1, 状态=成功
+    N2->>DB: CAS v1, 更新为成功
     DB-->>N2: 失败, 版本已变
     N2->>DB: 重读 v2
-    N2->>DB: CAS v2, 状态=成功
+    N2->>DB: CAS v2, 更新为成功
     DB-->>N2: OK, v3
     N3->>DB: 读取 status
     DB-->>N3: 已终态, 幂等返回
 ```
+
+上图只描述“多条通知并发到达时，数据库如何通过版本号和 CAS 保证幂等”。
 
 **三道防线：**
 
@@ -433,12 +443,83 @@ flowchart LR
 - 热点更新问题
 - 分库分表与迁移
 
-建议准备以下表达：
+高频追问：
 
-- 为什么支付流水表不能 `SELECT *`
-- 深分页如何优化
-- 如何缩短锁持有时间
-- 如何避免热点账户导致行锁竞争
+#### 为什么支付流水表不能 `SELECT *`？
+
+> 流水表字段多、行数大，`SELECT *` 导致回表次数增多、Buffer Pool 污染。正确做法是只查需要的列，建立覆盖索引，在索引层完成查询。
+
+```sql
+-- 反例：全列扫描，触发回表
+SELECT * FROM payment_flow WHERE merchant_id = ? AND created_at > ?;
+
+-- 正例：覆盖索引，无需回表
+SELECT order_id, amount, status FROM payment_flow
+WHERE merchant_id = ? AND created_at > ?;
+-- 联合索引：(merchant_id, created_at, order_id, amount, status)
+```
+
+#### 深分页如何优化？
+
+> `OFFSET 100000, 20` 实际要扫描前 100020 行再丢弃，性能极差。核心思路是游标分页替代 OFFSET。
+
+```sql
+-- 反例：深分页
+SELECT * FROM payment_flow ORDER BY id LIMIT 100000, 20;
+
+-- 正例：游标分页，每次只扫 20 行
+SELECT * FROM payment_flow WHERE id > #{lastMaxId} ORDER BY id LIMIT 20;
+```
+
+> 必须跳页时用延迟关联：先在索引上定位 ID，再回表取数据。
+
+```sql
+SELECT f.* FROM payment_flow f
+INNER JOIN (SELECT id FROM payment_flow ORDER BY id LIMIT 100000, 20) t
+ON f.id = t.id;
+```
+
+#### 如何缩短锁持有时间？
+
+> 事务越长，行锁持有越久，并发冲突越严重。核心原则："把锁操作放在事务最后，事务越短越好"。
+
+```go
+// 反例：事务开头锁行，后续 RPC 慢导致长时间持锁
+tx.Begin()
+tx.Exec("SELECT ... FOR UPDATE")  // 先锁行
+callChannel(ctx)                   // 慢 RPC
+tx.Exec("UPDATE ...")
+tx.Commit()
+
+// 正例：先完成耗时操作，事务最后才更新
+result := callChannel(ctx)         // 先完成 RPC
+tx.Begin()
+tx.Exec("UPDATE account SET balance = balance - ? WHERE id = ? AND balance >= ?", amount, id, amount)
+tx.Commit()                        // 极短事务，快速释放锁
+```
+
+#### 如何避免热点账户导致行锁竞争？
+
+> 热点账户并发更新同一行，行锁排队导致吞吐骤降。从轻到重依次：乐观锁 → 排队合并 → 子账户拆分。
+
+| 方案 | 适用场景 | 核心思路 |
+| --- | --- | --- |
+| 乐观锁 | 中低并发 | `WHERE version = ?` 冲突重试 |
+| 内存排队合并 | 高并发 | 攒批 10ms，多笔合并为一次 UPDATE |
+| 子账户拆分 | 极高并发 | 拆 N 个影子账户分散写入，查询时 SUM |
+
+```sql
+-- 乐观锁
+UPDATE account SET balance = balance - 100, version = version + 1
+WHERE id = ? AND version = ? AND balance >= 100;
+
+-- 子账户拆分：写入时随机选子账户
+UPDATE account_sub SET balance = balance - 100
+WHERE parent_id = ? AND sub_index = #{random(0,N)} AND balance >= 100;
+
+-- 查余额时聚合
+SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
+```
 
 ### 2. Redis
 
@@ -451,29 +532,144 @@ flowchart LR
 
 支付语境下的典型问题：
 
-- 如何防止重复支付？
-- 如何实现请求级幂等？
-- Redis 锁失效后如何避免并发扣款？
+#### 如何防止重复支付？
+
+> 多层防线组合：前端按钮防抖 → 网关层用 RequestID + Redis `SET NX EX` 拦截 → 数据库订单表唯一索引兜底。任何一层漏过，下一层都能拦住。
+
+```go
+// 网关层幂等拦截
+func (g *Gateway) CheckDuplicate(ctx context.Context, requestID string) (bool, error) {
+    ok, err := g.redis.SetNX(ctx, "pay:req:"+requestID, "1", 10*time.Minute).Result()
+    if err != nil {
+        return false, err
+    }
+    return !ok, nil // ok=false 说明 key 已存在，是重复请求
+}
+```
+
+#### 如何实现请求级幂等？
+
+> 以 `BusinessID`（如订单号 + 操作类型）作为幂等键，Redis 记录处理结果。首次请求正常处理并缓存结果，重复请求直接返回缓存结果。
+
+```go
+func (s *PaymentService) Pay(ctx context.Context, req *PayReq) (*PayResp, error) {
+    key := fmt.Sprintf("idem:%s:%s", req.OrderID, req.Action)
+
+    // 1. 查缓存，命中则直接返回
+    if cached, err := s.redis.Get(ctx, key).Result(); err == nil {
+        return Unmarshal[PayResp](cached), nil
+    }
+
+    // 2. 首次处理
+    resp, err := s.doPay(ctx, req)
+    if err != nil {
+        return nil, err
+    }
+
+    // 3. 缓存结果，TTL 覆盖重试窗口
+    s.redis.Set(ctx, key, Marshal(resp), 24*time.Hour)
+    return resp, nil
+}
+```
+
+#### Redis 锁失效后如何避免并发扣款？
+
+> Redis 分布式锁有续期失败、主从切换等风险，不能作为资金安全的唯一保障。正确做法是"Redis 锁挡大部分并发 + 数据库乐观锁/唯一索引做最终兜底"。
+
+```go
+func (s *PaymentService) Deduct(ctx context.Context, orderID string, amount int64) error {
+    // 第一层：Redis 分布式锁挡并发
+    lock := s.redis.SetNX(ctx, "lock:deduct:"+orderID, "1", 5*time.Second)
+    if !lock.Val() {
+        return ErrDuplicateDeduct
+    }
+    defer s.redis.Del(ctx, "lock:deduct:"+orderID)
+
+    // 第二层：数据库乐观锁兜底
+    result := s.db.Exec(
+        "UPDATE account SET balance = balance - ? WHERE id = ? AND balance >= ?",
+        amount, accountID, amount,
+    )
+    if result.RowsAffected == 0 {
+        return ErrInsufficientBalance
+    }
+    return nil
+}
+```
+
+> 关键认知：Redis 锁是"性能优化"，数据库约束才是"资金安全底线"。
 
 ### 3. Kafka
 
-要能回答：
+高频追问：
 
-- 消息如何做到尽量不丢
-- 如何保证同一订单的消息顺序
-- 如何处理消息积压
-- 如何做消费重试和死信处理
+#### 消息如何做到尽量不丢？
 
-可靠性常见配置点：
+> 从三层保障回答：Producer 端、Broker 端、Consumer 端各守一关。
 
-- Producer 设置 `acks=all`
-- 开启 `enable.idempotence=true`
-- Broker 设置 `min.insync.replicas > 1`
-- Consumer 业务成功后手动提交 offset
+| 层级 | 配置 | 作用 |
+| --- | --- | --- |
+| Producer | `acks=all` + `enable.idempotence=true` | 写入所有 ISR 副本后才确认，防止 Producer 重试重复 |
+| Broker | `min.insync.replicas=2`, `replication.factor=3` | 至少 2 副本同步成功，单节点宕机不丢数据 |
+| Consumer | 手动提交 offset，业务成功后再 commit | 防止消费失败但 offset 已提交 |
 
-顺序性常用答法：
+```go
+// Consumer：业务成功后才提交 offset
+func (c *Consumer) HandleMessage(msg *kafka.Message) error {
+    if err := c.processPayment(msg); err != nil {
+        return err // 不提交，下次重新消费
+    }
+    c.consumer.CommitMessages(context.Background(), msg)
+    return nil
+}
+```
 
-> 以 `OrderID` 作为 Kafka Partition Key，确保同一订单的创建、支付、成功等消息进入同一分区，由同一个消费者顺序处理。
+#### 如何保证同一订单的消息顺序？
+
+> 以 `OrderID` 作为 Partition Key，同一订单的创建、支付、成功消息进同一分区，由同一消费者顺序处理。下游状态机也要做防乱序校验。
+
+```go
+msg := &kafka.Message{
+    Topic: "payment_events",
+    Key:   []byte(order.OrderID), // 同一订单进同一分区
+    Value: payload,
+}
+producer.Produce(msg)
+```
+
+#### 如何处理消息积压？
+
+> 分紧急止血和根治两个层面。
+
+| 阶段 | 动作 |
+| --- | --- |
+| 紧急止血 | 扩容 Consumer 至分区数上限，临时跳过非核心消息 |
+| 短期优化 | 排查慢消费（DB 慢查询、RPC 超时），批量消费替代逐条 |
+| 长期治理 | 热点 Topic 拆分，按业务优先级设不同 Topic 和消费组 |
+
+#### 如何做消费重试和死信处理？
+
+> 消费失败不能无限重试阻塞队列。策略："重试 N 次 → 投入死信队列 → 人工或定时任务处理"。
+
+```go
+func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
+    for i := 0; i <= 3; i++ {
+        if err := c.processPayment(msg); err == nil {
+            c.consumer.CommitMessages(context.Background(), msg)
+            return
+        }
+        time.Sleep(time.Duration(i+1) * time.Second) // 递增退避
+    }
+    // 超过重试次数，投入死信队列
+    c.producer.Produce(&kafka.Message{
+        Topic: "payment_events_dlq",
+        Key:   msg.Key,
+        Value: msg.Value,
+    })
+    c.consumer.CommitMessages(context.Background(), msg)
+    log.Error("消息投入死信队列", "key", string(msg.Key))
+}
+```
 
 ---
 
@@ -497,20 +693,75 @@ flowchart LR
 
 ### 2. 防御机制
 
-建议重点准备：
+重点防御手段：
 
-- 重放攻击防御：`Nonce + Timestamp`
-- 数字签名：RSA2 / HMAC 验签
-- 金额篡改防御：以后端订单金额为准，不信任前端
-- SQL 注入防御：预编译语句，严禁拼接 SQL
+#### 重放攻击防御
+
+> 每个请求带随机 Nonce 和时间戳，服务端校验时间窗口（如 5 分钟），同时记录已用 Nonce 防重复。
+
+```go
+func (g *Gateway) AntiReplay(nonce string, ts int64) error {
+    if abs(time.Now().Unix()-ts) > 300 {
+        return ErrTimestampExpired // 超过 5 分钟窗口
+    }
+    if !g.redis.SetNX(ctx, "nonce:"+nonce, "1", 5*time.Minute).Val() {
+        return ErrNonceReused // Nonce 已使用
+    }
+    return nil
+}
+```
+
+#### 数字签名
+
+> 请求参数按 key 排序拼接后用 RSA/HMAC 签名，服务端用公钥/密钥验签。防止参数被中间人篡改。
+
+```go
+// 签名：参数排序 + HMAC-SHA256
+func Sign(params map[string]string, secret string) string {
+    keys := sortedKeys(params)
+    var buf strings.Builder
+    for _, k := range keys {
+        buf.WriteString(k + "=" + params[k] + "&")
+    }
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(buf.Bytes())
+    return hex.EncodeToString(mac.Sum(nil))
+}
+```
+
+#### 金额篡改防御
+
+> 前端传的金额仅用于展示，后端下单时以订单中心/商品中心的价格为准，同时验签防止请求参数被篡改。
+
+#### SQL 注入防御
+
+> 全部使用预编译语句（`?` 占位符），严禁字符串拼接 SQL。Go 的 `database/sql` 原生支持参数绑定。
+
+```go
+// 正例：参数绑定
+db.Query("SELECT * FROM orders WHERE id = ?", orderID)
+
+// 反例：字符串拼接（严禁）
+db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
+```
 
 ### 3. 鉴权与身份校验
 
-常考点包括：
+#### OAuth 2.0 常见授权模式
 
-- OAuth 2.0 常见授权模式
-- JWT 在分布式环境下的优缺点
-- 网关层鉴权与服务内鉴权的边界
+| 模式 | 适用场景 |
+| --- | --- |
+| 授权码模式 | 第三方 Web 应用，安全性最高 |
+| 客户端凭证模式 | 服务间调用，无用户参与 |
+| 密码模式 | 自有客户端（不推荐给三方） |
+
+#### JWT 在分布式环境下的优缺点
+
+> **优点**：无状态，不依赖集中式 Session 存储，网关层解析后即可鉴权。**缺点**：无法主动失效（需配合黑名单或短有效期 + Refresh Token）；Token 体积大，每次请求都携带。
+
+#### 网关层鉴权与服务内鉴权的边界
+
+> 网关层负责身份认证（Authentication）：验 Token、解析用户身份。服务层负责权限校验（Authorization）：判断该用户是否有权操作该资源。两者不能混在一起，也不能只做一层。
 
 ### 4. 安全问题速记表
 
@@ -681,30 +932,69 @@ func (s *PaymentService) RetryMessages() {
 2. Confirm：正式提交，例如扣减冻结金额
 3. Cancel：回滚资源，例如解冻余额
 
+#### 账户表设计
+
+```sql
+CREATE TABLE account (
+    id          BIGINT PRIMARY KEY,
+    balance     BIGINT NOT NULL DEFAULT 0,  -- 可用余额（分）
+    frozen      BIGINT NOT NULL DEFAULT 0,  -- 冻结金额（分）
+    version     BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT chk_balance CHECK (balance >= 0),
+    CONSTRAINT chk_frozen CHECK (frozen >= 0)
+);
+```
+
 #### Go 伪代码
 
 ```go
 type PaymentTCC interface {
-	Try(ctx context.Context, orderID string) error
-	Confirm(ctx context.Context, orderID string) error
-	Cancel(ctx context.Context, orderID string) error
+	Try(ctx context.Context, orderID string, amount int64) error
+	Confirm(ctx context.Context, orderID string, amount int64) error
+	Cancel(ctx context.Context, orderID string, amount int64) error
 }
 
+// Try：检查余额充足，将 amount 从可用余额转入冻结
 func (a *AccountService) Try(ctx context.Context, orderID string, amount int64) error {
-	// 检查余额并冻结
-	return a.db.Exec("UPDATE ...")
+	result := a.db.ExecContext(ctx,
+		`UPDATE account SET balance = balance - ?, frozen = frozen + ?, version = version + 1
+		 WHERE id = ? AND balance >= ?`,
+		amount, amount, a.accountID, amount,
+	)
+	if result.RowsAffected == 0 {
+		return ErrInsufficientBalance
+	}
+	return nil
 }
 
-func (a *AccountService) Confirm(ctx context.Context, orderID string) error {
-	// 确认扣减冻结金额
-	return a.db.Exec("UPDATE ...")
+// Confirm：扣减冻结金额，交易完成
+func (a *AccountService) Confirm(ctx context.Context, orderID string, amount int64) error {
+	result := a.db.ExecContext(ctx,
+		`UPDATE account SET frozen = frozen - ?, version = version + 1
+		 WHERE id = ? AND frozen >= ?`,
+		amount, a.accountID, amount,
+	)
+	if result.RowsAffected == 0 {
+		return ErrConfirmFailed
+	}
+	return nil
 }
 
-func (a *AccountService) Cancel(ctx context.Context, orderID string) error {
-	// 回滚并释放冻结金额
-	return a.db.Exec("UPDATE ...")
+// Cancel：将冻结金额退回可用余额
+func (a *AccountService) Cancel(ctx context.Context, orderID string, amount int64) error {
+	result := a.db.ExecContext(ctx,
+		`UPDATE account SET balance = balance + ?, frozen = frozen - ?, version = version + 1
+		 WHERE id = ? AND frozen >= ?`,
+		amount, amount, a.accountID, amount,
+	)
+	if result.RowsAffected == 0 {
+		return ErrCancelFailed
+	}
+	return nil
 }
 ```
+
+> 关键点：Try 阶段只冻结不扣减，Confirm 只操作冻结列，Cancel 把冻结退回可用。三个操作都必须做幂等校验（通常用 TCC 事务日志表记录阶段状态）。
 
 ### 3. 三个必须说出的关键词
 
@@ -752,15 +1042,72 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string) error {
 
 #### 缓冲入账
 
-先把入账请求写入高性能队列，再通过微批处理异步更新余额。
+先把入账请求写入高性能队列（Redis List / Kafka），再微批异步更新余额。核心是"流水先落盘，余额后更新"。
+
+```go
+// 1. 入账写入 Redis（毫秒级）
+func (s *AccountService) BufferedCredit(ctx context.Context, accountID string, amount int64) error {
+    return s.redis.RPush(ctx, "credit_buf:"+accountID, amount).Err()
+}
+
+// 2. 定时微批聚合（每 50ms 或满 100 笔触发）
+func (s *AccountService) FlushCredits(ctx context.Context, accountID string) error {
+    vals, _ := s.redis.LRange(ctx, "credit_buf:"+accountID, 0, 99).Result()
+    if len(vals) == 0 {
+        return nil
+    }
+    total := sumAmounts(vals)
+    s.db.Exec("UPDATE account SET balance = balance + ? WHERE id = ?", total, accountID)
+    s.redis.LTrim(ctx, "credit_buf:"+accountID, int64(len(vals)), -1)
+    return nil
+}
+```
 
 #### 影子账户拆分
 
-把一个大账户拆成多个影子子账户，并发打散，查询时再聚合。
+拆成 N 个子账户，写入时哈希打散，查询时 SUM 聚合。
+
+```sql
+-- 写入：hash 打散
+UPDATE account_sub SET balance = balance + 100
+WHERE parent_id = ? AND sub_index = #{orderID % 16};
+
+-- 查询：聚合总余额
+SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
+```
+
+> 拆分数量根据并发峰值决定，通常 8~64 个子账户即可。
 
 #### 指令合并
 
-在应用层做短时间窗口聚合，例如 10ms 内把多笔入账合并成一次数据库更新。
+应用层短窗口聚合，10ms 内多笔合并为一次 UPDATE。
+
+```go
+type Merger struct {
+    mu      sync.Mutex
+    pending map[string]int64 // accountID -> 累计金额
+}
+
+func (m *Merger) Enqueue(accountID string, amount int64) {
+    m.mu.Lock()
+    m.pending[accountID] += amount
+    m.mu.Unlock()
+}
+
+// 每 10ms 刷盘一次
+func (m *Merger) Run(ctx context.Context) {
+    ticker := time.NewTicker(10 * time.Millisecond)
+    for range ticker.C {
+        m.mu.Lock()
+        batch := m.pending
+        m.pending = make(map[string]int64)
+        m.mu.Unlock()
+        for id, total := range batch {
+            db.Exec("UPDATE account SET balance = balance + ? WHERE id = ?", total, id)
+        }
+    }
+}
+```
 
 ---
 
@@ -948,11 +1295,13 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string) error {
 
 ### 常见风控能力
 
-- 滑动窗口频控
-- 黑白名单
-- 风险评分
-- 设备指纹
-- 实时规则脚本
+| 能力 | 说明 |
+| --- | --- |
+| 滑动窗口频控 | 用 Redis ZSET 按时间戳统计窗口内事件数，超阈值拦截 |
+| 黑白名单 | 用户/设备/IP/卡号维度，命中黑名单直接拒绝，白名单跳过风控 |
+| 风险评分 | 综合用户画像、交易特征等多维度计算风险分，高分触发人审或拦截 |
+| 设备指纹 | 采集设备硬件/软件特征生成唯一 ID，识别换设备、模拟器等异常行为 |
+| 实时规则脚本 | 用 Lua/Groovy/CEL 等脚本引擎执行动态规则，支持热更新无需发版 |
 
 ### 高频答法
 
@@ -988,10 +1337,10 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string) error {
 
 ### 2. 更深入的优化点
 
-- 减少 Context Switch
-- 关注 false sharing
-- 合理做内存对齐
-- 大包场景下考虑零拷贝
+- **减少 Context Switch**：控制 goroutine 数量（用 worker pool），避免过多 goroutine 竞争 P，减少调度开销。`GOMAXPROCS` 设为 CPU 核数。
+- **关注 false sharing**：多核 CPU 中，不同核心修改同一 cache line 内的不同变量会导致缓存行反复失效。解决方案是用 padding 对齐，让热点变量独占 cache line（通常 64 字节）。
+- **合理做内存对齐**：Go struct 字段按类型大小从大到小排列可减少 padding 浪费。用 `unsafe.Sizeof` 验证。高频访问的字段放在 struct 开头，利用 CPU 缓存局部性。
+- **大包场景下考虑零拷贝**：传统 IO 需要内核态 → 用户态 → 内核态多次拷贝。大文件/大包场景下用 `sendfile` / `splice` 系统调用减少拷贝次数，Go 中 `io.Copy` 在底层已优化支持。
 
 ---
 
@@ -1001,10 +1350,36 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string) error {
 
 ### 1. 常见挑战
 
-- 动态货币转换
-- 汇率锁定
-- 汇损归属
-- 多币种账务模型
+#### 动态货币转换（DCC）
+
+> 用户用本币支付，商户以目标币种结算。关键是在收银台展示汇率和转换后金额，用户确认后锁定汇率。DCC 的利润来自汇率加点，合规要求必须明示。
+
+#### 汇率锁定
+
+> 从用户确认支付到渠道实际扣款之间有时间差，汇率可能波动。方案是"支付瞬间锁定汇率快照"，记录汇率 ID + 有效期（通常 15~30 分钟），过期需重新获取。
+
+#### 汇损归属
+
+> 锁定汇率与实际清算汇率之间的差异产生汇损。需要明确约定：谁承担汇损？通常平台侧承担锁汇期内的波动风险，超出锁汇期的由业务方承担。汇损计入财务报表的"汇兑损益"科目。
+
+#### 多币种账务模型
+
+> 账务系统必须支持多币种。每笔流水同时记录：原币种金额、目标币种金额、汇率 ID。账户余额按币种隔离，不同币种不能直接加减。
+
+```sql
+-- 多币种流水表
+CREATE TABLE payment_flow (
+    id            BIGINT PRIMARY KEY,
+    order_id      VARCHAR(64) NOT NULL,
+    src_currency  CHAR(3) NOT NULL,     -- 原币种 USD
+    src_amount    BIGINT NOT NULL,       -- 原币种金额（最小单位）
+    dst_currency  CHAR(3) NOT NULL,     -- 目标币种 CNY
+    dst_amount    BIGINT NOT NULL,       -- 目标币种金额
+    exchange_rate_id VARCHAR(32),        -- 汇率快照 ID
+    rate_value    DECIMAL(18,8),         -- 锁定汇率值
+    created_at    TIMESTAMP NOT NULL
+);
+```
 
 ### 2. 表达示例
 
