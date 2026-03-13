@@ -1472,6 +1472,163 @@ body:has(#VPNavScreen) {
   50% { opacity: 0.4; }
 }
 
+.vocab-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-text-3);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, transform 0.3s;
+}
+
+.vocab-settings-btn:hover {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+.vocab-settings-btn.active {
+  color: var(--vp-c-brand-1);
+  transform: rotate(60deg);
+}
+
+.vocab-settings-panel {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  background: var(--vp-c-bg);
+}
+
+.vocab-setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vocab-setting-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.vocab-setting-value {
+  font-family: var(--vp-font-family-mono);
+  font-size: 12px;
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.vocab-gender-filter {
+  display: flex;
+  gap: 4px;
+}
+
+.vocab-gender-btn {
+  flex: 1;
+  height: 30px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-text-3);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vocab-gender-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-text-1);
+}
+
+.vocab-gender-btn.active {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.vocab-setting-select {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.vocab-setting-select:focus {
+  border-color: var(--vp-c-brand-1);
+}
+
+.vocab-setting-range {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 3px;
+  background: var(--vp-c-divider);
+  outline: none;
+}
+
+.vocab-setting-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  cursor: pointer;
+  border: 2px solid var(--vp-c-bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.vocab-setting-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  cursor: pointer;
+  border: 2px solid var(--vp-c-bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.vocab-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid var(--vp-c-brand-soft);
+  border-radius: 8px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.vocab-preview-btn:hover {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 18%, transparent);
+  border-color: var(--vp-c-brand-1);
+}
+
 @media (max-width: 640px) {
   .vocab-grid {
     grid-template-columns: 1fr;
@@ -1479,5 +1636,8 @@ body:has(#VPNavScreen) {
   .vocab-card {
     padding: 16px;
     margin-top: 32px;
+  }
+  .vocab-settings-panel {
+    padding: 12px;
   }
 }

@@ -4,34 +4,44 @@ description: 围绕高并发支付系统的 Go 性能、分布式事务、资金
 vocabulary:
   - word: idempotent
     meaning: 幂等的
-    phonetic: "/ˌaɪ.demˈpoʊ.t̬ənt/"
+    phoneticUs: "/ˌaɪ.demˈpoʊ.t̬ənt/"
+    phoneticUk: "/ˌaɪ.demˈpəʊ.tənt/"
   - word: throughput
     meaning: 吞吐量
-    phonetic: "/ˈθruː.pʊt/"
+    phoneticUs: "/ˈθruː.pʊt/"
+    phoneticUk: "/ˈθruː.pʊt/"
   - word: latency
     meaning: 延迟
-    phonetic: "/ˈleɪ.t̬ən.si/"
+    phoneticUs: "/ˈleɪ.tən.si/"
+    phoneticUk: "/ˈleɪ.tən.si/"
   - word: settlement
     meaning: 清算；结算
-    phonetic: "/ˈset̬.əl.mənt/"
+    phoneticUs: "/ˈset̬.əl.mənt/"
+    phoneticUk: "/ˈset.əl.mənt/"
   - word: reconciliation
     meaning: 对账
-    phonetic: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
+    phoneticUs: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
+    phoneticUk: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
   - word: distributed transaction
     meaning: 分布式事务
-    phonetic: "/dɪˈstrɪb.juː.t̬ɪd trænˈzæk.ʃən/"
+    phoneticUs: "/dɪˈstrɪb.jə.t̬ɪd trænˈzæk.ʃən/"
+    phoneticUk: "/dɪˈstrɪb.juː.tɪd trænˈzæk.ʃən/"
   - word: circuit breaker
     meaning: 熔断器
-    phonetic: "/ˈsɜːr.kɪt ˈbreɪ.kɚ/"
+    phoneticUs: "/ˈsɝː.kɪt ˈbreɪ.kɚ/"
+    phoneticUk: "/ˈsɜː.kɪt ˈbreɪ.kər/"
   - word: rate limiting
     meaning: 限流
-    phonetic: "/reɪt ˈlɪm.ɪ.t̬ɪŋ/"
+    phoneticUs: "/reɪt ˈlɪm.ə.t̬ɪŋ/"
+    phoneticUk: "/reɪt ˈlɪm.ɪ.tɪŋ/"
   - word: hot account
     meaning: 热点账户
-    phonetic: "/hɑːt əˈkaʊnt/"
+    phoneticUs: "/hɑːt əˈkaʊnt/"
+    phoneticUk: "/hɒt əˈkaʊnt/"
   - word: consistency
     meaning: 一致性
-    phonetic: "/kənˈsɪs.tən.si/"
+    phoneticUs: "/kənˈsɪs.tən.si/"
+    phoneticUk: "/kənˈsɪs.tən.si/"
 ---
 
 # 高并发支付系统专题整理
@@ -156,9 +166,243 @@ vocabulary:
 
 要能回答这些追问：
 
-- 如何处理渠道异步通知与主动轮询并存？
-- 如何避免并发通知导致状态乱序？
-- 如何处理“成功通知晚于失败结果”的反转场景？
+#### 追问一：如何处理渠道异步通知与主动轮询并存？
+
+> 核心思路是”通知优先，轮询兜底，幂等收口”。渠道通知是推模式，延迟低但可能丢；主动轮询是拉模式，可靠但有延迟。两者并存时，必须通过幂等状态机保证无论哪条路径先到达，最终状态一致。
+
+```mermaid
+flowchart LR
+    A[支付请求] --> B[支付渠道] --> C[银行/三方]
+    C -->|异步通知 - 推| D
+    B -->|主动轮询 - 拉| D
+    subgraph D[幂等状态机 - 统一收口]
+        D1[查当前状态] --> D2[校验流转合法性]
+        D2 --> D3[CAS 乐观锁更新]
+        D3 --> D4[重复到达则忽略]
+    end
+```
+
+**具体实现策略：**
+
+- **通知优先**：渠道回调到达后立即处理，更新订单状态
+- **轮询兜底**：对超过 T 秒（如 30s）仍处于”支付中”的订单，启动定时轮询任务主动查询渠道
+- **幂等收口**：无论通知还是轮询，最终都走同一个状态更新方法，使用乐观锁（版本号）防止重复更新
+
+```go
+func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string, channelResult *ChannelResult) error {
+    // 1. 查询当前订单状态
+    order, err := s.orderRepo.GetByOrderID(ctx, orderID)
+    if err != nil {
+        return err
+    }
+
+    // 2. 幂等检查：已终态直接返回
+    if order.Status == StatusSuccess || order.Status == StatusFailed {
+        return nil // 幂等，直接忽略
+    }
+
+    // 3. 状态流转合法性校验
+    if !order.CanTransitTo(channelResult.Status) {
+        return ErrInvalidStateTransition
+    }
+
+    // 4. CAS 更新，防止并发覆盖
+    affected, err := s.orderRepo.UpdateStatusWithVersion(ctx, orderID, channelResult.Status, order.Version)
+    if err != nil {
+        return err
+    }
+    if affected == 0 {
+        return ErrConcurrentUpdate // 被其他线程抢先更新，可重试
+    }
+
+    return nil
+}
+```
+
+#### 追问二：如何避免并发通知导致状态乱序？
+
+> 核心方案是”版本号 + 状态机 + 数据库行锁”三道防线，确保即使多条通知并发到达，状态也只能沿着合法方向前进，不会回退或跳跃。
+
+```mermaid
+stateDiagram-v2
+    [*] --> 初始化
+    初始化 --> 支付中
+    支付中 --> 成功
+    支付中 --> 失败
+    成功 --> [*]: 终态，不可变
+    失败 --> [*]: 终态，不可变
+```
+
+```mermaid
+sequenceDiagram
+    participant N1 as 通知1-支付中
+    participant N2 as 通知2-成功
+    participant N3 as 通知3-成功
+    participant DB as 数据库
+
+    N1->>DB: CAS v1, 状态=支付中
+    DB-->>N1: OK, v2
+    N2->>DB: CAS v1, 状态=成功
+    DB-->>N2: 失败, 版本已变
+    N2->>DB: 重读 v2
+    N2->>DB: CAS v2, 状态=成功
+    DB-->>N2: OK, v3
+    N3->>DB: 读取 status
+    DB-->>N3: 已终态, 幂等返回
+```
+
+**三道防线：**
+
+| 防线 | 机制 | 作用 |
+| --- | --- | --- |
+| 第一道 | 状态机白名单 | 只允许合法方向流转，终态不可变 |
+| 第二道 | 乐观锁版本号 | 数据库 `WHERE version = ?` 防止并发覆盖 |
+| 第三道 | 分布式锁（可选） | 对同一 OrderID 加锁串行化处理，降低冲突概率 |
+
+```go
+// 状态流转白名单
+var validTransitions = map[Status][]Status{
+    StatusInit:   {StatusPaying},
+    StatusPaying: {StatusSuccess, StatusFailed},
+    // StatusSuccess 和 StatusFailed 是终态，无合法后续状态
+}
+
+func (o *Order) CanTransitTo(target Status) bool {
+    allowed, ok := validTransitions[o.Status]
+    if !ok {
+        return false
+    }
+    for _, s := range allowed {
+        if s == target {
+            return true
+        }
+    }
+    return false
+}
+
+// 数据库层 CAS 更新
+// UPDATE orders SET status = ?, version = version + 1
+//   WHERE order_id = ? AND version = ?
+func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string, status Status, version int64) (int64, error) {
+    result := r.db.WithContext(ctx).
+        Model(&Order{}).
+        Where(“order_id = ? AND version = ?”, orderID, version).
+        Updates(map[string]interface{}{
+            “status”:  status,
+            “version”: gorm.Expr(“version + 1”),
+        })
+    return result.RowsAffected, result.Error
+}
+```
+
+#### 追问三：如何处理”成功通知晚于失败结果”的反转场景？
+
+> 这是支付系统最棘手的场景之一。核心原则是”终态不可逆 + 渠道结果为准 + 对账兜底”。
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant S as 支付服务
+    participant C as 支付渠道
+
+    U->>S: t0 发起支付
+    S->>C: 调用渠道
+    Note over S,C: t1 超时未响应
+    S->>S: 标记失败待确认
+    Note over C: t2 渠道实际处理成功
+    C-->>S: t3 异步通知成功到达
+    S->>S: 检测到反转, 进入决策树
+```
+
+**关键设计策略：**
+
+**1. 区分”本地判定失败”和”渠道明确拒绝”**
+
+```mermaid
+flowchart LR
+    A[收到成功通知] --> B{失败原因}
+    B -->|超时| C[以渠道为准] --> E[修正为成功]
+    B -->|明确拒绝| D[以本地为准] --> F[生成异常工单]
+```
+
+| 失败类型 | 原因 | 是否可被渠道修正 |
+| --- | --- | --- |
+| 失败待确认 | 超时/网络异常，本地主动标记 | 可修正，以渠道结果为准 |
+| 真实失败 | 渠道明确返回拒绝码 | 不可修正 |
+
+**2. 引入”失败待确认”中间态**
+
+```mermaid
+stateDiagram-v2
+    [*] --> 初始化
+    初始化 --> 支付中
+    支付中 --> 成功: 渠道返回成功
+    支付中 --> 失败: 渠道明确拒绝
+    支付中 --> 失败待确认: 超时/网络异常
+    失败待确认 --> 成功: 渠道通知/轮询修正
+    失败待确认 --> 失败: 对账确认无此笔交易
+    成功 --> [*]
+    失败 --> [*]
+```
+
+**3. Go 伪代码实现**
+
+```go
+func (s *PaymentService) HandleChannelTimeout(ctx context.Context, orderID string) error {
+    // 超时不直接标记失败，而是标记”失败待确认”
+    return s.orderRepo.UpdateStatus(ctx, orderID, StatusFailPending)
+}
+
+func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string, result *ChannelResult) error {
+    order, err := s.orderRepo.GetByOrderID(ctx, orderID)
+    if err != nil {
+        return err
+    }
+
+    switch {
+    // 正常终态，幂等返回
+    case order.Status == StatusSuccess:
+        return nil
+
+    // “失败待确认”状态收到成功通知 → 修正为成功
+    case order.Status == StatusFailPending && result.Status == StatusSuccess:
+        log.Warn(“状态反转修正”, “orderID”, orderID, “from”, order.Status, “to”, StatusSuccess)
+        return s.correctToSuccess(ctx, order, result)
+
+    // 真正的终态失败，收到成功通知 → 异常告警，人工介入
+    case order.Status == StatusFailed && result.Status == StatusSuccess:
+        log.Error(“终态失败后收到成功通知，需人工处理”, “orderID”, orderID)
+        return s.createExceptionOrder(ctx, order, result)
+
+    default:
+        return s.normalStateTransit(ctx, order, result)
+    }
+}
+
+func (s *PaymentService) correctToSuccess(ctx context.Context, order *Order, result *ChannelResult) error {
+    // 1. 修正订单状态
+    if err := s.orderRepo.UpdateStatus(ctx, order.OrderID, StatusSuccess); err != nil {
+        return err
+    }
+    // 2. 触发后续流程（通知商户、记账等）
+    return s.triggerPostPayment(ctx, order)
+}
+```
+
+**4. 对账兜底**
+
+> 无论技术方案多完善，”失败待确认”的订单最终都必须通过对账确认。日终对账时，拉取渠道侧的交易明细，逐笔比对：渠道有而本地没有的，补充入账；本地有而渠道没有的，确认为真实失败并关闭。
+
+```mermaid
+flowchart LR
+    A[拉取渠道账单] --> B[逐笔比对]
+    B --> C{比对结果}
+    C -->|长款| D[补入账]
+    C -->|短款| E[确认失败]
+    C -->|一致| F[正常]
+```
+
+> 长款：渠道有、本地无；短款：渠道无、本地有。
 
 ### 3. 资金安全答题顺序
 

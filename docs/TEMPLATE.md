@@ -1,5 +1,28 @@
 # 文档模板
 
+## Frontmatter 参考
+
+如果文档要展示词汇卡，统一使用下面的字段：
+
+```yaml
+---
+title: 文档标题
+description: 文档描述
+vocabulary:
+  - word: scheduler
+    meaning: 调度器
+    phoneticUs: "/ˈskedʒ.uː.lɚ/"
+    phoneticUk: "/ˈʃedʒ.uː.lər/"
+---
+```
+
+约定：
+
+- 默认优先写 `phoneticUs`
+- 如果有英式写法，再补 `phoneticUk`
+- 不再新增只有 `phonetic` 的新词条，旧字段仅兼容历史内容
+- 音标以 IPA 为准
+
 ## 适合人群
 
 - 这篇文档适合谁

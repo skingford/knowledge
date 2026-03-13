@@ -56,6 +56,7 @@
 - 优先按“概览 -> 路线 -> 资料 -> 实践/能力自检”组织结构
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
+- 如果文档使用 `vocabulary` frontmatter，统一使用 `phoneticUs` / `phoneticUk` 字段；默认以 `phoneticUs` 为主，旧 `phonetic` 字段仅兼容历史内容
 
 ## 目录结构
 

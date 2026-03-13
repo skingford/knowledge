@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import { quickNavLink, sections } from './theme/content-data'
 
@@ -16,7 +17,7 @@ const sidebar = Object.fromEntries(
     .map((section) => [section.base, section.sidebar]),
 )
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
@@ -144,4 +145,4 @@ export default defineConfig({
       next: '下一篇',
     },
   },
-})
+}))
