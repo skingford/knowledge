@@ -1,192 +1,431 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from "vue";
 
 interface Site {
-  name: string
-  desc: string
-  domain: string
-  fallback: string
-  url: string
-  lightBg?: boolean
+  name: string;
+  desc: string;
+  domain: string;
+  fallback: string;
+  url: string;
+  lightBg?: boolean;
 }
 
 interface Category {
-  title: string
-  emoji: string
-  sites: Site[]
+  title: string;
+  emoji: string;
+  sites: Site[];
 }
 
 const getFavicon = (domain: string) =>
-  `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=64`
+  `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=64`;
 
 const onImgError = (e: Event) => {
-  const img = e.target as HTMLImageElement
-  img.style.display = 'none'
-  const fallback = img.nextElementSibling as HTMLElement
-  if (fallback) fallback.style.display = 'inline'
-}
+  const img = e.target as HTMLImageElement;
+  img.style.display = "none";
+  const fallback = img.nextElementSibling as HTMLElement;
+  if (fallback) fallback.style.display = "inline";
+};
 
-const activeCategory = ref('')
+const activeCategory = ref("");
 
 const getCategoryId = (title: string) =>
-  title.replace(/\s+/g, '-').toLowerCase()
+  title.replace(/\s+/g, "-").toLowerCase();
 
-let clickLock = ''
-let clickTimer = 0
+let clickLock = "";
+let clickTimer = 0;
 
 const scrollToCategory = (title: string) => {
-  const id = getCategoryId(title)
-  const el = document.getElementById(id)
+  const id = getCategoryId(title);
+  const el = document.getElementById(id);
   if (el) {
-    clickLock = id
-    activeCategory.value = id
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    clearTimeout(clickTimer)
-    clickTimer = window.setTimeout(() => { clickLock = '' }, 1000)
+    clickLock = id;
+    activeCategory.value = id;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    clearTimeout(clickTimer);
+    clickTimer = window.setTimeout(() => {
+      clickLock = "";
+    }, 1000);
   }
-}
+};
 
 const updateActiveOnScroll = () => {
   if (clickLock) {
-    activeCategory.value = clickLock
-    return
+    activeCategory.value = clickLock;
+    return;
   }
   const sections = Array.from(
-    document.querySelectorAll('.nav-category[id]')
-  ) as HTMLElement[]
-  if (!sections.length) return
+    document.querySelectorAll(".nav-category[id]"),
+  ) as HTMLElement[];
+  if (!sections.length) return;
 
-  const scrollY = window.scrollY
-  const windowHeight = window.innerHeight
-  const docHeight = document.documentElement.scrollHeight
-  const navOffset = 100
+  const scrollY = window.scrollY;
+  const windowHeight = window.innerHeight;
+  const docHeight = document.documentElement.scrollHeight;
+  const navOffset = 100;
 
   // Step 1: normal logic — last section whose top scrolled past navOffset
-  let current = ''
+  let current = "";
   for (const section of sections) {
     if (section.getBoundingClientRect().top <= navOffset) {
-      current = section.id
+      current = section.id;
     }
   }
 
   // Step 2: near bottom — advance one-by-one to sections that can't reach navOffset
-  const distToBottom = docHeight - scrollY - windowHeight
+  const distToBottom = docHeight - scrollY - windowHeight;
   if (distToBottom < 300) {
-    const currentIdx = current ? sections.findIndex((s) => s.id === current) : -1
-    const ratio = 1 - distToBottom / 300
-    const dynamicThreshold = navOffset + ratio * (windowHeight * 0.5 - navOffset)
+    const currentIdx = current
+      ? sections.findIndex((s) => s.id === current)
+      : -1;
+    const ratio = 1 - distToBottom / 300;
+    const dynamicThreshold =
+      navOffset + ratio * (windowHeight * 0.5 - navOffset);
     for (let i = currentIdx + 1; i < sections.length; i++) {
       if (sections[i].getBoundingClientRect().top <= dynamicThreshold) {
-        current = sections[i].id
+        current = sections[i].id;
       }
     }
   }
 
-  activeCategory.value = current || sections[0].id
-}
+  activeCategory.value = current || sections[0].id;
+};
 
-let rafId = 0
+let rafId = 0;
 const onScroll = () => {
-  cancelAnimationFrame(rafId)
-  rafId = requestAnimationFrame(updateActiveOnScroll)
-}
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(updateActiveOnScroll);
+};
 
 onMounted(() => {
-  window.addEventListener('scroll', onScroll, { passive: true })
-  updateActiveOnScroll()
-})
+  window.addEventListener("scroll", onScroll, { passive: true });
+  updateActiveOnScroll();
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
-  cancelAnimationFrame(rafId)
-})
+  window.removeEventListener("scroll", onScroll);
+  cancelAnimationFrame(rafId);
+});
 
 const categories: Category[] = [
   {
-    title: 'AI 对话助手',
-    emoji: '🤖',
+    title: "AI Talk",
+    emoji: "🤖",
     sites: [
-      { name: 'Claude', desc: 'Anthropic 出品，擅长分析与长文本理解', domain: 'claude.ai', fallback: '🟠', url: 'https://claude.ai' },
-      { name: 'ChatGPT', desc: 'OpenAI 旗舰模型，生态最广泛', domain: 'chat.openai.com', fallback: '🟢', url: 'https://chat.openai.com' },
-      { name: 'Gemini', desc: 'Google 多模态大模型，深度集成 Google 服务', domain: 'gemini.google.com', fallback: '🔵', url: 'https://gemini.google.com' },
-      { name: 'DeepSeek', desc: '国产顶级推理模型，性价比极高', domain: 'chat.deepseek.com', fallback: '🌊', url: 'https://chat.deepseek.com' },
-      { name: 'Grok', desc: 'xAI 出品，实时联网，内嵌 X 平台', domain: 'grok.com', fallback: '⚡', url: 'https://grok.com' },
-      { name: 'Kimi', desc: 'Moonshot AI，长文本处理能力强', domain: 'kimi.moonshot.cn', fallback: '🌙', url: 'https://kimi.moonshot.cn' },
-      { name: '豆包', desc: '字节跳动出品，中文场景优化', domain: 'www.doubao.com', fallback: '🫘', url: 'https://www.doubao.com' },
+      {
+        name: "Claude",
+        desc: "Anthropic 出品，擅长分析与长文本理解",
+        domain: "claude.ai",
+        fallback: "🟠",
+        url: "https://claude.ai",
+      },
+      {
+        name: "ChatGPT",
+        desc: "OpenAI 旗舰模型，生态最广泛",
+        domain: "chat.openai.com",
+        fallback: "🟢",
+        url: "https://chat.openai.com",
+      },
+      {
+        name: "Gemini",
+        desc: "Google 多模态大模型，深度集成 Google 服务",
+        domain: "gemini.google.com",
+        fallback: "🔵",
+        url: "https://gemini.google.com",
+      },
+      {
+        name: "Grok",
+        desc: "xAI 出品，实时联网，内嵌 X 平台",
+        domain: "grok.com",
+        fallback: "⚡",
+        url: "https://grok.com",
+      },
+      {
+        name: "DeepSeek",
+        desc: "国产顶级推理模型，性价比极高",
+        domain: "chat.deepseek.com",
+        fallback: "🌊",
+        url: "https://chat.deepseek.com",
+      },
+      {
+        name: "Kimi",
+        desc: "Moonshot AI，长文本处理能力强",
+        domain: "kimi.moonshot.cn",
+        fallback: "🌙",
+        url: "https://kimi.moonshot.cn",
+      },
+      {
+        name: "豆包",
+        desc: "字节跳动出品，中文场景优化",
+        domain: "www.doubao.com",
+        fallback: "🫘",
+        url: "https://www.doubao.com",
+      },
     ],
   },
   {
-    title: 'AI 编码工具',
-    emoji: '💻',
+    title: "AI 编程工具",
+    emoji: "💻",
     sites: [
-      { name: 'Claude Code', desc: 'Anthropic 官方 CLI 编码助手，终端原生体验', domain: 'claude.ai', fallback: '⌨️', url: 'https://claude.ai/code' },
-      { name: 'OpenAI Codex', desc: 'OpenAI 云端软件工程 Agent，异步并行执行任务', domain: 'openai.com', fallback: '🤖', url: 'https://openai.com/codex' },
-      { name: 'OpenCode', desc: 'SST 出品的开源终端 AI 编码助手，多模型支持', domain: 'opencode.ai', fallback: '🖥️', url: 'https://opencode.ai' },
-      { name: 'Cursor', desc: 'AI 原生代码编辑器，基于 VSCode 深度改造', domain: 'cursor.sh', fallback: '🖱️', url: 'https://cursor.sh' },
-      { name: 'Antigravity', desc: 'Google 出品的 AI 编码 Agent，深度集成 Google 生态', domain: 'antigravity.google', fallback: '🪐', url: 'https://antigravity.google/' },
-      { name: 'GitHub Copilot', desc: 'GitHub 官方 AI 编程助手，IDE 集成最广', domain: 'github.com', fallback: '🐙', url: 'https://github.com/features/copilot' },
-      { name: 'Windsurf', desc: 'Codeium 出品，流式 AI 编码体验', domain: 'windsurf.com', fallback: '🏄', url: 'https://windsurf.com' },
-      { name: 'Devin', desc: 'Cognition 出品，首个自主 AI 软件工程师', domain: 'cognition.ai', fallback: '🤖', url: 'https://cognition.ai/devin' },
-      { name: 'v0', desc: 'Vercel 出品，基于提示生成 React / Tailwind UI', domain: 'v0.dev', fallback: '▲', url: 'https://v0.dev' },
-      { name: 'Bolt', desc: 'StackBlitz 出品，浏览器内全栈 AI 开发', domain: 'bolt.new', fallback: '⚡', url: 'https://bolt.new' },
-      { name: 'Aider', desc: '终端 AI 结对编程工具，Git 感知自动提交', domain: 'aider.chat', fallback: '🖥️', url: 'https://aider.chat' },
-      { name: 'Continue', desc: '开源 AI 编码扩展，支持 VSCode / JetBrains', domain: 'continue.dev', fallback: '🔌', url: 'https://continue.dev' },
+      {
+        name: "Claude Code",
+        desc: "Anthropic 官方 CLI 编码助手，终端原生体验",
+        domain: "claude.ai",
+        fallback: "⌨️",
+        url: "https://claude.ai/code",
+      },
+      {
+        name: "OpenAI Codex",
+        desc: "OpenAI 云端软件工程 Agent，异步并行执行任务",
+        domain: "openai.com",
+        fallback: "🤖",
+        url: "https://openai.com/codex",
+      },
+      {
+        name: "OpenCode",
+        desc: "SST 出品的开源终端 AI 编码助手，多模型支持",
+        domain: "opencode.ai",
+        fallback: "🖥️",
+        url: "https://opencode.ai",
+      },
+      {
+        name: "GitHub Copilot",
+        desc: "GitHub 官方 AI 编程助手，IDE 集成最广",
+        domain: "github.com",
+        fallback: "🐙",
+        url: "https://github.com/features/copilot",
+      },
+      {
+        name: "Cursor",
+        desc: "AI 原生代码编辑器，基于 VSCode 深度改造",
+        domain: "cursor.sh",
+        fallback: "🖱️",
+        url: "https://cursor.sh",
+      },
+      {
+        name: "Antigravity",
+        desc: "Google 出品的 AI 编码 Agent，深度集成 Google 生态",
+        domain: "antigravity.google",
+        fallback: "🪐",
+        url: "https://antigravity.google/",
+      },
     ],
   },
   {
-    title: 'AI 研究工具',
-    emoji: '🔍',
+    title: "AI 研究工具",
+    emoji: "🔍",
     sites: [
-      { name: 'NotebookLM', desc: 'Google 出品，基于文档的 AI 问答与播客生成', domain: 'notebooklm.google.com', fallback: '📓', url: 'https://notebooklm.google.com' },
-      { name: 'Perplexity', desc: 'AI 搜索引擎，实时联网并引用来源', domain: 'www.perplexity.ai', fallback: '🔎', url: 'https://www.perplexity.ai' },
-      { name: 'Hugging Face', desc: '开源 AI 模型、数据集与 Space 社区', domain: 'huggingface.co', fallback: '🤗', url: 'https://huggingface.co' },
-      { name: 'Arena', desc: 'AI 模型能力对比与排行榜平台', domain: 'arena.ai', fallback: '🏆', url: 'https://arena.ai/', lightBg: true },
+      {
+        name: "NotebookLM",
+        desc: "Google 出品，基于文档的 AI 问答与播客生成",
+        domain: "notebooklm.google.com",
+        fallback: "📓",
+        url: "https://notebooklm.google.com",
+      },
+      {
+        name: "Perplexity",
+        desc: "AI 搜索引擎，实时联网并引用来源",
+        domain: "www.perplexity.ai",
+        fallback: "🔎",
+        url: "https://www.perplexity.ai",
+      },
+      {
+        name: "Hugging Face",
+        desc: "开源 AI 模型、数据集与 Space 社区",
+        domain: "huggingface.co",
+        fallback: "🤗",
+        url: "https://huggingface.co",
+      },
+      {
+        name: "Arena",
+        desc: "AI 模型能力对比与排行榜平台",
+        domain: "arena.ai",
+        fallback: "🏆",
+        url: "https://arena.ai/",
+        lightBg: true,
+      },
     ],
   },
   {
-    title: '开发者工具',
-    emoji: '🛠️',
+    title: "AI Skill",
+    emoji: "🧩",
     sites: [
-      { name: 'GitHub', desc: '代码托管与协作开发平台', domain: 'github.com', fallback: '🐱', url: 'https://github.com' },
-      { name: 'MDN Web Docs', desc: 'Web 技术权威参考文档', domain: 'developer.mozilla.org', fallback: '📚', url: 'https://developer.mozilla.org' },
-      { name: 'Can I Use', desc: '浏览器特性兼容性查询', domain: 'caniuse.com', fallback: '✅', url: 'https://caniuse.com' },
-      { name: 'Regex101', desc: '正则表达式在线测试与调试', domain: 'regex101.com', fallback: '🧪', url: 'https://regex101.com' },
-      { name: 'DevDocs', desc: '多语言 / 框架 API 文档聚合', domain: 'devdocs.io', fallback: '📖', url: 'https://devdocs.io' },
+      {
+        name: "skills.sh",
+        desc: "Skill 目录与发现平台，适合查找 AI Agent / Codex 可复用技能",
+        domain: "skills.sh",
+        fallback: "🧠",
+        url: "https://skills.sh/",
+      },
     ],
   },
   {
-    title: 'Skill 资源',
-    emoji: '🧩',
+    title: "AI GitHub",
+    emoji: "🧰",
     sites: [
-      { name: 'skills.sh', desc: 'Skill 目录与发现平台，适合查找 AI Agent / Codex 可复用技能', domain: 'skills.sh', fallback: '🧠', url: 'https://skills.sh/' },
+      {
+        name: "Agency Agents",
+        desc: "面向多 Agent 工作流的开源项目集合，适合参考协作式 AI 自动化实践",
+        domain: "github.com",
+        fallback: "🤝",
+        url: "https://github.com/msitarzewski/agency-agents",
+      },
+      {
+        name: "Everything Claude Code",
+        desc: "Claude Code 相关资源、技巧与集成方式的聚合仓库",
+        domain: "github.com",
+        fallback: "📦",
+        url: "https://github.com/affaan-m/everything-claude-code",
+      },
+      {
+        name: "OpenSpec",
+        desc: "围绕 AI 驱动规格定义与工程协作的开源工具项目",
+        domain: "github.com",
+        fallback: "📐",
+        url: "https://github.com/Fission-AI/OpenSpec",
+      },
     ],
   },
   {
-    title: 'AI 设计',
-    emoji: '🎨',
+    title: "AI 设计",
+    emoji: "🎨",
     sites: [
-      { name: 'Stitch', desc: 'Google 出品的 AI UI 设计工具，适合快速生成界面草图与页面结构', domain: 'stitch.withgoogle.com', fallback: '🪡', url: 'https://stitch.withgoogle.com/' },
-      { name: 'Figma', desc: '主流协作式界面设计平台，支持设计、原型与开发交付', domain: 'figma.com', fallback: '🎯', url: 'https://www.figma.com/' },
-      { name: 'Pencil', desc: '开源界面设计与原型工具，适合快速画线框和流程页面', domain: 'pencil.evolus.vn', fallback: '✏️', url: 'https://pencil.evolus.vn/' },
+      {
+        name: "Stitch",
+        desc: "Google 出品的 AI UI 设计工具，适合快速生成界面草图与页面结构",
+        domain: "stitch.withgoogle.com",
+        fallback: "🪡",
+        url: "https://stitch.withgoogle.com/",
+      },
+      {
+        name: "Figma",
+        desc: "主流协作式界面设计平台，支持设计、原型与开发交付",
+        domain: "figma.com",
+        fallback: "🎯",
+        url: "https://www.figma.com/",
+      },
+      {
+        name: "Pencil",
+        desc: "开源界面设计与原型工具，适合快速画线框和流程页面",
+        domain: "pencil.evolus.vn",
+        fallback: "✏️",
+        url: "https://pencil.evolus.vn/",
+      },
     ],
   },
   {
-    title: 'AI 音频',
-    emoji: '🎵',
+    title: "AI 音频",
+    emoji: "🎵",
     sites: [
-      { name: 'Seedance 2.0', desc: '字节 Seed 团队的多模态生成工具，支持音频输入并生成带原生音频的视频内容', domain: 'seed.bytedance.com', fallback: '🌊', url: 'https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0' },
-      { name: 'Suno', desc: '主流 AI 音乐生成平台，可通过提示词快速生成歌曲、配乐与音频素材', domain: 'suno.com', fallback: '🎤', url: 'https://suno.com/' },
-      { name: 'Udio', desc: 'AI 音乐生成平台，擅长生成高完成度歌曲与旋律片段', domain: 'udio.com', fallback: '🎶', url: 'https://www.udio.com/home' },
-      { name: 'ElevenLabs', desc: 'AI 语音与音频生成平台，适合配音、旁白、语音克隆与播客场景', domain: 'elevenlabs.io', fallback: '🗣️', url: 'https://elevenlabs.io/' },
+      {
+        name: "Seedance 2.0",
+        desc: "字节 Seed 团队的多模态生成工具，支持音频输入并生成带原生音频的视频内容",
+        domain: "seed.bytedance.com",
+        fallback: "🌊",
+        url: "https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0",
+      },
+      {
+        name: "Suno",
+        desc: "主流 AI 音乐生成平台，可通过提示词快速生成歌曲、配乐与音频素材",
+        domain: "suno.com",
+        fallback: "🎤",
+        url: "https://suno.com/",
+      },
+      {
+        name: "Udio",
+        desc: "AI 音乐生成平台，擅长生成高完成度歌曲与旋律片段",
+        domain: "udio.com",
+        fallback: "🎶",
+        url: "https://www.udio.com/home",
+      },
+      {
+        name: "ElevenLabs",
+        desc: "AI 语音与音频生成平台，适合配音、旁白、语音克隆与播客场景",
+        domain: "elevenlabs.io",
+        fallback: "🗣️",
+        url: "https://elevenlabs.io/",
+      },
     ],
   },
-]
+  {
+    title: "开发者工具",
+    emoji: "🛠️",
+    sites: [
+      {
+        name: "GitHub",
+        desc: "代码托管与协作开发平台",
+        domain: "github.com",
+        fallback: "🐱",
+        url: "https://github.com",
+      },
+      {
+        name: "MDN Web Docs",
+        desc: "Web 技术权威参考文档",
+        domain: "developer.mozilla.org",
+        fallback: "📚",
+        url: "https://developer.mozilla.org",
+      },
+      {
+        name: "Can I Use",
+        desc: "浏览器特性兼容性查询",
+        domain: "caniuse.com",
+        fallback: "✅",
+        url: "https://caniuse.com",
+      },
+      {
+        name: "Regex101",
+        desc: "正则表达式在线测试与调试",
+        domain: "regex101.com",
+        fallback: "🧪",
+        url: "https://regex101.com",
+      },
+      {
+        name: "DevDocs",
+        desc: "多语言 / 框架 API 文档聚合",
+        domain: "devdocs.io",
+        fallback: "📖",
+        url: "https://devdocs.io",
+      },
+    ],
+  },
+  {
+    title: "网站排行",
+    emoji: "📈",
+    sites: [
+      {
+        name: "GitHub Trending",
+        desc: "GitHub 热门仓库趋势榜，适合发现近期活跃项目",
+        domain: "github.com",
+        fallback: "🔥",
+        url: "https://github.com/trending",
+      },
+      {
+        name: "Hacker News",
+        desc: "Y Combinator 社区热门资讯与技术讨论榜单",
+        domain: "news.ycombinator.com",
+        fallback: "📰",
+        url: "https://news.ycombinator.com/",
+      },
+      {
+        name: "Best of JS",
+        desc: "JavaScript 生态项目排行与趋势发现平台",
+        domain: "bestofjs.org",
+        fallback: "✨",
+        url: "https://bestofjs.org/",
+      },
+    ],
+  },
+];
 </script>
 
 <template>
   <div class="quick-nav-layout">
     <div class="quick-nav">
-      <div v-for="cat in categories" :key="cat.title" :id="getCategoryId(cat.title)" class="nav-category">
+      <div
+        v-for="cat in categories"
+        :key="cat.title"
+        :id="getCategoryId(cat.title)"
+        class="nav-category"
+      >
         <h2 class="cat-title">
           <span class="cat-emoji">{{ cat.emoji }}</span>
           {{ cat.title }}
@@ -358,7 +597,9 @@ const categories: Category[] = [
   right: 14px;
   font-size: 14px;
   color: var(--vp-c-text-3);
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .site-card:hover .site-link-icon {
