@@ -4,25 +4,34 @@ description: 围绕高并发支付系统的 Go 性能、分布式事务、资金
 vocabulary:
   - word: idempotent
     meaning: 幂等的
+    phonetic: "/ˌaɪ.demˈpoʊ.t̬ənt/"
   - word: throughput
     meaning: 吞吐量
+    phonetic: "/ˈθruː.pʊt/"
   - word: latency
     meaning: 延迟
+    phonetic: "/ˈleɪ.t̬ən.si/"
   - word: settlement
     meaning: 清算；结算
+    phonetic: "/ˈset̬.əl.mənt/"
   - word: reconciliation
     meaning: 对账
+    phonetic: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
   - word: distributed transaction
     meaning: 分布式事务
+    phonetic: "/dɪˈstrɪb.juː.t̬ɪd trænˈzæk.ʃən/"
   - word: circuit breaker
     meaning: 熔断器
+    phonetic: "/ˈsɜːr.kɪt ˈbreɪ.kɚ/"
   - word: rate limiting
     meaning: 限流
+    phonetic: "/reɪt ˈlɪm.ɪ.t̬ɪŋ/"
   - word: hot account
     meaning: 热点账户
     phonetic: "/hɑːt əˈkaʊnt/"
   - word: consistency
     meaning: 一致性
+    phonetic: "/kənˈsɪs.tən.si/"
 ---
 
 # 高并发支付系统专题整理

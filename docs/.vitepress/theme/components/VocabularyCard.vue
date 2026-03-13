@@ -49,11 +49,22 @@ function getPhonetic(item: VocabItem) {
   return item.phonetic || phonetics.value[item.word] || ''
 }
 
+function getUSVoice(): SpeechSynthesisVoice | undefined {
+  const voices = window.speechSynthesis.getVoices()
+  return (
+    voices.find((v) => v.lang === 'en-US' && v.default) ||
+    voices.find((v) => v.lang === 'en-US') ||
+    voices.find((v) => v.lang.startsWith('en'))
+  )
+}
+
 function speak(word: string) {
   if (!window.speechSynthesis) return
   window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(word)
   utterance.lang = 'en-US'
+  const voice = getUSVoice()
+  if (voice) utterance.voice = voice
   utterance.rate = 0.85
   speakingWord.value = word
   utterance.onend = () => (speakingWord.value = '')
