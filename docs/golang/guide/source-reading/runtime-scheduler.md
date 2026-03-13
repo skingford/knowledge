@@ -1,6 +1,30 @@
 ---
 title: GMP 调度器源码精读
 description: 精读 Go runtime GMP 调度模型，理解 goroutine 调度、抢占与 work-stealing 机制。
+vocabulary:
+  - word: scheduler
+    meaning: 调度器
+  - word: preemption
+    meaning: 抢占
+  - word: work stealing
+    meaning: 工作窃取（负载均衡策略）
+    phonetic: "/wɜːrk ˈstiːlɪŋ/"
+  - word: goroutine
+    meaning: Go 协程；轻量级线程
+    phonetic: "/ɡoʊ.ruːˈtiːn/"
+  - word: processor
+    meaning: 处理器（GMP 中的 P）
+  - word: syscall
+    meaning: 系统调用
+    phonetic: "/ˈsɪs.kɔːl/"
+  - word: handoff
+    meaning: 交接；移交
+  - word: starvation
+    meaning: 饥饿（调度饥饿）
+  - word: cooperative
+    meaning: 协作式的
+  - word: asynchronous
+    meaning: 异步的
 ---
 
 # GMP 调度器：runtime 源码精读

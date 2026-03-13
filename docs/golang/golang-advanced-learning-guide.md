@@ -1,6 +1,28 @@
 ---
 title: 高级 Golang 学习资料
 description: 高级 Golang 学习主线，系统覆盖语言机制、并发模型、性能优化、工程实践与源码阅读。
+vocabulary:
+  - word: concurrency
+    meaning: 并发；同时发生
+  - word: goroutine
+    meaning: Go 协程；轻量级线程
+    phonetic: "/ɡoʊ.ruːˈtiːn/"
+  - word: scheduler
+    meaning: 调度器
+  - word: garbage collection
+    meaning: 垃圾回收
+  - word: mutex
+    meaning: 互斥锁
+  - word: channel
+    meaning: 通道；信道
+  - word: interface
+    meaning: 接口
+  - word: reflection
+    meaning: 反射
+  - word: profiling
+    meaning: 性能剖析
+  - word: deadlock
+    meaning: 死锁
 ---
 
 # 高级 Golang 学习资料
