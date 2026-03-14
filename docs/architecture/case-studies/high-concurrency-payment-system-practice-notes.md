@@ -671,6 +671,203 @@ SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
 - Lua 脚本原子性
 - 滑动窗口统计
 
+<details>
+<summary><strong>缓存穿透、击穿、雪崩怎么答？</strong></summary>
+
+> 这三个问题本质上都是“缓存没兜住，请求直接打到下游”。区别在于：穿透是“查不存在的数据”，击穿是“热点 Key 恰好过期”，雪崩是“大量 Key 同时失效”。
+
+建议先用表格快速区分：
+
+| 问题 | 本质 | 典型现象 | 核心治理 |
+| --- | --- | --- | --- |
+| 缓存穿透 | 查询根本不存在的数据 | 请求绕过缓存，持续打空 DB | 布隆过滤器、缓存空值、参数校验 |
+| 缓存击穿 | 热点 Key 在高并发下刚好过期 | 瞬时大量请求同时回源 | 热点 Key 永不过期、异步刷新、互斥锁 |
+| 缓存雪崩 | 大量 Key 同时失效或缓存服务异常 | 下游在短时间内被整体流量压垮 | TTL 随机化、多级缓存、限流降级、高可用 |
+
+#### 缓存穿透
+
+> 缓存穿透是指查询一个根本不存在的数据。由于缓存中没有，请求会直接穿透到数据库；数据库也没有这个数据，因此无法回填缓存。结果就是，后续同样的请求还会继续打到数据库。
+
+它的风险在于：
+
+- 每次对“不存在数据”的请求都会直接给 DB 施压
+- 恶意攻击者如果持续构造随机不存在的 ID，请求会绕过缓存直接打穿数据库
+- 业务侧如果参数校验不严，也会把大量非法请求直接透传到下游
+
+缓存穿透常见场景：
+
+- 恶意攻击：利用爬虫不断随机生成不存在的 ID 发起请求
+- 业务逻辑漏洞：代码层面对参数校验不严，导致非法请求透传
+
+1. 布隆过滤器 (Bloom Filter) —— 首选方案
+布隆过滤器是一种空间效率极高的概率型数据结构。它在请求到达缓存之前，先判断该数据是否存在。
+
+原理：将所有可能存在的数据通过多个 Hash 函数映射到一个位图（BitMap）中。
+
+效果：如果布隆过滤器说数据“不存在”，那它一定不存在；如果说“存在”，则有极小的概率是误判（数据其实不存在）。
+
+优点：内存占用极低，能有效拦截大部分非法请求。
+
+2. 缓存空对象 (Cache Null Object)
+
+如果数据库查询不到结果，仍然将这个“空结果”存入 Redis，并设置一个较短的过期时间（例如 1~5 分钟）。
+
+原理：后续相同的请求会命中缓存中的“空值”，不再查询数据库。
+
+缺点：
+
+如果不存在的 Key 很多，会浪费大量 Redis 内存。
+
+即便设置了过期时间，在过期时间内数据可能在 DB 中被新增，导致缓存不一致。
+
+3. 参数合法性校验
+
+这是最基础的一道防线。在 Controller 层或网关层对请求参数进行严格校验。
+
+#### 缓存击穿
+
+> 缓存击穿是指某个热点 Key 在高并发场景下刚好失效，导致大量请求在同一时刻回源数据库。因为这个 Key 本来就很热，所以一旦失效，冲击会非常集中。
+
+常见特点：
+
+- 通常只发生在少数热点 Key 上
+- 请求的数据是存在的，不是非法请求
+- 高峰期很容易把单个下游查询打爆
+
+核心治理方案：
+
+- 热点 Key 永不过期，由后台异步刷新
+- 回源时加互斥锁，控制只有一个线程去查 DB 并回填缓存
+- 对特别热点的数据做本地缓存或多级缓存
+
+**缓存雪崩**
+
+> 缓存雪崩是指大量缓存 Key 在同一时间集中失效，或者 Redis 整体不可用，导致海量请求在短时间内全部压向数据库或下游服务。
+
+常见原因：
+
+- 批量缓存统一 TTL，到点一起过期
+- Redis 节点故障、网络抖动、集群不可用
+- 大促前预热不充分，热点数据集中回源
+
+核心治理方案：
+
+- TTL 加随机值，避免同一批 Key 同时失效
+- 多级缓存，减轻 Redis 或 DB 的单点压力
+- 限流、降级、熔断，避免下游被拖垮
+- Redis 高可用部署，提前做预热和容量评估
+
+```text
+穿透：请求不存在的数据 -> DB 被持续打空
+击穿：热点 Key 过期 -> 瞬时并发回源
+雪崩：大量 Key 同时失效 -> 整体流量压垮下游
+```
+
+> 支付场景里可以补一句：商户配置、风控规则、订单查询这类热点数据一旦发生击穿或雪崩，核心交易链路的 RT 和成功率会被直接放大。
+
+</details>
+
+<details>
+<summary><strong>分布式锁安全性怎么答？</strong></summary>
+
+> Redis 锁不是“加了就安全”，它解决的是并发协调问题，不解决最终数据正确性问题。答题时一定要把“锁”和“数据库约束兜底”分开讲。
+
+建议抓住四个风险点：
+
+- 锁过期：业务没执行完，锁先失效，其他请求进入
+- 误删锁：A 的锁过期后被 B 拿到，A 执行完把 B 的锁删掉
+- 主从切换：主节点刚写锁还没同步，从节点晋升后锁丢失
+- 锁续期失败：长事务或 GC 抖动导致看门狗续期不及时
+
+标准答法：
+
+1. 加锁用唯一 value，解锁时校验 value 再删除
+2. 锁只做削峰和串行化，最终一致性靠唯一索引、乐观锁、状态机兜底
+3. 对资金类动作优先保证幂等，不把 Redis 锁当成唯一防线
+
+```lua
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+  return redis.call("DEL", KEYS[1])
+end
+return 0
+```
+
+> 一句话收口：Redis 锁解决“少做冲突”，数据库约束解决“绝不做错”。
+
+</details>
+
+<details>
+<summary><strong>Lua 脚本原子性怎么答？</strong></summary>
+
+> Redis 单线程执行命令，Lua 脚本在执行期间不会被其他命令插入，所以非常适合把“读 + 判断 + 写”合并成一个原子操作。
+
+典型使用场景：
+
+- 校验库存后扣减
+- 判断锁 value 后释放锁
+- 限流时窗口计数和过期时间一起设置
+
+和事务的区别要说清楚：
+
+- Redis Lua 保证的是脚本执行原子性，不是数据库那种可回滚事务
+- 脚本里已经执行成功的命令，不会因为后续报错自动回滚
+
+```lua
+local current = redis.call("GET", KEYS[1])
+if not current then
+  current = 0
+else
+  current = tonumber(current)
+end
+
+if current + tonumber(ARGV[1]) > tonumber(ARGV[2]) then
+  return 0
+end
+
+redis.call("INCRBY", KEYS[1], ARGV[1])
+redis.call("EXPIRE", KEYS[1], ARGV[3])
+return 1
+```
+
+> 面试里可以补一句：Lua 适合短小、确定性强的逻辑，不适合长脚本和复杂业务编排。
+
+</details>
+
+<details>
+<summary><strong>滑动窗口统计怎么答？</strong></summary>
+
+> 标准做法是 Redis ZSET。score 用时间戳，member 用唯一事件 ID；每次请求先删窗口外数据，再写入当前事件，最后统计窗口内元素数量。
+
+回答时按这个顺序最稳：
+
+1. 为什么用 ZSET：天然按时间排序，适合窗口裁剪
+2. 关键步骤：删旧数据、写新数据、统计数量、设置过期
+3. 典型场景：用户支付频次、接口限流、风控频控
+
+```go
+func Allow(ctx context.Context, rdb *redis.Client, key string, now int64, limit int64) (bool, error) {
+    min := "0"
+    max := strconv.FormatInt(now-60, 10)
+
+    pipe := rdb.TxPipeline()
+    pipe.ZRemRangeByScore(ctx, key, min, max)
+    pipe.ZAdd(ctx, key, redis.Z{
+        Score:  float64(now),
+        Member: fmt.Sprintf("%d-%s", now, uuid.NewString()),
+    })
+    count := pipe.ZCard(ctx, key)
+    pipe.Expire(ctx, key, 2*time.Minute)
+    if _, err := pipe.Exec(ctx); err != nil {
+        return false, err
+    }
+    return count.Val() <= limit, nil
+}
+```
+
+> 如果追问高并发热点，可以补充：按用户、商户、IP 分维度拆 key，必要时用 Lua 把裁剪和计数合成一次原子执行。
+
+</details>
+
 支付语境下的典型问题：
 
 <details>
@@ -857,7 +1054,8 @@ log.Error("消息投入死信队列", "key", string(msg.Key))
 
 重点防御手段：
 
-#### 重放攻击防御
+<details>
+<summary><strong>如何防御重放攻击？</strong></summary>
 
 > 每个请求带随机 Nonce 和时间戳，服务端校验时间窗口（如 5 分钟），同时记录已用 Nonce 防重复。
 
@@ -873,7 +1071,10 @@ func (g *Gateway) AntiReplay(nonce string, ts int64) error {
 }
 ```
 
-#### 数字签名
+</details>
+
+<details>
+<summary><strong>数字签名怎么答？</strong></summary>
 
 > 请求参数按 key 排序拼接后用 RSA/HMAC 签名，服务端用公钥/密钥验签。防止参数被中间人篡改。
 
@@ -891,11 +1092,17 @@ func Sign(params map[string]string, secret string) string {
 }
 ```
 
-#### 金额篡改防御
+</details>
+
+<details>
+<summary><strong>如何防止金额篡改？</strong></summary>
 
 > 前端传的金额仅用于展示，后端下单时以订单中心/商品中心的价格为准，同时验签防止请求参数被篡改。
 
-#### SQL 注入防御
+</details>
+
+<details>
+<summary><strong>如何防御 SQL 注入？</strong></summary>
 
 > 全部使用预编译语句（`?` 占位符），严禁字符串拼接 SQL。Go 的 `database/sql` 原生支持参数绑定。
 
@@ -907,9 +1114,12 @@ db.Query("SELECT * FROM orders WHERE id = ?", orderID)
 db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 ```
 
+</details>
+
 ### 3. 鉴权与身份校验
 
-#### OAuth 2.0 常见授权模式
+<details>
+<summary><strong>OAuth 2.0 常见授权模式怎么答？</strong></summary>
 
 | 模式 | 适用场景 |
 | --- | --- |
@@ -917,13 +1127,21 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 | 客户端凭证模式 | 服务间调用，无用户参与 |
 | 密码模式 | 自有客户端（不推荐给三方） |
 
-#### JWT 在分布式环境下的优缺点
+</details>
+
+<details>
+<summary><strong>JWT 在分布式环境下的优缺点怎么答？</strong></summary>
 
 > **优点**：无状态，不依赖集中式 Session 存储，网关层解析后即可鉴权。**缺点**：无法主动失效（需配合黑名单或短有效期 + Refresh Token）；Token 体积大，每次请求都携带。
 
-#### 网关层鉴权与服务内鉴权的边界
+</details>
+
+<details>
+<summary><strong>网关层鉴权与服务内鉴权的边界怎么答？</strong></summary>
 
 > 网关层负责身份认证（Authentication）：验 Token、解析用户身份。服务层负责权限校验（Authorization）：判断该用户是否有权操作该资源。两者不能混在一起，也不能只做一层。
+
+</details>
 
 ### 4. 安全问题速记表
 
@@ -976,21 +1194,33 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 
 可参考以下结构作答。
 
-#### 第一步：先讲原则
+<details>
+<summary><strong>第一步：先讲原则</strong></summary>
 
 > 我遵循“测量驱动优化”的原则，不会先拍脑袋改代码。通常会先通过 `pprof` 采集 CPU 和 Heap Profile。如果是长连接服务，我会重点看 goroutine 泄漏；如果是高吞吐接口，我会重点看 `allocs/op` 和 GC 压力。
 
-#### 第二步：再讲案例
+</details>
+
+<details>
+<summary><strong>第二步：再讲案例</strong></summary>
 
 > 例如在支付网关的加签逻辑里，我发现高峰期 CPU 占用异常。通过火焰图定位到频繁创建大对象，导致 GC 压力过大，STW 时间拉长。然后我结合逃逸分析，发现一些本该在栈上分配的对象逃逸到了堆上。
 
-#### 第三步：最后讲结果
+</details>
+
+<details>
+<summary><strong>第三步：最后讲结果</strong></summary>
 
 > 优化上我主要做了三件事：第一，用 `sync.Pool` 复用对象；第二，把频繁字符串拼接从 `+` 改成 `strings.Builder`；第三，减少中间临时对象分配。优化后单机 QPS 提升约 30%，GC 频率下降约 50%，P99 延迟明显收敛。
 
-#### 第四步：升华到底层理解
+</details>
+
+<details>
+<summary><strong>第四步：升华到底层理解</strong></summary>
 
 > 这让我进一步确认，在支付这种低延迟场景中，减少内存分配往往比单纯加机器更有效。我也会持续关注 Go Runtime 版本更新，例如 Soft Memory Limit 对 GC 控制的帮助。
+
+</details>
 
 ### 2. 清结算系统设计
 
@@ -998,28 +1228,43 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 
 建议按以下逻辑回答：
 
-#### 核心模型
+<details>
+<summary><strong>核心模型</strong></summary>
 
 > 清结算的核心不是“更新余额”，而是“保证账务准确”。我会基于复式记账模型设计系统，确保每笔资金流动都有对应借贷分录，借贷恒等。
 
-#### 系统拆分
+</details>
+
+<details>
+<summary><strong>系统拆分</strong></summary>
 
 ```text
 清算：计算谁欠谁多少钱
 结算：实际打款和资金划转
 ```
 
-#### 一致性保障
+</details>
+
+<details>
+<summary><strong>一致性保障</strong></summary>
 
 > 我会采用“事务消息 + 幂等状态机”的组合方案。所有结算请求都必须带全局唯一 BusinessID，数据库层用唯一索引做去重。核心账务落库后，再异步触发下游结算流程。
 
-#### 异常处理
+</details>
+
+<details>
+<summary><strong>异常处理</strong></summary>
 
 > 如果下游结算失败，可以根据场景选择 TCC 补偿，或者通过准实时 / 日终对账任务进行兜底，保证最终一致。
 
-#### 峰值场景
+</details>
+
+<details>
+<summary><strong>峰值场景</strong></summary>
 
 > 针对双十一这类场景，我会设计分布式对账引擎，支持并发拉取渠道账单并做分片比对，确保 T+1 之前完成资金核对。
+
+</details>
 
 ---
 
@@ -1036,14 +1281,18 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 
 这是支付系统里最实用、最常见的最终一致性方案。
 
-#### 核心思路
+<details>
+<summary><strong>核心思路</strong></summary>
 
 把业务数据变更和消息记录放在同一个本地事务里提交，保证：
 
 - 业务成功，消息一定落库
 - 消息没发出去，可以靠异步任务重试
 
-#### 流程
+</details>
+
+<details>
+<summary><strong>流程</strong></summary>
 
 1. 在本地事务中更新订单状态
 2. 同时写入消息表，状态为 `PENDING`
@@ -1051,7 +1300,10 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 4. 后台任务扫描消息表并投递 MQ
 5. 消费成功后更新消息状态
 
-#### Go 伪代码
+</details>
+
+<details>
+<summary><strong>Go 伪代码</strong></summary>
 
 ```go
 func (s *PaymentService) CreatePayment(ctx context.Context, req *PaymentReq) error {
@@ -1084,17 +1336,23 @@ func (s *PaymentService) RetryMessages() {
 }
 ```
 
+</details>
+
 ### 2. TCC
 
 适用于实时性要求更高、强一致性要求更强的业务场景。
 
-#### 流程
+<details>
+<summary><strong>流程</strong></summary>
 
 1. Try：预留资源，例如冻结余额
 2. Confirm：正式提交，例如扣减冻结金额
 3. Cancel：回滚资源，例如解冻余额
 
-#### 账户表设计
+</details>
+
+<details>
+<summary><strong>账户表设计</strong></summary>
 
 ```sql
 CREATE TABLE account (
@@ -1103,11 +1361,14 @@ CREATE TABLE account (
     frozen      BIGINT NOT NULL DEFAULT 0,  -- 冻结金额（分）
     version     BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT chk_balance CHECK (balance >= 0),
-    CONSTRAINT chk_frozen CHECK (frozen >= 0)
+CONSTRAINT chk_frozen CHECK (frozen >= 0)
 );
 ```
 
-#### Go 伪代码
+</details>
+
+<details>
+<summary><strong>Go 伪代码</strong></summary>
 
 ```go
 type PaymentTCC interface {
@@ -1158,19 +1419,30 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string, amount int6
 
 > 关键点：Try 阶段只冻结不扣减，Confirm 只操作冻结列，Cancel 把冻结退回可用。三个操作都必须做幂等校验（通常用 TCC 事务日志表记录阶段状态）。
 
+</details>
+
 ### 3. 三个必须说出的关键词
 
-#### 幂等性
+<details>
+<summary><strong>幂等性</strong></summary>
 
 > 分布式事务里重试是常态，必须通过 `business_id`、唯一索引或幂等表保证结果只执行一次。
 
-#### 空回滚与悬挂
+</details>
+
+<details>
+<summary><strong>空回滚与悬挂</strong></summary>
 
 > TCC 中要支持空回滚，也要防止 Cancel 执行完之后 Try 才到达造成悬挂。
 
-#### 对账
+</details>
+
+<details>
+<summary><strong>对账</strong></summary>
 
 > 再完美的技术方案也不能替代对账。对账是支付系统最后一道资金安全防线。
+
+</details>
 
 ---
 
@@ -1202,7 +1474,8 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string, amount int6
 
 ### 3. 热点账户的高阶方案
 
-#### 缓冲入账
+<details>
+<summary><strong>缓冲入账</strong></summary>
 
 先把入账请求写入高性能队列（Redis List / Kafka），再微批异步更新余额。核心是"流水先落盘，余额后更新"。
 
@@ -1225,7 +1498,10 @@ func (s *AccountService) FlushCredits(ctx context.Context, accountID string) err
 }
 ```
 
-#### 影子账户拆分
+</details>
+
+<details>
+<summary><strong>影子账户拆分</strong></summary>
 
 拆成 N 个子账户，写入时哈希打散，查询时 SUM 聚合。
 
@@ -1240,7 +1516,10 @@ SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
 
 > 拆分数量根据并发峰值决定，通常 8~64 个子账户即可。
 
-#### 指令合并
+</details>
+
+<details>
+<summary><strong>指令合并</strong></summary>
 
 应用层短窗口聚合，10ms 内多笔合并为一次 UPDATE。
 
@@ -1270,6 +1549,8 @@ func (m *Merger) Run(ctx context.Context) {
     }
 }
 ```
+
+</details>
 
 ---
 
@@ -1642,19 +1923,29 @@ func (r *RiskService) CountUserPayments(ctx context.Context, userID string, now 
 
 ### 1. 常见挑战
 
-#### 动态货币转换（DCC）
+<details>
+<summary><strong>动态货币转换（DCC）怎么答？</strong></summary>
 
 > 用户用本币支付，商户以目标币种结算。关键是在收银台展示汇率和转换后金额，用户确认后锁定汇率。DCC 的利润来自汇率加点，合规要求必须明示。
 
-#### 汇率锁定
+</details>
+
+<details>
+<summary><strong>汇率锁定怎么答？</strong></summary>
 
 > 从用户确认支付到渠道实际扣款之间有时间差，汇率可能波动。方案是"支付瞬间锁定汇率快照"，记录汇率 ID + 有效期（通常 15~30 分钟），过期需重新获取。
 
-#### 汇损归属
+</details>
+
+<details>
+<summary><strong>汇损归属怎么答？</strong></summary>
 
 > 锁定汇率与实际清算汇率之间的差异产生汇损。需要明确约定：谁承担汇损？通常平台侧承担锁汇期内的波动风险，超出锁汇期的由业务方承担。汇损计入财务报表的"汇兑损益"科目。
 
-#### 多币种账务模型
+</details>
+
+<details>
+<summary><strong>多币种账务模型怎么答？</strong></summary>
 
 > 账务系统必须支持多币种。每笔流水同时记录：原币种金额、目标币种金额、汇率 ID。账户余额按币种隔离，不同币种不能直接加减。
 
@@ -1672,6 +1963,8 @@ CREATE TABLE payment_flow (
     created_at    TIMESTAMP NOT NULL
 );
 ```
+
+</details>
 
 ### 2. 表达示例
 
