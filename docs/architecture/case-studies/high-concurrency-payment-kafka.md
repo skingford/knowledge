@@ -1,6 +1,40 @@
 ---
 title: 高并发支付系统专题整理：Kafka 篇
 description: 聚焦支付系统里的 Kafka 高频考点，覆盖消息可靠性、顺序性、积压治理与死信处理。
+vocabulary:
+  - message-queue
+  - decoupling
+  - absorb-traffic-spikes
+  - asynchronous-processing
+  - producer
+  - consumer
+  - broker
+  - topic
+  - partition
+  - partition-key
+  - acknowledgment
+  - idempotent-producer
+  - offset
+  - manual-offset-commit
+  - message-loss
+  - duplicate-consumption
+  - idempotency
+  - ordering
+  - ordering-within-a-partition
+  - state-machine
+  - replica
+  - backlog
+  - hot-partition
+  - scale-out-consumers
+  - degradation
+  - retry
+  - backoff
+  - bounded-retries
+  - dead-letter-queue
+  - alerting
+  - audit-log
+  - reconciliation
+  - risk-control
 ---
 
 # 高并发支付系统专题整理：Kafka 篇
@@ -228,12 +262,11 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
 
 ### Quick Phrases
 
-- Kafka is used for decoupling and asynchronous processing.
+- The producer sends payment events to Kafka brokers.
 - We use the order ID as the partition key.
 - Kafka only guarantees ordering within a partition.
-- We commit the offset only after the business logic succeeds.
-- Failed messages go through bounded retries and then enter the dead-letter queue.
-- In payment systems, idempotency is more important than theoretical exactly-once delivery.
+- The consumer commits the offset only after the business logic succeeds.
+- If retries still fail, the message is sent to the dead-letter queue.
 
 ## 继续阅读
 

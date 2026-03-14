@@ -226,5 +226,243 @@
     "phoneticUk": "/kənˈsɪs.tən.si/",
     "phoneticSource": "cambridge",
     "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/consistency"
+  },
+  "producer": {
+    "word": "producer",
+    "meaning": "生产者",
+    "phoneticUs": "/prəˈduː.sɚ/",
+    "phoneticUk": "/prəˈdjuː.sər/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/producer"
+  },
+  "consumer": {
+    "word": "consumer",
+    "meaning": "消费者",
+    "phoneticUs": "/kənˈsuː.mɚ/",
+    "phoneticUk": "/kənˈsjuː.mər/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/consumer"
+  },
+  "broker": {
+    "word": "broker",
+    "meaning": "代理节点；消息代理",
+    "phoneticUs": "/ˈbroʊ.kɚ/",
+    "phoneticUk": "/ˈbrəʊ.kər/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/broker"
+  },
+  "topic": {
+    "word": "topic",
+    "meaning": "主题",
+    "phoneticUs": "/ˈtɑː.pɪk/",
+    "phoneticUk": "/ˈtɒp.ɪk/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/topic"
+  },
+  "partition": {
+    "word": "partition",
+    "meaning": "分区",
+    "phoneticUs": "/pɑːrˈtɪʃ.ən/",
+    "phoneticUk": "/pɑːˈtɪʃ.ən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/partition"
+  },
+  "partition-key": {
+    "word": "partition key",
+    "meaning": "分区键",
+    "phoneticUs": "/pɑːrˈtɪʃ.ən kiː/",
+    "phoneticUk": "/pɑːˈtɪʃ.ən kiː/",
+    "phoneticSource": "manual-review"
+  },
+  "offset": {
+    "word": "offset",
+    "meaning": "偏移量；消费位点",
+    "phoneticUs": "/ˈɔːf.set/",
+    "phoneticUk": "/ˈɒf.set/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/offset"
+  },
+  "replica": {
+    "word": "replica",
+    "meaning": "副本",
+    "phoneticUs": "/ˈrep.lə.kə/",
+    "phoneticUk": "/ˈrep.lɪ.kə/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/replica"
+  },
+  "backlog": {
+    "word": "backlog",
+    "meaning": "积压；待处理量",
+    "phoneticUs": "/ˈbæk.lɑːɡ/",
+    "phoneticUk": "/ˈbæk.lɒɡ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/backlog"
+  },
+  "backoff": {
+    "word": "backoff",
+    "meaning": "退避；回退等待",
+    "phoneticUs": "/ˈbækˌɔːf/",
+    "phoneticUk": "/ˈbækˌɒf/",
+    "phoneticSource": "manual-review"
+  },
+  "dead-letter-queue": {
+    "word": "dead-letter queue",
+    "meaning": "死信队列",
+    "phoneticUs": "/ˈded ˌlet̬.ɚ kjuː/",
+    "phoneticUk": "/ˈded ˌlet.ər kjuː/",
+    "phoneticSource": "manual-review"
+  },
+  "message-queue": {
+    "word": "message queue",
+    "meaning": "消息队列",
+    "phoneticUs": "/ˈmes.ɪdʒ kjuː/",
+    "phoneticUk": "/ˈmes.ɪdʒ kjuː/",
+    "phoneticSource": "manual-review"
+  },
+  "decoupling": {
+    "word": "decoupling",
+    "meaning": "解耦",
+    "phoneticUs": "/diːˈkʌp.lɪŋ/",
+    "phoneticUk": "/diːˈkʌp.lɪŋ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/decoupling"
+  },
+  "absorb-traffic-spikes": {
+    "word": "absorb traffic spikes",
+    "meaning": "削峰填谷；吸收流量峰值",
+    "phoneticUs": "/əbˈzɔːrb ˈtræf.ɪk spaɪks/",
+    "phoneticUk": "/əbˈzɔːb ˈtræf.ɪk spaɪks/",
+    "phoneticSource": "manual-review"
+  },
+  "asynchronous-processing": {
+    "word": "asynchronous processing",
+    "meaning": "异步处理",
+    "phoneticUs": "/eɪˈsɪŋ.krə.nəs ˈprɑː.se.sɪŋ/",
+    "phoneticUk": "/eɪˈsɪŋ.krə.nəs ˈprəʊ.ses.ɪŋ/",
+    "phoneticSource": "manual-review"
+  },
+  "acknowledgment": {
+    "word": "acknowledgment",
+    "meaning": "确认机制；确认",
+    "phoneticUs": "/əkˈnɑː.lɪdʒ.mənt/",
+    "phoneticUk": "/əkˈnɒl.ɪdʒ.mənt/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/acknowledgment"
+  },
+  "idempotent-producer": {
+    "word": "idempotent producer",
+    "meaning": "幂等生产者；幂等生产",
+    "phoneticUs": "/ˌaɪ.dəmˈpoʊ.t̬ənt prəˈduː.sɚ/",
+    "phoneticUk": "/ˌɪd.əmˈpəʊ.tənt prəˈdjuː.sər/",
+    "phoneticSource": "manual-review"
+  },
+  "manual-offset-commit": {
+    "word": "manual offset commit",
+    "meaning": "手动提交偏移量",
+    "phoneticUs": "/ˈmæn.ju.əl ˈɔːf.set kəˈmɪt/",
+    "phoneticUk": "/ˈmæn.ju.əl ˈɒf.set kəˈmɪt/",
+    "phoneticSource": "manual-review"
+  },
+  "message-loss": {
+    "word": "message loss",
+    "meaning": "消息丢失",
+    "phoneticUs": "/ˈmes.ɪdʒ lɔːs/",
+    "phoneticUk": "/ˈmes.ɪdʒ lɒs/",
+    "phoneticSource": "manual-review"
+  },
+  "duplicate-consumption": {
+    "word": "duplicate consumption",
+    "meaning": "重复消费",
+    "phoneticUs": "/ˈduː.plə.kət kənˈsʌmp.ʃən/",
+    "phoneticUk": "/ˈdʒuː.plɪ.kət kənˈsʌmp.ʃən/",
+    "phoneticSource": "manual-review"
+  },
+  "idempotency": {
+    "word": "idempotency",
+    "meaning": "幂等性",
+    "phoneticUs": "/ˌaɪ.dəˈmpoʊ.tən.si/",
+    "phoneticUk": "/ˌɪd.əmˈpəʊ.tən.si/",
+    "phoneticSource": "manual-review"
+  },
+  "ordering": {
+    "word": "ordering",
+    "meaning": "顺序性；排序",
+    "phoneticUs": "/ˈɔːr.dɚ.ɪŋ/",
+    "phoneticUk": "/ˈɔː.dər.ɪŋ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/ordering"
+  },
+  "ordering-within-a-partition": {
+    "word": "ordering within a partition",
+    "meaning": "分区内有序",
+    "phoneticUs": "/ˈɔːr.dɚ.ɪŋ wɪˈðɪn ə pɑːrˈtɪʃ.ən/",
+    "phoneticUk": "/ˈɔː.dər.ɪŋ wɪðˈɪn ə pɑːˈtɪʃ.ən/",
+    "phoneticSource": "manual-review"
+  },
+  "state-machine": {
+    "word": "state machine",
+    "meaning": "状态机",
+    "phoneticUs": "/steɪt məˈʃiːn/",
+    "phoneticUk": "/steɪt məˈʃiːn/",
+    "phoneticSource": "manual-review"
+  },
+  "hot-partition": {
+    "word": "hot partition",
+    "meaning": "热点分区",
+    "phoneticUs": "/hɑːt pɑːrˈtɪʃ.ən/",
+    "phoneticUk": "/hɒt pɑːˈtɪʃ.ən/",
+    "phoneticSource": "manual-review"
+  },
+  "scale-out-consumers": {
+    "word": "scale out consumers",
+    "meaning": "扩容消费者",
+    "phoneticUs": "/skeɪl aʊt kənˈsuː.mɚz/",
+    "phoneticUk": "/skeɪl aʊt kənˈsjuː.məz/",
+    "phoneticSource": "manual-review"
+  },
+  "degradation": {
+    "word": "degradation",
+    "meaning": "降级",
+    "phoneticUs": "/ˌdeɡ.rəˈdeɪ.ʃən/",
+    "phoneticUk": "/ˌdeɡ.rəˈdeɪ.ʃən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/degradation"
+  },
+  "retry": {
+    "word": "retry",
+    "meaning": "重试",
+    "phoneticUs": "/ˌriːˈtraɪ/",
+    "phoneticUk": "/ˌriːˈtraɪ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/retry"
+  },
+  "bounded-retries": {
+    "word": "bounded retries",
+    "meaning": "有限重试",
+    "phoneticUs": "/ˈbaʊn.dɪd ˈriːˌtraɪz/",
+    "phoneticUk": "/ˈbaʊn.dɪd ˈriːˌtraɪz/",
+    "phoneticSource": "manual-review"
+  },
+  "alerting": {
+    "word": "alerting",
+    "meaning": "告警",
+    "phoneticUs": "/əˈlɝː.t̬ɪŋ/",
+    "phoneticUk": "/əˈlɜː.tɪŋ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/alerting"
+  },
+  "audit-log": {
+    "word": "audit log",
+    "meaning": "审计日志",
+    "phoneticUs": "/ˈɔː.dɪt lɔːɡ/",
+    "phoneticUk": "/ˈɔː.dɪt lɒɡ/",
+    "phoneticSource": "manual-review"
+  },
+  "risk-control": {
+    "word": "risk control",
+    "meaning": "风控",
+    "phoneticUs": "/rɪsk kənˈtroʊl/",
+    "phoneticUk": "/rɪsk kənˈtrəʊl/",
+    "phoneticSource": "manual-review"
   }
 }
