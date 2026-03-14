@@ -266,10 +266,10 @@ func (o *Order) CanTransitTo(target Status) bool {
 func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string, status Status, version int64) (int64, error) {
     result := r.db.WithContext(ctx).
         Model(&Order{}).
-        Where(“order_id = ? AND version = ?”, orderID, version).
+        Where("order_id = ? AND version = ?", orderID, version).
         Updates(map[string]interface{}{
-            “status”:  status,
-            “version”: gorm.Expr(“version + 1”),
+            "status":  status,
+            "version": gorm.Expr("version + 1"),
         })
     return result.RowsAffected, result.Error
 }
@@ -346,12 +346,12 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
 
     // “失败待确认”状态收到成功通知 → 修正为成功
     case order.Status == StatusFailPending && result.Status == StatusSuccess:
-        log.Warn(“状态反转修正”, “orderID”, orderID, “from”, order.Status, “to”, StatusSuccess)
+        log.Warn("状态反转修正", "orderID", orderID, "from", order.Status, "to", StatusSuccess)
         return s.correctToSuccess(ctx, order, result)
 
     // 真正的终态失败，收到成功通知 → 异常告警，人工介入
     case order.Status == StatusFailed && result.Status == StatusSuccess:
-        log.Error(“终态失败后收到成功通知，需人工处理”, “orderID”, orderID)
+        log.Error("终态失败后收到成功通知，需人工处理", "orderID", orderID)
         return s.createExceptionOrder(ctx, order, result)
 
     default:
@@ -405,13 +405,163 @@ flowchart LR
 
 ### 1. MySQL
 
-支付场景下，MySQL 高频考点包括：
+支付场景下，MySQL 高频考点建议直接按题目来准备，答题时尽量遵循“原理 -> 支付场景问题 -> 落地方案”的顺序。
 
-- B+ 树索引和最左前缀匹配
-- 大事务拆分
-- 死锁检测与回滚重试
-- 热点更新问题
-- 分库分表与迁移
+<details>
+<summary><strong>B+ 树索引和最左前缀匹配</strong></summary>
+
+> MySQL InnoDB 的主键索引和二级索引底层都是 B+ 树。B+ 树适合磁盘场景，因为高度低、范围查询稳定，叶子节点有序，天然支持区间扫描。支付系统里大量查询都是按商户、订单号、时间范围过滤，这正是 B+ 树擅长的场景。
+
+标准答法可以拆成三层：
+
+1. B+ 树非叶子节点只存键和指针，所以单页能放更多索引项，树更矮，IO 次数更少
+2. 叶子节点按 key 有序，范围查询和排序效率高
+3. 联合索引必须遵守最左前缀匹配，例如 `(merchant_id, created_at, status)` 可以命中 `merchant_id`、`merchant_id + created_at`，但不能跳过 `merchant_id` 直接用 `created_at`
+
+```sql
+CREATE INDEX idx_mch_time_status
+ON payment_order (merchant_id, created_at, status);
+
+SELECT order_id, status
+FROM payment_order
+WHERE merchant_id = ? AND created_at >= ?;
+
+SELECT order_id, status
+FROM payment_order
+WHERE created_at >= ? AND status = ?;
+```
+
+> 在支付语境下可以再补一句：订单查询、流水拉取、对账批次扫描，核心都依赖合理索引设计，否则高峰期很容易把数据库拖慢。
+
+</details>
+
+<details>
+<summary><strong>大事务拆分</strong></summary>
+
+> 大事务的问题不只是慢，而是它会长时间占用锁、膨胀 Undo/Redo、拖慢主从复制，还会放大回滚成本。支付系统高峰期最怕“大事务 + 热点行”，因为这会直接把后续请求都堵住。
+
+建议这样答：
+
+- 先识别大事务来源：批量更新、循环逐笔处理、事务内 RPC、事务内远程调用
+- 再说明拆分原则：事务里只保留必要的本地原子操作，网络调用和计算逻辑放到事务外
+- 最后给方案：批处理分段提交、流水和余额拆阶段、异步化非核心逻辑
+
+```go
+tx.Begin()
+tx.Exec("UPDATE payment_order SET status = 'PAYING' WHERE order_id = ?", orderID)
+callChannel(ctx)
+tx.Exec("INSERT INTO payment_flow(order_id, status) VALUES(?, ?)", orderID, "PAYING")
+tx.Commit()
+
+resp := callChannel(ctx)
+tx.Begin()
+tx.Exec("UPDATE payment_order SET status = ? WHERE order_id = ?", resp.Status, orderID)
+tx.Exec("INSERT INTO payment_flow(order_id, status) VALUES(?, ?)", orderID, resp.Status)
+tx.Commit()
+```
+
+> 面试里一句话总结就是：事务越短越好，锁越晚加越好，能异步就不要同步放进事务。
+
+</details>
+
+<details>
+<summary><strong>死锁检测与回滚重试</strong></summary>
+
+> 死锁本质是两个或多个事务互相等待资源。支付系统里常见于“更新顺序不一致”“范围更新”“同一事务跨多张表锁资源”。InnoDB 会主动检测死锁，并回滚代价较小的那个事务。
+
+答题顺序建议固定：
+
+1. 先说排查手段：`SHOW ENGINE INNODB STATUS`、慢 SQL、死锁日志
+2. 再说根因：锁顺序不一致、缺索引导致锁范围扩大、长事务
+3. 最后说治理：统一更新顺序、补索引、缩短事务、业务层重试
+
+```go
+func withDeadlockRetry(fn func() error) error {
+    for i := 0; i < 3; i++ {
+        err := fn()
+        if err == nil {
+            return nil
+        }
+        if !isDeadlockError(err) {
+            return err
+        }
+        time.Sleep(time.Duration(i+1) * 50 * time.Millisecond)
+    }
+    return ErrDeadlockRetryExhausted
+}
+```
+
+> 这里要强调：死锁重试只能用于幂等操作，像扣款这类资金动作如果没做好幂等，重试本身就可能带来资损。
+
+</details>
+
+<details>
+<summary><strong>热点更新问题</strong></summary>
+
+> 热点更新本质是大量请求并发修改同一行，导致行锁排队、TPS 降低、超时放大。在支付系统里最典型的是热点账户、大商户余额、平台总账、库存型额度账户。
+
+标准答法建议按“现象 -> 根因 -> 分层治理”展开：
+
+1. 现象是数据库 CPU 不一定高，但锁等待很高，接口 RT 明显抖动
+2. 根因是同一行被频繁更新，事务持锁时间稍长就会形成排队
+3. 治理从轻到重依次是：缩短事务、乐观锁、排队合并、子账户拆分、异步汇总
+
+可以这样组织方案：
+
+- 低并发时用乐观锁重试
+- 中高并发时用内存队列或 Kafka 做短窗口合并更新
+- 极端热点场景用影子账户或子账户拆分，把一行写扩散到多行
+- 查询余额时再聚合，或者维护异步汇总值
+
+```sql
+UPDATE account
+SET balance = balance - 100, version = version + 1
+WHERE id = ? AND version = ? AND balance >= 100;
+
+UPDATE account_sub
+SET balance = balance + 100
+WHERE parent_id = ? AND sub_index = ?;
+
+SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
+```
+
+> 面试收口时可以说一句：支付系统里先保证流水真实落库，再考虑余额的实时呈现；热点治理的目标不是每一笔都强实时，而是先把资金正确性和系统吞吐守住。
+
+</details>
+
+<details>
+<summary><strong>分库分表与迁移</strong></summary>
+
+> 分库分表不是为了“显得架构高级”，而是单表数据量、单机写入、索引维护成本都到瓶颈后才做。支付系统里通常是订单表、流水表最先触顶，因为写多、查多、保留周期还长。
+
+可以按这个框架展开：
+
+- 为什么拆：单表过大导致索引膨胀、查询变慢、DDL 风险高
+- 怎么拆：先垂直拆，再水平拆；水平拆通常按 `merchant_id`、`order_id hash`、时间分片
+- 会带来什么代价：跨分片查询、分页、排序、唯一键、事务都更复杂
+
+```text
+交易订单表：按 merchant_id hash 分库分表
+支付流水表：按月分表 + 商户维度分库
+历史归档表：冷数据下沉到归档库或对象存储
+```
+
+迁移的核心不是“把数据搬过去”，而是“业务不停、资金不乱、能随时回滚”。支付系统的数据迁移必须带校验、补偿和灰度。
+
+建议按这个顺序答：
+
+1. 先做双写或 CDC，同步增量
+2. 再迁移历史存量数据
+3. 做行数、金额、状态、账务结果多维校验
+4. 先灰度读，再灰度写，最后全量切换
+
+```text
+老库写入 -> 增量同步到新库 -> 历史数据回填 -> 对账校验 -> 灰度切读 -> 灰度切写 -> 下线老链路
+```
+
+> 如果面试官追问风险点，可以回答三件事：幂等补偿、防止重复迁移、切流失败可回滚。
+
+</details>
 
 高频追问：
 
@@ -1132,9 +1282,50 @@ func (m *Merger) Run(ctx context.Context) {
 
 > 每个请求带随机 `Nonce` 和时间戳。服务端维护时间窗口校验，超时拒绝；同时记录已使用的 Nonce，重复直接拦截。
 
+标准答题时建议补上“三层校验”：
+
+1. 网关验签，确保请求体没有被篡改
+2. 校验 `Timestamp` 是否在允许窗口内，例如 5 分钟
+3. 用 Redis 记录 `Nonce`，`SET NX EX` 成功才放行
+
+```go
+func (g *Gateway) VerifyReplay(ctx context.Context, nonce string, ts int64, sign string, body []byte) error {
+    if !g.verifySignature(sign, body) {
+        return ErrInvalidSignature
+    }
+    if abs(time.Now().Unix()-ts) > 300 {
+        return ErrTimestampExpired
+    }
+    ok, err := g.redis.SetNX(ctx, "replay:"+nonce, "1", 5*time.Minute).Result()
+    if err != nil {
+        return err
+    }
+    if !ok {
+        return ErrReplayAttack
+    }
+    return nil
+}
+```
+
+> 追问时可以再补一句：`Nonce` 要和商户号、请求路径一起组成幂等维度，避免不同接口之间误判冲突。
+
 #### 如何防止并发重复支付？
 
 > 在网关层根据 `RequestID` 做幂等控制，结合 Redis 锁、订单状态机和数据库唯一键形成多层防线。
+
+可以按“前端防抖 -> 网关拦截 -> 交易落库 -> 订单状态机”这个顺序展开：
+
+- 前端按钮置灰，避免用户连续点击
+- 网关按 `RequestID` 或 `BusinessID` 做短周期幂等
+- 订单表对 `merchant_id + order_id + pay_action` 建唯一索引
+- 状态机只允许 `INIT -> PAYING -> SUCCESS/FAILED` 单向流转
+
+```sql
+ALTER TABLE payment_order
+ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
+```
+
+> 重点要说明：Redis 锁负责挡高并发洪峰，数据库唯一键和状态机负责最终正确性。
 
 ---
 
@@ -1169,6 +1360,16 @@ func (m *Merger) Run(ctx context.Context) {
 
 > 大促场景不能只做接口压测，而要做全链路压测。核心是生产环境采样、流量染色和影子资源隔离，确保压测流量能完整穿透网关、服务、缓存和数据库，但又不污染真实账务数据。
 
+回答时最好把实施步骤也补全：
+
+1. 按真实流量模型准备压测脚本，覆盖下单、支付、回调、查询全链路
+2. 给压测请求打统一流量标记，例如 Header、TraceTag、影子商户号
+3. 缓存、MQ、数据库全部隔离到影子资源池，绝不混写真实账务
+4. 指标看四类：成功率、P99、下游超时率、数据库锁等待
+5. 压测结束后做容量回归，得到单机极限、集群极限和安全冗余
+
+> 如果是支付系统，必须强调“压测流量不落真实账、不触发真实结算、不触发真实通知”。
+
 ### 2. 可观测性
 
 建议从三位一体来讲：
@@ -1185,6 +1386,10 @@ func (m *Merger) Run(ctx context.Context) {
 - ELK
 - Jaeger
 
+补充一个更完整的答题模板：
+
+> 我的可观测性设计会围绕“先发现、再定位、能追责”三件事。发现靠指标告警，定位靠 Trace 和结构化日志，追责靠完整审计链路。对支付链路，我会给每笔交易打统一 `trace_id`、`order_id`、`merchant_id`，确保一笔单从网关到渠道到账务可以串起来看。
+
 ---
 
 ## 十三、零停机数据迁移
@@ -1197,6 +1402,24 @@ func (m *Merger) Run(ctx context.Context) {
 2. 历史迁移：迁存量数据
 3. 数据校验：核对一致性
 4. 灰度切流：逐步切读、切写
+
+#### 高频追问：双写期间如何防止新老库不一致？
+
+> 不能假设双写天然一致，必须把“双写失败”视为常态来设计。我的做法是“主链路单写成功 + 异步补偿双写 + 对账校验兜底”。
+
+建议从三层回答：
+
+- 主事实源只能有一个，通常先写主库，副库失败记补偿任务
+- 双写必须带同一个 `BusinessID`，副库也做幂等，避免补偿重放
+- 定时校验新老库行数、金额、状态差异，发现偏差自动修复或人工介入
+
+```text
+写主库成功 -> 写新库失败 -> 记录补偿任务 -> 异步重试 -> 校验脚本对比 -> 修复闭环
+```
+
+#### 高频追问：切流时怎么回滚？
+
+> 切流必须是可逆的。读流量先灰度，写流量最后切；每一步都保留回滚开关。如果新链路指标异常，立刻把读写切回老链路，补偿期间产生的数据再通过校验脚本回补。
 
 示例表达：
 
@@ -1279,9 +1502,40 @@ func (m *Merger) Run(ctx context.Context) {
 
 > 我会用 Redis ZSET 维护时间窗口内的事件，按时间戳清理窗口外数据，再做实时计数，满足低延迟风控判断需求。
 
+```go
+func (r *RiskService) CountUserPayments(ctx context.Context, userID string, now int64) (int64, error) {
+    key := "risk:payfreq:" + userID
+    minScore := "0"
+    maxScore := strconv.FormatInt(now-600, 10)
+
+    pipe := r.redis.TxPipeline()
+    pipe.ZRemRangeByScore(ctx, key, minScore, maxScore)
+    pipe.ZAdd(ctx, key, redis.Z{
+        Score:  float64(now),
+        Member: strconv.FormatInt(now, 10) + ":" + uuid.NewString(),
+    })
+    countCmd := pipe.ZCard(ctx, key)
+    pipe.Expire(ctx, key, 15*time.Minute)
+    if _, err := pipe.Exec(ctx); err != nil {
+        return 0, err
+    }
+    return countCmd.Val(), nil
+}
+```
+
+> 如果问题升级到“分商户、分设备、分 IP 联合频控”，就把 key 设计成不同维度组合，并统一走规则引擎判定阈值。
+
 #### 如何兼顾复杂规则和低延迟？
 
 > 规则执行分层处理，简单规则走内存或 Redis 快速判断，复杂规则通过规则引擎或脚本执行，但必须限定单次执行成本。
+
+一个更完整的回答是：
+
+- 第一层是同步硬规则，例如黑名单、支付频次、单笔限额，要求毫秒级返回
+- 第二层是同步评分规则，例如设备风险、IP 信誉、历史拒付率，要求几十毫秒内完成
+- 第三层是异步策略，例如机器学习模型、人审、事后稽核，不阻塞主支付链路
+
+> 这样拆层以后，主链路只承载“必须当场拦”的判断，复杂但不强依赖实时性的策略放到异步侧做，既能保证时延，也能保证风控覆盖。
 
 ---
 
@@ -1304,6 +1558,14 @@ func (m *Merger) Run(ctx context.Context) {
 可参考回答：
 
 > Go 通过 Netpoller 把非阻塞 IO 与 goroutine 调度结合起来。协程发起 IO 后不会一直占用线程，而是挂起并由 epoll 监听。数据到达后再唤醒对应 goroutine，从而显著降低线程资源消耗。
+
+如果要答得更深入，可以补这三点：
+
+- 一个线程可以复用处理大量连接，避免“一连接一线程”的高切换成本
+- goroutine 初始栈很小，连接数上来时内存模型更轻
+- Runtime 会把网络事件、定时器和调度器协同起来，减少空转和阻塞传播
+
+> 支付网关里大量请求都在等下游渠道响应，这类 IO 密集场景特别适合 Go 的这套模型。
 
 ### 2. 更深入的优化点
 
@@ -1408,11 +1670,29 @@ CREATE TABLE payment_flow (
 
 > 这是典型的一致性问题。我会优先采用本地消息表方案，让事务提交和消息记录同库原子化。如果追求更高性能，也可以基于 Binlog CDC 订阅业务变更，再异步触发下游流程，实现业务逻辑与消息发送解耦。
 
+进一步展开时，建议把处理闭环讲完整：
+
+1. 本地事务里同时写业务表和消息表
+2. 投递失败不回滚业务，而是把消息保留在 `PENDING`
+3. 后台任务按重试次数、退避时间扫描补发
+4. 超过阈值进入死信或告警，由人工排查
+
+> 关键点不是“立刻发出去”，而是“业务成功后消息不能永久丢失”。
+
 ### 2. 大促期间系统扛不住了，报错给用户和资金可能不一致二选一，你怎么选？
 
 建议答法：
 
 > 我两个都不选。我会通过降级和异步化守住资金底线。非核心逻辑先降级，核心账务链路优先保活；如果实时入账压力过大，就先保证流水持久化，再异步平账。支付行业里，资损是底线，可用性是生命线，两者都不能轻易放弃。
+
+面试里再往下讲，可以补一个处置优先级：
+
+1. 先限流和熔断非核心能力，例如营销、推荐、画像
+2. 核心链路只保留下单、扣款、订单查询、回调处理
+3. 对外提示“支付结果确认中”，避免直接误报失败
+4. 启动轮询、对账和补偿任务，把不确定订单收口
+
+> 这道题真正考的是取舍能力。标准答案不是牺牲一致性，而是把不确定状态显式化，先保住资金正确，再恢复用户体验。
 
 ---
 
