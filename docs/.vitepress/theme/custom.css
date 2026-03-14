@@ -500,6 +500,99 @@ body:has(#VPNavScreen) {
   text-underline-offset: 0.18em;
 }
 
+.vp-doc details {
+  margin: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.vp-doc details summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 2px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--vp-c-brand-1);
+  font-weight: 650;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.vp-doc details summary::-webkit-details-marker {
+  display: none;
+}
+
+.vp-doc details summary::before {
+  content: '';
+  flex: 0 0 0.38rem;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.vp-doc details summary::after {
+  content: '+';
+  margin-left: auto;
+  color: var(--vp-c-brand-2);
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.vp-doc details summary strong {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.vp-doc details[open] summary {
+  background: transparent;
+}
+
+.vp-doc details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.vp-doc details > :not(summary) {
+  padding-right: 0;
+  padding-left: 0.95rem;
+}
+
+.vp-doc details > :last-child {
+  padding-bottom: 4px;
+}
+
+.vp-doc details > summary + * {
+  padding-top: 4px;
+}
+
+.vp-doc details:hover summary {
+  color: var(--vp-c-brand-2);
+}
+
+.vp-doc details summary:focus,
+.vp-doc details summary:focus-visible {
+  outline: none;
+}
+
+.vp-doc details summary:focus-visible strong {
+  text-decoration-thickness: 2px;
+}
+
+.vp-doc details summary:focus-visible::after {
+  color: var(--vp-c-brand-1);
+}
+
 .vp-doc img,
 .vp-doc video,
 .vp-doc iframe {

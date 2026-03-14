@@ -136,7 +136,8 @@ vocabulary:
 
 要能回答这些追问：
 
-#### 追问一：如何处理渠道异步通知与主动轮询并存？
+<details>
+<summary><strong>追问一：如何处理渠道异步通知与主动轮询并存？</strong></summary>
 
 > 核心思路是”通知优先，轮询兜底，幂等收口”。渠道通知是推模式，延迟低但可能丢；主动轮询是拉模式，可靠但有延迟。两者并存时，必须通过幂等状态机保证无论哪条路径先到达，最终状态一致。
 
@@ -189,7 +190,10 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
 }
 ```
 
-#### 追问二：如何避免并发通知导致状态乱序？
+</details>
+
+<details>
+<summary><strong>追问二：如何避免并发通知导致状态乱序？</strong></summary>
 
 > 核心方案是”版本号 + 状态机 + 数据库行锁”三道防线，确保即使多条通知并发到达，状态也只能沿着合法方向前进，不会回退或跳跃。
 
@@ -275,7 +279,10 @@ func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string,
 }
 ```
 
-#### 追问三：如何处理”成功通知晚于失败结果”的反转场景？
+</details>
+
+<details>
+<summary><strong>追问三：如何处理”成功通知晚于失败结果”的反转场景？</strong></summary>
 
 > 这是支付系统最棘手的场景之一。核心原则是”终态不可逆 + 渠道结果为准 + 对账兜底”。
 
@@ -383,6 +390,8 @@ flowchart LR
 ```
 
 > 长款：渠道有、本地无；短款：渠道无、本地有。
+
+</details>
 
 ### 3. 资金安全答题顺序
 
@@ -565,7 +574,8 @@ SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
 
 高频追问：
 
-#### 为什么支付流水表不能 `SELECT *`？
+<details>
+<summary><strong>为什么支付流水表不能 `SELECT *`？</strong></summary>
 
 > 流水表字段多、行数大，`SELECT *` 导致回表次数增多、Buffer Pool 污染。正确做法是只查需要的列，建立覆盖索引，在索引层完成查询。
 
@@ -579,7 +589,10 @@ WHERE merchant_id = ? AND created_at > ?;
 -- 联合索引：(merchant_id, created_at, order_id, amount, status)
 ```
 
-#### 深分页如何优化？
+</details>
+
+<details>
+<summary><strong>深分页如何优化？</strong></summary>
 
 > `OFFSET 100000, 20` 实际要扫描前 100020 行再丢弃，性能极差。核心思路是游标分页替代 OFFSET。
 
@@ -599,7 +612,10 @@ INNER JOIN (SELECT id FROM payment_flow ORDER BY id LIMIT 100000, 20) t
 ON f.id = t.id;
 ```
 
-#### 如何缩短锁持有时间？
+</details>
+
+<details>
+<summary><strong>如何缩短锁持有时间？</strong></summary>
 
 > 事务越长，行锁持有越久，并发冲突越严重。核心原则："把锁操作放在事务最后，事务越短越好"。
 
@@ -618,7 +634,10 @@ tx.Exec("UPDATE account SET balance = balance - ? WHERE id = ? AND balance >= ?"
 tx.Commit()                        // 极短事务，快速释放锁
 ```
 
-#### 如何避免热点账户导致行锁竞争？
+</details>
+
+<details>
+<summary><strong>如何避免热点账户导致行锁竞争？</strong></summary>
 
 > 热点账户并发更新同一行，行锁排队导致吞吐骤降。从轻到重依次：乐观锁 → 排队合并 → 子账户拆分。
 
@@ -641,6 +660,8 @@ WHERE parent_id = ? AND sub_index = #{random(0,N)} AND balance >= 100;
 SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
 ```
 
+</details>
+
 ### 2. Redis
 
 重点关注：
@@ -652,7 +673,8 @@ SELECT SUM(balance) FROM account_sub WHERE parent_id = ?;
 
 支付语境下的典型问题：
 
-#### 如何防止重复支付？
+<details>
+<summary><strong>如何防止重复支付？</strong></summary>
 
 > 多层防线组合：前端按钮防抖 → 网关层用 RequestID + Redis `SET NX EX` 拦截 → 数据库订单表唯一索引兜底。任何一层漏过，下一层都能拦住。
 
@@ -667,7 +689,10 @@ func (g *Gateway) CheckDuplicate(ctx context.Context, requestID string) (bool, e
 }
 ```
 
-#### 如何实现请求级幂等？
+</details>
+
+<details>
+<summary><strong>如何实现请求级幂等？</strong></summary>
 
 > 以 `BusinessID`（如订单号 + 操作类型）作为幂等键，Redis 记录处理结果。首次请求正常处理并缓存结果，重复请求直接返回缓存结果。
 
@@ -692,7 +717,10 @@ func (s *PaymentService) Pay(ctx context.Context, req *PayReq) (*PayResp, error)
 }
 ```
 
-#### Redis 锁失效后如何避免并发扣款？
+</details>
+
+<details>
+<summary><strong>Redis 锁失效后如何避免并发扣款？</strong></summary>
 
 > Redis 分布式锁有续期失败、主从切换等风险，不能作为资金安全的唯一保障。正确做法是"Redis 锁挡大部分并发 + 数据库乐观锁/唯一索引做最终兜底"。
 
@@ -719,11 +747,14 @@ func (s *PaymentService) Deduct(ctx context.Context, orderID string, amount int6
 
 > 关键认知：Redis 锁是"性能优化"，数据库约束才是"资金安全底线"。
 
+</details>
+
 ### 3. Kafka
 
 高频追问：
 
-#### 消息如何做到尽量不丢？
+<details>
+<summary><strong>消息如何做到尽量不丢？</strong></summary>
 
 > 从三层保障回答：Producer 端、Broker 端、Consumer 端各守一关。
 
@@ -744,7 +775,10 @@ func (c *Consumer) HandleMessage(msg *kafka.Message) error {
 }
 ```
 
-#### 如何保证同一订单的消息顺序？
+</details>
+
+<details>
+<summary><strong>如何保证同一订单的消息顺序？</strong></summary>
 
 > 以 `OrderID` 作为 Partition Key，同一订单的创建、支付、成功消息进同一分区，由同一消费者顺序处理。下游状态机也要做防乱序校验。
 
@@ -757,7 +791,10 @@ msg := &kafka.Message{
 producer.Produce(msg)
 ```
 
-#### 如何处理消息积压？
+</details>
+
+<details>
+<summary><strong>如何处理消息积压？</strong></summary>
 
 > 分紧急止血和根治两个层面。
 
@@ -767,7 +804,10 @@ producer.Produce(msg)
 | 短期优化 | 排查慢消费（DB 慢查询、RPC 超时），批量消费替代逐条 |
 | 长期治理 | 热点 Topic 拆分，按业务优先级设不同 Topic 和消费组 |
 
-#### 如何做消费重试和死信处理？
+</details>
+
+<details>
+<summary><strong>如何做消费重试和死信处理？</strong></summary>
 
 > 消费失败不能无限重试阻塞队列。策略："重试 N 次 → 投入死信队列 → 人工或定时任务处理"。
 
@@ -787,9 +827,11 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
         Value: msg.Value,
     })
     c.consumer.CommitMessages(context.Background(), msg)
-    log.Error("消息投入死信队列", "key", string(msg.Key))
+log.Error("消息投入死信队列", "key", string(msg.Key))
 }
 ```
+
+</details>
 
 ---
 
@@ -1278,7 +1320,8 @@ func (m *Merger) Run(ctx context.Context) {
 
 ### 2. 常见追问
 
-#### 如何防重放攻击？
+<details>
+<summary><strong>如何防重放攻击？</strong></summary>
 
 > 每个请求带随机 `Nonce` 和时间戳。服务端维护时间窗口校验，超时拒绝；同时记录已使用的 Nonce，重复直接拦截。
 
@@ -1309,7 +1352,10 @@ func (g *Gateway) VerifyReplay(ctx context.Context, nonce string, ts int64, sign
 
 > 追问时可以再补一句：`Nonce` 要和商户号、请求路径一起组成幂等维度，避免不同接口之间误判冲突。
 
-#### 如何防止并发重复支付？
+</details>
+
+<details>
+<summary><strong>如何防止并发重复支付？</strong></summary>
 
 > 在网关层根据 `RequestID` 做幂等控制，结合 Redis 锁、订单状态机和数据库唯一键形成多层防线。
 
@@ -1326,6 +1372,8 @@ ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
 ```
 
 > 重点要说明：Redis 锁负责挡高并发洪峰，数据库唯一键和状态机负责最终正确性。
+
+</details>
 
 ---
 
@@ -1403,7 +1451,8 @@ ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
 3. 数据校验：核对一致性
 4. 灰度切流：逐步切读、切写
 
-#### 高频追问：双写期间如何防止新老库不一致？
+<details>
+<summary><strong>高频追问：双写期间如何防止新老库不一致？</strong></summary>
 
 > 不能假设双写天然一致，必须把“双写失败”视为常态来设计。我的做法是“主链路单写成功 + 异步补偿双写 + 对账校验兜底”。
 
@@ -1417,13 +1466,18 @@ ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
 写主库成功 -> 写新库失败 -> 记录补偿任务 -> 异步重试 -> 校验脚本对比 -> 修复闭环
 ```
 
-#### 高频追问：切流时怎么回滚？
+</details>
+
+<details>
+<summary><strong>高频追问：切流时怎么回滚？</strong></summary>
 
 > 切流必须是可逆的。读流量先灰度，写流量最后切；每一步都保留回滚开关。如果新链路指标异常，立刻把读写切回老链路，补偿期间产生的数据再通过校验脚本回补。
 
 示例表达：
 
 > 支付系统的数据迁移不能靠一次性切换完成，我通常采用双写迁移法，先让增量数据同时进入新老链路，再迁历史数据，最后通过校验脚本和灰度放量完成切换。
+
+</details>
 
 ---
 
@@ -1498,7 +1552,8 @@ ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
 
 ### 高频答法
 
-#### 如何统计“用户过去 10 分钟支付频次”？
+<details>
+<summary><strong>如何统计“用户过去 10 分钟支付频次”？</strong></summary>
 
 > 我会用 Redis ZSET 维护时间窗口内的事件，按时间戳清理窗口外数据，再做实时计数，满足低延迟风控判断需求。
 
@@ -1525,7 +1580,10 @@ func (r *RiskService) CountUserPayments(ctx context.Context, userID string, now 
 
 > 如果问题升级到“分商户、分设备、分 IP 联合频控”，就把 key 设计成不同维度组合，并统一走规则引擎判定阈值。
 
-#### 如何兼顾复杂规则和低延迟？
+</details>
+
+<details>
+<summary><strong>如何兼顾复杂规则和低延迟？</strong></summary>
 
 > 规则执行分层处理，简单规则走内存或 Redis 快速判断，复杂规则通过规则引擎或脚本执行，但必须限定单次执行成本。
 
@@ -1536,6 +1594,8 @@ func (r *RiskService) CountUserPayments(ctx context.Context, userID string, now 
 - 第三层是异步策略，例如机器学习模型、人审、事后稽核，不阻塞主支付链路
 
 > 这样拆层以后，主链路只承载“必须当场拦”的判断，复杂但不强依赖实时性的策略放到异步侧做，既能保证时延，也能保证风控覆盖。
+
+</details>
 
 ---
 
