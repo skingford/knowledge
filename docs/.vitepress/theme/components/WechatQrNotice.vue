@@ -6,7 +6,6 @@ const storageKey = 'knowledge:wechat-qr-notice:dismiss-until'
 const isVisible = ref(false)
 
 const qrImage = computed(() => withBase('/wechat-official-account-qr.svg'))
-const blogLink = computed(() => withBase('/nav'))
 
 function getEndOfDayTimestamp() {
   const now = new Date()
@@ -29,7 +28,7 @@ function closeNotice() {
 }
 
 function continueBrowsing() {
-  persistDismissUntilEndOfDay()
+  closeNotice()
 }
 
 function shouldShowNotice() {
@@ -106,13 +105,13 @@ onMounted(() => {
             </p>
 
             <div class="wechat-qr-notice__actions">
-              <a
+              <button
+                type="button"
                 class="wechat-qr-notice__action wechat-qr-notice__action--primary"
-                :href="blogLink"
                 @click="continueBrowsing"
               >
                 继续浏览
-              </a>
+              </button>
             </div>
           </div>
         </aside>
