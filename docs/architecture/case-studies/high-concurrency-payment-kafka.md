@@ -89,6 +89,12 @@ description: 聚焦支付系统里的 Kafka 高频考点，覆盖消息可靠性
 | Broker | `min.insync.replicas=2`, `replication.factor=3` | 单节点宕机不丢数据 |
 | Consumer | 手动提交 offset | 业务成功后再 commit |
 
+可以顺手补一句：
+
+- Producer 解决的是“发出去别丢”
+- Broker 解决的是“落盘后别丢”
+- Consumer 解决的是“处理失败别误提交”
+
 ```go
 func (c *Consumer) HandleMessage(msg *kafka.Message) error {
     if err := c.processPayment(msg); err != nil {
@@ -107,6 +113,12 @@ func (c *Consumer) HandleMessage(msg *kafka.Message) error {
 <summary><strong>如何保证同一订单的消息顺序？</strong></summary>
 
 > 以 `OrderID` 作为 Partition Key，同一订单的消息进入同一分区，由同一消费者顺序处理。下游状态机也要做防乱序校验。
+
+答题时建议固定讲三件事：
+
+1. 上游按订单维度路由到同一分区
+2. 分区内单线程顺序消费
+3. 下游状态机做幂等和合法状态流转校验
 
 ```go
 msg := &kafka.Message{
@@ -132,6 +144,8 @@ producer.Produce(msg)
 | 短期优化 | 排查慢消费（DB 慢查询、RPC 超时），批量消费替代逐条 |
 | 长期治理 | 热点 Topic 拆分，按业务优先级设不同 Topic 和消费组 |
 
+> 回答时最好强调：积压问题先看消费能力，再看下游依赖，不要只盯着 Kafka 本身。
+
 </details>
 
 ### **如何做消费重试和死信处理**
@@ -140,6 +154,13 @@ producer.Produce(msg)
 <summary><strong>如何做消费重试和死信处理？</strong></summary>
 
 > 核心策略是重试 N 次，投入死信队列，再由人工或定时任务处理，避免无限重试阻塞主队列。
+
+建议把闭环讲完整：
+
+1. 先做有限次重试，且带退避
+2. 超过阈值进入死信队列
+3. 死信队列由人工或后台任务再处理
+4. 对资损相关消息要有告警和审计记录
 
 ```go
 func (c *Consumer) HandleWithRetry(msg *kafka.Message) {

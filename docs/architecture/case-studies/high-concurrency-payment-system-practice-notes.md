@@ -31,7 +31,7 @@ vocabulary:
 
 1. Go 底层与性能优化
 2. 支付系统分布式架构与高可用
-3. MySQL / Redis / Kafka 等关键中间件实战
+3. MySQL / PostgreSQL / Redis / Kafka 等关键中间件实战
 4. 安全、合规与资损防控
 5. 业务理解、AI 提效与架构演进
 
@@ -409,6 +409,7 @@ flowchart LR
 
 - [database/sql：连接池与事务](/golang/guide/source-reading/database-sql)
 - [database/sql：高级事务与批量插入](/golang/guide/source-reading/database-sql-advanced)
+- [pgx：PostgreSQL 原生驱动](/golang/guide/source-reading/pgx-driver)
 - [go-redis：客户端与分布式锁](/golang/guide/source-reading/go-redis)
 - [net/http 限流与熔断](/golang/guide/source-reading/net-http-ratelimit)
 
@@ -417,26 +418,43 @@ flowchart LR
 MySQL、Redis、Kafka 已经从主文档中单独拆出，便于按中间件维度复习：
 
 - [MySQL 篇：索引、事务、死锁、热点更新、分库分表](./high-concurrency-payment-mysql.md)
+- [PostgreSQL 篇：MVCC、索引、批量写入、分区表、高可用](./high-concurrency-payment-postgresql.md)
 - [Redis 篇：缓存穿透/击穿/雪崩、分布式锁、Lua、滑动窗口](./high-concurrency-payment-redis.md)
 - [Kafka 篇：可靠性、顺序性、积压治理、重试与死信](./high-concurrency-payment-kafka.md)
 
 建议的复习顺序：
 
-1. 先看 MySQL，夯实存储与事务基本盘
+1. 先看 MySQL / PostgreSQL，夯实存储与事务基本盘
 2. 再看 Redis，补并发控制与缓存治理
 3. 最后看 Kafka，串起异步解耦与削峰填谷
 
-### 三篇重点速览
+### 四个中间件专题总览
+
+| MySQL | PostgreSQL |
+| --- | --- |
+| 适合先补事务、锁、热点更新这些 OLTP 基本盘。 | 适合先补 MVCC、分区表、批量写入、高可用这些 PostgreSQL 特色能力。 |
+| 重点：B+ 树与最左前缀、大事务拆分、死锁重试、热点更新、分库分表。 | 重点：MVCC、索引类型、`CopyFrom`、分区表、WAL 与流复制。 |
+| [进入 MySQL 篇](./high-concurrency-payment-mysql.md) | [进入 PostgreSQL 篇](./high-concurrency-payment-postgresql.md) |
+
+| Redis | Kafka |
+| --- | --- |
+| 适合先补缓存治理、并发控制和请求级幂等。 | 适合先补异步链路里不丢、不乱、不堵的治理。 |
+| 重点：穿透/击穿/雪崩、分布式锁、Lua、滑动窗口、幂等控制。 | 重点：消息可靠性、顺序性、积压处理、重试与死信。 |
+| [进入 Redis 篇](./high-concurrency-payment-redis.md) | [进入 Kafka 篇](./high-concurrency-payment-kafka.md) |
+
+### 四篇重点速览
 
 | 专题 | 适合先看什么 | 重点题目 |
 | --- | --- | --- |
 | MySQL | 支付链路为什么容易被事务和锁拖慢 | B+ 树与最左前缀、大事务拆分、死锁重试、热点更新、分库分表 |
+| PostgreSQL | 什么时候更适合用 PostgreSQL 做账务、流水、审计 | MVCC、索引类型、批量写入、分区表、WAL 与高可用 |
 | Redis | 缓存与并发控制怎么守住核心链路 | 穿透/击穿/雪崩、分布式锁安全性、Lua 原子性、滑动窗口、请求级幂等 |
 | Kafka | 异步链路如何保证不丢、不乱、不堵 | 消息可靠性、同单顺序、消息积压、重试与死信 |
 
 如果只够冲刺一轮：
 
 - 偏数据库基础薄弱，先看 [MySQL 篇](./high-concurrency-payment-mysql.md)
+- 偏 PostgreSQL / 账务流水治理薄弱，先看 [PostgreSQL 篇](./high-concurrency-payment-postgresql.md)
 - 偏高并发治理薄弱，先看 [Redis 篇](./high-concurrency-payment-redis.md)
 - 偏异步架构和削峰填谷薄弱，先看 [Kafka 篇](./high-concurrency-payment-kafka.md)
 

@@ -339,6 +339,7 @@ export const sections: SectionConfig[] = [
           { text: 'PostgreSQL 高可用集群整理', link: '/architecture/postgresql-ha-cluster' },
           { text: '高并发支付系统专题整理', link: '/architecture/case-studies/high-concurrency-payment-system-practice-notes' },
           { text: '高并发支付系统：MySQL 篇', link: '/architecture/case-studies/high-concurrency-payment-mysql' },
+          { text: '高并发支付系统：PostgreSQL 篇', link: '/architecture/case-studies/high-concurrency-payment-postgresql' },
           { text: '高并发支付系统：Redis 篇', link: '/architecture/case-studies/high-concurrency-payment-redis' },
           { text: '高并发支付系统：Kafka 篇', link: '/architecture/case-studies/high-concurrency-payment-kafka' },
           { text: '运动 APP 出海架构与管理完全指南', link: '/architecture/case-studies/global-fitness-app-architecture-and-management-guide' },
