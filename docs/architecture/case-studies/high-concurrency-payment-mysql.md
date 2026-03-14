@@ -7,9 +7,9 @@ description: 聚焦支付系统里的 MySQL 高频考点，覆盖索引、事务
 
 适合把支付场景里的 MySQL 高频考点单独拉出来复习。答题时建议始终按原理 -> 支付场景问题 -> 落地方案的顺序组织。
 
-- [返回高并发支付系统专题整理](./high-concurrency-payment-system-practice-notes.md)
-- [Redis 篇](./high-concurrency-payment-redis.md)
-- [Kafka 篇](./high-concurrency-payment-kafka.md)
+- [返回专题总览](./high-concurrency-payment-system-practice-notes.md)
+- [下一篇：Redis 篇](./high-concurrency-payment-redis.md)
+- [延伸：Kafka 篇](./high-concurrency-payment-kafka.md)
 
 ## 适合谁看
 
@@ -52,7 +52,21 @@ description: 聚焦支付系统里的 MySQL 高频考点，覆盖索引、事务
 - 极高并发场景下引入热点拆分
 - 通过分库分表和冷热分离降低单表压力
 
+建议先用表格快速区分这几个高频问题：
+
+| 题目 | 核心矛盾 | 典型后果 | 首先要答什么 |
+| --- | --- | --- | --- |
+| B+ 树与最左前缀 | 索引设计不合理 | 查询慢、扫描多 | 索引结构 + 命中规则 |
+| 大事务拆分 | 事务范围过大 | 锁持有长、回滚成本高 | 事务缩短原则 |
+| 死锁检测与回滚重试 | 并发锁顺序冲突 | 回滚、超时、RT 抖动 | 排查手段 + 治理 |
+| 热点更新 | 同一行并发修改 | 行锁排队、TPS 下降 | 分层治理方案 |
+| 分库分表与迁移 | 单表/单库到瓶颈 | 查询、DDL、扩容复杂 | 为什么拆 + 怎么迁 |
+
 ## MySQL 高频考点
+
+> 这几个问题可以按“索引 -> 事务 -> 并发锁 -> 扩容迁移”的顺序来准备，先把单库单表问题讲清，再讲演进方案。
+
+### **B+ 树索引和最左前缀匹配**
 
 <details>
 <summary><strong>B+ 树索引和最左前缀匹配</strong></summary>
@@ -80,6 +94,8 @@ WHERE created_at >= ? AND status = ?;
 
 </details>
 
+### **大事务拆分**
+
 <details>
 <summary><strong>大事务拆分</strong></summary>
 
@@ -98,6 +114,8 @@ tx.Commit()
 ```
 
 </details>
+
+### **死锁检测与回滚重试**
 
 <details>
 <summary><strong>死锁检测与回滚重试</strong></summary>
@@ -122,6 +140,8 @@ func withDeadlockRetry(fn func() error) error {
 
 </details>
 
+### **热点更新问题**
+
 <details>
 <summary><strong>热点更新问题</strong></summary>
 
@@ -135,6 +155,8 @@ WHERE id = ? AND version = ? AND balance >= 100;
 
 </details>
 
+### **分库分表与迁移**
+
 <details>
 <summary><strong>分库分表与迁移</strong></summary>
 
@@ -147,6 +169,19 @@ WHERE id = ? AND version = ? AND balance >= 100;
 </details>
 
 ## 高频追问
+
+> 这组追问更偏落地细节，适合在讲完主方案后补一句，体现你不只懂原理，也考虑到了真实 SQL 和事务成本。
+
+建议先用追问表快速过一遍：
+
+| 追问 | 本质 | 常见答案方向 |
+| --- | --- | --- |
+| 为什么不能 `SELECT *` | 回表和缓存污染 | 覆盖索引 |
+| 深分页如何优化 | OFFSET 扫描成本高 | 游标分页、延迟关联 |
+| 如何缩短锁持有时间 | 事务中混入耗时操作 | 把锁放到事务后段 |
+| 如何避免热点账户行锁竞争 | 同一行并发写入 | 乐观锁、排队合并、子账户拆分 |
+
+### **为什么支付流水表不能 `SELECT *`**
 
 <details>
 <summary><strong>为什么支付流水表不能 `SELECT *`？</strong></summary>
@@ -164,6 +199,8 @@ WHERE merchant_id = ? AND created_at > ?;
 
 </details>
 
+### **深分页如何优化**
+
 <details>
 <summary><strong>深分页如何优化？</strong></summary>
 
@@ -175,6 +212,8 @@ SELECT * FROM payment_flow WHERE id > #{lastMaxId} ORDER BY id LIMIT 20;
 ```
 
 </details>
+
+### **如何缩短锁持有时间**
 
 <details>
 <summary><strong>如何缩短锁持有时间？</strong></summary>
@@ -190,6 +229,8 @@ tx.Commit()
 ```
 
 </details>
+
+### **如何避免热点账户导致行锁竞争**
 
 <details>
 <summary><strong>如何避免热点账户导致行锁竞争？</strong></summary>
@@ -208,6 +249,6 @@ tx.Commit()
 
 ## 继续阅读
 
-- [返回高并发支付系统专题整理](./high-concurrency-payment-system-practice-notes.md)
+- [返回专题总览](./high-concurrency-payment-system-practice-notes.md)
 - [下一篇：Redis 篇](./high-concurrency-payment-redis.md)
 - [案例总览](./index.md)

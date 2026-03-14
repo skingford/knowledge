@@ -5,9 +5,9 @@ description: 聚焦支付系统里的 Kafka 高频考点，覆盖消息可靠性
 
 # 高并发支付系统专题整理：Kafka 篇
 
-- [返回高并发支付系统专题整理](./high-concurrency-payment-system-practice-notes.md)
-- [MySQL 篇](./high-concurrency-payment-mysql.md)
-- [Redis 篇](./high-concurrency-payment-redis.md)
+- [返回专题总览](./high-concurrency-payment-system-practice-notes.md)
+- [上一篇：Redis 篇](./high-concurrency-payment-redis.md)
+- [参考：MySQL 篇](./high-concurrency-payment-mysql.md)
 
 ## 适合谁看
 
@@ -30,6 +30,15 @@ description: 聚焦支付系统里的 Kafka 高频考点，覆盖消息可靠性
 支付链路里，MQ 不只是削峰工具，更是保证异步解耦和系统恢复能力的重要组件。
 
 ## 先建立答题框架
+
+建议先用表格快速区分：
+
+| 问题 | 核心矛盾 | 典型风险 | 首先要答什么 |
+| --- | --- | --- | --- |
+| 消息如何做到尽量不丢 | 生产、存储、消费任一环节都可能丢 | 丢消息、重复消费 | Producer/Broker/Consumer 三层兜底 |
+| 如何保证同一订单顺序 | 多分区、多消费者并发 | 状态乱序、资金状态异常 | Partition Key + 下游状态机 |
+| 如何处理消息积压 | 生产速度大于消费速度 | 延迟飙升、队列堆积 | 先止血再治理 |
+| 如何做重试和死信 | 失败消息不能无限重试 | 阻塞主队列、异常扩散 | 重试次数 + 死信闭环 |
 
 ### 不丢失怎么讲
 
@@ -58,6 +67,17 @@ description: 聚焦支付系统里的 Kafka 高频考点，覆盖消息可靠性
 
 ## Kafka 高频追问
 
+建议先用追问表快速过一遍：
+
+| 追问 | 本质 | 常见答案方向 |
+| --- | --- | --- |
+| 消息如何做到尽量不丢 | 三段链路任一环节都可能丢 | Producer/Broker/Consumer 三层兜底 |
+| 如何保证同一订单的消息顺序 | 多分区并发消费导致乱序 | Partition Key + 状态机防乱序 |
+| 如何处理消息积压 | 生产快于消费 | 先止血再治理 |
+| 如何做消费重试和死信处理 | 失败消息不能无限堆积 | 有限重试 + 死信闭环 |
+
+### **消息如何做到尽量不丢**
+
 <details>
 <summary><strong>消息如何做到尽量不丢？</strong></summary>
 
@@ -81,6 +101,8 @@ func (c *Consumer) HandleMessage(msg *kafka.Message) error {
 
 </details>
 
+### **如何保证同一订单的消息顺序**
+
 <details>
 <summary><strong>如何保证同一订单的消息顺序？</strong></summary>
 
@@ -97,6 +119,8 @@ producer.Produce(msg)
 
 </details>
 
+### **如何处理消息积压**
+
 <details>
 <summary><strong>如何处理消息积压？</strong></summary>
 
@@ -109,6 +133,8 @@ producer.Produce(msg)
 | 长期治理 | 热点 Topic 拆分，按业务优先级设不同 Topic 和消费组 |
 
 </details>
+
+### **如何做消费重试和死信处理**
 
 <details>
 <summary><strong>如何做消费重试和死信处理？</strong></summary>
@@ -141,5 +167,5 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
 ## 继续阅读
 
 - [上一篇：Redis 篇](./high-concurrency-payment-redis.md)
-- [返回高并发支付系统专题整理](./high-concurrency-payment-system-practice-notes.md)
+- [返回专题总览](./high-concurrency-payment-system-practice-notes.md)
 - [案例总览](./index.md)
