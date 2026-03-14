@@ -1,0 +1,230 @@
+{
+  "concurrency": {
+    "word": "concurrency",
+    "meaning": "并发；同时发生",
+    "phoneticUs": "/kənˈkɝː.ən.si/",
+    "phoneticUk": "/kənˈkʌr.ən.si/",
+    "phoneticSource": "merriam-webster",
+    "phoneticSourceUrl": "https://www.merriam-webster.com/dictionary/concurrency"
+  },
+  "goroutine": {
+    "word": "goroutine",
+    "meaning": "Go 协程；轻量级线程",
+    "phoneticUs": "/ˌɡoʊ.ruˈtiːn/",
+    "phoneticUk": "/ˌɡəʊ.ruːˈtiːn/",
+    "phoneticSource": "official-docs",
+    "phoneticSourceUrl": "https://go.dev/ref/spec"
+  },
+  "scheduler": {
+    "word": "scheduler",
+    "meaning": "调度器",
+    "phoneticUs": "/ˈskedʒ.uː.lɚ/",
+    "phoneticUk": "/ˈʃedʒ.uː.lər/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/scheduler"
+  },
+  "garbage-collection": {
+    "word": "garbage collection",
+    "meaning": "垃圾回收",
+    "phoneticUs": "/ˈɡɑr.bɪdʒ kəˈlek.ʃən/",
+    "phoneticUk": "/ˈɡɑː.bɪdʒ kəˈlek.ʃən/",
+    "phoneticSource": "collins",
+    "phoneticSourceUrl": "https://www.collinsdictionary.com/us/dictionary/english/garbage-collection"
+  },
+  "mutex": {
+    "word": "mutex",
+    "meaning": "互斥锁",
+    "phoneticUs": "/ˈmjuː.teks/",
+    "phoneticUk": "/ˈmjuː.teks/",
+    "phoneticSource": "official-docs",
+    "phoneticSourceUrl": "https://pkg.go.dev/sync#Mutex"
+  },
+  "channel": {
+    "word": "channel",
+    "meaning": "通道；信道",
+    "phoneticUs": "/ˈtʃæn.əl/",
+    "phoneticUk": "/ˈtʃæn.əl/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/channel"
+  },
+  "interface": {
+    "word": "interface",
+    "meaning": "接口",
+    "phoneticUs": "/ˈɪn.tɚ.feɪs/",
+    "phoneticUk": "/ˈɪn.tə.feɪs/",
+    "phoneticSource": "merriam-webster",
+    "phoneticSourceUrl": "https://www.merriam-webster.com/dictionary/interface"
+  },
+  "reflection": {
+    "word": "reflection",
+    "meaning": "反射",
+    "phoneticUs": "/rɪˈflek.ʃən/",
+    "phoneticUk": "/rɪˈflek.ʃən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/reflection"
+  },
+  "profiling": {
+    "word": "profiling",
+    "meaning": "性能剖析",
+    "phoneticUs": "/ˈproʊ.faɪ.lɪŋ/",
+    "phoneticUk": "/ˈprəʊ.faɪ.lɪŋ/",
+    "phoneticSource": "collins",
+    "phoneticSourceUrl": "https://www.collinsdictionary.com/us/dictionary/english/profiling"
+  },
+  "deadlock": {
+    "word": "deadlock",
+    "meaning": "死锁",
+    "phoneticUs": "/ˈded.lɑːk/",
+    "phoneticUk": "/ˈded.lɒk/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/deadlock"
+  },
+  "preemption": {
+    "word": "preemption",
+    "meaning": "抢占",
+    "phoneticUs": "/ˌpriːˈemp.ʃən/",
+    "phoneticUk": "/ˌpriːˈemp.ʃən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/pre-emption"
+  },
+  "work-stealing": {
+    "word": "work stealing",
+    "meaning": "工作窃取（负载均衡策略）",
+    "phoneticUs": "/wɝːrk ˈstiː.lɪŋ/",
+    "phoneticUk": "/wɜːk ˈstiː.lɪŋ/",
+    "phoneticSource": "manual-review"
+  },
+  "machine": {
+    "word": "machine",
+    "meaning": "机器；操作系统线程（GMP 中的 M）",
+    "phoneticUs": "/məˈʃiːn/",
+    "phoneticUk": "/məˈʃiːn/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/machine"
+  },
+  "processor": {
+    "word": "processor",
+    "meaning": "处理器（GMP 中的 P）",
+    "phoneticUs": "/ˈprɑː.ses.ɚ/",
+    "phoneticUk": "/ˈprəʊ.ses.ər/",
+    "phoneticSource": "merriam-webster",
+    "phoneticSourceUrl": "https://www.merriam-webster.com/dictionary/processor"
+  },
+  "syscall": {
+    "word": "syscall",
+    "meaning": "系统调用",
+    "phoneticUs": "/ˈsɪs.kɔːl/",
+    "phoneticUk": "/ˈsɪs.kɔːl/",
+    "phoneticSource": "official-docs",
+    "phoneticSourceUrl": "https://pkg.go.dev/syscall"
+  },
+  "handoff": {
+    "word": "handoff",
+    "meaning": "交接；移交",
+    "phoneticUs": "/ˈhænd.ɑːf/",
+    "phoneticUk": "/ˈhænd.ɒf/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/handoff"
+  },
+  "starvation": {
+    "word": "starvation",
+    "meaning": "饥饿（调度饥饿）",
+    "phoneticUs": "/stɑːrˈveɪ.ʃən/",
+    "phoneticUk": "/stɑːˈveɪ.ʃən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/starvation"
+  },
+  "cooperative": {
+    "word": "cooperative",
+    "meaning": "协作式的",
+    "phoneticUs": "/koʊˈɑː.pɚ.ə.t̬ɪv/",
+    "phoneticUk": "/kəʊˈɒp.ər.ə.tɪv/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/cooperative"
+  },
+  "asynchronous": {
+    "word": "asynchronous",
+    "meaning": "异步的",
+    "phoneticUs": "/eɪˈsɪŋ.krə.nəs/",
+    "phoneticUk": "/eɪˈsɪŋ.krə.nəs/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/asynchronous"
+  },
+  "idempotent": {
+    "word": "idempotent",
+    "meaning": "幂等的",
+    "phoneticUs": "/ˌaɪ.dəmˈpoʊ.t̬ənt/",
+    "phoneticUk": "/ˌɪd.əmˈpəʊ.tənt/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/idempotent"
+  },
+  "throughput": {
+    "word": "throughput",
+    "meaning": "吞吐量",
+    "phoneticUs": "/ˈθruː.pʊt/",
+    "phoneticUk": "/ˈθruː.pʊt/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/throughput"
+  },
+  "latency": {
+    "word": "latency",
+    "meaning": "延迟",
+    "phoneticUs": "/ˈleɪ.tən.si/",
+    "phoneticUk": "/ˈleɪ.tən.si/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/latency"
+  },
+  "settlement": {
+    "word": "settlement",
+    "meaning": "清算；结算",
+    "phoneticUs": "/ˈset̬.əl.mənt/",
+    "phoneticUk": "/ˈset.əl.mənt/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/settlement"
+  },
+  "reconciliation": {
+    "word": "reconciliation",
+    "meaning": "对账",
+    "phoneticUs": "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/",
+    "phoneticUk": "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/reconciliation"
+  },
+  "distributed-transaction": {
+    "word": "distributed transaction",
+    "meaning": "分布式事务",
+    "phoneticUs": "/dɪˈstrɪb.jə.t̬ɪd trænˈzæk.ʃən/",
+    "phoneticUk": "/dɪˈstrɪb.juː.tɪd trænˈzæk.ʃən/",
+    "phoneticSource": "manual-review"
+  },
+  "circuit-breaker": {
+    "word": "circuit breaker",
+    "meaning": "熔断器",
+    "phoneticUs": "/ˈsɝː.kɪt ˌbreɪ.kɚ/",
+    "phoneticUk": "/ˈsɜː.kɪt ˌbreɪ.kər/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/circuit-breaker"
+  },
+  "rate-limiting": {
+    "word": "rate limiting",
+    "meaning": "限流",
+    "phoneticUs": "/reɪt ˈlɪm.ə.t̬ɪŋ/",
+    "phoneticUk": "/reɪt ˈlɪm.ɪ.tɪŋ/",
+    "phoneticSource": "manual-review"
+  },
+  "hot-account": {
+    "word": "hot account",
+    "meaning": "热点账户",
+    "phoneticUs": "/hɑːt əˈkaʊnt/",
+    "phoneticUk": "/hɒt əˈkaʊnt/",
+    "phoneticSource": "manual-review"
+  },
+  "consistency": {
+    "word": "consistency",
+    "meaning": "一致性",
+    "phoneticUs": "/kənˈsɪs.tən.si/",
+    "phoneticUk": "/kənˈsɪs.tən.si/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/consistency"
+  }
+}

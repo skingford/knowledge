@@ -2,46 +2,16 @@
 title: 高并发支付系统专题整理
 description: 围绕高并发支付系统的 Go 性能、分布式事务、资金安全、清结算、跨境支付、热点账户与稳定性治理做系统梳理，适合用作架构设计和实战复盘参考。
 vocabulary:
-  - word: idempotent
-    meaning: 幂等的
-    phoneticUs: "/ˌaɪ.demˈpoʊ.t̬ənt/"
-    phoneticUk: "/ˌaɪ.demˈpəʊ.tənt/"
-  - word: throughput
-    meaning: 吞吐量
-    phoneticUs: "/ˈθruː.pʊt/"
-    phoneticUk: "/ˈθruː.pʊt/"
-  - word: latency
-    meaning: 延迟
-    phoneticUs: "/ˈleɪ.tən.si/"
-    phoneticUk: "/ˈleɪ.tən.si/"
-  - word: settlement
-    meaning: 清算；结算
-    phoneticUs: "/ˈset̬.əl.mənt/"
-    phoneticUk: "/ˈset.əl.mənt/"
-  - word: reconciliation
-    meaning: 对账
-    phoneticUs: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
-    phoneticUk: "/ˌrek.ənˌsɪl.iˈeɪ.ʃən/"
-  - word: distributed transaction
-    meaning: 分布式事务
-    phoneticUs: "/dɪˈstrɪb.jə.t̬ɪd trænˈzæk.ʃən/"
-    phoneticUk: "/dɪˈstrɪb.juː.tɪd trænˈzæk.ʃən/"
-  - word: circuit breaker
-    meaning: 熔断器
-    phoneticUs: "/ˈsɝː.kɪt ˈbreɪ.kɚ/"
-    phoneticUk: "/ˈsɜː.kɪt ˈbreɪ.kər/"
-  - word: rate limiting
-    meaning: 限流
-    phoneticUs: "/reɪt ˈlɪm.ə.t̬ɪŋ/"
-    phoneticUk: "/reɪt ˈlɪm.ɪ.tɪŋ/"
-  - word: hot account
-    meaning: 热点账户
-    phoneticUs: "/hɑːt əˈkaʊnt/"
-    phoneticUk: "/hɒt əˈkaʊnt/"
-  - word: consistency
-    meaning: 一致性
-    phoneticUs: "/kənˈsɪs.tən.si/"
-    phoneticUk: "/kənˈsɪs.tən.si/"
+  - idempotent
+  - throughput
+  - latency
+  - settlement
+  - reconciliation
+  - distributed-transaction
+  - circuit-breaker
+  - rate-limiting
+  - hot-account
+  - consistency
 ---
 
 # 高并发支付系统专题整理

@@ -9,19 +9,19 @@
 title: 文档标题
 description: 文档描述
 vocabulary:
-  - word: scheduler
-    meaning: 调度器
-    phoneticUs: "/ˈskedʒ.uː.lɚ/"
-    phoneticUk: "/ˈʃedʒ.uː.lər/"
+  - scheduler
 ---
 ```
 
 约定：
 
-- 默认优先写 `phoneticUs`
-- 如果有英式写法，再补 `phoneticUk`
-- 不再新增只有 `phonetic` 的新词条，旧字段仅兼容历史内容
-- 音标以 IPA 为准
+- 文档 frontmatter 里的 `vocabulary` 只写词典 key，例如 `scheduler`
+- 词条详情统一维护在 `docs/.vitepress/theme/vocabulary-dictionary.json`
+- 词典项里 `phoneticUs` 为必填，`phoneticUk` 选填
+- 词典项里 `phoneticSource` 为必填，允许值：`oxford`、`cambridge`、`merriam-webster`、`collins`、`official-docs`、`manual-review`
+- 当 `phoneticSource` 不是 `manual-review` 时，`phoneticSourceUrl` 为必填，必须指向具体词典条目或官方文档页面
+- `official-docs` 用于 `goroutine`、`mutex`、`syscall` 这类更适合引用语言/标准库官方文档的技术术语
+- 页面展示的音标只允许来自共享词典中人工确认过的字段，不再运行时自动补全
 
 ## 适合人群
 

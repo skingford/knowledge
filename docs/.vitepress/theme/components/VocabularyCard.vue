@@ -7,6 +7,8 @@ interface VocabItem {
   phonetic?: string
   phoneticUs?: string
   phoneticUk?: string
+  phoneticSource?: string
+  phoneticSourceUrl?: string
 }
 
 type VoiceGender = 'male' | 'female' | 'unknown'
@@ -25,7 +27,6 @@ interface SpeechSettings {
 }
 
 const SETTINGS_KEY = 'vocab-speech-settings'
-const PHONETICS_CACHE_KEY = 'vocab-phonetics-v2'
 const DEFAULT_VOICE = 'Nicky'
 const DEFAULT_SETTINGS: SpeechSettings = {
   voiceName: DEFAULT_VOICE,
@@ -40,7 +41,6 @@ const MALE_PATTERNS = /\b(daniel|alex|tom|fred|ralph|albert|junior|aaron|rishi|j
 
 const props = defineProps<{ items: VocabItem[] }>()
 
-const phonetics = ref<Record<string, { us?: string; uk?: string }>>({})
 const speakingWord = ref('')
 const showSettings = ref(false)
 const voiceEntries = ref<VoiceEntry[]>([])
@@ -98,94 +98,20 @@ onMounted(() => {
     loadVoices()
     window.speechSynthesis.onvoiceschanged = loadVoices
   }
-
-  const missing = props.items.filter(
-    (item) =>
-      !item.phoneticUs &&
-      !item.phoneticUk &&
-      !item.phonetic &&
-      !phonetics.value[item.word]?.us &&
-      !phonetics.value[item.word]?.uk,
-  )
-  if (!missing.length) return
-
-  const cached = JSON.parse(localStorage.getItem(PHONETICS_CACHE_KEY) || '{}')
-
-  const toFetch: VocabItem[] = []
-  for (const item of missing) {
-    if (cached[item.word]) {
-      phonetics.value[item.word] = cached[item.word]
-    } else {
-      toFetch.push(item)
-    }
-  }
-
-  for (const item of toFetch) {
-    fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(item.word)}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        const p = pickPhonetics(data)
-        if (p.us || p.uk) {
-          phonetics.value[item.word] = p
-          cached[item.word] = p
-          localStorage.setItem(PHONETICS_CACHE_KEY, JSON.stringify(cached))
-        }
-      })
-      .catch(() => {})
-  }
 })
-
-function pickPhonetics(entries: any[]) {
-  if (!Array.isArray(entries)) return {}
-
-  const phonetics = entries.flatMap((entry) =>
-    Array.isArray(entry?.phonetics) ? entry.phonetics : [],
-  )
-
-  const normalize = (text: string) => text.trim()
-  const pick = (candidates: any[]) => {
-    const picked = candidates.find(Boolean)
-    if (!picked) return ''
-    if (typeof picked === 'string') return normalize(picked)
-    if (typeof picked.text === 'string') return normalize(picked.text)
-    if (typeof picked.phonetic === 'string') return normalize(picked.phonetic)
-    return ''
-  }
-
-  const us = pick([
-    phonetics.find((ph) => typeof ph?.audio === 'string' && /[-_/]us\./i.test(ph.audio) && ph.text),
-    phonetics.find((ph) => typeof ph?.sourceUrl === 'string' && /american/i.test(ph.sourceUrl) && ph.text),
-    phonetics.find((ph) => typeof ph?.text === 'string' && /ɚ|ɝ/.test(ph.text)),
-    phonetics.find((ph) => typeof ph?.text === 'string' && ph.text),
-    entries.find((entry) => typeof entry?.phonetic === 'string' && entry.phonetic),
-  ])
-
-  const uk = pick([
-    phonetics.find((ph) => typeof ph?.audio === 'string' && /[-_/]uk\./i.test(ph.audio) && ph.text),
-    phonetics.find((ph) => typeof ph?.sourceUrl === 'string' && /british/i.test(ph.sourceUrl) && ph.text),
-    phonetics.find((ph) => typeof ph?.text === 'string' && /ɒ|əʊ|ʃedʒ|juːə/.test(ph.text)),
-    phonetics.find((ph) => typeof ph?.text === 'string' && ph.text && ph.text !== us),
-  ])
-
-  return { us, uk }
-}
 
 function getPhonetic(item: VocabItem) {
   if (speechSettings.value.phoneticVariant === 'uk') {
     return (
       item.phoneticUk ||
-      phonetics.value[item.word]?.uk ||
       item.phoneticUs ||
-      phonetics.value[item.word]?.us ||
       item.phonetic ||
       ''
     )
   }
   return (
     item.phoneticUs ||
-    phonetics.value[item.word]?.us ||
     item.phoneticUk ||
-    phonetics.value[item.word]?.uk ||
     item.phonetic ||
     ''
   )

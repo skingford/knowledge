@@ -2,50 +2,17 @@
 title: GMP 调度器源码精读
 description: 精读 Go runtime GMP 调度模型，理解 goroutine 调度、抢占与 work-stealing 机制。
 vocabulary:
-  - word: scheduler
-    meaning: 调度器
-    phoneticUs: "/ˈskedʒ.uː.lɚ/"
-    phoneticUk: "/ˈʃedʒ.uː.lər/"
-  - word: preemption
-    meaning: 抢占
-    phoneticUs: "/priˈemp.ʃən/"
-    phoneticUk: "/priˈemp.ʃən/"
-  - word: work stealing
-    meaning: 工作窃取（负载均衡策略）
-    phoneticUs: "/wɝːrk ˈstiː.lɪŋ/"
-    phoneticUk: "/wɜːk ˈstiː.lɪŋ/"
-  - word: goroutine
-    meaning: Go 协程；轻量级线程
-    phoneticUs: "/ˌɡoʊ.ruˈtiːn/"
-    phoneticUk: "/ˌɡəʊ.ruːˈtiːn/"
-  - word: machine
-    meaning: 机器；操作系统线程（GMP 中的 M）
-    phoneticUs: "/məˈʃiːn/"
-    phoneticUk: "/məˈʃiːn/"
-  - word: processor
-    meaning: 处理器（GMP 中的 P）
-    phoneticUs: "/ˈprɑː.ses.ɚ/"
-    phoneticUk: "/ˈprəʊ.ses.ər/"
-  - word: syscall
-    meaning: 系统调用
-    phoneticUs: "/ˈsɪs.kɔːl/"
-    phoneticUk: "/ˈsɪs.kɔːl/"
-  - word: handoff
-    meaning: 交接；移交
-    phoneticUs: "/ˈhænd.ɔːf/"
-    phoneticUk: "/ˈhænd.ɒf/"
-  - word: starvation
-    meaning: 饥饿（调度饥饿）
-    phoneticUs: "/stɑːrˈveɪ.ʃən/"
-    phoneticUk: "/stɑːˈveɪ.ʃən/"
-  - word: cooperative
-    meaning: 协作式的
-    phoneticUs: "/koʊˈɑː.pɚ.ə.t̬ɪv/"
-    phoneticUk: "/kəʊˈɒp.ər.ə.tɪv/"
-  - word: asynchronous
-    meaning: 异步的
-    phoneticUs: "/eɪˈsɪŋ.krə.nəs/"
-    phoneticUk: "/eɪˈsɪŋ.krə.nəs/"
+  - scheduler
+  - preemption
+  - work-stealing
+  - goroutine
+  - machine
+  - processor
+  - syscall
+  - handoff
+  - starvation
+  - cooperative
+  - asynchronous
 ---
 
 # GMP 调度器：runtime 源码精读

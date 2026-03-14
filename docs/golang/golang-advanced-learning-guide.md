@@ -2,46 +2,16 @@
 title: 高级 Golang 学习资料
 description: 高级 Golang 学习主线，系统覆盖语言机制、并发模型、性能优化、工程实践与源码阅读。
 vocabulary:
-  - word: concurrency
-    meaning: 并发；同时发生
-    phoneticUs: "/kənˈkɝː.ən.si/"
-    phoneticUk: "/kənˈkʌr.ən.si/"
-  - word: goroutine
-    meaning: Go 协程；轻量级线程
-    phoneticUs: "/ˌɡoʊ.ruˈtiːn/"
-    phoneticUk: "/ˌɡəʊ.ruːˈtiːn/"
-  - word: scheduler
-    meaning: 调度器
-    phoneticUs: "/ˈskedʒ.uː.lɚ/"
-    phoneticUk: "/ˈʃedʒ.uː.lər/"
-  - word: garbage collection
-    meaning: 垃圾回收
-    phoneticUs: "/ˈɡɑr.bɪdʒ kəˈlek.ʃən/"
-    phoneticUk: "/ˈɡɑː.bɪdʒ kəˈlek.ʃən/"
-  - word: mutex
-    meaning: 互斥锁
-    phoneticUs: "/ˈmjuː.teks/"
-    phoneticUk: "/ˈmjuː.teks/"
-  - word: channel
-    meaning: 通道；信道
-    phoneticUs: "/ˈtʃæn.əl/"
-    phoneticUk: "/ˈtʃæn.əl/"
-  - word: interface
-    meaning: 接口
-    phoneticUs: "/ˈɪn.tɚ.feɪs/"
-    phoneticUk: "/ˈɪn.tə.feɪs/"
-  - word: reflection
-    meaning: 反射
-    phoneticUs: "/rɪˈflek.ʃən/"
-    phoneticUk: "/rɪˈflek.ʃən/"
-  - word: profiling
-    meaning: 性能剖析
-    phoneticUs: "/ˈproʊ.faɪ.lɪŋ/"
-    phoneticUk: "/ˈprəʊ.faɪ.lɪŋ/"
-  - word: deadlock
-    meaning: 死锁
-    phoneticUs: "/ˈded.lɑːk/"
-    phoneticUk: "/ˈded.lɒk/"
+  - concurrency
+  - goroutine
+  - scheduler
+  - garbage-collection
+  - mutex
+  - channel
+  - interface
+  - reflection
+  - profiling
+  - deadlock
 ---
 
 # 高级 Golang 学习资料
