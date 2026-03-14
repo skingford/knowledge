@@ -185,6 +185,56 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
 
 ---
 
+## English Vocabulary Notes
+
+适合在面试前快速过一遍 Kafka 相关英文术语，重点记“中文含义 + 英文说法 + 支付场景里怎么用”。
+
+| 中文 | 英文 | 速记 |
+| --- | --- | --- |
+| 消息队列 | message queue | 常缩写为 MQ |
+| 解耦 | decoupling | 服务之间不要强依赖 |
+| 削峰填谷 | absorb traffic spikes | 高峰期先入队，低峰期再消费 |
+| 异步处理 | asynchronous processing | 非核心链路异步化 |
+| 生产者 | producer | 负责发送消息 |
+| 消费者 | consumer | 负责拉取和处理消息 |
+| 代理节点 | broker | Kafka 服务节点 |
+| 主题 | topic | 消息的逻辑分类 |
+| 分区 | partition | Kafka 并发和顺序的基本单位 |
+| 分区键 | partition key | 常用 `order_id` 做路由 |
+| 副本 | replica | 用于提高可靠性 |
+| 确认机制 | acknowledgment | 常见表达是 `acks=all` |
+| 幂等生产 | idempotent producer | 防止重复发送 |
+| 偏移量 | offset | 消费进度标记 |
+| 手动提交偏移量 | manual offset commit | 业务成功后再提交 |
+| 消息丢失 | message loss | 高频追问之一 |
+| 重复消费 | duplicate consumption | 支付系统必须重点防 |
+| 幂等 | idempotency | 重复执行结果一致 |
+| 顺序性 | ordering | 更自然的说法也可用 message order |
+| 分区内有序 | ordering within a partition | Kafka 只保证分区内顺序 |
+| 状态机 | state machine | 防止状态乱序流转 |
+| 消息积压 | message backlog | 生产快于消费时出现 |
+| 热点分区 | hot partition | 某个分区负载过高 |
+| 扩容消费者 | scale out consumers | 先止血的常见动作 |
+| 降级 | degradation | 非核心链路先降级 |
+| 限流 | rate limiting | 避免下游被打爆 |
+| 重试 | retry | 失败后再次处理 |
+| 退避 | backoff | 控制重试节奏 |
+| 有限重试 | bounded retries | 避免无限重试 |
+| 死信队列 | dead-letter queue | 常写作 DLQ |
+| 告警 | alerting | 资损类问题必须告警 |
+| 审计日志 | audit log | 关键链路留痕 |
+| 对账 | reconciliation | 支付结果核对 |
+| 风控 | risk control | 常见异步消费场景 |
+
+### Quick Phrases
+
+- Kafka is used for decoupling and asynchronous processing.
+- We use the order ID as the partition key.
+- Kafka only guarantees ordering within a partition.
+- We commit the offset only after the business logic succeeds.
+- Failed messages go through bounded retries and then enter the dead-letter queue.
+- In payment systems, idempotency is more important than theoretical exactly-once delivery.
+
 ## 继续阅读
 
 - [上一篇：Redis 篇](./high-concurrency-payment-redis.md)
