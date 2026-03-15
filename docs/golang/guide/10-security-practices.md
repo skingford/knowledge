@@ -1336,7 +1336,7 @@ JWT_SECRET=your-jwt-secret-at-least-32-chars
 API_KEY=your-api-key
 ```
 
-```gitignore
+```txt
 # .gitignore 必须包含以下规则
 
 # 环境变量文件

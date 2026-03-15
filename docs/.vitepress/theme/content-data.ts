@@ -338,7 +338,7 @@ export const sections: SectionConfig[] = [
           { text: '组织架构与业务系统设计方案', link: '/architecture/case-studies/organization-structure-and-business-system-design' },
           { text: 'PostgreSQL 高可用集群整理', link: '/architecture/postgresql-ha-cluster' },
           { text: '高并发支付系统专题整理', link: '/architecture/case-studies/high-concurrency-payment-system-practice-notes' },
-          { text: '高并发支付系统：MySQL 篇', link: '/architecture/case-studies/high-concurrency-payment-mysql' },
+          { text: '高并发支付系统：MySQL 篇', link: '/mysql/' },
           { text: '高并发支付系统：PostgreSQL 篇', link: '/architecture/case-studies/high-concurrency-payment-postgresql' },
           { text: '高并发支付系统：Redis 篇', link: '/architecture/case-studies/high-concurrency-payment-redis' },
           { text: '高并发支付系统：Kafka 篇', link: '/architecture/case-studies/high-concurrency-payment-kafka' },
@@ -467,6 +467,73 @@ export const sections: SectionConfig[] = [
           { text: 'RPC、注册发现与配置', link: '/golang/guide/08-rpc-discovery-config' },
           { text: '追踪、容错与重试', link: '/golang/guide/08-observability-resilience' },
           { text: 'MQ、事务、治理与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'mysql',
+    base: '/mysql/',
+    navText: 'MySQL',
+    overviewDescription:
+      '系统整理 MySQL 核心知识，涵盖 database/sql、连接池、事务、SQL 优化、ORM，以及高并发场景下的索引设计、大事务拆分、死锁治理、热点更新与分库分表。',
+    landing: {
+      eyebrow: 'MySQL',
+      title: 'MySQL 专题',
+      intro:
+        '把散落在 Go 学习大纲和支付系统案例中的 MySQL 相关内容统一收敛，涵盖日常开发基础和高并发场景实战。',
+      primary: { title: '专题总览', href: '/mysql/', description: '从总览页开始，按主题查阅。' },
+      secondary: { title: '索引设计', href: '/mysql/index-design', description: '从 B+ 树和最左前缀开始。' },
+      scope: [
+        'database/sql 与连接池',
+        '事务处理与 SQL 优化',
+        'ORM 使用经验',
+        'B+ 树索引设计',
+        '大事务拆分与死锁治理',
+        '热点更新与分库分表',
+      ],
+      docs: [
+        { title: 'database/sql 与连接池', href: '/mysql/database-sql-and-connection', description: 'Go 标准库操作 MySQL 的核心用法与连接池配置。' },
+        { title: '事务处理与 SQL 优化', href: '/mysql/transaction-and-optimization', description: '事务模式、EXPLAIN 分析、批量操作与游标分页。' },
+        { title: 'ORM 使用经验（GORM）', href: '/mysql/orm-gorm', description: 'GORM 基础用法、N+1 问题与何时用原生 SQL。' },
+        { title: 'B+ 树索引与最左前缀', href: '/mysql/index-design', description: '索引结构、回表原理、最左前缀与索引失效场景。' },
+        { title: '大事务拆分', href: '/mysql/large-transaction-splitting', description: '大事务来源、拆分原则与正反例代码。' },
+        { title: '死锁检测与回滚重试', href: '/mysql/deadlock-and-retry', description: '死锁排查、根因治理与幂等回滚重试。' },
+        { title: '热点账户更新', href: '/mysql/hot-account-update', description: '从乐观锁到子账户拆分的分层治理方案。' },
+        { title: '分库分表与迁移', href: '/mysql/sharding-and-migration', description: '拆分策略、数据迁移流程与核心原则。' },
+        { title: '高频追问', href: '/mysql/high-frequency-questions', description: 'SELECT *、深分页、锁持有时间等落地细节。' },
+      ],
+      order: [
+        'database/sql 与连接池',
+        '事务处理与 SQL 优化',
+        'ORM 使用经验（GORM）',
+        'B+ 树索引与最左前缀',
+        '大事务拆分',
+        '死锁检测与回滚重试',
+        '热点账户更新',
+        '分库分表与迁移',
+        '高频追问',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'MySQL 基础',
+        items: [
+          { text: '专题总览', link: '/mysql/' },
+          { text: 'database/sql 与连接池', link: '/mysql/database-sql-and-connection' },
+          { text: '事务处理与 SQL 优化', link: '/mysql/transaction-and-optimization' },
+          { text: 'ORM 使用经验（GORM）', link: '/mysql/orm-gorm' },
+        ],
+      },
+      {
+        text: '高并发场景',
+        items: [
+          { text: 'B+ 树索引与最左前缀', link: '/mysql/index-design' },
+          { text: '大事务拆分', link: '/mysql/large-transaction-splitting' },
+          { text: '死锁检测与回滚重试', link: '/mysql/deadlock-and-retry' },
+          { text: '热点账户更新', link: '/mysql/hot-account-update' },
+          { text: '分库分表与迁移', link: '/mysql/sharding-and-migration' },
+          { text: '高频追问', link: '/mysql/high-frequency-questions' },
         ],
       },
     ],
@@ -619,9 +686,11 @@ export const homeTracks = sections
           ? '围绕系统设计、高并发与分布式治理，构建能复用到真实业务的判断框架与清单。'
           : section.key === 'golang'
             ? '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。'
-            : section.key === 'go-source-reading'
-              ? '把 runtime、标准库和工程周边源码拆成独立阅读模块，适合按主题持续深挖实现细节。'
-            : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
+            : section.key === 'mysql'
+              ? '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。'
+              : section.key === 'go-source-reading'
+                ? '把 runtime、标准库和工程周边源码拆成独立阅读模块，适合按主题持续深挖实现细节。'
+                : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
     href: section.base,
   }))
 
