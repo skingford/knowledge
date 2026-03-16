@@ -296,6 +296,7 @@ export const sections: SectionConfig[] = [
         '高可用与稳定性治理',
         '架构方法论与技术规划',
         '案例实战',
+        'MySQL 深入学习',
       ],
       docs: [
         { title: '架构师学习路线', href: '/architecture/architect-learning-roadmap', description: '适合作为主入口，先看清楚各阶段该补什么。' },
@@ -305,6 +306,7 @@ export const sections: SectionConfig[] = [
         { title: '分布式事务方案对比', href: '/architecture/distributed-transaction-comparison', description: '快速对比常见事务方案的边界与取舍。' },
         { title: 'PostgreSQL 高可用集群整理', href: '/architecture/postgresql-ha-cluster', description: 'PG 高可用方案选型、Patroni 部署、WAL 流复制与故障恢复速查。' },
         { title: '架构案例实战', href: '/architecture/case-studies/', description: '收录偏业务落地的组织设计、PostgreSQL 高可用、支付系统与出海架构案例。' },
+        { title: 'MySQL 实战 45 讲', href: '/architecture/mysql45/', description: '极客时间《MySQL 实战 45 讲》学习笔记，按主题分类整理。' },
         { title: '待补主题清单', href: '/architecture/todo-topics', description: '查看后续计划补充的专题。' },
       ],
       order: [
@@ -343,6 +345,21 @@ export const sections: SectionConfig[] = [
           { text: '高并发支付系统：Redis 篇', link: '/architecture/case-studies/high-concurrency-payment-redis' },
           { text: '高并发支付系统：Kafka 篇', link: '/architecture/case-studies/high-concurrency-payment-kafka' },
           { text: '运动 APP 出海架构与管理完全指南', link: '/architecture/case-studies/global-fitness-app-architecture-and-management-guide' },
+        ],
+      },
+      {
+        text: 'MySQL 实战 45 讲',
+        collapsed: true,
+        items: [
+          { text: '专题概览', link: '/architecture/mysql45/' },
+          { text: '基础架构与日志', link: '/architecture/mysql45/basics' },
+          { text: '索引原理与优化', link: '/architecture/mysql45/index-chapter' },
+          { text: '锁与事务', link: '/architecture/mysql45/lock-transaction' },
+          { text: '数据页与 IO', link: '/architecture/mysql45/flush-io' },
+          { text: 'SQL 查询优化', link: '/architecture/mysql45/query-optimization' },
+          { text: '高可用与主从复制', link: '/architecture/mysql45/high-availability' },
+          { text: '运维与故障处理', link: '/architecture/mysql45/operation-maintenance' },
+          { text: '引擎与进阶', link: '/architecture/mysql45/engine-advanced' },
         ],
       },
     ],

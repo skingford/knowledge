@@ -31,6 +31,7 @@ description: 聚焦支付系统里的 MySQL 高频考点，覆盖索引、事务
 
 ## 对应资料导航
 
+- [MySQL 实战 45 讲：专题概览](/architecture/mysql45/) — 系统学习 MySQL 原理与实战
 - [database/sql：连接池与事务](/golang/guide/source-reading/database-sql)
 - [database/sql：高级事务与批量插入](/golang/guide/source-reading/database-sql-advanced)
 
