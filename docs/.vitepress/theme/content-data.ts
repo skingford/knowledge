@@ -303,7 +303,7 @@ export const sections: SectionConfig[] = [
         { title: '架构能力自检准备清单', href: '/architecture/architect-interview-prep-checklist', description: '用判断项梳理系统设计和架构治理能力。' },
         { title: '高并发系统设计清单', href: '/architecture/high-concurrency-system-checklist', description: '把常见高并发设计问题拆成一组可检查项。' },
         { title: '分布式事务方案对比', href: '/architecture/distributed-transaction-comparison', description: '快速对比常见事务方案的边界与取舍。' },
-        { title: 'PostgreSQL 高可用集群整理', href: '/architecture/postgresql-ha-cluster', description: 'PG 高可用方案选型、Patroni 部署、WAL 流复制与故障恢复速查。' },
+        { title: 'PostgreSQL 高可用集群整理', href: '/postgresql/ha-cluster', description: 'PG 高可用方案选型、Patroni 部署、WAL 流复制与故障恢复速查。' },
         { title: '架构案例实战', href: '/architecture/case-studies/', description: '收录偏业务落地的组织设计、PostgreSQL 高可用、支付系统与出海架构案例。' },
         { title: '待补主题清单', href: '/architecture/todo-topics', description: '查看后续计划补充的专题。' },
       ],
@@ -327,7 +327,7 @@ export const sections: SectionConfig[] = [
           { text: '架构能力自检准备清单', link: '/architecture/architect-interview-prep-checklist' },
           { text: '高并发系统设计清单', link: '/architecture/high-concurrency-system-checklist' },
           { text: '分布式事务方案对比', link: '/architecture/distributed-transaction-comparison' },
-          { text: 'PostgreSQL 高可用集群整理', link: '/architecture/postgresql-ha-cluster' },
+          { text: 'PostgreSQL 高可用集群整理', link: '/postgresql/ha-cluster' },
           { text: '待补主题清单', link: '/architecture/todo-topics' },
         ],
       },
@@ -336,12 +336,12 @@ export const sections: SectionConfig[] = [
         items: [
           { text: '案例概览', link: '/architecture/case-studies/' },
           { text: '组织架构与业务系统设计方案', link: '/architecture/case-studies/organization-structure-and-business-system-design' },
-          { text: 'PostgreSQL 高可用集群整理', link: '/architecture/postgresql-ha-cluster' },
+          { text: 'PostgreSQL 高可用集群整理', link: '/postgresql/ha-cluster' },
           { text: '高并发支付系统专题整理', link: '/architecture/case-studies/high-concurrency-payment-system-practice-notes' },
           { text: '高并发支付系统：MySQL 篇', link: '/mysql/' },
-          { text: '高并发支付系统：PostgreSQL 篇', link: '/architecture/case-studies/high-concurrency-payment-postgresql' },
+          { text: '高并发支付系统：PostgreSQL 篇', link: '/postgresql/' },
           { text: '高并发支付系统：Redis 篇', link: '/architecture/case-studies/high-concurrency-payment-redis' },
-          { text: '高并发支付系统：Kafka 篇', link: '/architecture/case-studies/high-concurrency-payment-kafka' },
+          { text: '高并发支付系统：Kafka 篇', link: '/kafka/' },
           { text: '运动 APP 出海架构与管理完全指南', link: '/architecture/case-studies/global-fitness-app-architecture-and-management-guide' },
         ],
       },
@@ -539,6 +539,94 @@ export const sections: SectionConfig[] = [
     ],
   },
   {
+    key: 'kafka',
+    base: '/kafka/',
+    navText: 'Kafka',
+    overviewDescription:
+      '系统整理 Kafka 核心知识，涵盖 Producer/Consumer/Broker、分区与副本、消息可靠性、顺序性、积压治理与支付实战。',
+    landing: {
+      eyebrow: 'Kafka',
+      title: 'Kafka 专题',
+      intro:
+        '把散落在支付系统案例中的 Kafka 相关内容统一收敛，涵盖核心概念、支付实战和高频深入追问。',
+      primary: { title: '专题总览', href: '/kafka/', description: '从总览页开始，按主题查阅。' },
+      secondary: { title: '核心概念', href: '/kafka/core-concepts', description: '从 Producer/Broker/Consumer 开始。' },
+      scope: [
+        'Producer/Consumer/Broker',
+        'Topic/Partition/Offset',
+        'Consumer Group 与 Rebalance',
+        '高可用与副本机制',
+        '支付场景消息可靠性',
+        '顺序性、积压治理与死信',
+      ],
+      docs: [
+        { title: '核心概念', href: '/kafka/core-concepts', description: 'Producer/Consumer/Broker、Topic/Partition、Consumer Group、高可用机制与性能原理。' },
+        { title: '支付实战', href: '/kafka/payment-practice', description: 'TCC+Kafka、本地消息表、Offset 补偿、全链路闭环、延迟队列与生产治理。' },
+        { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '消息不丢失、顺序性、积压处理、重试与死信、幂等与事务、英语术语速查。' },
+      ],
+      order: [
+        '核心概念',
+        '支付实战',
+        '深入追问与词汇',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'Kafka 专题',
+        items: [
+          { text: '专题总览', link: '/kafka/' },
+          { text: '核心概念', link: '/kafka/core-concepts' },
+          { text: '支付实战', link: '/kafka/payment-practice' },
+          { text: '深入追问与词汇', link: '/kafka/interview-questions' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'postgresql',
+    base: '/postgresql/',
+    navText: 'PostgreSQL',
+    overviewDescription:
+      '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、锁与事务、批量写入、分区表、高可用集群部署与故障恢复。',
+    landing: {
+      eyebrow: 'PostgreSQL',
+      title: 'PostgreSQL 专题',
+      intro:
+        '把散落在支付系统案例和架构文档中的 PostgreSQL 相关内容统一收敛，方便按主题查阅和持续更新。',
+      primary: { title: '专题总览', href: '/postgresql/', description: '从总览页开始，按主题查阅。' },
+      secondary: { title: '高可用集群', href: '/postgresql/ha-cluster', description: '从 Patroni + etcd + HAProxy 开始。' },
+      scope: [
+        'MVCC 与可见性',
+        '索引与查询计划',
+        '锁与事务',
+        '批量写入与分区表',
+        '高可用集群部署',
+        'WAL 流复制与故障恢复',
+      ],
+      docs: [
+        { title: '核心概念与高频考点', href: '/postgresql/core-concepts', description: 'MVCC、索引类型、锁与事务、批量写入、分区表、高可用与复制。' },
+        { title: '支付场景追问', href: '/postgresql/payment-practice', description: '长事务问题、流水表分区、CopyFrom 使用时机、复制延迟监控。' },
+        { title: '高可用集群整理', href: '/postgresql/ha-cluster', description: 'Patroni + etcd + HAProxy 部署、WAL 流复制、同步策略、故障恢复。' },
+      ],
+      order: [
+        '核心概念与高频考点',
+        '支付场景追问',
+        '高可用集群整理',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'PostgreSQL 专题',
+        items: [
+          { text: '专题总览', link: '/postgresql/' },
+          { text: '核心概念与高频考点', link: '/postgresql/core-concepts' },
+          { text: '支付场景追问', link: '/postgresql/payment-practice' },
+          { text: '高可用集群整理', link: '/postgresql/ha-cluster' },
+        ],
+      },
+    ],
+  },
+  {
     key: 'go-source-reading',
     base: '/golang/guide/source-reading/',
     navText: 'Go 源码阅读',
@@ -688,7 +776,11 @@ export const homeTracks = sections
             ? '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。'
             : section.key === 'mysql'
               ? '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。'
-              : section.key === 'go-source-reading'
+              : section.key === 'kafka'
+                ? '系统整理 Kafka 核心知识，涵盖消息可靠性、顺序性、积压治理与支付场景实战。'
+                : section.key === 'postgresql'
+                  ? '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。'
+                  : section.key === 'go-source-reading'
                 ? '把 runtime、标准库和工程周边源码拆成独立阅读模块，适合按主题持续深挖实现细节。'
                 : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
     href: section.base,
