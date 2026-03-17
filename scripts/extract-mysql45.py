@@ -290,20 +290,108 @@ description: "极客时间《MySQL 实战 45 讲》—— {group_title}章节笔
     return frontmatter + content
 
 
+# File slug for each lecture (used in individual mode)
+FILE_SLUGS = {
+    "00": "00-preface",
+    "01": "01-sql-query-execution",
+    "02": "02-sql-update-log-system",
+    "03": "03-transaction-isolation",
+    "04": "04-index-part1",
+    "05": "05-index-part2",
+    "06": "06-global-table-lock",
+    "07": "07-row-lock",
+    "08": "08-transaction-isolation-detail",
+    "09": "09-normal-vs-unique-index",
+    "10": "10-wrong-index-selection",
+    "11": "11-string-index",
+    "12": "12-mysql-flush",
+    "13": "13-table-space-reclaim",
+    "14": "14-count-slow",
+    "15": "15-qa-log-and-index",
+    "16": "16-order-by",
+    "17": "17-random-message",
+    "18": "18-sql-same-logic-diff-perf",
+    "19": "19-single-row-query-slow",
+    "20": "20-phantom-read",
+    "21": "21-single-row-update-many-locks",
+    "22": "22-emergency-perf-boost",
+    "23": "23-data-durability",
+    "24": "24-master-slave-consistency",
+    "25": "25-high-availability",
+    "26": "26-slave-delay",
+    "27": "27-master-failure",
+    "28": "28-read-write-split-pitfalls",
+    "29": "29-database-health-check",
+    "30": "30-qa-dynamic-locking",
+    "31": "31-data-recovery",
+    "32": "32-unkillable-query",
+    "33": "33-large-query-memory",
+    "34": "34-join-usage",
+    "35": "35-join-optimization",
+    "36": "36-temp-table-rename",
+    "37": "37-internal-temp-table",
+    "38": "38-innodb-vs-memory-engine",
+    "39": "39-auto-increment-gaps",
+    "40": "40-insert-locks",
+    "41": "41-fastest-table-copy",
+    "42": "42-grant-flush-privileges",
+    "43": "43-partition-table",
+    "44": "44-qa-good-questions",
+    "45": "45-auto-increment-overflow",
+    "46": "46-conclusion",
+}
+
+
+def build_individual_file(lecture_num):
+    """Build an individual Markdown file for a single lecture."""
+    title = CLEAN_TITLES.get(lecture_num, f"Lecture {lecture_num}")
+    md = process_single(lecture_num)
+    if not md:
+        return None
+
+    prefix = f"{lecture_num}. " if lecture_num not in ("00", "46") else ""
+    full_title = f"{prefix}{title}"
+
+    frontmatter = f"""---
+title: "MySQL 实战 45 讲：{full_title}"
+description: "极客时间《MySQL 实战 45 讲》第 {lecture_num} 讲笔记整理"
+---
+
+# {full_title}
+
+> 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
+
+"""
+    return frontmatter + md
+
+
 def main():
-    mode = sys.argv[1] if len(sys.argv) > 1 else "build"
+    mode = sys.argv[1] if len(sys.argv) > 1 else "split"
+    out_dir = sys.argv[2] if len(sys.argv) > 2 else "/Users/kingford/workspace/github.com/knowledge/docs/mysql"
 
     if mode == "test":
-        # Test extraction on first 3 lectures
         print("=== Testing extraction on lectures 01, 02, 03 ===\n")
         for num in ["01", "02", "03"]:
             process_single(num, dry_run=True)
         return
 
+    if mode == "split":
+        os.makedirs(out_dir, exist_ok=True)
+        for num, slug in sorted(FILE_SLUGS.items()):
+            title = CLEAN_TITLES.get(num, f"Lecture {num}")
+            print(f"  [{num}] {title} -> {slug}.md ...")
+            content = build_individual_file(num)
+            if content:
+                outpath = os.path.join(out_dir, f"{slug}.md")
+                with open(outpath, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print(f"       OK ({len(content)} chars)")
+            else:
+                print(f"       SKIPPED")
+        print(f"\nDone! {len(FILE_SLUGS)} files written to: {out_dir}")
+
     if mode == "build":
         os.makedirs(OUT_DIR, exist_ok=True)
-
-        # Build each thematic group
         for group_slug, group_title, lecture_nums in GROUPS:
             print(f"Building {group_slug}: {group_title} ({len(lecture_nums)} lectures)...")
             content = build_group_file(group_slug, group_title, lecture_nums)
@@ -314,7 +402,6 @@ def main():
                 print(f"  -> {outpath} ({len(content)} chars)")
             else:
                 print(f"  -> SKIPPED (no content)")
-
         print("\nDone! All files written to:", OUT_DIR)
 
 
