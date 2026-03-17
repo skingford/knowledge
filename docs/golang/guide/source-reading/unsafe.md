@@ -241,6 +241,10 @@ type Good struct {
 }
 
 // 技巧：按字段大小从大到小排列，减少 padding
+
+// 实际项目：使用 go vet 或 fieldalignment 工具自动检测
+// go install golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment@latest
+// fieldalignment ./...
 ```
 
 ### sync/atomic 操作自定义结构体字段
@@ -259,6 +263,39 @@ func (s *Stats) Inc() {
 
 ---
 
+## 七、cgo 内存交互
+
+```go
+/*
+#include <stdlib.h>
+#include <string.h>
+
+char* createString(int n) {
+    return (char*)malloc(n);
+}
+*/
+import "C"
+import "unsafe"
+
+func cgoExample() {
+    // C 分配内存 → Go 使用 → C 释放
+    cStr := C.createString(256)
+    defer C.free(unsafe.Pointer(cStr))
+
+    // Go string → C string（有内存分配）
+    goStr := "hello from Go"
+    cGoStr := C.CString(goStr)
+    defer C.free(unsafe.Pointer(cGoStr))
+
+    // C 内存视为 Go byte slice（零拷贝读取）
+    // ⚠️ 不可让 GC 管理 C 内存
+    goSlice := unsafe.Slice((*byte)(unsafe.Pointer(cStr)), 256)
+    _ = goSlice
+}
+```
+
+---
+
 ## 核心要点
 
 | 问题 | 要点 |
@@ -269,3 +306,7 @@ func (s *Stats) Inc() {
 | 如何安全地做指针算术？ | 用 unsafe.Add，在单一表达式中完成，不把 uintptr 存入变量 |
 | struct 如何减少内存占用？ | 字段按大小降序排列，减少 padding；或用 -gcflags=-S 查看汇编 |
 | Go 1.17/1.20 引入了什么 unsafe 函数？ | 1.17: Add/Slice；1.20: SliceData/String/StringData |
+| 为什么 `uintptr` 不能长期持有地址？ | `uintptr` 是整数，GC 不知道它指向堆对象；GC 移动对象（未来计划）或对象被回收后，`uintptr` 成为悬空指针 |
+| `unsafe.Pointer` 的 6 条合法规则中最重要的是？ | 规则 3：`uintptr` → `unsafe.Pointer` 必须在**同一个表达式**中完成，不可将 `uintptr` 存入变量后再转换 |
+| `unsafe.Sizeof` 和 `reflect.Type.Size()` 的区别？ | 结果相同，但 `unsafe.Sizeof` 在编译期计算（零开销）；`reflect.Type.Size()` 是运行时方法（有反射开销） |
+| 什么时候应该使用 `unsafe`？ | 极少数高性能场景（零拷贝转换、特定底层操作）；CGO 交互；实现类似 `sync/atomic` 的基础库；业务代码应完全避免 |

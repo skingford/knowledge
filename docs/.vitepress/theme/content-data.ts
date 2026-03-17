@@ -34,14 +34,6 @@ export const quickNavLink = { text: '快速导航', link: '/nav' }
 
 const golangSourceReadingSidebar: SidebarGroup[] = [
   {
-    text: '源码阅读入口',
-    items: [
-      { text: '模块总览', link: '/golang/guide/source-reading/' },
-      { text: 'Go 主方向入口', link: '/golang/' },
-      { text: '源码与 Runtime 大纲', link: '/golang/guide/09-runtime-source' },
-    ],
-  },
-  {
     text: '先读这几篇',
     items: [
       { text: 'runtime：GMP 调度器', link: '/golang/guide/source-reading/runtime-scheduler' },
@@ -91,11 +83,9 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
       { text: 'math/bits：位操作', link: '/golang/guide/source-reading/math-bits' },
       { text: 'time：时间处理', link: '/golang/guide/source-reading/time-pkg' },
       { text: 'unsafe：内存操作', link: '/golang/guide/source-reading/unsafe' },
-      { text: 'unsafe：底层指针操作', link: '/golang/guide/source-reading/unsafe-pkg' },
       { text: 'reflect：反射原理', link: '/golang/guide/source-reading/reflect' },
       { text: 'iter（Go 1.23+）：迭代器协议', link: '/golang/guide/source-reading/iter-pkg' },
       { text: 'unique（Go 1.23+）：字符串驻留', link: '/golang/guide/source-reading/unique-pkg' },
-      { text: 'maps/cmp/slices：泛型工具', link: '/golang/guide/source-reading/maps-cmp' },
       { text: 'slices/maps/cmp：泛型标准库', link: '/golang/guide/source-reading/slices-maps-cmp' },
     ],
   },
@@ -130,6 +120,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
       { text: 'net/netip：现代 IP 地址', link: '/golang/guide/source-reading/net-netip' },
       { text: 'net/rpc：远程过程调用', link: '/golang/guide/source-reading/net-rpc' },
       { text: 'net/smtp：邮件发送', link: '/golang/guide/source-reading/net-smtp' },
+      { text: 'mime/multipart：表单上传', link: '/golang/guide/source-reading/mime-multipart' },
       { text: '自定义 TCP 协议服务器', link: '/golang/guide/source-reading/net-tcp-server' },
       { text: 'WebSocket 服务器实现', link: '/golang/guide/source-reading/websocket' },
       { text: 'gRPC-Go：微服务通信', link: '/golang/guide/source-reading/grpc-go' },
@@ -179,6 +170,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
       { text: 'crypto/ecdsa：椭圆曲线签名', link: '/golang/guide/source-reading/crypto-ecdsa' },
       { text: 'crypto/ed25519：EdDSA 签名', link: '/golang/guide/source-reading/crypto-ed25519' },
       { text: '密码散列：bcrypt/Argon2id/scrypt', link: '/golang/guide/source-reading/crypto-password' },
+      { text: 'hash/crc32：校验和', link: '/golang/guide/source-reading/hash-crc32' },
     ],
   },
   {
@@ -186,11 +178,12 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     collapsed: true,
     items: [
       { text: 'log/slog：结构化日志', link: '/golang/guide/source-reading/log-slog' },
-      { text: 'log/slog：深度解析', link: '/golang/guide/source-reading/log-slog-deep' },
+      { text: 'zap：高性能日志库', link: '/golang/guide/source-reading/zap' },
       { text: 'log：标准日志库', link: '/golang/guide/source-reading/log-pkg' },
       { text: 'testing：测试框架', link: '/golang/guide/source-reading/testing' },
       { text: 'testing 高级模式', link: '/golang/guide/source-reading/testing-advanced' },
       { text: 'testing/fstest：虚拟文件系统测试', link: '/golang/guide/source-reading/testing-fstest' },
+      { text: 'testing/fuzzing：模糊测试', link: '/golang/guide/source-reading/go-fuzzing' },
       { text: 'go:generate 代码生成工具链', link: '/golang/guide/source-reading/go-generate' },
       { text: 'go/format：代码格式化', link: '/golang/guide/source-reading/go-format' },
       { text: 'go/ast + go/parser：AST 解析', link: '/golang/guide/source-reading/go-ast' },
@@ -361,7 +354,7 @@ export const sections: SectionConfig[] = [
         '从语言机制、并发与性能，到服务端工程实践和能力自检，把 Go 进阶学习从零散资料整理成一条连续路径。',
       primary: { title: '高级资料', href: '/golang/golang-advanced-learning-guide', description: '先走主线。' },
       secondary: { title: '高频题', href: '/golang/go-top-30-interview-questions', description: '再做自检。' },
-      scope: ['Go 语言底层', '并发模型', '性能优化与排障', '服务端工程实践', '能力自检准备', '设计模式与安全', '容器化与云原生', '代码生成与元编程'],
+      scope: ['Go 语言底层', '并发模型', '性能优化与排障', '服务端工程实践', '能力自检准备', '设计模式与安全', '容器化与云原生', '代码生成与元编程', '标准库源码精读', 'runtime 源码分析'],
       docs: [
         { title: '高级 Golang 学习资料', href: '/golang/golang-advanced-learning-guide', description: '主入口文档，覆盖语言、并发、性能和工程实践。' },
         { title: '30+ 高频 Golang 能力自检题', href: '/golang/go-top-30-interview-questions', description: '用问题驱动回顾知识盲区和底层理解。' },
@@ -373,7 +366,7 @@ export const sections: SectionConfig[] = [
       ],
       order: [
         '高级 Golang 学习资料',
-        'Go 推荐书单、博客与视频资料',
+        'Go 推荐书单与资料',
         '30+ 高频 Golang 能力自检题',
         'Golang 高频题代码片段',
         'Pprof 排障指南',
@@ -470,6 +463,7 @@ export const sections: SectionConfig[] = [
           { text: 'MQ、事务、治理与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
         ],
       },
+      ...golangSourceReadingSidebar,
     ],
   },
   {
@@ -706,46 +700,6 @@ export const sections: SectionConfig[] = [
     ],
   },
   {
-    key: 'go-source-reading',
-    base: '/golang/guide/source-reading/',
-    navText: 'Go 源码阅读',
-    overviewDescription:
-      '独立整理 Go 标准库、runtime 与工程周边源码精读，适合按专题深入阅读而不是在 Golang 主菜单里翻长列表。',
-    landing: {
-      eyebrow: 'Go Source Reading',
-      title: 'Go 源码阅读模块',
-      intro:
-        '把 runtime、标准库、网络栈、数据编码、安全与工程工具链拆成独立模块，方便按专题深挖 Go 的实现细节。',
-      primary: { title: '总览入口', href: '/golang/guide/source-reading/', description: '先看全景图与精读索引。' },
-      secondary: { title: 'Runtime 主线', href: '/golang/guide/source-reading/runtime-scheduler', description: '先走调度、GC、内存分配三件套。' },
-      scope: [
-        'runtime 与调度',
-        '并发原语',
-        'I/O 与网络栈',
-        '数据结构与编码',
-        '安全与密码学',
-        '工程实践与工具链',
-      ],
-      docs: [
-        { title: 'Go 源码精读总览', href: '/golang/guide/source-reading/', description: '从包全景图进入，再按主题选择。' },
-        { title: 'runtime：GMP 调度器', href: '/golang/guide/source-reading/runtime-scheduler', description: '理解 G、M、P 关系和调度主线。' },
-        { title: 'runtime：GC 垃圾回收', href: '/golang/guide/source-reading/runtime-gc', description: '建立三色标记、写屏障和调优视角。' },
-        { title: 'runtime：内存分配', href: '/golang/guide/source-reading/runtime-memory', description: '厘清 mcache、mcentral、mheap 分层。' },
-        { title: 'channel：底层实现', href: '/golang/guide/source-reading/channel', description: '看懂发送、接收、阻塞与唤醒。' },
-        { title: 'net/http：HTTP 实现', href: '/golang/guide/source-reading/net-http', description: '把服务端和客户端主路径串起来。' },
-      ],
-      order: [
-        'Go 源码精读总览',
-        'runtime：GMP 调度器',
-        'runtime：GC 垃圾回收',
-        'runtime：内存分配',
-        'channel：底层实现',
-        'net/http：HTTP 实现',
-      ],
-    },
-    sidebar: golangSourceReadingSidebar,
-  },
-  {
     key: 'ops',
     base: '/ops/',
     navText: '运维',
@@ -859,9 +813,7 @@ export const homeTracks = sections
                 ? '系统整理 Kafka 核心知识，涵盖消息可靠性、顺序性、积压治理与支付场景实战。'
                 : section.key === 'postgresql'
                   ? '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。'
-                  : section.key === 'go-source-reading'
-                ? '把 runtime、标准库和工程周边源码拆成独立阅读模块，适合按主题持续深挖实现细节。'
-                : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
+                  : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
     href: section.base,
   }))
 

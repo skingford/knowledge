@@ -220,62 +220,179 @@ func main() {
 }
 ```
 
-### per-request Logger（With 模式）
+### 配置 JSON Handler（生产推荐）
 
 ```go
-func handleRequest(w http.ResponseWriter, r *http.Request) {
-    // 每个请求创建带固定字段的子 logger，不影响全局 logger
-    log := slog.Default().With(
-        "requestID", r.Header.Get("X-Request-ID"),
-        "method",    r.Method,
-        "path",      r.URL.Path,
+func setupProductionLogger() *slog.Logger {
+    handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+        Level:     slog.LevelInfo, // 生产环境不记录 Debug
+        AddSource: true,           // 添加文件:行号
+        ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+            // 自定义属性格式
+            if a.Key == slog.TimeKey {
+                // 统一时间格式为 Unix 时间戳（便于日志系统索引）
+                return slog.Int64("ts", a.Value.Time().Unix())
+            }
+            if a.Key == slog.LevelKey {
+                // 统一 level 为小写
+                return slog.String("level", strings.ToLower(a.Value.String()))
+            }
+            return a
+        },
+    })
+
+    return slog.New(handler)
+}
+
+// 输出格式：
+// {"ts":1704067200,"level":"info","source":{"function":"main.xxx","file":"main.go","line":42},"msg":"server started","port":8080}
+```
+
+### WithAttrs 预绑定属性（per-request Logger）
+
+```go
+// WithAttrs 返回新 Logger，预格式化属性（避免重复序列化）
+func contextualLogging(baseLogger *slog.Logger) {
+    // 为每个请求创建携带请求 ID 的 logger
+    requestLogger := baseLogger.With(
+        "request_id", "req-abc123",
+        "user_id", 42,
     )
 
-    log.Info("request received")
+    requestLogger.Info("processing request")
+    requestLogger.Info("db query", "table", "users", "rows", 5)
+    // 每条日志都自动包含 request_id 和 user_id
+}
 
-    result, err := processRequest(r)
-    if err != nil {
-        log.Error("processing failed", "error", err)
-        return
+// HTTP 中间件：将 logger 注入 context
+func loggingMiddleware(logger *slog.Logger, next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        reqLogger := logger.With(
+            "method", r.Method,
+            "path", r.URL.Path,
+            "request_id", r.Header.Get("X-Request-ID"),
+        )
+
+        // 将 logger 注入 context，供下游使用
+        ctx := context.WithValue(r.Context(), loggerKey{}, reqLogger)
+        next.ServeHTTP(w, r.WithContext(ctx))
+    })
+}
+
+// 从 context 取出 logger
+func LoggerFromCtx(ctx context.Context) *slog.Logger {
+    if l, ok := ctx.Value(loggerKey{}).(*slog.Logger); ok {
+        return l
     }
-
-    log.Info("request completed", "status", 200, "items", len(result))
+    return slog.Default()
 }
 ```
 
-### 自定义 Handler（对接 OpenTelemetry）
+### WithGroup 属性分组
 
 ```go
-// 将日志写入 OTEL trace span
-type OTELHandler struct {
-    attrs []slog.Attr
+// WithGroup 将后续属性放入命名组
+func groupedAttributes() {
+    logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+    // 分组：将数据库相关属性放入 "db" 组
+    dbLogger := logger.WithGroup("db")
+    dbLogger.Info("query executed",
+        "host", "postgres:5432",
+        "table", "users",
+        "duration_ms", 12,
+    )
+    // 输出：{"msg":"query executed","db":{"host":"postgres:5432","table":"users","duration_ms":12}}
+
+    // 嵌套分组
+    httpLogger := logger.WithGroup("http").WithGroup("request")
+    httpLogger.Info("incoming", "method", "GET", "path", "/api/v1")
+    // 输出：{"msg":"incoming","http":{"request":{"method":"GET","path":"/api/v1"}}}
+}
+```
+
+### 自定义 Handler（多目标 + 动态 Level）
+
+```go
+// 多目标 Handler：同时输出到控制台（Text）和文件（JSON）
+type MultiHandler struct {
+    handlers []slog.Handler
 }
 
-func (h *OTELHandler) Enabled(_ context.Context, _ slog.Level) bool {
-    return true
-}
-
-func (h *OTELHandler) Handle(ctx context.Context, r slog.Record) error {
-    span := trace.SpanFromContext(ctx)
-    if !span.IsRecording() {
-        return nil
+func (h *MultiHandler) Enabled(ctx context.Context, level slog.Level) bool {
+    for _, handler := range h.handlers {
+        if handler.Enabled(ctx, level) {
+            return true
+        }
     }
-
-    attrs := make([]attribute.KeyValue, 0, r.NumAttrs())
-    r.Attrs(func(a slog.Attr) bool {
-        attrs = append(attrs, attribute.String(a.Key, a.Value.String()))
-        return true
-    })
-    span.AddEvent(r.Message, trace.WithAttributes(attrs...))
-    return nil
+    return false
 }
 
-func (h *OTELHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-    return &OTELHandler{attrs: append(h.attrs, attrs...)}
+func (h *MultiHandler) Handle(ctx context.Context, r slog.Record) error {
+    var errs []error
+    for _, handler := range h.handlers {
+        if handler.Enabled(ctx, r.Level) {
+            if err := handler.Handle(ctx, r.Clone()); err != nil {
+                errs = append(errs, err)
+            }
+        }
+    }
+    return errors.Join(errs...)
 }
 
-func (h *OTELHandler) WithGroup(name string) slog.Handler {
-    return h // 简化实现
+func (h *MultiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+    handlers := make([]slog.Handler, len(h.handlers))
+    for i, handler := range h.handlers {
+        handlers[i] = handler.WithAttrs(attrs)
+    }
+    return &MultiHandler{handlers: handlers}
+}
+
+func (h *MultiHandler) WithGroup(name string) slog.Handler {
+    handlers := make([]slog.Handler, len(h.handlers))
+    for i, handler := range h.handlers {
+        handlers[i] = handler.WithGroup(name)
+    }
+    return &MultiHandler{handlers: handlers}
+}
+
+// 动态 Level 调整（无需重启）
+type DynamicLevelHandler struct {
+    level   atomic.Int64 // slog.Level 的底层类型是 int
+    handler slog.Handler
+}
+
+func (h *DynamicLevelHandler) SetLevel(level slog.Level) {
+    h.level.Store(int64(level))
+}
+
+func (h *DynamicLevelHandler) Enabled(_ context.Context, level slog.Level) bool {
+    return level >= slog.Level(h.level.Load())
+}
+```
+
+### 与 OpenTelemetry 集成
+
+```go
+// 将 slog 日志关联到 OTel trace span
+type OTelHandler struct {
+    base slog.Handler
+}
+
+func (h *OTelHandler) Handle(ctx context.Context, r slog.Record) error {
+    span := trace.SpanFromContext(ctx)
+    if span.IsRecording() {
+        // 将日志事件附加到 span
+        attrs := make([]attribute.KeyValue, 0, r.NumAttrs())
+        r.Attrs(func(a slog.Attr) bool {
+            attrs = append(attrs, attribute.String(a.Key, a.Value.String()))
+            return true
+        })
+        span.AddEvent(r.Message, trace.WithAttributes(attrs...))
+        // 注入 trace_id 到日志
+        r.AddAttrs(slog.String("trace_id", span.SpanContext().TraceID().String()))
+    }
+    return h.base.Handle(ctx, r)
 }
 ```
 
@@ -332,3 +449,7 @@ if logger.Enabled(ctx, slog.LevelDebug) {
 | With 为什么每次返回新 Logger？ | Handler 不可变设计，并发安全；不同 goroutine 可持有不同字段集 |
 | 如何做到动态调整日志级别？ | slog.LevelVar 实现 Leveler 接口，Enabled() 每次调用时读取原子值 |
 | 为什么用 LogAttrs 而不是 Info？ | LogAttrs 接受 []Attr，无需 key-value 配对解析，零额外分配 |
+| slog 为什么先调用 `Enabled` 再构建 Record？ | 避免在 Level 未达到阈值时做无用的参数求值和内存分配（零成本过滤）|
+| `slog.Attr` 和直接传 key-value 对的性能差异？ | `slog.Int/String` 等类型化 Attr 避免反射；直接传 `"key", value` 需反射判断类型，稍慢但更简洁 |
+| TextHandler 和 JSONHandler 在 Buffer 上的优化？ | 两者都用 `sync.Pool` 复用 `[]byte` buffer，避免每条日志分配；Handler 内部持有 Mutex 保护写入 |
+| 如何实现动态调整日志级别？ | 用 `atomic.Int64` 存储 Level 值，实现自定义 Handler 的 Enabled 方法；通过 HTTP 端点修改 atomic 值 |

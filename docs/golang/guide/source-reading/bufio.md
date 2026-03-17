@@ -1,6 +1,6 @@
 ---
 title: bufio 包源码精读
-description: 精读 bufio.Reader/Writer/Scanner 的缓冲策略与 SplitFunc 机制，理解行扫描与高性能 I/O 的底层实现。
+description: 精读 bufio.Reader/Writer/Scanner 的缓冲策略与 SplitFunc 机制，涵盖 ReadLine vs ReadString 选择、Peek 高级用法、ReadWriter 双向缓冲与高性能 I/O 最佳实践。
 ---
 
 # bufio：缓冲 I/O 源码精读
@@ -256,26 +256,139 @@ func parseCSVLine(line string) []string {
 // "Alice, 30, alice@example.com" → ["Alice", "30", "alice@example.com"]
 ```
 
+### 自定义 SplitFunc：按固定字节边界分割
+
+```go
+// 场景：网络协议，每个消息以 4 字节长度头开头
+func scanLengthPrefixed(data []byte, atEOF bool) (advance int, token []byte, err error) {
+    if len(data) < 4 {
+        return 0, nil, nil // 等待长度头
+    }
+
+    // 读取消息长度
+    msgLen := int(data[0])<<24 | int(data[1])<<16 | int(data[2])<<8 | int(data[3])
+    if len(data) < 4+msgLen {
+        return 0, nil, nil // 等待完整消息体
+    }
+
+    return 4 + msgLen, data[4 : 4+msgLen], nil
+}
+
+// 解析长度前缀协议
+func readMessages(conn net.Conn) {
+    // ⚠️ 大消息需要扩大 Buffer
+    scanner := bufio.NewScanner(conn)
+    scanner.Buffer(make([]byte, 1<<20), 1<<20) // 最大 1MB
+    scanner.Split(scanLengthPrefixed)
+
+    for scanner.Scan() {
+        msg := scanner.Bytes()
+        processMessage(msg)
+    }
+}
+```
+
+### ReadLine vs ReadString：正确选择
+
+```go
+// ReadLine：零拷贝，但需处理超长行（isPrefix=true 时行未读完）
+func readLargeLines(r io.Reader) {
+    br := bufio.NewReaderSize(r, 64*1024) // 64KB 缓冲
+
+    for {
+        var line []byte
+        var isPrefix bool
+        var err error
+
+        // 循环读取直到完整行
+        for {
+            var segment []byte
+            segment, isPrefix, err = br.ReadLine()
+            line = append(line, segment...) // ⚠️ 有内存拷贝
+            if !isPrefix || err != nil {
+                break
+            }
+        }
+
+        if len(line) > 0 {
+            process(line)
+        }
+        if err != nil {
+            break
+        }
+    }
+}
+
+// ReadString：简洁，自动处理超长行，有内存分配（推荐日常使用）
+func readLines(r io.Reader) {
+    br := bufio.NewReader(r)
+
+    for {
+        line, err := br.ReadString('\n')
+        if len(line) > 0 {
+            line = strings.TrimRight(line, "\n\r")
+            process([]byte(line))
+        }
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
+}
+
+// Scanner：最简洁，适合大多数场景（注意默认 64KB token 限制）
+func scanLines(r io.Reader) {
+    scanner := bufio.NewScanner(r)
+    // 大文件需要扩大 buffer
+    scanner.Buffer(make([]byte, 512*1024), 512*1024)
+
+    for scanner.Scan() {
+        process([]byte(scanner.Text()))
+    }
+}
+```
+
 ### 高效写入日志（Writer + Flush）
 
 ```go
-func writeLog(w io.Writer, entries []LogEntry) error {
-    bw := bufio.NewWriterSize(w, 64*1024) // 64KB 写缓冲
-    defer bw.Flush() // 确保最终刷新
+// 场景：批量写入日志文件（减少系统调用）
+type BufferedLogger struct {
+    w   *bufio.Writer
+    mu  sync.Mutex
+}
 
-    for _, e := range entries {
-        fmt.Fprintf(bw, "%s\t%s\t%s\n",
-            e.Time.Format(time.RFC3339),
-            e.Level,
-            e.Message,
-        )
-        if bw.Buffered() >= 60*1024 { // 接近满时主动 Flush
-            if err := bw.Flush(); err != nil {
-                return err
-            }
-        }
+func NewBufferedLogger(f *os.File) *BufferedLogger {
+    return &BufferedLogger{
+        w: bufio.NewWriterSize(f, 256*1024), // 256KB 缓冲
     }
-    return nil
+}
+
+func (l *BufferedLogger) Log(msg string) {
+    l.mu.Lock()
+    defer l.mu.Unlock()
+    l.w.WriteString(time.Now().Format("2006-01-02 15:04:05"))
+    l.w.WriteByte(' ')
+    l.w.WriteString(msg)
+    l.w.WriteByte('\n')
+}
+
+// ⚠️ 必须定期 Flush，否则数据停在缓冲区
+func (l *BufferedLogger) Flush() error {
+    l.mu.Lock()
+    defer l.mu.Unlock()
+    return l.w.Flush()
+}
+
+// 定时刷盘（生产中常用）
+func (l *BufferedLogger) StartAutoFlush(interval time.Duration) {
+    go func() {
+        ticker := time.NewTicker(interval)
+        for range ticker.C {
+            l.Flush()
+        }
+    }()
 }
 ```
 
@@ -295,23 +408,56 @@ func detectFormat(r io.Reader) string {
     }
     return "msgpack"
 }
+
+// 场景：自动检测文件编码（BOM 检测）
+func detectBOM(r io.Reader) (io.Reader, string) {
+    br := bufio.NewReader(r)
+    bom, _ := br.Peek(3)
+
+    switch {
+    case len(bom) >= 3 && bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF:
+        br.Discard(3) // 消耗 BOM
+        return br, "UTF-8"
+    case len(bom) >= 2 && bom[0] == 0xFF && bom[1] == 0xFE:
+        br.Discard(2)
+        return br, "UTF-16LE"
+    default:
+        return br, "UTF-8" // 假设 UTF-8
+    }
+}
 ```
 
-### ReadString vs Scanner 对比
+### ReadWriter：双向缓冲（网络协议实现）
 
 ```go
-// ❌ ReadString：每行分配新字符串（大文件内存压力大）
-br := bufio.NewReader(f)
-for {
-    line, err := br.ReadString('\n') // 每次分配 string
-    if err == io.EOF { break }
-    process(strings.TrimRight(line, "\n"))
+// 场景：实现简单文本协议客户端（如 Redis RESP 协议）
+type ProtocolConn struct {
+    rw *bufio.ReadWriter
 }
 
-// ✅ Scanner：内部复用 buf（大文件首选）
-scanner := bufio.NewScanner(f)
-for scanner.Scan() {
-    process(scanner.Text()) // Text() 分配新 string，但 Bytes() 可零拷贝
+func NewProtocolConn(conn net.Conn) *ProtocolConn {
+    return &ProtocolConn{
+        rw: bufio.NewReadWriter(
+            bufio.NewReaderSize(conn, 32*1024),  // 32KB 读缓冲
+            bufio.NewWriterSize(conn, 32*1024),  // 32KB 写缓冲
+        ),
+    }
+}
+
+func (c *ProtocolConn) SendCommand(cmd string, args ...string) error {
+    // 写入命令（缓冲）
+    fmt.Fprintf(c.rw, "*%d\r\n", 1+len(args))
+    fmt.Fprintf(c.rw, "$%d\r\n%s\r\n", len(cmd), cmd)
+    for _, arg := range args {
+        fmt.Fprintf(c.rw, "$%d\r\n%s\r\n", len(arg), arg)
+    }
+    // ⚠️ 必须 Flush 才会发送
+    return c.rw.Flush()
+}
+
+func (c *ProtocolConn) ReadLine() (string, error) {
+    line, err := c.rw.ReadString('\n')
+    return strings.TrimRight(line, "\r\n"), err
 }
 ```
 
@@ -327,3 +473,6 @@ for scanner.Scan() {
 | Scanner.Bytes() 和 Text() 的区别？ | Bytes() 返回引用底层 buf 的切片（下次 Scan 失效）；Text() 返回独立 string（分配新内存） |
 | SplitFunc 返回 advance=0, token=nil 是什么意思？ | 需要更多数据，Scanner 会扩展缓冲后重新调用 SplitFunc |
 | bufio.Writer 适合哪些场景？ | 频繁小写操作（如逐字节/逐行写日志）；减少系统调用次数 |
+| `Scanner.Scan()` 和 `Reader.ReadString()` 的区别？ | Scanner 自动处理缓冲扩容，接口简洁，但有 token 大小上限；ReadString 返回完整行（含分段拼接），内存分配更可控 |
+| `ReadLine` 返回 `isPrefix=true` 时如何处理？ | 表示行超过缓冲区，需循环调用 ReadLine 并拼接 segment，直到 `isPrefix=false` |
+| `Peek(n)` 与 `ReadByte` + `UnreadByte` 的区别？ | Peek 可预读多字节且不消耗；UnreadByte 只能回退 1 字节；二者都不分配额外内存 |

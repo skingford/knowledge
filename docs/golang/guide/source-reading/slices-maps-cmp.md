@@ -239,6 +239,64 @@ func cmpExamples() {
 }
 ```
 
+### cmp.Or 惯用法（替代三元运算符）
+
+```go
+import "cmp"
+
+// cmp.Or：返回第一个非零值（Go 1.22+）
+
+// 配置回退链
+host := cmp.Or(os.Getenv("DB_HOST"), "localhost")
+port := cmp.Or(os.Getenv("DB_PORT"), "5432")
+
+// 多级回退
+timeout := cmp.Or(
+    cfg.Timeout,           // 用户配置
+    envTimeout,            // 环境变量
+    30*time.Second,        // 默认值
+)
+
+// 替代冗长的 if 链：
+// 旧写法：
+name := userInput
+if name == "" { name = defaultName }
+
+// 新写法：
+name = cmp.Or(userInput, defaultName)
+```
+
+### 实际场景：Map 转换与过滤
+
+```go
+// 按条件过滤 map（maps 包暂无 Filter，需手动）
+func filterMap[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V {
+    result := make(map[K]V)
+    for k, v := range m {
+        if fn(k, v) {
+            result[k] = v
+        }
+    }
+    return result
+}
+
+// 实际使用
+scores := map[string]int{
+    "Alice": 92, "Bob": 75, "Charlie": 88, "Dave": 61,
+}
+passed := filterMap(scores, func(_ string, score int) bool {
+    return score >= 80
+})
+// passed = {"Alice":92,"Charlie":88}
+
+// 获取排好序的 key
+sortedKeys := maps.Keys(passed)
+slices.Sort(sortedKeys)
+for _, k := range sortedKeys {
+    fmt.Printf("%s: %d\n", k, passed[k])
+}
+```
+
 ### 实际场景：去重并排序
 
 ```go
@@ -284,3 +342,5 @@ func intersection[T cmp.Ordered](a, b []T) []T {
 | `maps.Keys` 的返回顺序？ | 不确定（Go map 迭代顺序随机化）；需要确定顺序时用 `slices.Sort(slices.Collect(maps.Keys(m)))` |
 | `cmp.Ordered` 约束包含哪些类型？ | 所有整数类型（int/uint/...）、浮点（float32/64）、string；不包含 bool 和复数 |
 | `slices.Delete` 的内存行为？ | 返回的切片与原切片共享底层数组；删除后末尾可能有"脏数据"（零值）；用 `slices.Clip` 收缩容量避免内存泄漏 |
+| `cmp.Or` 和 `\|\|` 的区别？ | `\|\|` 是布尔逻辑；cmp.Or 对任意 comparable 类型返回第一个非零值，类似其他语言的 ?? 运算符 |
+| 这些包在 Go 1.21 之前能用吗？ | 不能；Go 1.21 引入。旧版本需用 golang.org/x/exp/maps 和 golang.org/x/exp/slices |

@@ -1,6 +1,6 @@
 ---
 title: math/rand 源码精读
-description: 精读 Go math/rand/v2（Go 1.22+）的 ChaCha8/PCG 生成器实现，理解伪随机数生成与并发安全设计。
+description: 精读 Go math/rand v1 与 v2（Go 1.22+）的 ChaCha8/PCG 生成器实现，理解伪随机数生成、并发安全设计与 v1→v2 迁移。
 ---
 
 # math/rand：随机数源码精读
@@ -180,6 +180,34 @@ items := []string{"apple", "banana", "cherry"}
 pick := items[rand.N(len(items))]
 ```
 
+### Shuffle：无偏洗牌（Fisher-Yates）
+
+```go
+// 洗牌（v2 比 v1 的 Shuffle 更简洁）
+func shuffle(s []string) []string {
+    result := make([]string, len(s))
+    copy(result, s)
+    rand.Shuffle(len(result), func(i, j int) {
+        result[i], result[j] = result[j], result[i]
+    })
+    return result
+}
+
+// 随机抽取 k 个（reservoir sampling 简化版）
+func sample[T any](items []T, k int) []T {
+    if k >= len(items) {
+        return items
+    }
+    // 复制并洗牌，取前 k 个
+    cp := make([]T, len(items))
+    copy(cp, items)
+    rand.Shuffle(len(cp), func(i, j int) {
+        cp[i], cp[j] = cp[j], cp[i]
+    })
+    return cp[:k]
+}
+```
+
 ### 可重现的随机序列（固定种子）
 
 ```go
@@ -237,6 +265,99 @@ func weightedChoice(items []string, weights []float64) string {
 // items=["A","B","C"], weights=[1,2,7] → A:10%, B:20%, C:70%
 ```
 
+### 指数退避抖动（防雷群效应）
+
+```go
+// 带抖动的指数退避（Cloud Spanner/Envoy 标准模式）
+func exponentialBackoffWithJitter(attempt int, base, max time.Duration) time.Duration {
+    // 指数部分：base * 2^attempt
+    exp := base * (1 << attempt)
+    if exp > max {
+        exp = max
+    }
+
+    // 全抖动：[0, exp)（full jitter 策略）
+    return rand.N(exp)
+
+    // 等抖动：[exp/2, exp)（equal jitter，均值更稳定）
+    // half := exp / 2
+    // return half + rand.N(exp-half)
+}
+
+// 重试循环
+func retryWithBackoff(fn func() error, maxRetries int) error {
+    for i := 0; i < maxRetries; i++ {
+        if err := fn(); err == nil {
+            return nil
+        }
+        wait := exponentialBackoffWithJitter(i, 100*time.Millisecond, 30*time.Second)
+        time.Sleep(wait)
+    }
+    return errors.New("max retries exceeded")
+}
+```
+
+### 测试辅助：随机测试数据生成
+
+```go
+// 随机字符串（测试数据生成）
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func randString(n int) string {
+    b := make([]byte, n)
+    for i := range b {
+        b[i] = charset[rand.N(len(charset))]
+    }
+    return string(b)
+}
+
+// 随机 Email
+func randEmail() string {
+    return randString(8) + "@" + randString(5) + ".com"
+}
+
+// 表格驱动测试 + 随机输入（fuzz 前置）
+func TestSomeFunc(t *testing.T) {
+    // 固定种子保证测试可复现
+    r := rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), 0))
+
+    for i := 0; i < 1000; i++ {
+        input := r.N(10000)
+        result := someFunc(input)
+        if !isValid(result) {
+            t.Errorf("someFunc(%d) = %v, invalid", input, result)
+        }
+    }
+}
+```
+
+### v1 → v2 迁移指南
+
+```go
+// v1（旧写法）：
+import "math/rand"
+rand.Seed(time.Now().UnixNano()) // ⚠️ 多 goroutine 全局 Seed 有竞争
+n := rand.Intn(100)
+
+// v2（新写法）：
+import "math/rand/v2"
+n := rand.N(100) // 无需 Seed，自动从 OS 熵源初始化
+
+// v1 本地实例（测试中可复现）：
+r1 := rand.New(rand.NewSource(42))
+n1 := r1.Intn(100)
+
+// v2 本地实例（测试中可复现）：
+r2 := rand.New(rand.NewPCG(42, 0))
+n2 := r2.N(100)
+
+// 注意：v2 移除了 Read([]byte)，需用 crypto/rand
+// ⚠️ 安全随机字节应始终用 crypto/rand.Read，不是 math/rand
+import "crypto/rand"
+token := make([]byte, 32)
+crypto_rand.Read(token)
+```
+
 ### 正态分布
 
 ```go
@@ -290,3 +411,8 @@ func simulationRandom(n int) int {
 | 全局 rand.N 并发安全吗？ | 安全（内部带锁）；高并发时有锁竞争，可用 sync.Pool 缓存 *rand.Rand |
 | v1 的 rand.Seed 有什么问题？ | 全局状态修改影响所有使用全局 rand 的代码；v2 废弃了 Seed |
 | Go 1.20 前全局 rand 的默认种子是什么？ | 1（固定！），即 rand.Intn 每次运行结果相同；1.20 起默认随机种子 |
+| v2 为什么去掉了 `Read([]byte)`？ | math/rand 的 Read 让用户误以为可用于密码学场景；v2 强迫用户区分：非安全场景用 Shuffle/N，安全场景用 crypto/rand.Read |
+| `rand.N(n)` 比 `rand.Intn(n)` 好在哪里？ | N 是泛型，支持所有整数/浮点类型；内部用无偏拒绝采样避免取模偏差（旧 Intn 用 `Uint64()%n` 在 n 不是 2 的幂时有轻微偏差）|
+| v2 全局函数为什么不需要 Seed？ | 全局 `globalRand` 是 ChaCha8 实例，在 `init()` 时从 `runtime_rand()` 读取 OS 熵源种子，每次运行都不同且线程安全 |
+| 如何在测试中得到可复现的随机序列？ | 使用 `rand.New(rand.NewPCG(seed1, seed2))` 创建本地实例，固定 seed 则序列固定；生产代码用包级 rand，测试代码传入 `*rand.Rand` 参数 |
+| 指数退避为什么要加随机抖动？ | 雷群效应（Thundering Herd）：多个客户端同时重试会在同一时刻打垮服务；全抖动 `[0, cap)` 使重试均匀分散，降低峰值流量 |

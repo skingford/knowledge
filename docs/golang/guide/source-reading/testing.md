@@ -1,6 +1,6 @@
 ---
 title: testing 包源码精读
-description: 精读 Go testing 包的 T/B/F 结构体实现，理解表驱动测试、Benchmark、Fuzz 的底层机制与最佳实践。
+description: 精读 Go testing 包的 T/B/F 结构体实现，理解表驱动测试、Benchmark、Fuzz 的底层机制、高级模式与最佳实践。
 ---
 
 # testing：测试框架源码精读
@@ -266,30 +266,193 @@ func setupTestDB(t *testing.T) *TestDB {
 }
 ```
 
-### Benchmark：基准测试规范写法
+### Golden File 测试（文本生成类测试）
 
 ```go
-func BenchmarkMarshal(b *testing.B) {
-    data := generateTestData()
+import (
+    "flag"
+    "os"
+    "path/filepath"
+    "testing"
+)
 
-    b.ReportAllocs()       // 报告内存分配
-    b.SetBytes(int64(len(data))) // 设置每次操作的数据量（影响 MB/s 计算）
-    b.ResetTimer()         // 重置计时（排除 setup 时间）
+// 命令行 flag：go test -update 更新 golden 文件
+var update = flag.Bool("update", false, "update golden files")
 
-    for i := 0; i < b.N; i++ {
-        _, err := json.Marshal(data)
+// goldenTest 对比函数输出与 golden 文件
+func goldenTest(t *testing.T, name string, got []byte) {
+    t.Helper()
+
+    golden := filepath.Join("testdata", name+".golden")
+
+    if *update {
+        // 更新模式：覆写 golden 文件
+        os.MkdirAll(filepath.Dir(golden), 0755)
+        if err := os.WriteFile(golden, got, 0644); err != nil {
+            t.Fatalf("update golden: %v", err)
+        }
+        t.Logf("Updated golden file: %s", golden)
+        return
+    }
+
+    expected, err := os.ReadFile(golden)
+    if os.IsNotExist(err) {
+        t.Fatalf("golden file not found: %s (run with -update to create)", golden)
+    }
+    if err != nil {
+        t.Fatalf("read golden: %v", err)
+    }
+
+    if !bytes.Equal(got, expected) {
+        t.Errorf("output mismatch for %s:\ngot:\n%s\nwant:\n%s",
+            name, got, expected)
+    }
+}
+
+// 实际使用：测试代码生成器/模板渲染/JSON 序列化
+func TestGenerateUserStruct(t *testing.T) {
+    got, err := generateUserStruct("User", map[string]string{
+        "Name":  "string",
+        "Email": "string",
+        "Age":   "int",
+    })
+    if err != nil {
+        t.Fatal(err)
+    }
+    goldenTest(t, "user_struct", got)
+}
+
+// 第一次运行：go test -run TestGenerateUserStruct -update
+// 后续运行：go test -run TestGenerateUserStruct（自动对比）
+```
+
+### 并行子测试（Table-Driven + Parallel + HTTP）
+
+```go
+func TestHTTPHandler(t *testing.T) {
+    tests := []struct {
+        name       string
+        method     string
+        path       string
+        wantStatus int
+        wantBody   string
+    }{
+        {"get users", "GET", "/api/users", 200, `[`},
+        {"create user", "POST", "/api/users", 201, `"id"`},
+        {"not found", "GET", "/api/missing", 404, `"error"`},
+        {"method not allowed", "PUT", "/api/users", 405, ``},
+    }
+
+    // 设置共享资源（所有子测试共用）
+    srv := httptest.NewServer(setupRouter())
+    t.Cleanup(srv.Close)
+
+    for _, tc := range tests {
+        tc := tc // ⚠️ Go 1.22 之前必须捕获循环变量
+
+        t.Run(tc.name, func(t *testing.T) {
+            t.Parallel() // 所有子测试并发执行
+
+            req, _ := http.NewRequest(tc.method, srv.URL+tc.path, nil)
+            resp, err := http.DefaultClient.Do(req)
+            if err != nil {
+                t.Fatalf("request: %v", err)
+            }
+            defer resp.Body.Close()
+
+            if resp.StatusCode != tc.wantStatus {
+                t.Errorf("status: got %d, want %d", resp.StatusCode, tc.wantStatus)
+            }
+
+            if tc.wantBody != "" {
+                body, _ := io.ReadAll(resp.Body)
+                if !strings.Contains(string(body), tc.wantBody) {
+                    t.Errorf("body %q does not contain %q", body, tc.wantBody)
+                }
+            }
+        })
+    }
+}
+```
+
+### Benchmark 进阶技巧
+
+```go
+// 基础 Benchmark
+func BenchmarkJSONMarshal(b *testing.B) {
+    user := User{ID: 1, Name: "Alice", Email: "alice@example.com"}
+
+    b.ReportAllocs() // 报告内存分配
+    b.ResetTimer()   // 排除 setup 时间
+
+    for b.Loop() {   // Go 1.24+ 推荐（自动处理 N）
+        _, err := json.Marshal(user)
         if err != nil {
             b.Fatal(err)
         }
     }
 }
 
-// 并行 Benchmark（模拟并发场景）
-func BenchmarkConcurrent(b *testing.B) {
-    cache := NewCache()
+// 对比多种实现（子 Benchmark）
+func BenchmarkStringConcat(b *testing.B) {
+    strs := []string{"hello", " ", "world", "!"}
+
+    b.Run("+运算符", func(b *testing.B) {
+        b.ReportAllocs()
+        for b.Loop() {
+            var result string
+            for _, s := range strs {
+                result += s
+            }
+            _ = result
+        }
+    })
+
+    b.Run("strings.Builder", func(b *testing.B) {
+        b.ReportAllocs()
+        for b.Loop() {
+            var sb strings.Builder
+            for _, s := range strs {
+                sb.WriteString(s)
+            }
+            _ = sb.String()
+        }
+    })
+
+    b.Run("strings.Join", func(b *testing.B) {
+        b.ReportAllocs()
+        for b.Loop() {
+            _ = strings.Join(strs, "")
+        }
+    })
+}
+
+// 吞吐量 Benchmark（SetBytes）
+func BenchmarkHashSHA256(b *testing.B) {
+    data := make([]byte, 4096)
+    rand.Read(data)
+
+    b.SetBytes(int64(len(data))) // 设置每次操作字节数
+    b.ReportAllocs()
+    b.ResetTimer()
+
+    for b.Loop() {
+        sha256.Sum256(data)
+    }
+    // 输出会显示 MB/s 吞吐量
+}
+
+// 并发压测（发现竞态）
+func BenchmarkConcurrentMap(b *testing.B) {
+    m := sync.Map{}
+
     b.RunParallel(func(pb *testing.PB) {
-        for pb.Next() { // pb.Next() 等价于 i < b.N，但线程安全
-            cache.Get("key")
+        i := 0
+        for pb.Next() {
+            key := fmt.Sprintf("key-%d", i%100)
+            m.Store(key, i)
+            m.Load(key)
+            i++
         }
     })
 }
@@ -323,19 +486,143 @@ func FuzzJSON(f *testing.F) {
 }
 ```
 
-### TestMain：全局 setup/teardown
+### TestMain：全局 Setup/Teardown
 
 ```go
-func TestMain(m *testing.M) {
-    // 全局 setup
-    db := setupGlobalDB()
+// 文件：main_test.go
+package integration_test
 
-    // 运行所有测试
+import (
+    "context"
+    "database/sql"
+    "os"
+    "testing"
+)
+
+var (
+    testDB     *sql.DB
+    testServer *httptest.Server
+)
+
+func TestMain(m *testing.M) {
+    // ─── 全局 Setup ───
+    ctx := context.Background()
+
+    // 启动测试数据库（testcontainers-go）
+    pgContainer, err := postgres.RunContainer(ctx,
+        testcontainers.WithImage("postgres:16"),
+        postgres.WithDatabase("testdb"),
+        postgres.WithUsername("test"),
+        postgres.WithPassword("test"),
+    )
+    if err != nil {
+        log.Fatalf("start postgres: %v", err)
+    }
+    defer pgContainer.Terminate(ctx)
+
+    connStr, _ := pgContainer.ConnectionString(ctx, "sslmode=disable")
+    testDB, err = sql.Open("pgx", connStr)
+    if err != nil {
+        log.Fatalf("open db: %v", err)
+    }
+
+    // 运行数据库迁移
+    if err := runMigrations(testDB); err != nil {
+        log.Fatalf("migration: %v", err)
+    }
+
+    // 启动测试 HTTP 服务器
+    testServer = httptest.NewServer(setupRouter(testDB))
+
+    // ─── 运行所有测试 ───
     code := m.Run()
 
-    // 全局 teardown（即使测试失败也执行）
-    db.Close()
-    os.Exit(code) // 必须调用，否则程序不退出
+    // ─── 全局 Teardown ───
+    testServer.Close()
+    testDB.Close()
+
+    os.Exit(code)
+}
+```
+
+### t.Setenv 与 t.TempDir
+
+```go
+func TestReadConfig(t *testing.T) {
+    // t.Setenv：临时修改环境变量，测试结束后自动还原
+    t.Setenv("APP_ENV", "test")
+    t.Setenv("LOG_LEVEL", "debug")
+    t.Setenv("DB_URL", "postgres://localhost/testdb")
+
+    // t.TempDir：创建临时目录，测试结束后自动删除（含内容）
+    tmpDir := t.TempDir()
+    configFile := filepath.Join(tmpDir, "config.yaml")
+    os.WriteFile(configFile, []byte(`
+env: test
+log_level: debug
+`), 0644)
+
+    cfg, err := ReadConfig(configFile)
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    if cfg.Env != "test" {
+        t.Errorf("Env: got %s, want test", cfg.Env)
+    }
+}
+
+// 测试文件写入功能
+func TestExportReport(t *testing.T) {
+    tmpDir := t.TempDir()
+    outFile := filepath.Join(tmpDir, "report.csv")
+
+    err := ExportReport(outFile, sampleData())
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    content, err := os.ReadFile(outFile)
+    if err != nil {
+        t.Fatal(err)
+    }
+    if !strings.Contains(string(content), "alice@example.com") {
+        t.Error("report missing user data")
+    }
+}
+```
+
+### 自定义 assert 辅助库
+
+```go
+// 轻量断言辅助，无需引入第三方库
+func assertEqual[T comparable](t *testing.T, got, want T) {
+    t.Helper()
+    if got != want {
+        t.Errorf("got %v, want %v", got, want)
+    }
+}
+
+func assertNoError(t *testing.T, err error) {
+    t.Helper()
+    if err != nil {
+        t.Fatalf("unexpected error: %v", err)
+    }
+}
+
+func assertContains(t *testing.T, s, substr string) {
+    t.Helper()
+    if !strings.Contains(s, substr) {
+        t.Errorf("%q does not contain %q", s, substr)
+    }
+}
+
+// 使用（错误行号精确指向调用处）
+func TestParseName(t *testing.T) {
+    first, last, err := parseName("Alice Smith")
+    assertNoError(t, err)
+    assertEqual(t, first, "Alice")
+    assertEqual(t, last, "Smith")
 }
 ```
 
@@ -371,3 +658,6 @@ go tool pprof mem.out
 | t.Helper() 有什么作用？ | 标记辅助函数，使 t.Errorf 报告的行号指向调用者而非辅助函数内部 |
 | Fuzz 测试在 CI 中如何运行？ | CI 通常只跑种子语料库（go test）；长时间 Fuzz 单独运行或用 -fuzztime 限制时长 |
 | testing.Cleanup 和 defer 的区别？ | Cleanup 回调在测试结束后执行（含子测试收集完成后），defer 在函数返回时执行；Cleanup 对子测试更友好 |
+| 并行子测试中为什么要 `tc := tc`？ | Go 1.22 之前循环变量 `tc` 在所有迭代中共享同一地址；`t.Parallel()` 会让测试在循环结束后再执行，此时 `tc` 已是最后一个值；Go 1.22+ 编译器自动处理，不再需要 |
+| Golden File 测试适合什么场景？ | 代码生成器、模板渲染、CLI 命令输出、协议序列化——任何有复杂预期输出且手写不方便的场景；`-update` flag 初始化和更新期望值 |
+| `TestMain` 和普通 `TestXxx` 的执行顺序？ | `TestMain` 先执行（调用 `m.Run()` 才真正跑测试）；适合全局资源（数据库容器、HTTP 服务器）的初始化，比 `init()` 更可控 |
