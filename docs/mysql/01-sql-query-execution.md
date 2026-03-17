@@ -21,35 +21,65 @@ mysql> select * from T where ID=10;
 
 下面我给出的是 MySQL 的基本架构示意图，从中你可以清楚地看到 SQL 语句在 MySQL 的各个功能模块中的执行过程。
 
-```mermaid
-flowchart TD
-    Client["客户端"]
-
-    subgraph Server["Server 层"]
-        Connector["连接器<br/>管理连接，权限验证"]
-        Cache["查询缓存<br/>命中则直接返回结果"]
-        Analyzer["分析器<br/>词法分析，语法分析"]
-        Optimizer["优化器<br/>执行计划生成，索引选择"]
-        Executor["执行器<br/>操作引擎，返回结果"]
-    end
-
-    subgraph StorageLayer["存储引擎层"]
-        direction LR
-        InnoDB["存储引擎<br/>(InnoDB)"]
-        MyISAM["存储引擎<br/>(MyISAM)"]
-        Memory["存储引擎<br/>(Memory)"]
-    end
-
-    Client -->|"连接"| Connector
-    Connector --> Cache
-    Cache -->|"未命中"| Analyzer
-    Cache -->|"命中则<br/>直接返回"| Client
-    Analyzer --> Optimizer
-    Optimizer --> Executor
-    Executor -->|"存储数据，提供读写接口"| StorageLayer
-```
-
-> MySQL 逻辑架构图：自上而下分为 Server 层（连接器 → 查询缓存 → 分析器 → 优化器 → 执行器）和存储引擎层（InnoDB / MyISAM / Memory 等插件式引擎）。
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:#333;max-width:460px;width:100%;">
+  <!-- 客户端 -->
+  <div style="text-align:center;padding:10px 20px;background:#e3f2fd;border:2px solid #1565c0;border-radius:8px;color:#0d47a1;font-weight:bold;">客户端</div>
+  <div style="text-align:center;font-size:20px;color:#666;">↓</div>
+  <!-- Server 层 -->
+  <div style="border:2px solid #78909c;border-radius:10px;padding:16px;background:#fafafa;">
+    <div style="text-align:center;color:#546e7a;font-weight:bold;margin-bottom:12px;font-size:15px;">Server 层</div>
+    <!-- 连接器 -->
+    <div style="text-align:center;padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+      <div style="font-weight:bold;">连接器</div>
+      <div style="font-size:12px;color:#666;">管理连接，权限验证</div>
+    </div>
+    <div style="text-align:center;font-size:18px;color:#666;">↓</div>
+    <!-- 分析器 -->
+    <div style="text-align:center;padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+      <div style="font-weight:bold;">分析器</div>
+      <div style="font-size:12px;color:#666;">词法分析，语法分析</div>
+    </div>
+    <div style="text-align:center;font-size:18px;color:#666;">↓</div>
+    <!-- 查询缓存（可选旁路） -->
+    <div style="display:flex;gap:12px;align-items:stretch;margin-bottom:4px;">
+      <!-- 左侧：查询缓存旁路 -->
+      <div style="flex:1;border:1px dashed #bdbdbd;border-radius:8px;padding:8px;background:#fafafa;text-align:center;">
+        <div style="font-size:11px;color:#999;margin-bottom:6px;">查询缓存（可选）</div>
+        <div style="padding:6px;background:#f5f5f5;border:1px solid #bdbdbd;border-radius:5px;margin-bottom:6px;">
+          <div style="font-weight:bold;font-size:13px;color:#666;">查询缓存</div>
+          <div style="font-size:11px;color:#999;">MySQL 8.0 已移除</div>
+        </div>
+        <div style="font-size:11px;color:#888;">↓ 命中</div>
+        <div style="padding:6px;background:#fff3cd;border:1px solid #ffc107;border-radius:5px;color:#856404;font-weight:bold;font-size:12px;margin-top:4px;">直接返回结果</div>
+      </div>
+      <!-- 右侧：主流程继续 -->
+      <div style="flex:1.6;text-align:center;">
+        <div style="font-size:11px;color:#999;margin-bottom:6px;">未命中 / 未开启缓存</div>
+        <div style="padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+          <div style="font-weight:bold;">优化器</div>
+          <div style="font-size:12px;color:#666;">执行计划生成，索引选择</div>
+        </div>
+        <div style="font-size:18px;color:#666;">↓</div>
+        <div style="padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+          <div style="font-weight:bold;">执行器</div>
+          <div style="font-size:12px;color:#666;">操作引擎，返回结果</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:20px;color:#666;">↓</div>
+  <!-- 存储引擎层 -->
+  <div style="border:2px solid #78909c;border-radius:10px;padding:16px;background:#fafafa;">
+    <div style="text-align:center;color:#546e7a;font-weight:bold;margin-bottom:10px;font-size:15px;">存储引擎层 <span style="font-weight:normal;font-size:12px;color:#888;">— 存储数据，提供读写接口</span></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">InnoDB</div>
+      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">MyISAM</div>
+      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">Memory</div>
+    </div>
+  </div>
+</div>
+</div>
 
 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。
 
