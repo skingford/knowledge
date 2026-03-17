@@ -133,13 +133,15 @@ select * from t force index(a) where a between 10000 and 20000;/*Q2*/
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:600px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">Slow Query Log 输出</div>
-<pre style="margin:0;white-space:pre-wrap;"><span style="color:var(--d-text-muted);"># Query_time: 0.040000  Lock_time: 0.000100  Rows_sent: 10001  Rows_examined: <span style="color:var(--d-orange);font-weight:bold;">100000</span></span>
+<pre style="margin:0;white-space:pre-wrap;">
+<span style="color:var(--d-text-muted);"># Query_time: 0.040000  Lock_time: 0.000100  Rows_sent: 10001  Rows_examined: <span style="color:var(--d-orange);font-weight:bold;">100000</span></span>
 SET timestamp=1551007510;
 select * from t where a between 10000 and 20000;
 
 <span style="color:var(--d-text-muted);"># Query_time: 0.021000  Lock_time: 0.000080  Rows_sent: 10001  Rows_examined: <span style="color:var(--d-green);font-weight:bold;">10001</span></span>
 SET timestamp=1551007510;
-select * from t force index(a) where a between 10000 and 20000;</pre>
+select * from t force index(a) where a between 10000 and 20000;
+</pre>
 </div>
 </div>
 
@@ -243,7 +245,8 @@ rows这个字段表示的是预计扫描行数。
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">执行 analyze table t 后重新 EXPLAIN</div>
-<pre style="margin:0;white-space:pre-wrap;">mysql&gt; analyze table t;
+<pre style="margin:0;white-space:pre-wrap;">
+mysql&gt; analyze table t;
 +------+---------+----------+----------+
 | Table| Op      | Msg_type | Msg_text |
 +------+---------+----------+----------+
@@ -255,7 +258,8 @@ mysql&gt; explain select * from t where a between 10000 and 20000;
 | id | select_type | table | type  | possible_keys | key | key_len | ref  | rows  | Extra                 |
 +----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
 |  1 | SIMPLE      | t     | range | a             | <span style="color:var(--d-green);font-weight:bold;">a</span>   | 5       | NULL | <span style="color:var(--d-green);font-weight:bold;">10001</span> | Using index condition |
-+----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+</pre>
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+</pre>
 </div>
 </div>
 
@@ -392,13 +396,15 @@ mysql> explain select * from t where (a between 1 and 1000) and (b between 50000
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">不同索引的执行耗时对比</div>
-<pre style="margin:0;white-space:pre-wrap;">mysql&gt; select * from t where (a between 1 and 1000)
+<pre style="margin:0;white-space:pre-wrap;">
+mysql&gt; select * from t where (a between 1 and 1000)
        and (b between 50000 and 100000) order by b limit 1;
 Empty set (<span style="color:var(--d-orange);font-weight:bold;">2.23 sec</span>)
 
 mysql&gt; select * from t force index(a) where (a between 1 and 1000)
        and (b between 50000 and 100000) order by b limit 1;
-Empty set (<span style="color:var(--d-green);font-weight:bold;">0.05 sec</span>)</pre>
+Empty set (<span style="color:var(--d-green);font-weight:bold;">0.05 sec</span>)
+</pre>
 <div style="margin-top:10px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);border-radius:0 4px 4px 0;font-size:12px;color:var(--d-text-sub);">
 force index(a) 比优化器自动选择快 <strong>40 多倍</strong>
 </div>

@@ -18,7 +18,7 @@ description: 精读 database/sql 的高级用法，掌握 Savepoint 嵌套事务
 
 如果你还没建立 `database/sql` 的基础心智模型，先看：
 
-- 基础总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/database-sql.md`](./database-sql.md)
+- 基础总览：[database/sql 源码精读](./database-sql.md)
 
 ## 包结构图
 

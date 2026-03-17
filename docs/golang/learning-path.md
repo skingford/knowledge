@@ -21,50 +21,50 @@ search: false
 
 目标：补齐值语义、切片、Map、接口、反射、泛型、逃逸分析和内存模型。
 
-- 语言基础：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/01-language-fundamentals.md`](./guide/01-language-fundamentals.md)
-- Slice 典型坑：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/01-slice-append-pitfalls.md`](./guide/01-slice-append-pitfalls.md)
-- String / `[]byte` 实践：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/01-string-byte-best-practices.md`](./guide/01-string-byte-best-practices.md)
-- 底层原理总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/02-underlying-principles.md`](./guide/02-underlying-principles.md)
-- 逃逸分析：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/02-escape-analysis.md`](./guide/02-escape-analysis.md)
+- 语言基础：[语言基础深化](./guide/01-language-fundamentals.md)
+- Slice 典型坑：[Slice 的坑：append 污染原底层数组与三指切片](./guide/01-slice-append-pitfalls.md)
+- String / `[]byte` 实践：[String 与 \[\]byte：转换、构建与数据流最佳实践](./guide/01-string-byte-best-practices.md)
+- 底层原理总览：[底层原理](./guide/02-underlying-principles.md)
+- 逃逸分析：[逃逸分析、栈与堆：Go 编译器如何决定内存分配](./guide/02-escape-analysis.md)
 
 ### 第二阶段：并发与调度
 
 目标：建立 Goroutine、Channel、Context、Mutex 和调度器的完整心智模型。
 
-- 并发编程总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
-- 高级并发模式：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-advanced-concurrency-patterns.md`](./guide/03-advanced-concurrency-patterns.md)
-- Context 使用边界：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/context-usage-boundaries.md`](./context-usage-boundaries.md)
-- GMP / 调度源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-scheduler.md`](./guide/source-reading/runtime-scheduler.md)
-- Goroutine 生命周期：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/goroutine.md`](./guide/source-reading/goroutine.md)
+- 并发编程总览：[并发编程](./guide/03-concurrency.md)
+- 高级并发模式：[高级并发模式](./guide/03-advanced-concurrency-patterns.md)
+- Context 使用边界：[Context 使用边界](./context-usage-boundaries.md)
+- GMP / 调度源码：[GMP 调度器源码精读](./guide/source-reading/runtime-scheduler.md)
+- Goroutine 生命周期：[Goroutine 生命周期源码精读](./guide/source-reading/goroutine.md)
 
 ### 第三阶段：网络、工程与服务治理
 
 目标：把语言能力落到服务端开发、连接治理、错误处理、测试和交付流程中。
 
-- 网络编程与标准库：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/04-network-stdlib.md`](./guide/04-network-stdlib.md)
-- 工程实践总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/05-engineering-practices.md`](./guide/05-engineering-practices.md)
-- 数据库与缓存：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/06-database-cache.md`](./guide/06-database-cache.md)
-- 微服务与分布式：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/08-microservices-distributed.md`](./guide/08-microservices-distributed.md)
+- 网络编程与标准库：[网络编程与标准库](./guide/04-network-stdlib.md)
+- 工程实践总览：[工程实践](./guide/05-engineering-practices.md)
+- 数据库与缓存：[数据库与缓存](./guide/06-database-cache.md)
+- 微服务与分布式：[微服务与分布式](./guide/08-microservices-distributed.md)
 
 ### 第四阶段：性能、排障与运行时
 
 目标：能从指标异常走到根因定位，并读懂 runtime 关键执行路径。
 
-- 性能优化与排障：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/07-performance-troubleshooting.md`](./guide/07-performance-troubleshooting.md)
-- Pprof 排障指南：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/pprof-troubleshooting-guide.md`](./pprof-troubleshooting-guide.md)
-- 源码与 Runtime 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/09-runtime-source.md`](./guide/09-runtime-source.md)
-- `runtime/pprof`：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-pprof.md`](./guide/source-reading/runtime-pprof.md)
-- `runtime/trace`：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-trace.md`](./guide/source-reading/runtime-trace.md)
+- 性能优化与排障：[性能优化与排障](./guide/07-performance-troubleshooting.md)
+- Pprof 排障指南：[Pprof 排障指南](./pprof-troubleshooting-guide.md)
+- 源码与 Runtime 总览：[源码与 Runtime](./guide/09-runtime-source.md)
+- `runtime/pprof`：[runtime/pprof + net/http/pprof 源码精读](./guide/source-reading/runtime-pprof.md)
+- `runtime/trace`：[runtime/trace 源码精读](./guide/source-reading/runtime-trace.md)
 
 ### 第五阶段：进阶专题
 
 目标：补齐设计模式、安全、容器化、代码生成和版本演进。
 
-- 设计模式与惯用法：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/10-design-patterns-idioms.md`](./guide/10-design-patterns-idioms.md)
-- 安全编程实践：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/10-security-practices.md`](./guide/10-security-practices.md)
-- 容器化与云原生：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/10-containerization-cloud-native.md`](./guide/10-containerization-cloud-native.md)
-- 代码生成与元编程：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/10-codegen-metaprogramming.md`](./guide/10-codegen-metaprogramming.md)
-- Go 版本特性：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-version-features.md`](./go-version-features.md)
+- 设计模式与惯用法：[设计模式与惯用法](./guide/10-design-patterns-idioms.md)
+- 安全编程实践：[安全编程实践](./guide/10-security-practices.md)
+- 容器化与云原生：[容器化与云原生实践](./guide/10-containerization-cloud-native.md)
+- 代码生成与元编程：[代码生成与元编程](./guide/10-codegen-metaprogramming.md)
+- Go 版本特性：[Go 版本特性总结（1.21 ~ 1.24）](./go-version-features.md)
 
 ## 按目标选入口
 
@@ -78,10 +78,10 @@ search: false
 
 ## 练习与复盘入口
 
-- 自检导航：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/interview-prep.md`](./interview-prep.md)
-- 高频题总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
-- 题目示例代码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-interview-code-snippets.md`](./go-interview-code-snippets.md)
-- 源码精读总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/index.md`](./guide/source-reading/index.md)
+- 自检导航：[Go 能力自检与面试准备导航](./interview-prep.md)
+- 高频题总览：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
+- 题目示例代码：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+- 源码精读总览：[Go 源码精读总览](./guide/source-reading/index.md)
 
 建议的使用顺序：
 

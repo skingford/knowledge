@@ -5,7 +5,7 @@ description: Golang 高频能力自检题清单，覆盖语言机制、并发、
 
 # 30+ 高频 Golang 能力自检题
 
-这页专注“题目 + 口述模板 + 源码线索”。如果你想把题目和代码示例、专题回查串起来，先看 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/interview-prep.md`](./interview-prep.md)。
+这页专注“题目 + 口述模板 + 源码线索”。如果你想把题目和代码示例、专题回查串起来，先看 [Go 能力自检与面试准备导航](./interview-prep.md)。
 
 ## 适合人群
 

@@ -56,7 +56,8 @@ mysql> select word from words order by rand() limit 3;
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图1 使用 explain 命令查看语句的执行情况</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select word from words order by rand() limit 3;
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select word from words order by rand() limit 3;
 
 +----+-------------+-------+------+---------------+------+
 | id | select_type | table | type | possible_keys | key  |
@@ -66,7 +67,8 @@ mysql> select word from words order by rand() limit 3;
 | rows  | filtered | Extra                                |
 +-------+----------+--------------------------------------+
 | 10000 |   100.00 | <span style="color:var(--d-orange);font-weight:bold;">Using temporary; Using filesort</span>       |
-+-------+----------+--------------------------------------+</pre>
++-------+----------+--------------------------------------+
+</pre>
 </div>
 </div>
 
@@ -284,7 +286,8 @@ SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图5 磁盘临时表的 OPTIMIZER_TRACE 部分结果</div>
-<pre style="margin:0;">"filesort_priority_queue_optimization": {
+<pre style="margin:0;">
+"filesort_priority_queue_optimization": {
   "usable":                      true,
   <span style="color:var(--d-green);font-weight:bold;">"chosen":                      true</span>
 },
@@ -299,7 +302,8 @@ SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
 
 <span style="color:var(--d-text-muted);">-- chosen=true → 使用优先队列排序算法</span>
 <span style="color:var(--d-text-muted);">-- number_of_tmp_files=0 → 无需临时文件</span>
-<span style="color:var(--d-text-muted);">-- sort_mode=&lt;sort_key, rowid&gt; → rowid 排序</span></pre>
+<span style="color:var(--d-text-muted);">-- sort_mode=&lt;sort_key, rowid&gt; → rowid 排序</span>
+</pre>
 </div>
 </div>
 

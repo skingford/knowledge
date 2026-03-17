@@ -11,8 +11,8 @@ description: 精读 net/http Server、Transport、ServeMux 实现，理解 HTTP 
 
 如果你已经明确只关心某个切面，建议直接跳到更聚焦的子页：
 
-- 服务端生命周期、优雅关闭、中间件：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http-server.md`](./net-http-server.md)
-- 客户端连接池、超时级联、Keep-Alive：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http-transport.md`](./net-http-transport.md)
+- 服务端生命周期、优雅关闭、中间件：[net/http 服务端高级模式源码精读](./net-http-server.md)
+- 客户端连接池、超时级联、Keep-Alive：[net/http Transport 深度解析](./net-http-transport.md)
 
 也就是说：
 

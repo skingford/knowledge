@@ -6,13 +6,13 @@ search: false
 
 # Pprof 排障指南
 
-这页不再重复讲 `pprof` 的基础接入和每个 profile 的入门概念，而是作为 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/07-performance-troubleshooting.md`](./guide/07-performance-troubleshooting.md) 的深度补充页，专门解决“拿到一个线上性能问题，怎么系统排”的问题。
+这页不再重复讲 `pprof` 的基础接入和每个 profile 的入门概念，而是作为 [性能优化与排障](./guide/07-performance-troubleshooting.md) 的深度补充页，专门解决“拿到一个线上性能问题，怎么系统排”的问题。
 
 ## 先看主线，再看这页
 
-- 性能主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/07-performance-troubleshooting.md`](./guide/07-performance-troubleshooting.md)
-- `runtime/pprof` 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-pprof.md`](./guide/source-reading/runtime-pprof.md)
-- `runtime/trace` 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-trace.md`](./guide/source-reading/runtime-trace.md)
+- 性能主线：[性能优化与排障](./guide/07-performance-troubleshooting.md)
+- `runtime/pprof` 源码：[runtime/pprof + net/http/pprof 源码精读](./guide/source-reading/runtime-pprof.md)
+- `runtime/trace` 源码：[runtime/trace 源码精读](./guide/source-reading/runtime-trace.md)
 
 如果你还在学“CPU profile 是什么、heap profile 看什么”，先看性能主线；如果你已经会抓 profile，但不知道怎么形成排障闭环，再看这页。
 
@@ -251,7 +251,7 @@ runtime 热点往往是业务模式放大的结果，比如：
 
 ## 延伸阅读
 
-- 性能主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/07-performance-troubleshooting.md`](./guide/07-performance-troubleshooting.md)
-- `runtime/pprof` 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-pprof.md`](./guide/source-reading/runtime-pprof.md)
-- `runtime/trace` 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/runtime-trace.md`](./guide/source-reading/runtime-trace.md)
-- 高频题：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
+- 性能主线：[性能优化与排障](./guide/07-performance-troubleshooting.md)
+- `runtime/pprof` 源码：[runtime/pprof + net/http/pprof 源码精读](./guide/source-reading/runtime-pprof.md)
+- `runtime/trace` 源码：[runtime/trace 源码精读](./guide/source-reading/runtime-trace.md)
+- 高频题：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)

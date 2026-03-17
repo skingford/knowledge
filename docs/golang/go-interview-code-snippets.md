@@ -10,8 +10,8 @@ search: false
 
 它不再重复承担“题目解释”和“系统原理总览”的职责。想先看题目和口述模板，请到：
 
-- 题库：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
-- 自检导航：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/interview-prep.md`](./interview-prep.md)
+- 题库：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
+- 自检导航：[Go 能力自检与面试准备导航](./interview-prep.md)
 
 ## 怎么使用这页
 

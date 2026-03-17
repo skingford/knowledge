@@ -472,7 +472,7 @@ Go 标准库核心包关系图
 | `runtime/debug` | [调试工具](./runtime-debug) | GC 控制 + 栈追踪 + 构建信息 | ★★★☆☆ |
 | `crypto/hmac` | [哈希与消息认证](./crypto-hmac) | SHA256 + HMAC 常数时间比较 | ★★★☆☆ |
 | `net/http/httptest` | [HTTP 测试工具](./net-http-test) | ResponseRecorder + 测试服务器 | ★★☆☆☆ |
-| `maps`/`cmp`/`slices` | [泛型工具包](./maps-cmp) | Go 1.21+ 标准泛型操作 | ★★☆☆☆ |
+| `maps`/`cmp`/`slices` | [泛型工具包](./slices-maps-cmp) | Go 1.21+ 标准泛型操作 | ★★☆☆☆ |
 | `archive/zip` | [ZIP 归档](./archive-zip) | 中央目录 + Zip Slip 防护 | ★★★☆☆ |
 | `encoding/csv` | [CSV 处理](./encoding-csv) | 流式读写 + ReuseRecord + BOM | ★★☆☆☆ |
 | `crypto/rand` | [密码学随机数](./crypto-rand) | CSPRNG + UUID + Token 生成 | ★★☆☆☆ |
@@ -490,7 +490,7 @@ Go 标准库核心包关系图
 | `hash/crc32` | [校验和](./hash-crc32) | slicing-by-8 + SSE4.2 硬件加速 | ★★★☆☆ |
 | `os/user` | [用户信息](./os-user) | CGO/纯 Go 双后端 + NSS 查询 | ★★☆☆☆ |
 | `debug/buildinfo` | [构建信息](./debug-buildinfo) | VCS 信息嵌入 + 二进制审计 | ★★★☆☆ |
-| `log/slog` | [结构化日志（深度）](./log-slog-deep) | Handler 接口 + WithAttrs + 动态 Level | ★★★☆☆ |
+| `log/slog` | [结构化日志（深度）](./log-slog) | Handler 接口 + WithAttrs + 动态 Level | ★★★☆☆ |
 | `mime/multipart` | [文件上传](./mime-multipart) | 流式解析 + 安全验证 + MIME 构建 | ★★★☆☆ |
 | `net/http/cookiejar` | [Cookie 管理](./net-cookiejar) | Public Suffix List + 持久化 + 爬虫 | ★★★☆☆ |
 | `sync.Cond` | [条件变量](./sync-cond) | Wait/Signal/Broadcast + for 循环惯用法 | ★★★☆☆ |
@@ -501,7 +501,7 @@ Go 标准库核心包关系图
 | `io`（高级） | [高级组合模式](./io-advanced) | TeeReader/Pipe/SectionReader/MultiWriter | ★★★☆☆ |
 | `text/tabwriter` | [列对齐输出](./text-tabwriter) | 弹性制表符 + kubectl 风格 + 分段 Flush | ★★☆☆☆ |
 | `go/format` | [代码格式化](./go-format) | AST 往返 + 代码生成格式化 + CI 检查 | ★★★☆☆ |
-| `bufio`（高级） | [高级缓冲 IO](./bufio-advanced) | 自定义 SplitFunc + Peek 嗅探 + 协议解析 | ★★★☆☆ |
+| `bufio`（高级） | [高级缓冲 IO](./bufio) | 自定义 SplitFunc + Peek 嗅探 + 协议解析 | ★★★☆☆ |
 | `database/sql` | [连接池与事务](./database-sql) | LIFO 连接池 + defer Rollback + 自定义 Scanner | ★★★★☆ |
 | `crypto/tls` | [TLS 握手与证书](./crypto-tls) | TLS 1.3 握手 + mTLS + 证书热更新 | ★★★★☆ |
 | `encoding/binary` | [字节序与协议帧](./encoding-binary) | BigEndian/LittleEndian + 协议解析 + varint | ★★★☆☆ |
@@ -513,7 +513,7 @@ Go 标准库核心包关系图
 | `runtime/pprof` | [性能剖析](./runtime-pprof) | CPU/堆/goroutine Profile + 火焰图 + 持续剖析 | ★★★★☆ |
 | `crypto/x509` | [证书与 PKI](./crypto-x509) | 证书链验证 + 自签名 CA + CSR 流程 | ★★★★☆ |
 | `net/netip` | [现代 IP 地址](./net-netip) | 零分配 + 可作 map key + CIDR 路由表 | ★★★☆☆ |
-| `unsafe` | [底层指针操作](./unsafe-pkg) | 6 条转换规则 + 零拷贝转换 + 内存布局优化 | ★★★★☆ |
+| `unsafe` | [底层指针操作](./unsafe) | 6 条转换规则 + 零拷贝转换 + 内存布局优化 | ★★★★☆ |
 | `encoding/hex` | [十六进制编解码](./encoding-hex) | lookup table + 流式编解码 + HMAC 常量时间比较 | ★★☆☆☆ |
 | `crypto/rsa` | [RSA 非对称加密](./crypto-rsa) | OAEP/PSS + 混合加密 + RS256 JWT | ★★★★☆ |
 | `slices/maps/cmp` | [泛型标准库](./slices-maps-cmp) | pdqsort + BinarySearch + cmp.Or (Go 1.21+) | ★★★☆☆ |
@@ -521,7 +521,7 @@ Go 标准库核心包关系图
 | `crypto/sha256` | [hash 接口体系](./crypto-sha) | SHA-256/512 + HMAC + Merkle 树 + 内容寻址存储 | ★★★☆☆ |
 | `net/http Transport` | [连接池调优](./net-http-transport) | MaxIdleConnsPerHost + 超时级联 + 自定义 RoundTripper | ★★★★☆ |
 | `iter`（Go 1.23+）| [迭代器协议](./iter-pkg) | Seq/Seq2 + pull/push + range over func + 适配器链 | ★★★☆☆ |
-| `math/rand/v2`（Go 1.22+）| [现代随机数](./math-rand-v2) | PCG/ChaCha8 + 泛型 rand.N + 加权随机 + 抖动退避 | ★★★☆☆ |
+| `math/rand/v2`（Go 1.22+）| [现代随机数](./math-rand) | PCG/ChaCha8 + 泛型 rand.N + 加权随机 + 抖动退避 | ★★★☆☆ |
 | `crypto/ecdsa` | [椭圆曲线签名](./crypto-ecdsa) | P-256/P-384 + JWT ES256 + ECDH 密钥交换 | ★★★★☆ |
 | `net/http` 服务端 | [高级模式](./net-http-server) | Middleware 链 + graceful shutdown + SSE + Hijacker | ★★★★☆ |
 | `golang.org/x/sync` | [并发工具包](./golang-x-sync) | errgroup + singleflight + semaphore + pipeline | ★★★★☆ |
@@ -541,7 +541,7 @@ Go 标准库核心包关系图
 | `crypto/ed25519` | [EdDSA 签名](./crypto-ed25519) | Ed25519 密钥生成 + JWT EdDSA + TLS 证书 + seed 派生 | ★★★★☆ |
 | CGO | [C/Go 互操作](./cgo-basics) | 类型映射 + 指针规则 + 静态库集成 + Finalizer 内存管理 | ★★★★☆ |
 | `golang.org/x/oauth2` | [OAuth2 客户端](./golang-x-oauth2) | 授权码 + PKCE + Client Credentials + Token 持久化 | ★★★★☆ |
-| `testing`（高级）| [高级测试模式](./testing-advanced) | Golden File + t.Cleanup + 并行子测试 + Benchmark + TestMain | ★★★★☆ |
+| `testing`（高级）| [高级测试模式](./testing) | Golden File + t.Cleanup + 并行子测试 + Benchmark + TestMain | ★★★★☆ |
 | WebSocket | [服务器实现](./websocket) | HTTP Upgrade + Hub 广播 + writePump/readPump + 心跳 | ★★★★☆ |
 | Go 内存调优 | [GOMEMLIMIT 与 GC 调优](./go-memory-tuning) | GOGC/GOMEMLIMIT + 内存气球 + 泄漏检测 + Heap Profile | ★★★★★ |
 | `go/analysis` | [自定义 Linter](./go-analysis) | Analyzer + Pass + AST 遍历 + SuggestedFix + 测试框架 | ★★★★☆ |

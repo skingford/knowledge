@@ -56,8 +56,18 @@
 - 优先按“概览 -> 路线 -> 资料 -> 实践/能力自检”组织结构
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
+- 文档内部跳转统一使用相对链接，例如 `[Go 学习路径](./golang/learning-path.md)`，这样本地预览和线上发布都能直接使用
+- 不要把 `/Users/...`、`file://...` 这类机器相关绝对路径写进正文链接文字或 `href`
+- 如果只想在自己机器上直接打开文件，优先使用编辑器的“打开链接/打开文件”能力；若必须使用本地协议，建议只在不发布的个人笔记里使用 `vscode://file/...`
 - 如果文档使用 `vocabulary` frontmatter，只写共享词典 key，词条详情统一维护在 `docs/.vitepress/theme/vocabulary-dictionary.json`
 - 共享词典里 `phoneticUs` 与 `phoneticSource` 为必填、`phoneticUk` 为选填；`phoneticSource` 只允许 `oxford`、`cambridge`、`merriam-webster`、`collins`、`official-docs`、`manual-review`；非 `manual-review` 词条必须补 `phoneticSourceUrl` 指向具体词典条目或官方文档页面
+
+## 本地检查
+
+- 全量检查：`npm run docs:check`
+- 只检查共享词典：`npm run docs:check:vocabulary`
+- 只检查链接规范：`npm run docs:check:links`
+- 自动修正文档链接显示文本：`npm run docs:fix:links`
 
 ## 目录结构
 

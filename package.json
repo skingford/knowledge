@@ -9,7 +9,10 @@
     "docs:dev": "vitepress dev docs --host 0.0.0.0",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "docs:check:vocabulary": "node scripts/check-vocabulary-phonetics.mjs"
+    "docs:check:vocabulary": "node scripts/check-vocabulary-phonetics.mjs",
+    "docs:fix:links": "node scripts/normalize-doc-links.mjs",
+    "docs:check:links": "node scripts/normalize-doc-links.mjs --check",
+    "docs:check": "npm run docs:check:vocabulary && npm run docs:check:links && npm run docs:build"
   },
   "dependencies": {
     "playwright": "^1.58.2"

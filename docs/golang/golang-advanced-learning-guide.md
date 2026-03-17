@@ -10,15 +10,15 @@ search: false
 
 ## 建议入口
 
-- 总导航：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
-- 高频题：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
-- 代码片段：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-interview-code-snippets.md`](./go-interview-code-snippets.md)
+- 总导航：[Go 学习路径与资料导航](./learning-path.md)
+- 高频题：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
+- 代码片段：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
 
 ## 如果你现在要开始
 
-- 想按阶段系统学习：去 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
-- 想直接补并发：去 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
-- 想练排障：去 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/07-performance-troubleshooting.md`](./guide/07-performance-troubleshooting.md)
-- 想读 runtime：去 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/09-runtime-source.md`](./guide/09-runtime-source.md)
+- 想按阶段系统学习：去 [Go 学习路径与资料导航](./learning-path.md)
+- 想直接补并发：去 [并发编程](./guide/03-concurrency.md)
+- 想练排障：去 [性能优化与排障](./guide/07-performance-troubleshooting.md)
+- 想读 runtime：去 [源码与 Runtime](./guide/09-runtime-source.md)
 
 后续新增的学习路径和资料，优先维护在统一导航页。

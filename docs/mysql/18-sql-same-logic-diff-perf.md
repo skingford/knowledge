@@ -115,7 +115,8 @@ mysql> select count(*) from tradelog where month(t_modified)=7;
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图2 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select count(*) from tradelog
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select count(*) from tradelog
        where month(t_modified)=7;
 
 +----+-------------+----------+-------+---------------+------------+
@@ -127,7 +128,8 @@ mysql> select count(*) from tradelog where month(t_modified)=7;
 +---------+--------+----------+----------------------+
 | 5       | <span style="color:var(--d-orange);">100335</span> |   100.00 | <span style="color:var(--d-green);">Using where;</span>         |
 |         |        |          | <span style="color:var(--d-green);">Using index</span>          |
-+---------+--------+----------+----------------------+</pre>
++---------+--------+----------+----------------------+
+</pre>
 </div>
 </div>
 
@@ -274,7 +276,8 @@ mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and 
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图4 语句 Q1 的 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
        trade_detail d
        where d.tradeid=l.tradeid and l.id=2;
 
@@ -284,7 +287,8 @@ mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and 
 |  1 | l     | const        | <span style="color:var(--d-green);">PRIMARY</span>| 4      | const |    <span style="color:var(--d-green);">1</span> |       |
 |  1 | d     | <span style="color:var(--d-orange);">ALL</span>          | <span style="color:var(--d-orange);">NULL</span>  | NULL    | NULL  |   <span style="color:var(--d-orange);">11</span> | Using |
 |    |       |              |       |         |       |      | where |
-+----+-------+--------------+-------+---------+-------+------+-------+</pre>
++----+-------+--------------+-------+---------+-------+------+-------+
+</pre>
 </div>
 </div>
 
@@ -399,7 +403,8 @@ mysql>select l.operator from tradelog l , trade_detail d where d.tradeid=l.trade
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图6 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select l.operator from tradelog l,
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select l.operator from tradelog l,
        trade_detail d
        where d.tradeid=l.tradeid and d.id=4;
 
@@ -408,7 +413,8 @@ mysql>select l.operator from tradelog l , trade_detail d where d.tradeid=l.trade
 +----+-------+--------------+---------+---------+-------+------+-------+
 |  1 | d     | const        | <span style="color:var(--d-green);">PRIMARY</span> | 4       | const |    <span style="color:var(--d-green);">1</span> |       |
 |  1 | l     | ref          | <span style="color:var(--d-green);">tradeid</span> | 131     | const |    <span style="color:var(--d-green);">1</span> |       |
-+----+-------+--------------+---------+---------+-------+------+-------+</pre>
++----+-------+--------------+---------+---------+-------+------+-------+
+</pre>
 </div>
 </div>
 
@@ -458,7 +464,8 @@ mysql> select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tra
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图7 SQL 语句优化后的 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
        trade_detail d
        where d.tradeid=CONVERT(l.tradeid USING utf8)
        and l.id=2;
@@ -469,7 +476,8 @@ mysql> select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tra
 |  1 | l     | const        | <span style="color:var(--d-green);">PRIMARY</span> | 4       | const |    <span style="color:var(--d-green);">1</span> |       |
 |  1 | d     | ref          | <span style="color:var(--d-green);">tradeid</span> | 99      | const |    <span style="color:var(--d-green);">1</span> | Using |
 |    |       |              |         |         |       |      | where |
-+----+-------+--------------+---------+---------+-------+------+-------+</pre>
++----+-------+--------------+---------+---------+-------+------+-------+
+</pre>
 </div>
 </div>
 

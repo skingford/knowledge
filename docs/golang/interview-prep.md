@@ -16,9 +16,9 @@ search: false
 
 ## 核心入口
 
-- 高频题题库：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
-- 高频题代码片段：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-interview-code-snippets.md`](./go-interview-code-snippets.md)
-- Go 学习路径总入口：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
+- 高频题题库：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
+- 高频题代码片段：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+- Go 学习路径总入口：[Go 学习路径与资料导航](./learning-path.md)
 
 ## 题目、代码、专题怎么配合
 
@@ -89,8 +89,8 @@ search: false
 
 ## 建议顺序
 
-1. [`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
-2. [`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-interview-code-snippets.md`](./go-interview-code-snippets.md)
-3. [`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md) 里对应专题
+1. [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
+2. [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+3. [Go 学习路径与资料导航](./learning-path.md) 里对应专题
 
 如果你的目标是“压缩准备时间”，直接从这页开始最合适。

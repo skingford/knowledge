@@ -4,6 +4,17 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import { quickNavLink, sections } from './theme/content-data'
 
 const siteUrl = 'https://skingford.github.io/knowledge/'
+const voidHtmlTagPattern = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)(\s[^<>]*?)?\s*(\/?)>/gi
+
+function normalizeVoidHtmlTags(html: string) {
+  return html.replace(voidHtmlTagPattern, (_, tagName: string, attrs = '', selfClosing = '') => {
+    if (selfClosing === '/') {
+      return `<${tagName}${attrs} />`
+    }
+
+    return `<${tagName}${attrs} />`
+  })
+}
 
 const sectionNavItems = sections.map((section) => ({
   text: section.navText,
@@ -56,11 +67,25 @@ export default withMermaid(defineConfig({
   ],
 
   markdown: {
+    xhtmlOut: true,
     theme: {
       light: 'github-light',
       dark: 'github-dark',
     },
     config(md) {
+      const defaultHtmlBlock =
+        md.renderer.rules.html_block ??
+        ((tokens, idx) => tokens[idx].content)
+      const defaultHtmlInline =
+        md.renderer.rules.html_inline ??
+        ((tokens, idx) => tokens[idx].content)
+
+      md.renderer.rules.html_block = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
+        defaultHtmlBlock(tokens, idx, options, env, self),
+      )
+      md.renderer.rules.html_inline = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
+        defaultHtmlInline(tokens, idx, options, env, self),
+      )
       md.use(tabsMarkdownPlugin)
     },
   },

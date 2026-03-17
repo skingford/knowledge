@@ -10,13 +10,13 @@ search: false
 
 ## 统一入口
 
-- 资料导航总页：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
+- 资料导航总页：[Go 学习路径与资料导航](./learning-path.md)
 
 ## 你可能在找的内容
 
-- 官方资料与规范：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
-- 推荐书单：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
-- GopherCon 演讲：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
-- 值得阅读的开源项目：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/learning-path.md`](./learning-path.md)
+- 官方资料与规范：[Go 学习路径与资料导航](./learning-path.md)
+- 推荐书单：[Go 学习路径与资料导航](./learning-path.md)
+- GopherCon 演讲：[Go 学习路径与资料导航](./learning-path.md)
+- 值得阅读的开源项目：[Go 学习路径与资料导航](./learning-path.md)
 
 如果后续新增资料，请优先更新统一导航页，而不是在多个入口重复补充。

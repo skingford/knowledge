@@ -6,7 +6,7 @@ search: false
 
 # Context 使用边界
 
-这页不再重复讲 `context` 的基础概念，而是作为 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md) 的深度补充页，专门回答三个问题：
+这页不再重复讲 `context` 的基础概念，而是作为 [并发编程](./guide/03-concurrency.md) 的深度补充页，专门回答三个问题：
 
 - 什么场景应该传 `context`
 - 什么场景不应该把问题都塞给 `context`
@@ -14,8 +14,8 @@ search: false
 
 ## 先看主线，再看这页
 
-- 并发主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
-- Context 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/context.md`](./guide/source-reading/context.md)
+- 并发主线：[并发编程](./guide/03-concurrency.md)
+- Context 源码：[context 包源码精读](./guide/source-reading/context.md)
 
 如果你还在补“`context` 是什么、怎么取消、怎么超时”，先看主线；如果你已经会用，但总觉得边界不稳，再看这页。
 
@@ -177,6 +177,6 @@ search: false
 
 ## 延伸阅读
 
-- 并发主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
-- Context 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/context.md`](./guide/source-reading/context.md)
-- 高频题：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
+- 并发主线：[并发编程](./guide/03-concurrency.md)
+- Context 源码：[context 包源码精读](./guide/source-reading/context.md)
+- 高频题：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)

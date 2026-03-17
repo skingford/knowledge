@@ -11,7 +11,7 @@ description: 精读 sync.Cond 的条件变量实现，掌握 Wait/Signal/Broadca
 
 如果你还在比较各种同步工具的适用边界，先看：
 
-- 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/sync-primitives.md`](./sync-primitives.md)
+- 总览：[sync 包源码精读](./sync-primitives.md)
 
 `sync.Cond` 适合解决“等待某个条件成立”的问题，不适合拿来替代所有 channel 或 mutex 场景。
 

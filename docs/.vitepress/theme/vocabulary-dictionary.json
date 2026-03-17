@@ -243,6 +243,13 @@
     "phoneticSource": "cambridge",
     "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/consumer"
   },
+  "consumer-group": {
+    "word": "consumer group",
+    "meaning": "消费组；消费者组",
+    "phoneticUs": "/kənˈsuː.mɚ ɡruːp/",
+    "phoneticUk": "/kənˈsjuː.mər ɡruːp/",
+    "phoneticSource": "manual-review"
+  },
   "broker": {
     "word": "broker",
     "meaning": "代理节点；消息代理",
@@ -290,6 +297,13 @@
     "phoneticSource": "cambridge",
     "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/replica"
   },
+  "in-sync-replicas": {
+    "word": "in-sync replicas",
+    "meaning": "同步副本集；ISR",
+    "phoneticUs": "/ɪn sɪŋk ˈrep.lə.kəz/",
+    "phoneticUk": "/ɪn sɪŋk ˈrep.lɪ.kəz/",
+    "phoneticSource": "manual-review"
+  },
   "backlog": {
     "word": "backlog",
     "meaning": "积压；待处理量",
@@ -312,11 +326,32 @@
     "phoneticUk": "/ˈded ˌlet.ər kjuː/",
     "phoneticSource": "manual-review"
   },
+  "delay-queue": {
+    "word": "delay queue",
+    "meaning": "延迟队列",
+    "phoneticUs": "/dɪˈleɪ kjuː/",
+    "phoneticUk": "/dɪˈleɪ kjuː/",
+    "phoneticSource": "manual-review"
+  },
   "message-queue": {
     "word": "message queue",
     "meaning": "消息队列",
     "phoneticUs": "/ˈmes.ɪdʒ kjuː/",
     "phoneticUk": "/ˈmes.ɪdʒ kjuː/",
+    "phoneticSource": "manual-review"
+  },
+  "rebalance": {
+    "word": "rebalance",
+    "meaning": "再平衡；重新分配分区",
+    "phoneticUs": "/ˌriːˈbæl.əns/",
+    "phoneticUk": "/ˌriːˈbæl.əns/",
+    "phoneticSource": "manual-review"
+  },
+  "backpressure": {
+    "word": "backpressure",
+    "meaning": "背压",
+    "phoneticUs": "/ˈbækˌpreʃ.ɚ/",
+    "phoneticUk": "/ˈbækˌpreʃ.ər/",
     "phoneticSource": "manual-review"
   },
   "decoupling": {

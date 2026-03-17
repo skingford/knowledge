@@ -42,7 +42,8 @@ select city,name,age from t where city='杭州' order by name limit 1000  ;
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图1 使用 explain 命令查看语句的执行情况</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
        where city='杭州' order by name limit 1000;
 
 +----+-------------+-------+-------+---------------+------+---------+
@@ -54,7 +55,8 @@ select city,name,age from t where city='杭州' order by name limit 1000  ;
 +-------+-----------+---------------------------------+
 |  4000 |    100.00 | Using index condition;          |
 |       |           | <span style="color:var(--d-orange);">Using filesort</span>                  |
-+-------+-----------+---------------------------------+</pre>
++-------+-----------+---------------------------------+
+</pre>
 </div>
 </div>
 
@@ -212,14 +214,16 @@ select @b-@a;
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图4 全字段排序的 OPTIMIZER_TRACE 部分结果</div>
-<pre style="margin:0;">"filesort_summary": {
+<pre style="margin:0;">
+"filesort_summary": {
   "rows":                        4000,
   "examined_rows":               4000,
   "number_of_tmp_files":         <span style="color:var(--d-orange);font-weight:bold;">12</span>,
   "sort_buffer_size":            32768,
   "sort_mode":
     "<span style="color:var(--d-green);">&lt;sort_key, packed_additional_fields&gt;</span>"
-}</pre>
+}
+</pre>
 </div>
 </div>
 
@@ -354,14 +358,16 @@ city、name、age 这三个字段的定义总长度是36，我把max_length_for_
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图6 rowid 排序的 OPTIMIZER_TRACE 部分输出</div>
-<pre style="margin:0;">"filesort_summary": {
+<pre style="margin:0;">
+"filesort_summary": {
   "rows":                        4000,
   "examined_rows":               4000,
   "number_of_tmp_files":         <span style="color:var(--d-orange);font-weight:bold;">10</span>,
   "sort_buffer_size":            32768,
   "sort_mode":
     "<span style="color:var(--d-green);">&lt;sort_key, rowid&gt;</span>"
-}</pre>
+}
+</pre>
 </div>
 </div>
 
@@ -497,7 +503,8 @@ alter table t add index city_user(city, name);
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图9 引入 (city, name) 联合索引后的 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
        where city='杭州' order by name limit 1000;
 
 +----+-------------+-------+------+-----------+-----------+
@@ -510,7 +517,8 @@ alter table t add index city_user(city, name);
 | 1000 |   100.00 | <span style="color:var(--d-green);font-weight:bold;">Using index condition</span>                 |
 +------+----------+----------------------------------------+
 
-<span style="color:var(--d-text-muted);">-- Extra 中没有 Using filesort，说明无需排序</span></pre>
+<span style="color:var(--d-text-muted);">-- Extra 中没有 Using filesort，说明无需排序</span>
+</pre>
 </div>
 </div>
 
@@ -568,7 +576,8 @@ alter table t add index city_user_age(city, name, age);
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图11 引入 (city, name, age) 覆盖索引后的 explain 结果</div>
-<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+<pre style="margin:0;">
+mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
        where city='杭州' order by name limit 1000;
 
 +----+-------------+-------+------+---------------+------+
@@ -582,7 +591,8 @@ alter table t add index city_user_age(city, name, age);
 +----------+----------------------------------------------+
 
 <span style="color:var(--d-text-muted);">-- Using index = 覆盖索引，无需回表</span>
-<span style="color:var(--d-text-muted);">-- 无 Using filesort，说明无需排序</span></pre>
+<span style="color:var(--d-text-muted);">-- 无 Using filesort，说明无需排序</span>
+</pre>
 </div>
 </div>
 
@@ -627,7 +637,8 @@ mysql> select * from t where city in ('杭州',"苏州") order by name limit 100
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图12 锁验证方式</div>
-<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+<pre style="margin:0;">
+<span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
 ┌─────────────────────────┬─────────────────────────────┐
 │                         │                             │
 │ <span style="color:var(--d-blue);">begin;</span>                  │                             │
@@ -639,7 +650,8 @@ mysql> select * from t where city in ('杭州',"苏州") order by name limit 100
 │                         │ <span style="color:var(--d-orange);font-weight:bold;">(blocked)</span>                   │
 │                         │                             │
 └─────────────────────────┴─────────────────────────────┘
-<span style="color:var(--d-text-muted);">-- session B 被锁住，说明 MySQL 确实执行了更新（加锁）</span></pre>
+<span style="color:var(--d-text-muted);">-- session B 被锁住，说明 MySQL 确实执行了更新（加锁）</span>
+</pre>
 </div>
 </div>
 
@@ -653,7 +665,8 @@ session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图13 可见性验证方式</div>
-<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+<pre style="margin:0;">
+<span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
 ┌─────────────────────────┬─────────────────────────────┐
 │                         │                             │
 │ <span style="color:var(--d-blue);">begin;</span>                  │                             │
@@ -672,7 +685,8 @@ session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的
 │ → 返回 <span style="color:var(--d-orange);font-weight:bold;">(1, 3)</span>           │                             │
 │                         │                             │
 └─────────────────────────┴─────────────────────────────┘
-<span style="color:var(--d-text-muted);">-- 一致性读看到 (1,3)，说明 session A 的 update 生成了新版本</span></pre>
+<span style="color:var(--d-text-muted);">-- 一致性读看到 (1,3)，说明 session A 的 update 生成了新版本</span>
+</pre>
 </div>
 </div>
 
@@ -692,7 +706,8 @@ session A的第二个select 语句是一致性读（快照读)，它是不能看
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图14 可见性验证方式 -- 对照</div>
-<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+<pre style="margin:0;">
+<span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
 ┌─────────────────────────┬─────────────────────────────┐
 │                         │                             │
 │ <span style="color:var(--d-blue);">begin;</span>                  │                             │
@@ -709,7 +724,8 @@ session A的第二个select 语句是一致性读（快照读)，它是不能看
 │                         │                             │
 └─────────────────────────┴─────────────────────────────┘
 <span style="color:var(--d-text-muted);">-- 未执行 update 时，一致性读仍为 (1,2)，证明上例的</span>
-<span style="color:var(--d-text-muted);">-- (1,3) 确实是 session A 的 update 产生的新版本</span></pre>
+<span style="color:var(--d-text-muted);">-- (1,3) 确实是 session A 的 update 产生的新版本</span>
+</pre>
 </div>
 </div>
 
@@ -729,7 +745,8 @@ session A的第二个select 语句是一致性读（快照读)，它是不能看
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图15 binlog_row_image=FULL 时的判断逻辑（MySQL 5.6+）</div>
-<pre style="margin:0;"><span style="color:var(--d-text-muted);">/* mysql-server/sql/sql_update.cc */</span>
+<pre style="margin:0;">
+<span style="color:var(--d-text-muted);">/* mysql-server/sql/sql_update.cc */</span>
 
 if (<span style="color:var(--d-blue);">binlog_row_image</span> != BINLOG_ROW_IMAGE_MINIMAL) {
   <span style="color:var(--d-text-muted);">// 需要读出所有字段用于 binlog 记录</span>
@@ -738,10 +755,11 @@ if (<span style="color:var(--d-blue);">binlog_row_image</span> != BINLOG_ROW_IMA
 
 <span style="color:var(--d-text-muted);">// 读取了所有字段后，MySQL 会对比新旧值</span>
 <span style="color:var(--d-text-muted);">// 如果发现值没变，则不会实际执行更新</span>
-if (<span style="color:var(--d-green);">table->compare_records</span>()) {
+if (<span style="color:var(--d-green);">table-&gt;compare_records</span>()) {
   <span style="color:var(--d-text-muted);">// 值相同，跳过更新</span>
   return;
-}</pre>
+}
+</pre>
 </div>
 </div>
 
@@ -752,7 +770,7 @@ if (<span style="color:var(--d-green);">table->compare_records</span>()) {
 
 评论区留言点赞板：
 
-> @Gavin 、@melon、@阿建 等同学提到了锁验证法；  
->  @郭江伟 同学提到了两个点，都非常好，有去实际验证。结论是这样的：  
->  第一，hexdump看出来没改应该是WAL机制生效了，要过一会儿，或者把库shutdown看看。  
->  第二，binlog没写是MySQL Server层知道行的值没变，所以故意不写的，这个是在row格式下的策略。你可以把binlog_format 改成statement再验证下。
+- @Gavin、@melon、@阿建 等同学提到了锁验证法。
+- @郭江伟 同学提到了两个点，都非常好，也做了实际验证：
+  - hexdump 看出来没改，可能是 WAL 机制生效了；等一会儿，或者把库 shutdown 之后再看。
+  - binlog 没写，是 MySQL Server 层知道行值没变，所以故意不写；这个是 `row` 格式下的策略。你可以把 `binlog_format` 改成 `statement` 再验证。

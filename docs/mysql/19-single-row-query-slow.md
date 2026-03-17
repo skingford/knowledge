@@ -125,13 +125,15 @@ session A 通过lock table命令持有表t的MDL写锁，而session B的查询�
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 4 — 通过 sys.schema_table_lock_waits 查获加表锁的线程</div>
-<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select blocking_pid</span>
+<pre style="margin:0;white-space:pre-wrap;">
+mysql> <span style="color:var(--d-blue);">select blocking_pid</span>
     <span style="color:var(--d-blue);">from sys.schema_table_lock_waits\G</span>
 *************************** 1. row ***************************
 blocking_pid: <span style="color:var(--d-orange);font-weight:bold;">4</span>
 1 row in set
 
-mysql> <span style="color:var(--d-orange);font-weight:bold;">kill 4;</span></pre>
+mysql> <span style="color:var(--d-orange);font-weight:bold;">kill 4;</span>
+</pre>
 </div>
 </div>
 
@@ -416,7 +418,8 @@ select * from t where id=1 <span style="color:var(--d-blue);font-weight:bold;">l
 <div style="display:flex;justify-content:center;padding:20px 0;">
 <div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
 <div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 14 — 两个语句的输出结果对比</div>
-<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select * from t where id=1;</span>
+<pre style="margin:0;white-space:pre-wrap;">
+mysql> <span style="color:var(--d-blue);">select * from t where id=1;</span>
 +----+------+
 | id | c    |
 +----+------+
@@ -428,7 +431,8 @@ mysql> <span style="color:var(--d-blue);">select * from t where id=1 lock in sha
 | id | c       |
 +----+---------+
 |  1 | <span style="color:var(--d-green);font-weight:bold;">1000001</span> |
-+----+---------+</pre>
++----+---------+
+</pre>
 <div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);">一致性读返回 c=1（事务启动时的快照），当前读返回 c=1000001（最新值）</div>
 </div>
 </div>

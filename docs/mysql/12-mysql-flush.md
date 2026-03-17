@@ -25,49 +25,49 @@ description: "极客时间《MySQL 实战 45 讲》第 12 讲笔记整理"
 
 接下来，我们用一个示意图来展示一下“孔乙己赊账”的整个操作过程。假设原来孔乙己欠账10文，这次又要赊9文。
 
-<div style=”display:flex;justify-content:center;padding:20px 0;”>
-<div style=”font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:500px;width:100%;”>
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:500px;width:100%;">
   <!-- 标题 -->
-  <div style=”text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);”>图1 “孔乙己赊账”更新和flush过程</div>
-  <svg viewBox=”0 0 500 300” style=”width:100%;height:auto;”>
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">图1 “孔乙己赊账”更新和flush过程</div>
+  <svg viewBox="0 0 500 300" style="width:100%;height:auto;">
     <!-- 背景区域：粉板（内存/redo log） -->
-    <rect x=”20” y=”40” width=”180” height=”220” rx=”10” style=”fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5”/>
-    <text x=”110” y=”30” text-anchor=”middle” style=”font-size:14px;font-weight:bold;fill:var(--d-blue);”>粉板（redo log）</text>
-    <text x=”110” y=”55” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>顺序写 · 速度快</text>
+    <rect x="20" y="40" width="180" height="220" rx="10" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5" />
+    <text x="110" y="30" text-anchor="middle" style="font-size:14px;font-weight:bold;fill:var(--d-blue);">粉板（redo log）</text>
+    <text x="110" y="55" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">顺序写 · 速度快</text>
     <!-- 粉板内容 -->
-    <rect x=”40” y=”70” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-border);stroke-width:1”/>
-    <text x=”110” y=”90” text-anchor=”middle” style=”font-size:12px;fill:var(--d-text);”>孔乙己：欠10文</text>
-    <rect x=”40” y=”110” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-orange);stroke-width:1.5”/>
-    <text x=”110” y=”130” text-anchor=”middle” style=”font-size:12px;fill:var(--d-orange);font-weight:bold;”>+ 赊账 9文</text>
-    <text x=”110” y=”165” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>① 先写日志（WAL）</text>
+    <rect x="40" y="70" width="140" height="30" rx="4" style="fill:var(--d-bg);stroke:var(--d-border);stroke-width:1" />
+    <text x="110" y="90" text-anchor="middle" style="font-size:12px;fill:var(--d-text);">孔乙己：欠10文</text>
+    <rect x="40" y="110" width="140" height="30" rx="4" style="fill:var(--d-bg);stroke:var(--d-orange);stroke-width:1.5" />
+    <text x="110" y="130" text-anchor="middle" style="font-size:12px;fill:var(--d-orange);font-weight:bold;">+ 赊账 9文</text>
+    <text x="110" y="165" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">① 先写日志（WAL）</text>
     <!-- 返回客户端 -->
-    <rect x=”40” y=”180” width=”140” height=”28” rx=”4” style=”fill:var(--d-green);opacity:0.15;stroke:var(--d-green);stroke-width:1”/>
-    <text x=”110” y=”199” text-anchor=”middle” style=”font-size:12px;fill:var(--d-green);font-weight:bold;”>✓ 返回更新成功</text>
-    <text x=”110” y=”230” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>内存数据页已更新</text>
-    <text x=”110” y=”248” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>（此时为”脏页”）</text>
+    <rect x="40" y="180" width="140" height="28" rx="4" style="fill:var(--d-green);opacity:0.15;stroke:var(--d-green);stroke-width:1" />
+    <text x="110" y="199" text-anchor="middle" style="font-size:12px;fill:var(--d-green);font-weight:bold;">✓ 返回更新成功</text>
+    <text x="110" y="230" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">内存数据页已更新</text>
+    <text x="110" y="248" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">（此时为”脏页”）</text>
     <!-- 中间：flush 箭头 -->
     <defs>
-      <marker id=”arrowF1” markerWidth=”8” markerHeight=”6” refX=”8” refY=”3” orient=”auto”>
-        <path d=”M0,0 L8,3 L0,6” style=”fill:var(--d-orange)”/>
+      <marker id="arrowF1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6" style="fill:var(--d-orange)" />
       </marker>
     </defs>
-    <line x1=”210” y1=”150” x2=”290” y2=”150” style=”stroke:var(--d-orange);stroke-width:2;stroke-dasharray:6,3” marker-end=”url(#arrowF1)”/>
-    <text x=”250” y=”140” text-anchor=”middle” style=”font-size:12px;fill:var(--d-orange);font-weight:bold;”>flush</text>
-    <text x=”250” y=”170” text-anchor=”middle” style=”font-size:10px;fill:var(--d-text-muted);”>② 空闲时刷盘</text>
+    <line x1="210" y1="150" x2="290" y2="150" style="stroke:var(--d-orange);stroke-width:2;stroke-dasharray:6,3" marker-end="url(#arrowF1)" />
+    <text x="250" y="140" text-anchor="middle" style="font-size:12px;fill:var(--d-orange);font-weight:bold;">flush</text>
+    <text x="250" y="170" text-anchor="middle" style="font-size:10px;fill:var(--d-text-muted);">② 空闲时刷盘</text>
     <!-- 账本（磁盘/数据文件） -->
-    <rect x=”300” y=”40” width=”180” height=”220” rx=”10” style=”fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.5”/>
-    <text x=”390” y=”30” text-anchor=”middle” style=”font-size:14px;font-weight:bold;fill:var(--d-text);”>账本（数据文件）</text>
-    <text x=”390” y=”55” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>随机写 · 速度慢</text>
+    <rect x="300" y="40" width="180" height="220" rx="10" style="fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.5" />
+    <text x="390" y="30" text-anchor="middle" style="font-size:14px;font-weight:bold;fill:var(--d-text);">账本（数据文件）</text>
+    <text x="390" y="55" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">随机写 · 速度慢</text>
     <!-- 账本内容：flush前 -->
-    <rect x=”320” y=”75” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-border);stroke-width:1”/>
-    <text x=”390” y=”95” text-anchor=”middle” style=”font-size:12px;fill:var(--d-text-sub);”>孔乙己：欠10文</text>
-    <text x=”390” y=”120” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>flush 前（旧值）</text>
+    <rect x="320" y="75" width="140" height="30" rx="4" style="fill:var(--d-bg);stroke:var(--d-border);stroke-width:1" />
+    <text x="390" y="95" text-anchor="middle" style="font-size:12px;fill:var(--d-text-sub);">孔乙己：欠10文</text>
+    <text x="390" y="120" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">flush 前（旧值）</text>
     <!-- 账本内容：flush后 -->
-    <text x=”390” y=”155” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-dim);”>▼ flush 后</text>
-    <rect x=”320” y=”165” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-green);stroke-width:1.5”/>
-    <text x=”390” y=”185” text-anchor=”middle” style=”font-size:12px;fill:var(--d-green);font-weight:bold;”>孔乙己：欠19文</text>
-    <text x=”390” y=”215” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>内存 = 磁盘</text>
-    <text x=”390” y=”233” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>（变为”干净页”）</text>
+    <text x="390" y="155" text-anchor="middle" style="font-size:11px;fill:var(--d-text-dim);">▼ flush 后</text>
+    <rect x="320" y="165" width="140" height="30" rx="4" style="fill:var(--d-bg);stroke:var(--d-green);stroke-width:1.5" />
+    <text x="390" y="185" text-anchor="middle" style="font-size:12px;fill:var(--d-green);font-weight:bold;">孔乙己：欠19文</text>
+    <text x="390" y="215" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">内存 = 磁盘</text>
+    <text x="390" y="233" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">（变为”干净页”）</text>
   </svg>
 </div>
 </div>

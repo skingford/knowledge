@@ -11,7 +11,7 @@ description: 精读 sync.Pool 的对象复用机制，理解 per-P 本地池、v
 
 如果你还在补锁、等待、Once、Map 这些基础同步原语，先看：
 
-- 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/sync-primitives.md`](./sync-primitives.md)
+- 总览：[sync 包源码精读](./sync-primitives.md)
 
 更适合带着这些问题来读：
 
