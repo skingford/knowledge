@@ -7,6 +7,18 @@ description: 精读 sync.Pool 的对象复用机制，理解 per-P 本地池、v
 
 > 核心源码：`src/sync/pool.go`、`src/sync/poolqueue.go`
 
+这篇聚焦对象复用与 GC 交互，不再承担 `sync` 总览页的职责。
+
+如果你还在补锁、等待、Once、Map 这些基础同步原语，先看：
+
+- 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/sync-primitives.md`](./sync-primitives.md)
+
+更适合带着这些问题来读：
+
+- `sync.Pool` 为什么不能当缓存用
+- 为什么对象最多只会跨两轮 GC
+- 为什么它和 per-P、本地性、性能热点密切相关
+
 ## 包结构图
 
 ```

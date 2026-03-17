@@ -588,7 +588,7 @@ db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
 ### 对应资料导航
 
 - [架构师学习路线](/architecture/architect-learning-roadmap)
-- [Golang 进阶学习指南](/golang/golang-advanced-learning-guide)
+- [Go 学习路径与资料导航](/golang/learning-path)
 
 ### 1. 跨境支付链路
 
@@ -1564,7 +1564,7 @@ CREATE TABLE payment_flow (
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)
 - [架构师学习路线](/architecture/architect-learning-roadmap)
 - [架构能力自检准备清单](/architecture/architect-interview-prep-checklist)
-- [Golang 进阶学习指南](/golang/golang-advanced-learning-guide)
+- [Go 学习路径与资料导航](/golang/learning-path)
 - [Go 微服务可观测性与稳定性专题](/golang/guide/08-observability-resilience)
 - [Go 安全编程专题](/golang/guide/10-security-practices)
 

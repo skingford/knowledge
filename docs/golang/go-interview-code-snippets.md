@@ -1,29 +1,39 @@
 ---
 title: Golang 能力自检高频题示例代码片段
-description: Golang 高频自检题代码片段集合，通过可运行示例理解常见底层机制与面试题。
+description: 作为能力自检题库的配套代码页，专注最小可讲解示例，减少与题库和主线专题的重复。
+search: false
 ---
 
 # Golang 能力自检高频题示例代码片段
 
-## 适合人群
+这页只做一件事：给高频题提供**最小、可讲解、可手写**的代码片段。
 
-- 想把 Go 能力自检题从“会说”提升到“会写”的工程师
-- 需要准备手写代码或现场解释代码的候选人
-- 希望用最小示例加深对底层原理理解的人
+它不再重复承担“题目解释”和“系统原理总览”的职责。想先看题目和口述模板，请到：
 
-## 学习目标
+- 题库：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)
+- 自检导航：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/interview-prep.md`](./interview-prep.md)
 
-- 给高频 Go 能力自检题补最小可讲解代码
-- 形成“题目 -> 原理 -> 模板 -> 示例”的完整复习链路
-- 帮助在能力自检里更自然地结合代码说明问题
+## 怎么使用这页
 
-## 快速导航
+- **准备手写代码**：优先看这页
+- **准备口述表达**：先看题库，再回这页补例子
+- **准备追源码或补主线**：从这页跳回对应专题，不在这页深挖
 
-- [适合人群](#适合人群)
-- [学习目标](#学习目标)
-- [基础与底层](#基础与底层)
-- [并发与调度](#并发与调度)
-- [性能与工程](#性能与工程)
+## 快速索引
+
+| 主题 | 代码片段 | 对应题库/专题 |
+| --- | --- | --- |
+| Slice 与底层数组 | Slice 扩容与共享 | `go-top-30-interview-questions` 基础与底层 |
+| Interface | Nil Interface | `go-top-30-interview-questions` 基础与底层 |
+| Defer | 参数求值 | `go-top-30-interview-questions` 基础与底层 |
+| Channel | 无缓冲同步 | `guide/03-concurrency` |
+| Context | 取消传播 | `context-usage-boundaries` + `guide/03-concurrency` |
+| WaitGroup | 正确等待方式 | `guide/03-concurrency` |
+| Mutex | 共享状态保护 | `guide/03-concurrency` |
+| 逃逸分析 | `-gcflags=-m` | `guide/02-escape-analysis` |
+| `sync.Pool` | 对象复用 | `guide/07-performance-troubleshooting` |
+| Pprof | HTTP 接入 | `pprof-troubleshooting-guide` |
+| `http.Client` | 复用客户端 | `guide/04-network-stdlib` |
 
 ## 基础与底层
 
@@ -325,8 +335,10 @@ func main() {
 - `http.Client` 应尽量复用
 - 超时配置是服务稳定性的基础
 
-## 推荐使用方式
+## 建议使用方式
 
-- 先口述题目答案
-- 再手写最小代码片段
-- 最后结合源码与原理文档补深度
+- 先用题库练“怎么回答”
+- 再用这页练“怎么举例”
+- 最后回对应专题练“为什么会这样”
+
+如果你正在压缩准备时间，这页只需要反复吃透最常见的 5 到 10 个片段，不必一次全背。

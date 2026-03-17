@@ -7,6 +7,19 @@ description: 精读 net/http Server、Transport、ServeMux 实现，理解 HTTP 
 
 > 核心源码：`src/net/http/server.go`、`src/net/http/transport.go`
 
+这篇是 `net/http` 的总览页，负责把服务端、客户端、路由和连接池放到一个整体视角里讲清楚。
+
+如果你已经明确只关心某个切面，建议直接跳到更聚焦的子页：
+
+- 服务端生命周期、优雅关闭、中间件：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http-server.md`](./net-http-server.md)
+- 客户端连接池、超时级联、Keep-Alive：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http-transport.md`](./net-http-transport.md)
+
+也就是说：
+
+- **先建立全景认知**：看这页
+- **只想深入服务端**：看 `net-http-server`
+- **只想深入客户端传输层**：看 `net-http-transport`
+
 ## 包结构图
 
 ```

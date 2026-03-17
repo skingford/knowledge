@@ -7,6 +7,19 @@ description: 精读 database/sql 的高级用法，掌握 Savepoint 嵌套事务
 
 > 核心源码：`src/database/sql/sql.go`、`src/database/sql/convert.go`
 
+这篇是 `database/sql` 的进阶补充页，不再重复连接池和基础扫描模型。
+
+更适合你在下面这些问题出现时再看：
+
+- 事务函数如何封装得更稳
+- Savepoint 怎么落地
+- 批量插入和 COPY 怎么选
+- Prepared Statement 缓存和连接池如何配合
+
+如果你还没建立 `database/sql` 的基础心智模型，先看：
+
+- 基础总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/database-sql.md`](./database-sql.md)
+
 ## 包结构图
 
 ```

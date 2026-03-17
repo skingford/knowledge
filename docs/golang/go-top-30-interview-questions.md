@@ -5,6 +5,8 @@ description: Golang 高频能力自检题清单，覆盖语言机制、并发、
 
 # 30+ 高频 Golang 能力自检题
 
+这页专注“题目 + 口述模板 + 源码线索”。如果你想把题目和代码示例、专题回查串起来，先看 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/interview-prep.md`](./interview-prep.md)。
+
 ## 适合人群
 
 - 正在准备 Go 高级开发、后端或架构能力自检的工程师
@@ -560,4 +562,5 @@ Worker Pool + Channel 分发 + errgroup 错误收集。任务入队（Redis/Kafk
 - 先口述回答一遍，再回看文档
 - 对答不顺的题补"原理 + 示例代码 + 排障思路"
 - 每轮复习都挑 5 到 10 题做强化输出
+- 想把题目、代码和专题串起来，先看 [Go 能力自检与面试准备导航](./interview-prep.md)
 - 示例代码详见 [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)

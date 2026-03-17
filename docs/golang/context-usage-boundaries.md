@@ -1,101 +1,182 @@
 ---
 title: Context 使用边界
-description: Go context 使用边界与误区总结，帮助厘清超时、取消、传值与 Goroutine 生命周期管理。
+description: 作为并发专题的深度补充页，聚焦 context 的边界、反模式、代码评审清单与治理建议，减少与主线并发文档的重复。
+search: false
 ---
 
 # Context 使用边界
 
-## 适合人群
+这页不再重复讲 `context` 的基础概念，而是作为 [`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md) 的深度补充页，专门回答三个问题：
 
-- 已经在 Go 项目里使用 `context`，但不确定是否规范
-- 能力自检中经常被问到 `context` 用法的人
-- 想减少超时、取消、Goroutine 泄漏问题的工程师
+- 什么场景应该传 `context`
+- 什么场景不应该把问题都塞给 `context`
+- 代码评审时如何快速判断 `context` 用得对不对
 
-## 学习目标
+## 先看主线，再看这页
 
-- 理解 `context` 的核心职责
-- 知道哪些场景该用，哪些场景不该滥用
-- 建立一套更稳的传递和取消约定
+- 并发主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
+- Context 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/context.md`](./guide/source-reading/context.md)
 
-## 快速导航
+如果你还在补“`context` 是什么、怎么取消、怎么超时”，先看主线；如果你已经会用，但总觉得边界不稳，再看这页。
 
-- [适合人群](#适合人群)
-- [学习目标](#学习目标)
-- [核心职责](#核心职责)
-- [该怎么用](#该怎么用)
-- [不该怎么用](#不该怎么用)
-- [常见问题](#常见问题)
-- [实践建议](#实践建议)
+## 一句话判断标准
 
-## 核心职责
+`context` 适合表达**请求生命周期**，不适合表达**业务领域状态**。
 
-`context` 主要解决三件事：
+可以把它理解成两类信息：
 
-- 传递取消信号
-- 控制超时和截止时间
-- 传递少量请求级别上下文数据
+- **该取消吗**：请求结束了、超时了、上游不等了
+- **谁发起的请求**：trace id、request id、auth claims 这类少量跨层协作信息
 
-它不是通用参数袋，也不是用来传业务对象的容器。
+不应该放进去的，是用户对象、订单聚合、数据库连接、配置集合、缓存句柄这类“业务或依赖本体”。
 
-## 该怎么用
+## 什么时候该用
 
-### 请求链路透传
+### 1. 请求链路透传
 
-- 从 HTTP 请求入口向下传
-- 从 RPC 入口向下传
-- 保证数据库、缓存、下游调用都能感知取消和超时
+典型场景：
 
-### 超时控制
+- HTTP Handler 调服务层
+- gRPC / RPC Handler 调下游客户端
+- 服务层调数据库、缓存、消息队列、第三方 HTTP API
 
-- 对外部调用设置超时
-- 对可能阻塞的操作设置边界
-- 避免无限等待导致资源堆积
+判断标准：
 
-### 取消后台任务
+- 这段逻辑是否受上游请求生命周期约束
+- 上游取消后，下游是否应该尽快停下来
 
-- 当请求结束时，让依赖请求上下文的异步任务退出
-- 避免请求早已超时，后台工作仍继续跑
+如果答案是“应该”，就继续透传上游 `ctx`，而不是偷偷换成 `context.Background()`。
 
-## 不该怎么用
+### 2. 外部调用超时控制
 
-### 不要传业务大对象
+适合用 `WithTimeout` / `WithDeadline` 的地方：
 
-- 不要把用户对象、订单对象整包塞进 `context`
-- 不要把它当作“隐藏参数通道”
+- 数据库查询
+- Redis / MQ / RPC / HTTP 调用
+- 可能阻塞的锁等待或异步结果等待
 
-### 不要用字符串乱塞值
+边界提醒：
 
-- 避免 Key 冲突
-- 避免代码可读性变差
+- 超时应该尽量贴近外部调用边界设置
+- 不要在非常靠上的入口给整条链路套一个粗暴超时，导致局部问题难诊断
 
-### 不要把 `context.Background()` 当兜底乱用
+### 3. 与请求强绑定的 Goroutine
 
-- 如果当前逻辑属于请求链路，应继续透传上游 `context`
-- 随意换成 `Background` 会切断取消信号
+如果你起了一个协程专门服务当前请求，比如：
 
-## 常见问题
+- 聚合多个下游并发请求
+- 做请求内的异步预取
+- 等待下游结果后回填响应
 
-### 为什么 `context` 要放在第一个参数？
+那它就应该监听 `ctx.Done()`，否则请求早就超时了，后台 Goroutine 还在跑。
 
-因为这是一种约定，能让调用链更统一，也方便快速识别这个函数是否受请求生命周期控制。
+## 什么时候不该用
 
-### 为什么不能滥用 `WithValue`？
+### 1. 不要把它当参数袋
 
-因为它会让依赖关系变隐式，难排查、难测试、难维护。它只适合放少量跨层协作的请求级数据。
+下面这些都不适合塞进 `context`：
 
-### `context` 能解决 Goroutine 泄漏吗？
+- `*User`
+- `*Order`
+- `*sql.DB`
+- `*redis.Client`
+- 大型配置对象
+- 任意“为了少写一个参数”的业务对象
 
-它不能自动解决，但它提供了可取消机制，是治理 Goroutine 泄漏的重要工具。
+原因不是“语法不允许”，而是会带来三个问题：
 
-## 实践建议
+- 依赖关系隐藏，函数签名看不出真实输入
+- 测试困难，调用方不知道要塞哪些值
+- 维护困难，跨层取值逐渐演变成隐式耦合
 
-- 每个外部调用都审查是否应设置超时
-- 启 Goroutine 时明确退出条件，必要时监听 `ctx.Done()`
-- 对请求级日志、trace id 之类信息使用明确 key 类型
-- 在 code review 中把 `context` 透传和取消作为固定检查项
+### 2. 不要用它替代显式依赖
 
-## 推荐实践项目
+错误思路：
 
-- 给一个 HTTP 服务补齐请求级超时控制
-- 给一个异步任务增加基于 `ctx.Done()` 的退出逻辑
-- 复盘一次因为超时或泄漏导致的问题链路
+- “日志器放进 `ctx`，这样不用传 logger 了”
+- “租户信息放进 `ctx`，所有地方自己取”
+- “配置放 `ctx`，这样函数签名更短”
+
+更稳妥的做法是：
+
+- 依赖对象通过结构体字段或参数显式注入
+- 请求级元数据才通过 `context` 传递
+
+### 3. 不要滥用 `WithValue`
+
+`WithValue` 不是禁用，而是要克制。
+
+适合放的内容：
+
+- trace id
+- request id
+- 认证后的小型 claims
+- 跨中间件协作所需的少量元数据
+
+不适合放的内容：
+
+- 大对象
+- 高频业务字段
+- 下游核心依赖
+- 本该在函数参数里出现的业务输入
+
+## 常见反模式速查表
+
+| 反模式 | 表现 | 风险 | 更好的做法 |
+| --- | --- | --- | --- |
+| 用 `Background()` 兜底 | 中途切断上游 `ctx` | 取消和超时失效 | 优先透传上游 `ctx` |
+| 把业务对象塞进 `ctx` | `ctx.Value("user")` 到处飞 | 依赖隐式、难测试 | 显式参数或结构体依赖 |
+| 字符串 key 到处乱用 | `"traceId"`、`"uid"` 分散定义 | key 冲突、可读性差 | 定义私有 key 类型 |
+| 起 Goroutine 不监听 `Done()` | 请求结束后后台任务继续跑 | Goroutine 泄漏 | 在 select 中监听 `ctx.Done()` |
+| 统一超时过大或过小 | 整条链路一刀切 | 难定位、误伤正常请求 | 在边界处设置局部超时 |
+
+## 代码评审检查清单
+
+看到 `context.Context` 时，可以快速过一遍下面这些问题：
+
+### 传递层面
+
+- `ctx` 是否放在第一个参数
+- 是否从入口一路向下透传，而不是中途换 `Background()`
+- 是否给外部调用设置了合理超时
+
+### 退出层面
+
+- 新起的 Goroutine 是否有退出条件
+- 阻塞等待是否监听了 `ctx.Done()`
+- 请求结束后是否还会继续占用下游资源
+
+### 传值层面
+
+- `WithValue` 里存的是不是少量请求级元数据
+- key 是否是自定义私有类型
+- 是否把本该显式出现的业务依赖塞进了 `ctx`
+
+## 一个更实用的决策问题
+
+当你犹豫某个值该不该放进 `context` 时，问自己：
+
+> 如果去掉 `context`，这个值还应不应该作为函数的明确输入存在？
+
+如果答案是“应该”，那它大概率就不该放进 `context`。
+
+## 治理建议
+
+### 团队约定
+
+- `ctx` 一律作为第一个参数
+- 业务对象不得通过 `context` 传递
+- `WithValue` 只允许放请求级元数据
+- 外部调用默认显式设置超时
+
+### 工程治理
+
+- code review 固定检查 `ctx` 透传和取消路径
+- 对 Goroutine 泄漏、超时失效类事故做复盘归因
+- 给公共库设计明确的 `ctx` 约定，而不是让调用方猜
+
+## 延伸阅读
+
+- 并发主线：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/03-concurrency.md`](./guide/03-concurrency.md)
+- Context 源码：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/context.md`](./guide/source-reading/context.md)
+- 高频题：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/go-top-30-interview-questions.md`](./go-top-30-interview-questions.md)

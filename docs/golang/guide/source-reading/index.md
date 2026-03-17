@@ -7,6 +7,186 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 
 > 源码路径：`$GOROOT/src/`（版本：v1.26.1）
 
+这页现在承担 `guide/source-reading/` 的统一导航职责。为了减少源码精读模块的碎片化，优先按主题分组，而不是让读者直接在几十篇独立文章里盲找。
+
+## 怎么使用这页
+
+- **想先抓主线**：看“推荐阅读路线”
+- **想按主题查包**：看“按主题分组索引”
+- **想知道单篇文章的定位**：再看后面的“精读索引”
+
+## 推荐阅读路线
+
+### 路线一：先补 runtime 主线
+
+适合：想把并发、GC、内存和排障串成一条线的人。
+
+1. [Goroutine 生命周期](./goroutine.md)：先建立 goroutine 创建、阻塞、退出的基本视角。
+2. [GMP 调度器](./runtime-scheduler.md)：把 P/M/G 调度、抢占和 work stealing 串起来。
+3. [Channel 底层实现](./channel.md)：理解 goroutine 之间怎么同步与传递数据。
+4. [内存分配器](./runtime-memory.md)：补齐对象分配、span、mcache/mcentral/mheap 关系。
+5. [GC 垃圾回收](./runtime-gc.md)：继续顺着内存主线读清三色标记和写屏障。
+6. [runtime/pprof](./runtime-pprof.md)：从源码角度理解 profile 数据如何采样和输出。
+7. [runtime/trace](./runtime-trace.md)：最后把调度、GC、syscall 放到时序视角里看全局行为。
+
+### 路线二：并发与服务治理
+
+适合：想把 `context`、`sync`、`x/sync`、`net/http` 放进同一个工程视角理解的人。
+
+1. [context 包](./context.md)：先搞清取消树、超时传播和值传递边界。
+2. [sync 包](./sync-primitives.md)：理解 Mutex、RWMutex、WaitGroup、Once 的设计取舍。
+3. [sync/atomic](./sync-atomic.md)：补上无锁并发和内存序的基础认知。
+4. [golang.org/x/sync](./golang-x-sync.md)：把工程里常见的 `errgroup`、`singleflight`、`semaphore` 纳入视角。
+5. [net/http 总览](./net-http.md)：看并发原语在服务框架里的落点。
+6. [net/http Transport](./net-http-transport.md)：最后理解客户端连接池、超时级联和资源治理。
+
+### 路线三：网络与 API 服务
+
+适合：做 Web、RPC、网关、代理和客户端治理的人。
+
+1. [net 包](./net.md)：从 `Conn`、listener、DNS 和 netpoller 打底。
+2. [net/http 总览](./net-http.md)：建立 HTTP 服务端与客户端的整体结构认知。
+3. [net/http Server](./net-http-server.md)：深入请求生命周期、连接复用和优雅关闭。
+4. [net/http Transport](./net-http-transport.md)：再读客户端连接池、Keep-Alive 和超时控制。
+5. [net/http/httputil](./net-httputil.md)：把反向代理、请求转发和调试工具补齐。
+6. [gRPC-Go](./grpc-go.md)：最后把 HTTP/2、拦截器、流式调用迁移到 RPC 视角。
+
+## 按主题分组索引
+
+### Runtime 与调度
+
+- [`goroutine`](./goroutine.md) - Goroutine 生命周期
+- [`runtime-scheduler`](./runtime-scheduler.md) - GMP 调度器
+- [`channel`](./channel.md) - Channel 底层实现
+- [`map`](./map.md) - map / Swiss Table
+- [`runtime-memory`](./runtime-memory.md) - 内存分配器
+- [`runtime-gc`](./runtime-gc.md) - GC 垃圾回收
+- [`runtime-debug`](./runtime-debug.md) - 调试接口
+- [`runtime-finalizer`](./runtime-finalizer.md) - 终结器
+- [`runtime-metrics`](./runtime-metrics.md) - 运行时指标
+- [`runtime-pprof`](./runtime-pprof.md) - Profile 工具链
+- [`runtime-trace`](./runtime-trace.md) - 执行追踪
+- [`go-memory-tuning`](./go-memory-tuning.md) - 运行时内存调优
+
+### 并发与同步
+
+- [`context`](./context.md)
+- [`sync-primitives`](./sync-primitives.md)
+- [`sync-atomic`](./sync-atomic.md)
+- [`sync-cond`](./sync-cond.md)
+- [`sync-pool`](./sync-pool.md)
+- [`golang-x-sync`](./golang-x-sync.md)
+- [`timer`](./timer.md)
+
+### 网络、HTTP 与 RPC
+
+- [`net`](./net.md)
+- [`net-http`](./net-http.md)
+- [`net-http-server`](./net-http-server.md)
+- [`net-http-transport`](./net-http-transport.md)
+- [`net-http-api`](./net-http-api.md)
+- [`net-http-ratelimit`](./net-http-ratelimit.md)
+- [`net-http-test`](./net-http-test.md)
+- [`net-http-trace`](./net-http-trace.md)
+- [`net-http2`](./net-http2.md)
+- [`net-httputil`](./net-httputil.md)
+- [`net-url`](./net-url.md)
+- [`net-netip`](./net-netip.md)
+- [`net-rpc`](./net-rpc.md)
+- [`net-smtp`](./net-smtp.md)
+- [`net-tcp-server`](./net-tcp-server.md)
+- [`net-cookiejar`](./net-cookiejar.md)
+- [`websocket`](./websocket.md)
+- [`grpc-go`](./grpc-go.md)
+- [`opentelemetry-go`](./opentelemetry-go.md)
+
+### I/O、编码与数据格式
+
+- [`io-interfaces`](./io-interfaces.md)
+- [`io-advanced`](./io-advanced.md)
+- [`io-fs`](./io-fs.md)
+- [`bufio`](./bufio.md)
+- [`encoding-json`](./encoding-json.md)
+- [`encoding-xml`](./encoding-xml.md)
+- [`encoding-gob`](./encoding-gob.md)
+- [`encoding-binary`](./encoding-binary.md)
+- [`encoding-base64`](./encoding-base64.md)
+- [`encoding-csv`](./encoding-csv.md)
+- [`encoding-hex`](./encoding-hex.md)
+- [`compress-gzip`](./compress-gzip.md)
+- [`archive-tar`](./archive-tar.md)
+- [`archive-zip`](./archive-zip.md)
+- [`mime-multipart`](./mime-multipart.md)
+
+### 语言机制与基础能力
+
+- [`errors`](./errors.md)
+- [`fmt`](./fmt.md)
+- [`reflect`](./reflect.md)
+- [`strings-bytes`](./strings-bytes.md)
+- [`strconv`](./strconv.md)
+- [`regexp`](./regexp.md)
+- [`unicode-utf8`](./unicode-utf8.md)
+- [`iter-pkg`](./iter-pkg.md)
+- [`unique-pkg`](./unique-pkg.md)
+- [`slices-maps-cmp`](./slices-maps-cmp.md)
+- [`sort`](./sort.md)
+- [`math-rand`](./math-rand.md)
+- [`math-bits`](./math-bits.md)
+- [`math-big`](./math-big.md)
+- [`time-pkg`](./time-pkg.md)
+
+### 工程化、工具链与测试
+
+- [`testing`](./testing.md)
+- [`testing-fstest`](./testing-fstest.md)
+- [`flag`](./flag.md)
+- [`embed`](./embed.md)
+- [`debug-buildinfo`](./debug-buildinfo.md)
+- [`expvar`](./expvar.md)
+- [`go-ast`](./go-ast.md)
+- [`go-analysis`](./go-analysis.md)
+- [`go-format`](./go-format.md)
+- [`go-fuzzing`](./go-fuzzing.md)
+- [`go-generate`](./go-generate.md)
+- [`go-types`](./go-types.md)
+- [`cobra-viper`](./cobra-viper.md)
+- [`wire`](./wire.md)
+- [`prometheus-go`](./prometheus-go.md)
+- [`zap`](./zap.md)
+- [`log-pkg`](./log-pkg.md)
+- [`log-slog`](./log-slog.md)
+
+### 数据库、缓存与外部集成
+
+- [`database-sql`](./database-sql.md)
+- [`database-sql-advanced`](./database-sql-advanced.md)
+- [`pgx-driver`](./pgx-driver.md)
+- [`go-redis`](./go-redis.md)
+- [`golang-x-oauth2`](./golang-x-oauth2.md)
+- [`golang-x-text`](./golang-x-text.md)
+
+### 操作系统、安全与底层边界
+
+- [`os`](./os.md)
+- [`os-exec`](./os-exec.md)
+- [`os-signal`](./os-signal.md)
+- [`os-user`](./os-user.md)
+- [`path-filepath`](./path-filepath.md)
+- [`unsafe`](./unsafe.md)
+- [`cgo-basics`](./cgo-basics.md)
+- [`crypto-aes`](./crypto-aes.md)
+- [`crypto-cipher`](./crypto-cipher.md)
+- [`crypto-rand`](./crypto-rand.md)
+- [`crypto-rsa`](./crypto-rsa.md)
+- [`crypto-ecdsa`](./crypto-ecdsa.md)
+- [`crypto-ed25519`](./crypto-ed25519.md)
+- [`crypto-hmac`](./crypto-hmac.md)
+- [`crypto-sha`](./crypto-sha.md)
+- [`crypto-password`](./crypto-password.md)
+- [`crypto-tls`](./crypto-tls.md)
+- [`crypto-x509`](./crypto-x509.md)
+
 ## 包全景图
 
 ```

@@ -7,6 +7,16 @@ description: 精读 net/http Server 的连接生命周期、middleware 链设计
 
 > 核心源码：`src/net/http/server.go`
 
+这篇是 `net/http` 服务端方向的深挖页，重点是连接生命周期、middleware、graceful shutdown、SSE 和连接劫持。
+
+如果你还没建立 `net/http` 的整体认知，建议先看总览页：
+
+- 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http.md`](./net-http.md)
+
+如果你关心的是客户端连接池和超时治理，而不是服务端，请看：
+
+- Transport：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/net-http-transport.md`](./net-http-transport.md)
+
 ## 包结构图
 
 ```

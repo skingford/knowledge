@@ -35,12 +35,12 @@
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
-- [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
+- [Go 学习路径与资料导航](./golang/learning-path.md)
 
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- [高级 Golang 学习资料](./golang/golang-advanced-learning-guide.md)
+- [Go 学习路径与资料导航](./golang/learning-path.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模

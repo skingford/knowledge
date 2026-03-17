@@ -7,6 +7,14 @@ description: 精读 sync.Cond 的条件变量实现，掌握 Wait/Signal/Broadca
 
 > 核心源码：`src/sync/cond.go`
 
+这篇只聚焦条件变量语义：`Wait`、`Signal`、`Broadcast` 以及为什么必须用 `for` 循环守护条件。
+
+如果你还在比较各种同步工具的适用边界，先看：
+
+- 总览：[`/Users/kingford/workspace/github.com/knowledge/docs/golang/guide/source-reading/sync-primitives.md`](./sync-primitives.md)
+
+`sync.Cond` 适合解决“等待某个条件成立”的问题，不适合拿来替代所有 channel 或 mutex 场景。
+
 ## 包结构图
 
 ```

@@ -349,21 +349,21 @@ export const sections: SectionConfig[] = [
       title: 'Golang 方向',
       intro:
         '从语言机制、并发与性能，到服务端工程实践和能力自检，把 Go 进阶学习从零散资料整理成一条连续路径。',
-      primary: { title: '高级资料', href: '/golang/golang-advanced-learning-guide', description: '先走主线。' },
+      primary: { title: '学习路径', href: '/golang/learning-path', description: '先走主线。' },
       secondary: { title: '高频题', href: '/golang/go-top-30-interview-questions', description: '再做自检。' },
       scope: ['Go 语言底层', '并发模型', '性能优化与排障', '服务端工程实践', '能力自检准备', '设计模式与安全', '容器化与云原生', '代码生成与元编程', '标准库源码精读', 'runtime 源码分析'],
       docs: [
-        { title: '高级 Golang 学习资料', href: '/golang/golang-advanced-learning-guide', description: '主入口文档，覆盖语言、并发、性能和工程实践。' },
+        { title: 'Go 学习路径与资料导航', href: '/golang/learning-path', description: '统一入口，覆盖学习路线、专题入口与推荐资料。' },
+        { title: 'Go 能力自检与面试准备导航', href: '/golang/interview-prep', description: '统一整理题库、代码片段与专题回查入口。' },
         { title: '30+ 高频 Golang 能力自检题', href: '/golang/go-top-30-interview-questions', description: '用问题驱动回顾知识盲区和底层理解。' },
         { title: 'Golang 高频题代码片段', href: '/golang/go-interview-code-snippets', description: '配套示例代码，方便把抽象概念落到实现。' },
-        { title: 'Go 推荐书单与资料', href: '/golang/golang-recommended-resources', description: '补充阅读清单，便于继续深挖。' },
         { title: 'Pprof 排障指南', href: '/golang/pprof-troubleshooting-guide', description: '针对性能定位和排障建立实操路径。' },
         { title: 'Context 使用边界', href: '/golang/context-usage-boundaries', description: '厘清在 Go 服务里使用 Context 的边界和误区。' },
         { title: 'Go 源码精读模块', href: '/golang/guide/source-reading/', description: '把标准库与 runtime 源码阅读作为独立模块来学。' },
       ],
       order: [
-        '高级 Golang 学习资料',
-        'Go 推荐书单与资料',
+        'Go 学习路径与资料导航',
+        'Go 能力自检与面试准备导航',
         '30+ 高频 Golang 能力自检题',
         'Golang 高频题代码片段',
         'Pprof 排障指南',
@@ -375,10 +375,10 @@ export const sections: SectionConfig[] = [
         text: 'Golang',
         items: [
           { text: '方向概览', link: '/golang/' },
-          { text: '高级 Golang 学习资料', link: '/golang/golang-advanced-learning-guide' },
+          { text: '学习路径与资料导航', link: '/golang/learning-path' },
+          { text: '能力自检与面试准备导航', link: '/golang/interview-prep' },
           { text: '30+ 高频能力自检题', link: '/golang/go-top-30-interview-questions' },
           { text: '能力自检高频题代码片段', link: '/golang/go-interview-code-snippets' },
-          { text: '推荐书单与资源', link: '/golang/golang-recommended-resources' },
           { text: 'Pprof 排障指南', link: '/golang/pprof-troubleshooting-guide' },
           { text: 'Context 使用边界', link: '/golang/context-usage-boundaries' },
           { text: 'Go 版本特性总结', link: '/golang/go-version-features' },
@@ -788,7 +788,7 @@ export const learningOverviewTracks = sections.map((section) => ({
 export const learningOverviewGoals = [
   { title: '想先看路线图', href: '/architecture/architect-learning-roadmap', description: '先从架构路线开始，再延伸到 AI 或 Go 的专题。' },
   { title: '想快速入门 Agent 开发', href: '/ai/agent-learning-guide', description: '先建立 Agent 全局认知，再展开 Tool Calling 和 RAG。' },
-  { title: '想强化 Go 高级能力', href: '/golang/golang-advanced-learning-guide', description: '从主线资料切入，再补性能、排障和高频题。' },
+  { title: '想强化 Go 高级能力', href: '/golang/learning-path', description: '从统一学习路径切入，再补性能、排障和高频题。' },
   { title: '想专项读 Go 源码', href: '/golang/guide/source-reading/', description: '直接进入独立源码阅读模块，按 runtime、网络、编码等主题深挖。' },
   { title: '想做能力自检准备', href: '/architecture/architect-interview-prep-checklist', description: '架构和 Go 都提供适合阶段复盘或面试准备的清单和题目。' },
 ]
