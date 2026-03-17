@@ -1,22 +1,22 @@
 ---
-title: Go 推荐书单、博客与视频资料
-description: 推荐资料已并入 Go 学习路径与资料导航，统一维护书单、博客、演讲与开源项目入口。
+title: Go 推荐书单、博客与视频资料（已归档）
+description: 原资料清单已并入 guide/source-reading/learning-path，当前页面仅保留历史访问路径。
 search: false
 ---
 
-# Go 推荐书单、博客与视频资料
+# Go 推荐书单、博客与视频资料（已归档）
 
-这页保留原有访问入口，但资料清单已并入统一导航页，避免“路线页”和“资料页”长期重复维护。
+原来的资料清单已经不再单独维护，统一收口到源码阅读模块，和阅读路线、runtime 导读放在一起维护。
 
-## 统一入口
+## 当前应该去哪里
 
-- 资料导航总页：[Go 学习路径与资料导航](./learning-path.md)
+- 资料与路线统一入口：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
+- Go 总导航：[Go 学习路径与资料导航](./learning-path.md)
 
-## 你可能在找的内容
+## 这页为什么还保留
 
-- 官方资料与规范：[Go 学习路径与资料导航](./learning-path.md)
-- 推荐书单：[Go 学习路径与资料导航](./learning-path.md)
-- GopherCon 演讲：[Go 学习路径与资料导航](./learning-path.md)
-- 值得阅读的开源项目：[Go 学习路径与资料导航](./learning-path.md)
+- 兼容旧链接
+- 给历史入口一个明确的去向
+- 避免资料页和路线页再次分叉
 
-如果后续新增资料，请优先更新统一导航页，而不是在多个入口重复补充。
+如果你现在要找书单、博客、演讲或开源项目，直接去 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)。

@@ -19,6 +19,7 @@ search: false
 - 高频题题库：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
 - 高频题代码片段：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
 - Go 学习路径总入口：[Go 学习路径与资料导航](./learning-path.md)
+- 源码阅读主线：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 
 ## 题目、代码、专题怎么配合
 
@@ -27,7 +28,7 @@ search: false
 | 切片、接口、逃逸 | `go-top-30-interview-questions` 基础与底层 | `go-interview-code-snippets` 基础与底层 | `guide/01-*`、`guide/02-*` |
 | Channel、Context、WaitGroup、Mutex | `go-top-30-interview-questions` 并发与调度 | `go-interview-code-snippets` 并发与调度 | `guide/03-concurrency` |
 | Pprof、sync.Pool、http.Client | `go-top-30-interview-questions` 工程与性能 | `go-interview-code-snippets` 性能与工程 | `guide/07-performance-troubleshooting` |
-| 调度器、GMP、runtime | `go-top-30-interview-questions` 并发与调度 | 代码片段只做辅助 | `guide/09-runtime-source` + `guide/source-reading/` |
+| 调度器、GMP、runtime | `go-top-30-interview-questions` 并发与调度 | 代码片段只做辅助 | `guide/source-reading/learning-path` + `guide/source-reading/` |
 
 ## 推荐练习方式
 
@@ -83,6 +84,7 @@ search: false
 - `go-top-30-interview-questions`：负责题目和回答模板
 - `go-interview-code-snippets`：负责最小示例代码
 - `guide/*`：负责系统原理和工程实践
+- `guide/source-reading/learning-path`：负责源码阅读主线、方法和资料
 - `guide/source-reading/*`：负责源码实现
 
 也就是说，题库和代码页不再追求“大而全”，而是做能力自检入口。
@@ -92,5 +94,6 @@ search: false
 1. [30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
 2. [Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
 3. [Go 学习路径与资料导航](./learning-path.md) 里对应专题
+4. [Go 源码阅读学习主线](./guide/source-reading/learning-path.md) 补 runtime 和标准库实现
 
 如果你的目标是“压缩准备时间”，直接从这页开始最合适。

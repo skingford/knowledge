@@ -1,18 +1,18 @@
 ---
 title: Go 学习路径与资料导航
-description: 合并 Go 学习路线、专题入口与推荐资料，减少入口碎片化，帮助按阶段组织语言、并发、性能、工程实践与源码阅读。
+description: Go 通用学习导航，负责串联专题入口；源码阅读相关路线、方法与资料已统一收口到 guide/source-reading。
 search: false
 ---
 
 # Go 学习路径与资料导航
 
-这页用于合并原来的“进阶学习指南”和“推荐资料清单”两类入口，减少同一主题在多个页面重复出现。你可以把它当成 `docs/golang` 的总导航页：先定阶段，再进专题，最后补资料和练习。
+这页现在只负责 `docs/golang` 的通用专题导航：先定阶段，再进专题，最后回到自检与源码阅读模块。源码阅读相关的路线、方法、runtime 导读和资料清单，已经统一收口到 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)。
 
 ## 怎么使用这页
 
 - **想系统学一遍**：按“阶段学习路径”从上往下走
 - **想补薄弱项**：直接跳到对应专题入口
-- **想找书、博客、演讲和源码项目**：看文末“推荐资料”
+- **想系统读源码**：直接去 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 - **想准备能力自检或面试**：直接看“练习与复盘入口”
 
 ## 阶段学习路径
@@ -52,7 +52,7 @@ search: false
 
 - 性能优化与排障：[性能优化与排障](./guide/07-performance-troubleshooting.md)
 - Pprof 排障指南：[Pprof 排障指南](./pprof-troubleshooting-guide.md)
-- 源码与 Runtime 总览：[源码与 Runtime](./guide/09-runtime-source.md)
+- 源码阅读主线：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 - `runtime/pprof`：[runtime/pprof + net/http/pprof 源码精读](./guide/source-reading/runtime-pprof.md)
 - `runtime/trace`：[runtime/trace 源码精读](./guide/source-reading/runtime-trace.md)
 
@@ -74,13 +74,14 @@ search: false
 | 想把并发讲清楚 | `guide/03-concurrency` → `guide/03-advanced-concurrency-patterns` → `runtime-scheduler` |
 | 想提升排障能力 | `guide/07-performance-troubleshooting` → `pprof-troubleshooting-guide` → `runtime-trace` |
 | 想准备能力自检/面试 | `go-top-30-interview-questions` → `go-interview-code-snippets` → 对应 guide 专题 |
-| 想系统读源码 | `guide/09-runtime-source` → `guide/source-reading/index` |
+| 想系统读源码 | `guide/source-reading/learning-path` → `guide/source-reading/index` |
 
 ## 练习与复盘入口
 
 - 自检导航：[Go 能力自检与面试准备导航](./interview-prep.md)
 - 高频题总览：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
 - 题目示例代码：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+- 源码阅读主线：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 - 源码精读总览：[Go 源码精读总览](./guide/source-reading/index.md)
 
 建议的使用顺序：
@@ -89,66 +90,21 @@ search: false
 2. 再回到对应专题页补原理和实践
 3. 最后用源码精读页补“为什么”
 
-## 推荐资料
+## 源码阅读与资料入口
 
-### 官方资料
+- 路线、方法、资料统一入口：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
+- 按包索引：[Go 源码精读总览](./guide/source-reading/index.md)
 
-- [Go 官方博客](https://go.dev/blog/)
-- [语言规范](https://go.dev/ref/spec)
-- [标准库文档](https://pkg.go.dev/std)
-- [Effective Go](https://go.dev/doc/effective_go)
-- [Go Memory Model](https://go.dev/ref/mem)
-- [Release Notes](https://go.dev/doc/devel/release)
-
-### 推荐书单
-
-#### 基础到进阶
-
-- `The Go Programming Language`
-- `Learning Go, 2nd Edition`
-- `Go in Action`
-
-#### 并发与底层
-
-- `Concurrency in Go`
-- `100 Go Mistakes and How to Avoid Them`
-
-#### 工程与系统设计
-
-- `Let's Go`
-- `Let's Go Further`
-- `Cloud Native Go`
-
-### 推荐演讲
-
-- `Concurrency Is Not Parallelism` — Rob Pike
-- `Go Proverbs` — Rob Pike
-- `Understanding Channels` — Kavya Joshi
-- `The Scheduler Saga` — Kavya Joshi
-- `Profiling Go Programs` — Rhys Hiltner
-
-### 值得长期关注的博客
-
-- [Dave Cheney](https://dave.cheney.net/)
-- [Russ Cox](https://research.swtch.com/)
-- [Eli Bendersky](https://eli.thegreenplace.net/tag/go)
-- [Ardan Labs Blog](https://www.ardanlabs.com/blog/)
-
-### 值得阅读的开源项目
-
-- [gin](https://github.com/gin-gonic/gin)
-- [etcd](https://github.com/etcd-io/etcd)
-- [minio](https://github.com/minio/minio)
-- [cobra](https://github.com/spf13/cobra)
-- [wire](https://github.com/google/wire)
+这样处理之后，根目录导航页不再重复维护书单、博客、runtime 导读等内容，源码模块相关信息只在 `guide/source-reading/` 下更新。
 
 ## 当前整理原则
 
 为减少 `docs/golang` 内的碎片化，后续按下面的规则组织：
 
-- **入口型内容尽量合并**：同类“路线/书单/资料导航”优先收敛到本页
+- **通用专题留在根目录**：语言、并发、性能、工程实践继续在 `guide/*`
+- **源码阅读统一收口**：路线、方法、资料和 runtime 导读统一放到 `guide/source-reading/`
 - **专题页负责讲清楚**：例如并发、性能、工程实践、runtime
 - **深度页负责补细节**：例如 `context-usage-boundaries`、`pprof-troubleshooting-guide`
-- **源码页负责解释实现**：统一放在 `guide/source-reading/`
+- **历史重复入口只保留归档说明**：避免再维护两份相同内容
 
 如果你是第一次进入这个目录，建议直接从本页开始，再进入具体专题。

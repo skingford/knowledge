@@ -35,19 +35,19 @@
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
-- [Go 学习路径与资料导航](./golang/learning-path.md)
+- [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
 
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- [Go 学习路径与资料导航](./golang/learning-path.md)
+- [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模
 
 - `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
-- `golang/`：学习资料、能力自检资料、大纲、题库、模板、源码、代码片段、资源清单
+- `golang/`：专题导航、源码精读、能力自检资料、题库与代码片段
 
 ## 整理规则
 
@@ -56,7 +56,7 @@
 - 优先按“概览 -> 路线 -> 资料 -> 实践/能力自检”组织结构
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
-- 文档内部跳转统一使用相对链接，例如 `[Go 学习路径](./golang/learning-path.md)`，这样本地预览和线上发布都能直接使用
+- 文档内部跳转统一使用相对链接，例如 `[Go 源码阅读主线](./golang/guide/source-reading/learning-path.md)`，这样本地预览和线上发布都能直接使用
 - 不要把 `/Users/...`、`file://...` 这类机器相关绝对路径写进正文链接文字或 `href`
 - 如果只想在自己机器上直接打开文件，优先使用编辑器的“打开链接/打开文件”能力；若必须使用本地协议，建议只在不发布的个人笔记里使用 `vscode://file/...`
 - 如果文档使用 `vocabulary` frontmatter，只写共享词典 key，词条详情统一维护在 `docs/.vitepress/theme/vocabulary-dictionary.json`
