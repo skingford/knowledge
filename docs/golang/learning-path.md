@@ -44,6 +44,7 @@ search: false
 - 网络编程与标准库：[网络编程与标准库](./guide/04-network-stdlib.md)
 - 工程实践总览：[工程实践](./guide/05-engineering-practices.md)
 - 数据库与缓存：[数据库与缓存](./guide/06-database-cache.md)
+- `database/sql` 与连接池：[database/sql 与连接池](./guide/06-database-sql-and-connection.md)
 - 微服务与分布式：[微服务与分布式](./guide/08-microservices-distributed.md)
 
 ### 第四阶段：性能、排障与运行时
@@ -60,6 +61,7 @@ search: false
 
 目标：补齐设计模式、安全、容器化、代码生成和版本演进。
 
+- 进阶专题总览：[进阶专题](./guide/10-advanced-topics.md)
 - 设计模式与惯用法：[设计模式与惯用法](./guide/10-design-patterns-idioms.md)
 - 安全编程实践：[安全编程实践](./guide/10-security-practices.md)
 - 容器化与云原生：[容器化与云原生实践](./guide/10-containerization-cloud-native.md)
@@ -72,7 +74,9 @@ search: false
 | --- | --- |
 | 快速建立 Go 全景认知 | `guide/01` → `guide/03` → `guide/05` |
 | 想把并发讲清楚 | `guide/03-concurrency` → `guide/03-advanced-concurrency-patterns` → `runtime-scheduler` |
+| 想补数据库接入与连接池 | `guide/06-database-cache` → `guide/06-database-sql-and-connection` → `source-reading/database-sql` |
 | 想提升排障能力 | `guide/07-performance-troubleshooting` → `pprof-troubleshooting-guide` → `runtime-trace` |
+| 想补设计、安全、容器化和工具链 | `guide/10-advanced-topics` → 对应 `10-*` 专题页 |
 | 想准备能力自检/面试 | `go-top-30-interview-questions` → `go-interview-code-snippets` → 对应 guide 专题 |
 | 想系统读源码 | `guide/source-reading/learning-path` → `guide/source-reading/index` |
 
@@ -90,6 +94,15 @@ search: false
 2. 再回到对应专题页补原理和实践
 3. 最后用源码精读页补“为什么”
 
+## 关键补充页
+
+这些页面不是“章节大纲”的一部分，但在真实项目里会被频繁回查：
+
+- `database/sql` 与连接池：[database/sql 与连接池](./guide/06-database-sql-and-connection.md)
+- Context 使用边界：[Context 使用边界](./context-usage-boundaries.md)
+- Pprof 排障指南：[Pprof 排障指南](./pprof-troubleshooting-guide.md)
+- Go 版本特性：[Go 版本特性总结（1.21 ~ 1.24）](./go-version-features.md)
+
 ## 源码阅读与资料入口
 
 - 路线、方法、资料统一入口：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
@@ -105,6 +118,6 @@ search: false
 - **源码阅读统一收口**：路线、方法、资料和 runtime 导读统一放到 `guide/source-reading/`
 - **专题页负责讲清楚**：例如并发、性能、工程实践、runtime
 - **深度页负责补细节**：例如 `context-usage-boundaries`、`pprof-troubleshooting-guide`
-- **历史重复入口只保留归档说明**：避免再维护两份相同内容
+- **历史重复入口只保留兼容页**：源码层移动到 `legacy/`，对外 URL 保持不变
 
 如果你是第一次进入这个目录，建议直接从本页开始，再进入具体专题。

@@ -102,6 +102,6 @@ func withDeadlockRetry(fn func() error) error {
 
 ## 继续阅读
 
-- [大事务拆分](./large-transaction-splitting.md)
+- [大事务拆分](./transaction-and-optimization.md#大事务拆分)
 - [热点账户更新](./hot-account-update.md)
 - [返回 MySQL 专题总览](./index.md)

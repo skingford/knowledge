@@ -1,4 +1,6 @@
 ---
+title: 切片并发陷阱：Append、锁、Channel 与工程化取舍
+description: Go 切片并发写入专题，梳理 append 的竞态风险，以及预分配、加锁和 Channel 串行化等工程化方案。
 search: false
 ---
 

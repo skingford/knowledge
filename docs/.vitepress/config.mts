@@ -16,17 +16,17 @@ function normalizeVoidHtmlTags(html: string) {
   })
 }
 
-const sectionNavItems = sections.map((section) => ({
-  text: section.navText,
-  link: section.base,
-  activeMatch: `^${section.base}`,
-}))
-
 const sidebar = Object.fromEntries(
   [...sections]
     .sort((a, b) => b.base.length - a.base.length)
     .map((section) => [section.base, section.sidebar]),
 )
+
+const sectionNavItems = sections.map((section) => ({
+  text: section.navText,
+  link: section.base,
+  activeMatch: `^${section.base}`,
+}))
 
 export default withMermaid(defineConfig({
   lang: 'zh-CN',
@@ -36,6 +36,11 @@ export default withMermaid(defineConfig({
 
   base: '/knowledge/',
   srcExclude: ['README.md', 'TEMPLATE.md'],
+  rewrites: {
+    'golang/legacy/golang-advanced-learning-guide.md': 'golang/golang-advanced-learning-guide.md',
+    'golang/legacy/golang-recommended-resources.md': 'golang/golang-recommended-resources.md',
+    'golang/guide/legacy/09-runtime-source.md': 'golang/guide/09-runtime-source.md',
+  },
   lastUpdated: true,
   appearance: true,
   sitemap: {
@@ -125,6 +130,7 @@ export default withMermaid(defineConfig({
       {
         text: '工具',
         items: [
+          { text: 'Claude Code 使用指南', link: '/tools/claude-code' },
           { text: 'Vim 实用方案', link: '/tools/vim' },
           { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
           { text: 'Git 常用技巧', link: '/tools/git' },

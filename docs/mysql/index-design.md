@@ -245,6 +245,6 @@ WHERE created_at >= ? AND status = ?;
 
 ## 继续阅读
 
-- [大事务拆分](./large-transaction-splitting.md)
+- [大事务拆分](./transaction-and-optimization.md#大事务拆分)
 - [死锁检测与回滚重试](./deadlock-and-retry.md)
 - [返回 MySQL 专题总览](./index.md)

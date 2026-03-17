@@ -35,19 +35,20 @@
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
+- [Go 学习路径与资料导航](./golang/learning-path.md)
 - [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
 
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
+- [Go 能力自检与面试准备导航](./golang/interview-prep.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 
 ## 当前规模
 
 - `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
-- `golang/`：专题导航、源码精读、能力自检资料、题库与代码片段
+- `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
 
 ## 整理规则
 
@@ -73,4 +74,4 @@
 
 - `architecture/`：系统设计、架构方法、分布式与治理、案例实战
 - `ai/`：Agent、LLM 应用、RAG、工作流
-- `golang/`：Go 语言进阶、并发、性能、工程实践
+- `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读

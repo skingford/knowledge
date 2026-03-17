@@ -10,8 +10,8 @@ search: false
 
 ## 当前应该去哪里
 
-- 资料与路线统一入口：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
-- Go 总导航：[Go 学习路径与资料导航](./learning-path.md)
+- 资料与路线统一入口：[Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)
+- Go 总导航：[Go 学习路径与资料导航](/golang/learning-path)
 
 ## 这页为什么还保留
 
@@ -19,4 +19,4 @@ search: false
 - 给历史入口一个明确的去向
 - 避免资料页和路线页再次分叉
 
-如果你现在要找书单、博客、演讲或开源项目，直接去 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)。
+如果你现在要找书单、博客、演讲或开源项目，直接去 [Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)。

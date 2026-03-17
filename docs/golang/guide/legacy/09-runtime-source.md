@@ -10,11 +10,11 @@ search: false
 
 ## 当前应该去哪里
 
-- 源码阅读主入口：[Go 源码阅读学习主线](./source-reading/learning-path.md)
-- 包级索引总览：[Go 源码精读总览](./source-reading/index.md)
-- 调度主线：[GMP 调度器](./source-reading/runtime-scheduler.md)
-- 内存与 GC：[内存分配器](./source-reading/runtime-memory.md)、[GC 垃圾回收](./source-reading/runtime-gc.md)
-- 排障与观测：[runtime/pprof](./source-reading/runtime-pprof.md)、[runtime/trace](./source-reading/runtime-trace.md)
+- 源码阅读主入口：[Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)
+- 包级索引总览：[Go 源码精读总览](/golang/guide/source-reading/)
+- 调度主线：[GMP 调度器](/golang/guide/source-reading/runtime-scheduler)
+- 内存与 GC：[内存分配器](/golang/guide/source-reading/runtime-memory)、[GC 垃圾回收](/golang/guide/source-reading/runtime-gc)
+- 排障与观测：[runtime/pprof](/golang/guide/source-reading/runtime-pprof)、[runtime/trace](/golang/guide/source-reading/runtime-trace)
 
 ## 这页为什么保留
 
@@ -28,4 +28,4 @@ search: false
 - `guide/source-reading/index`：主题索引
 - `guide/source-reading/*.md`：单个包或主题的深度文章
 
-如果你是第一次来这里，直接跳到 [Go 源码阅读学习主线](./source-reading/learning-path.md) 即可。
+如果你是第一次来这里，直接跳到 [Go 源码阅读学习主线](/golang/guide/source-reading/learning-path) 即可。

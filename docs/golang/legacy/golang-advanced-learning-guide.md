@@ -10,10 +10,10 @@ search: false
 
 ## 当前应该去哪里
 
-- 源码阅读主入口：[Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
-- Go 总体导航：[Go 学习路径与资料导航](./learning-path.md)
-- 题库入口：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)
-- 代码片段入口：[Golang 能力自检高频题示例代码片段](./go-interview-code-snippets.md)
+- 源码阅读主入口：[Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)
+- Go 总体导航：[Go 学习路径与资料导航](/golang/learning-path)
+- 题库入口：[30+ 高频 Golang 能力自检题](/golang/go-top-30-interview-questions)
+- 代码片段入口：[Golang 能力自检高频题示例代码片段](/golang/go-interview-code-snippets)
 
 ## 这页为什么还保留
 
@@ -21,4 +21,4 @@ search: false
 - 避免历史收藏失效
 - 明确新的统一维护位置
 
-如果你是从旧入口跳过来的，直接去 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)。
+如果你是从旧入口跳过来的，直接去 [Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)。

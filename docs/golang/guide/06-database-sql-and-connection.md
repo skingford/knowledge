@@ -228,5 +228,6 @@ func dbStatsHandler(db *sql.DB) http.HandlerFunc {
 - [数据库与缓存](./06-database-cache.md)
 - [database/sql：连接池与事务（源码精读）](./source-reading/database-sql.md)
 - [database/sql：高级事务与批量插入（源码精读）](./source-reading/database-sql-advanced.md)
-- [事务处理与 SQL 优化](/mysql/transaction-and-optimization)
+- [事务处理](/mysql/transaction-and-optimization)
+- [SQL 优化](/mysql/sql-optimization)
 - [ORM 使用经验（GORM）](/mysql/orm-gorm)

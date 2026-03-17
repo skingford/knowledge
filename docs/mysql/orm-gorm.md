@@ -153,5 +153,6 @@ func getSalesReport(db *gorm.DB) ([]SalesReport, error) {
 ## 继续阅读
 
 - [database/sql 与连接池](/golang/guide/06-database-sql-and-connection)
-- [事务处理与 SQL 优化](./transaction-and-optimization.md)
+- [事务处理](./transaction-and-optimization.md)
+- [SQL 优化](./sql-optimization.md)
 - [返回 MySQL 专题总览](./index.md)

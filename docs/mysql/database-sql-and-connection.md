@@ -12,7 +12,8 @@ search: false
 
 - 新的正式入口：[database/sql 与连接池](/golang/guide/06-database-sql-and-connection)
 - 源码精读版：[database/sql：连接池与事务（源码精读）](/golang/guide/source-reading/database-sql)
-- MySQL 相关继续阅读：[事务处理与 SQL 优化](./transaction-and-optimization.md)
+- MySQL 相关继续阅读：[事务处理](./transaction-and-optimization.md)
+- MySQL 相关继续阅读：[SQL 优化](./sql-optimization.md)
 - MySQL 相关继续阅读：[ORM 使用经验（GORM）](./orm-gorm.md)
 
 如果你是从旧链接进入这里，后续请优先使用 Go 专题下的新路径。
