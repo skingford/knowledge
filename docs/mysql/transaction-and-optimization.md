@@ -279,7 +279,7 @@ func listUsersAfter(db *sql.DB, lastID int64, limit int) ([]User, error) {
 
 ## 继续阅读
 
-- [database/sql 与连接池](./database-sql-and-connection.md)
+- [database/sql 与连接池](/golang/guide/06-database-sql-and-connection)
 - [ORM 使用经验（GORM）](./orm-gorm.md)
 - [大事务拆分](./large-transaction-splitting.md)
 - [返回 MySQL 专题总览](./index.md)

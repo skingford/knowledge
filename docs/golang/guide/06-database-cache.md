@@ -1,18 +1,26 @@
 ---
 title: 数据库与缓存
-description: Go 数据库与缓存专题，涵盖 MySQL 与 Redis 实践。MySQL 相关内容已迁移至独立专题，本页聚焦 Redis 与缓存。
+description: Go 数据库与缓存专题，收纳 database/sql 与连接池这类 Go 集成能力，并关联 MySQL 与 Redis 实践。
 search: false
 ---
 
 # 数据库与缓存
 
-## MySQL 部分
+## Go 与数据库集成
 
-MySQL 相关内容已迁移至独立的 [MySQL 专题](/mysql/)，涵盖以下主题：
+与 Go 强绑定的数据库访问能力保留在本专题，例如 `database/sql` 的连接池配置、`Rows` 生命周期、资源释放和监控方式。
 
 | 主题 | 链接 |
 | --- | --- |
-| database/sql 与连接池 | [查看](/mysql/database-sql-and-connection) |
+| database/sql 与连接池 | [查看](./06-database-sql-and-connection.md) |
+| database/sql：连接池与事务（源码精读） | [查看](./source-reading/database-sql.md) |
+
+## MySQL 部分
+
+MySQL 本体相关内容仍然在独立的 [MySQL 专题](/mysql/) 中维护，涵盖以下主题：
+
+| 主题 | 链接 |
+| --- | --- |
 | 事务处理与 SQL 优化 | [查看](/mysql/transaction-and-optimization) |
 | ORM 使用经验（GORM） | [查看](/mysql/orm-gorm) |
 | B+ 树索引与最左前缀 | [查看](/mysql/index-design) |

@@ -446,6 +446,13 @@ export const sections: SectionConfig[] = [
         ],
       },
       {
+        text: '数据库与缓存拆分专题',
+        collapsed: true,
+        items: [
+          { text: 'database/sql 与连接池', link: '/golang/guide/06-database-sql-and-connection' },
+        ],
+      },
+      {
         text: '进阶专题',
         collapsed: true,
         items: [
@@ -472,7 +479,7 @@ export const sections: SectionConfig[] = [
     base: '/mysql/',
     navText: 'MySQL',
     overviewDescription:
-      '系统整理 MySQL 核心知识，涵盖 database/sql、连接池、事务、SQL 优化、ORM，以及高并发场景下的索引设计、大事务拆分、死锁治理、热点更新与分库分表。',
+      '系统整理 MySQL 核心知识，聚焦事务、SQL 优化、ORM，以及高并发场景下的索引设计、大事务拆分、死锁治理、热点更新与分库分表。',
     landing: {
       eyebrow: 'MySQL',
       title: 'MySQL 专题',
@@ -481,7 +488,7 @@ export const sections: SectionConfig[] = [
       primary: { title: '专题总览', href: '/mysql/', description: '从总览页开始，按主题查阅。' },
       secondary: { title: '索引设计', href: '/mysql/index-design', description: '从 B+ 树和最左前缀开始。' },
       scope: [
-        'database/sql 与连接池',
+        'Go 与 MySQL 集成',
         '事务处理与 SQL 优化',
         'ORM 使用经验',
         'B+ 树索引设计',
@@ -490,7 +497,7 @@ export const sections: SectionConfig[] = [
         'MySQL 实战 45 讲（原理精读）',
       ],
       docs: [
-        { title: 'database/sql 与连接池', href: '/mysql/database-sql-and-connection', description: 'Go 标准库操作 MySQL 的核心用法与连接池配置。' },
+        { title: 'database/sql 与连接池（Go 专题）', href: '/golang/guide/06-database-sql-and-connection', description: 'Go 标准库操作数据库的核心用法与连接池配置。' },
         { title: '事务处理与 SQL 优化', href: '/mysql/transaction-and-optimization', description: '事务模式、EXPLAIN 分析、批量操作与游标分页。' },
         { title: 'ORM 使用经验（GORM）', href: '/mysql/orm-gorm', description: 'GORM 基础用法、N+1 问题与何时用原生 SQL。' },
         { title: 'B+ 树索引与最左前缀', href: '/mysql/index-design', description: '索引结构、回表原理、最左前缀与索引失效场景。' },
@@ -501,7 +508,7 @@ export const sections: SectionConfig[] = [
         { title: '高频追问', href: '/mysql/high-frequency-questions', description: 'SELECT *、深分页、锁持有时间等落地细节。' },
       ],
       order: [
-        'database/sql 与连接池',
+        'database/sql 与连接池（Go 专题）',
         '事务处理与 SQL 优化',
         'ORM 使用经验（GORM）',
         'B+ 树索引与最左前缀',
@@ -517,7 +524,7 @@ export const sections: SectionConfig[] = [
         text: 'MySQL 基础',
         items: [
           { text: '专题总览', link: '/mysql/' },
-          { text: 'database/sql 与连接池', link: '/mysql/database-sql-and-connection' },
+          { text: 'database/sql 与连接池（Go 专题）', link: '/golang/guide/06-database-sql-and-connection' },
           { text: '事务处理与 SQL 优化', link: '/mysql/transaction-and-optimization' },
           { text: 'ORM 使用经验（GORM）', link: '/mysql/orm-gorm' },
         ],
