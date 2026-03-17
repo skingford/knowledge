@@ -49,7 +49,13 @@ mysql> select * from t where id=1;
 
 查询结果长时间不返回。
 
-> **[图：图1 查询长时间不返回]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 1 — 查询长时间不返回</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);font-weight:bold;">select * from t where id=1;</span>
+<span style="color:var(--d-orange);font-weight:bold;">— 长时间无响应，光标一直闪烁等待 …</span></pre>
+</div>
+</div>
 
 
 一般碰到这种情况的话，大概率是表t被锁住了。接下来分析原因的时候，一般都是首先执行一下show processlist命令，看看当前语句处于什么状态。
@@ -60,7 +66,18 @@ mysql> select * from t where id=1;
 
 如图2所示，就是使用show processlist命令查看Waiting for table metadata lock的示意图。
 
-> **[图：图2 Waiting for table me]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 2 — Waiting for table metadata lock</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">show processlist;</span>
++----+---------+---------+------+---------+------+------------------------------+----------------------------------+
+| Id | User    | Host    | db   | Command | Time | State                        | Info                             |
++----+---------+---------+------+---------+------+------------------------------+----------------------------------+
+|  4 | root    | ...     | test | Sleep   |  120 |                              | NULL                             |
+|  5 | root    | ...     | test | Query   |   98 | <span style="color:var(--d-orange);font-weight:bold;">Waiting for table metadata lock</span> | select * from t where id=1       |
++----+---------+---------+------+---------+------+------------------------------+----------------------------------+</pre>
+</div>
+</div>
 
 
 出现**这个状态表示的是，现在有一个线程正在表t上请求或者持有MDL写锁，把select语句堵住了。**
@@ -69,7 +86,32 @@ mysql> select * from t where id=1;
 
 不过，在MySQL 5.7版本下复现这个场景，也很容易。如图3所示，我给出了简单的复现步骤。  
 
-> **[图：图3 MySQL 5.7中Waiting fo]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 3 — MySQL 5.7 中复现 Waiting for table metadata lock</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:50%;color:var(--d-th-text);">Session A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:50%;color:var(--d-th-text);">Session B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">lock table t write;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-weight:bold;">(blocked)</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);text-align:center;">
+    Session A 持有 MDL 写锁，Session B 需要 MDL 读锁 → 被阻塞
+  </div>
+</div>
+</div>
 
 
 session A 通过lock table命令持有表t的MDL写锁，而session B的查询需要获取MDL读锁。所以，session B进入等待状态。
@@ -80,7 +122,18 @@ session A 通过lock table命令持有表t的MDL写锁，而session B的查询�
 
 通过查询sys.schema_table_lock_waits这张表，我们就可以直接找出造成阻塞的process id，把这个连接用kill 命令断开即可。
 
-> **[图：图4 查获加表锁的线程id]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 4 — 通过 sys.schema_table_lock_waits 查获加表锁的线程</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select blocking_pid</span>
+    <span style="color:var(--d-blue);">from sys.schema_table_lock_waits\G</span>
+*************************** 1. row ***************************
+blocking_pid: <span style="color:var(--d-orange);font-weight:bold;">4</span>
+1 row in set
+
+mysql> <span style="color:var(--d-orange);font-weight:bold;">kill 4;</span></pre>
+</div>
+</div>
 
 
 ## 等flush
@@ -98,7 +151,17 @@ mysql> select * from information_schema.processlist where id=1;
 
 你可以看一下图5。我查出来这个线程的状态是Waiting for table flush，你可以设想一下这是什么原因。  
 
-> **[图：图5 Waiting for table fl]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 5 — Waiting for table flush</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select * from information_schema.processlist where id=1;</span>
++----+------+-------+------+---------+------+-------------------------+-------+
+| Id | User | Host  | db   | Command | Time | State                   | Info  |
++----+------+-------+------+---------+------+-------------------------+-------+
+|  1 | root | ...   | test | Query   |   45 | <span style="color:var(--d-orange);font-weight:bold;">Waiting for table flush</span> | ...   |
++----+------+-------+------+---------+------+-------------------------+-------+</pre>
+</div>
+</div>
 
 
 这个状态表示的是，现在有一个线程正要对表t做flush操作。MySQL里面对表做flush操作的用法，一般有以下两个：
@@ -118,14 +181,63 @@ flush tables with read lock;
 
 现在，我们一起来复现一下这种情况，**复现步骤** 如图6所示：
 
-> **[图：图6 Waiting for table fl]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 6 — 复现 Waiting for table flush 的步骤</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:12%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:30%;color:var(--d-th-text);">Session A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:30%;color:var(--d-th-text);">Session B</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:28%;color:var(--d-th-text);">Session C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select sleep(1) from t;<br><span style="color:var(--d-text-sub);">（10 万行，执行 10 万秒）</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">flush tables t;<br><span style="color:var(--d-orange);font-weight:bold;">(blocked — 等 A 关闭表)</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-weight:bold;">(blocked — 等 flush 完成)</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);text-align:center;">
+    A 长查询打开表 → B flush 等 A → C 查询等 B → 三级阻塞链
+  </div>
+</div>
+</div>
 
 
 在session A中，我故意每行都调用一次sleep(1)，这样这个语句默认要执行10万秒，在这期间表t一直是被session A“打开”着。然后，session B的flush tables t命令再要去关闭表t，就需要等session A的查询结束。这样，session C要再次查询的话，就会被flush 命令堵住了。
 
 图7是这个复现步骤的show processlist结果。这个例子的排查也很简单，你看到这个show processlist的结果，肯定就知道应该怎么做了。
 
-> **[图：图 7 Waiting for table fl]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 7 — show processlist 查看 flush 阻塞现场</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">show processlist;</span>
++----+------+-------+------+---------+-------+-------------------------+-------------------------------+
+| Id | User | Host  | db   | Command | Time  | State                   | Info                          |
++----+------+-------+------+---------+-------+-------------------------+-------------------------------+
+|  4 | root | ...   | test | Query   | 12052 | User sleep              | select sleep(1) from t        |
+|  5 | root | ...   | test | Query   |    98 | <span style="color:var(--d-orange);font-weight:bold;">Waiting for table flush</span> | flush tables t                |
+|  6 | root | ...   | test | Query   |    92 | <span style="color:var(--d-orange);font-weight:bold;">Waiting for table flush</span> | select * from t where id=1    |
++----+------+-------+------+---------+-------+-------------------------+-------------------------------+</pre>
+</div>
+</div>
 
 
 ## 等行锁
@@ -143,9 +255,48 @@ mysql> select * from t where id=1 lock in share mode;
 
 复现步骤和现场如下：
 
-> **[图：图 8 行锁复现]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 8 — 行锁复现步骤</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:42%;color:var(--d-th-text);">Session A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:43%;color:var(--d-th-text);">Session B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">begin;<br>update t set c=c+1 where id=1;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select * from t where id=1<br>lock in share mode;<br><span style="color:var(--d-orange);font-weight:bold;">(blocked — 等待行锁)</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);text-align:center;">
+    Session A 持有 id=1 的写锁且未提交 → Session B 的加锁读被阻塞
+  </div>
+</div>
+</div>
 
-> **[图：图 9 行锁show processlist 现场]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 9 — show processlist 行锁等待现场</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">show processlist;</span>
++----+------+-------+------+---------+------+------------------------------+--------------------------------------------+
+| Id | User | Host  | db   | Command | Time | State                        | Info                                       |
++----+------+-------+------+---------+------+------------------------------+--------------------------------------------+
+|  4 | root | ...   | test | Sleep   |  180 |                              | NULL                                       |
+|  5 | root | ...   | test | Query   |   68 | <span style="color:var(--d-orange);font-weight:bold;">Sending data</span>                 | select * from t where id=1 lock in share.. |
++----+------+-------+------+---------+------+------------------------------+--------------------------------------------+</pre>
+</div>
+</div>
 
 
 显然，session A启动了事务，占有写锁，还不提交，是导致session B被堵住的原因。
@@ -158,7 +309,33 @@ mysql> select * from t where id=1 lock in share mode;
 mysql> select * from t sys.innodb_lock_waits where locked_table=`'test'.'t'`\G
 ```
 
-> **[图：图10 通过sys.innodb_lock_wa]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 10 — 通过 sys.innodb_lock_waits 查到阻塞源</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select * from sys.innodb_lock_waits
+       where locked_table='`test`.`t`'\G</span>
+*************************** 1. row ***************************
+                wait_started: 2019-01-14 18:25:30
+                    wait_age: 00:01:08
+               wait_age_secs: 68
+                locked_table: `test`.`t`
+                locked_index: PRIMARY
+                 locked_type: RECORD
+              waiting_trx_id: 281479652498456
+         waiting_trx_started: 2019-01-14 18:25:30
+             waiting_trx_age: 00:01:08
+     waiting_query: select * from t where id=1 lock in share mode
+              waiting_lock_id: 281479652498456:54:4:2
+            waiting_lock_mode: S
+              blocking_trx_id: 281479652498448
+                 blocking_pid: <span style="color:var(--d-orange);font-weight:bold;">4</span>
+              blocking_query: NULL
+            blocking_lock_id: 281479652498448:54:4:2
+           blocking_lock_mode: X
+         sql_kill_blocking_query: <span style="color:var(--d-text-muted);">KILL QUERY 4</span>
+    sql_kill_blocking_connection: <span style="color:var(--d-orange);font-weight:bold;">KILL 4</span></pre>
+</div>
+</div>
 
 
 可以看到，这个信息很全，4号线程是造成堵塞的罪魁祸首。而干掉这个罪魁祸首的方式，就是KILL QUERY 4或KILL 4。
@@ -182,7 +359,14 @@ mysql> select * from t where c=50000 limit 1;
 
 作为确认，你可以看一下慢查询日志。注意，这里为了把所有语句记录到slow log里，我在连接后先执行了 set `long_query_time`=0，将慢查询日志的时间阈值设置为0。
 
-> **[图：图11 全表扫描5万行的slow log]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 11 — 全表扫描 5 万行的 slow log</div>
+<pre style="margin:0;white-space:pre-wrap;"><span style="color:var(--d-text-muted);"># Query_time: <span style="color:var(--d-orange);font-weight:bold;">0.011500</span>  Lock_time: 0.000100  Rows_sent: 1  Rows_examined: <span style="color:var(--d-orange);font-weight:bold;">50000</span></span>
+SET timestamp=1551007510;
+select * from t where c=50000 limit 1;</pre>
+</div>
+</div>
 
 
 Rows_examined显示扫描了50000行。你可能会说，不是很慢呀，11.5毫秒就返回了，我们线上一般都配置超过1秒才算慢查询。但你要记住：**坏查询不一定是慢查询** 。我们这个例子里面只有10万行记录，数据量大起来的话，执行时间就线性涨上去了。
@@ -200,33 +384,144 @@ mysql> select * from t where id=1；
 
 虽然扫描行数是1，但执行时间却长达800毫秒。
 
-> **[图：图12 扫描一行却执行得很慢]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 12 — 扫描一行却执行得很慢</div>
+<pre style="margin:0;white-space:pre-wrap;"><span style="color:var(--d-text-muted);"># Query_time: <span style="color:var(--d-orange);font-weight:bold;">0.800000</span>  Lock_time: 0.000000  Rows_sent: 1  Rows_examined: <span style="color:var(--d-green);font-weight:bold;">1</span></span>
+SET timestamp=1551007580;
+select * from t where id=1;</pre>
+</div>
+</div>
 
 
 是不是有点奇怪呢，这些时间都花在哪里了？
 
 如果我把这个slow log的截图再往下拉一点，你可以看到下一个语句，select * from t where id=1 lock in share mode，执行时扫描行数也是1行，执行时间是0.2毫秒。
 
-> **[图：图 13 加上lock in share mode]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 13 — 加上 lock in share mode 的 slow log</div>
+<pre style="margin:0;white-space:pre-wrap;"><span style="color:var(--d-text-muted);"># Query_time: <span style="color:var(--d-green);font-weight:bold;">0.000200</span>  Lock_time: 0.000100  Rows_sent: 1  Rows_examined: 1</span>
+SET timestamp=1551007590;
+select * from t where id=1 <span style="color:var(--d-blue);font-weight:bold;">lock in share mode</span>;</pre>
+<div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);">加锁读（当前读）反而更快 — 只需 0.2ms，而一致性读需要 800ms</div>
+</div>
+</div>
 
 
 看上去是不是更奇怪了？按理说lock in share mode还要加锁，时间应该更长才对啊。
 
 可能有的同学已经有答案了。如果你还没有答案的话，我再给你一个提示信息，图14是这两个语句的执行输出结果。
 
-> **[图：图14 两个语句的输出结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">图 14 — 两个语句的输出结果对比</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql> <span style="color:var(--d-blue);">select * from t where id=1;</span>
++----+------+
+| id | c    |
++----+------+
+|  1 | <span style="color:var(--d-orange);font-weight:bold;">   1</span> |
++----+------+
+
+mysql> <span style="color:var(--d-blue);">select * from t where id=1 lock in share mode;</span>
++----+---------+
+| id | c       |
++----+---------+
+|  1 | <span style="color:var(--d-green);font-weight:bold;">1000001</span> |
++----+---------+</pre>
+<div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);">一致性读返回 c=1（事务启动时的快照），当前读返回 c=1000001（最新值）</div>
+</div>
+</div>
 
 
 第一个语句的查询结果里c=1，带lock in share mode的语句返回的是c=1000001。看到这里应该有更多的同学知道原因了。如果你还是没有头绪的话，也别着急。我先跟你说明一下复现步骤，再分析原因。
 
-> **[图：图15 复现步骤]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 15 — 复现步骤</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:42%;color:var(--d-th-text);">Session A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:43%;color:var(--d-th-text);">Session B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">start transaction with<br>consistent snapshot;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">update t set c=c+1 where id=1;<br><span style="color:var(--d-text-sub);">（自动提交，执行 100 万次）</span></td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-weight:bold;">耗时 800ms — 一致性读回溯 100 万版本</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-family:'Courier New',monospace;font-size:12px;">select * from t where id=1<br>lock in share mode;<br><span style="color:var(--d-green);font-weight:bold;">耗时 0.2ms — 当前读直接返回</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
 
 
 你看到了，session A先用start transaction with consistent snapshot命令启动了一个事务，之后session B才开始执行update 语句。
 
 session B执行完100万次update语句后，id=1这一行处于什么状态呢？你可以从图16中找到答案。
 
-> **[图：图16 id=1的数据状态]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;">图 16 — id=1 的数据状态（MVCC undo log 版本链）</div>
+  <svg viewBox="0 0 520 320" style="width:100%;max-width:520px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+    <!-- Current version -->
+    <rect x="180" y="10" width="160" height="48" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+    <text x="260" y="30" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-blue)">当前版本（最新）</text>
+    <text x="260" y="46" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">c = 1000001</text>
+    <!-- Arrow 1 -->
+    <line x1="260" y1="58" x2="260" y2="80" stroke="var(--d-border)" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+    <text x="280" y="73" font-size="10" fill="var(--d-text-muted)">undo: c-1</text>
+    <!-- Version N-1 -->
+    <rect x="180" y="80" width="160" height="40" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+    <text x="260" y="105" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">c = 1000000</text>
+    <!-- Arrow 2 -->
+    <line x1="260" y1="120" x2="260" y2="142" stroke="var(--d-border)" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+    <text x="280" y="135" font-size="10" fill="var(--d-text-muted)">undo: c-1</text>
+    <!-- Version N-2 -->
+    <rect x="180" y="142" width="160" height="40" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+    <text x="260" y="167" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">c = 999999</text>
+    <!-- Dots -->
+    <text x="260" y="200" text-anchor="middle" font-size="16" fill="var(--d-text-muted)">. . .</text>
+    <text x="260" y="216" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">共 100 万个 undo log 版本</text>
+    <!-- Arrow to bottom -->
+    <line x1="260" y1="224" x2="260" y2="246" stroke="var(--d-border)" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+    <text x="280" y="239" font-size="10" fill="var(--d-text-muted)">undo: c-1</text>
+    <!-- Original version -->
+    <rect x="180" y="246" width="160" height="48" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.5"/>
+    <text x="260" y="266" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-warn-text)">Session A 可见版本</text>
+    <text x="260" y="282" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">c = 1</text>
+    <!-- Labels on right -->
+    <text x="355" y="38" font-size="11" fill="var(--d-green)" font-weight="bold">lock in share mode</text>
+    <text x="355" y="52" font-size="10" fill="var(--d-text-sub)">直接读取 → 0.2ms</text>
+    <text x="355" y="274" font-size="11" fill="var(--d-orange)" font-weight="bold">一致性读</text>
+    <text x="355" y="288" font-size="10" fill="var(--d-text-sub)">回溯 100 万版本 → 800ms</text>
+    <!-- Arrow marker -->
+    <defs>
+      <marker id="arrowDown" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0,0 L5,10 L10,0" fill="var(--d-border)"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+</div>
 
 
 session B更新完100万次，生成了100万个回滚日志(`undo log`)。

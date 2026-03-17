@@ -53,7 +53,22 @@ mysql> select word from words order by rand() limit 3;
 
 我们先用explain命令来看看这个语句的执行情况。
 
-> **[图：图1 使用explain命令查看语句的执行情况]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图1 使用 explain 命令查看语句的执行情况</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select word from words order by rand() limit 3;
+
++----+-------------+-------+------+---------------+------+
+| id | select_type | table | type | possible_keys | key  |
++----+-------------+-------+------+---------------+------+
+|  1 | SIMPLE      | words | ALL  | NULL          | NULL |
++----+-------------+-------+------+---------------+------+
+| rows  | filtered | Extra                                |
++-------+----------+--------------------------------------+
+| 10000 |   100.00 | <span style="color:var(--d-orange);font-weight:bold;">Using temporary; Using filesort</span>       |
++-------+----------+--------------------------------------+</pre>
+</div>
+</div>
 
 
 Extra字段显示Using temporary，表示的是需要使用临时表；`Using filesort`，表示的是需要执行排序操作。
@@ -62,9 +77,77 @@ Extra字段显示Using temporary，表示的是需要使用临时表；`Using fi
 
 这里，你可以先回顾一下[上一篇文章](<https://time.geekbang.org/column/article/73479>)中全字段排序和rowid排序的内容。我把上一篇文章的两个流程图贴过来，方便你复习。
 
-> **[图：图2 全字段排序]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图2 全字段排序流程（回顾）</div>
+<svg viewBox="0 0 480 250" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB2r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+  </defs>
+  <!-- Step 1 -->
+  <rect x="10" y="10" width="140" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="80" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">索引定位</text>
+  <text x="80" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">找满足条件的 id</text>
+  <line x1="150" y1="30" x2="190" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB2r)"/>
+  <!-- Step 2 -->
+  <rect x="195" y="10" width="120" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="255" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">回表取整行</text>
+  <text x="255" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">取所有查询字段</text>
+  <line x1="315" y1="30" x2="355" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB2r)"/>
+  <!-- sort_buffer -->
+  <rect x="360" y="5" width="110" height="50" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="415" y="25" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer</text>
+  <text x="415" y="42" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">所有字段</text>
+  <!-- sort -->
+  <rect x="140" y="80" width="200" height="32" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="240" y="101" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold">按排序字段快速排序</text>
+  <!-- result -->
+  <rect x="140" y="130" width="200" height="32" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="240" y="151" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">取前 N 行直接返回</text>
+  <!-- advantage -->
+  <text x="240" y="190" text-anchor="middle" font-size="10" fill="var(--d-green)" font-weight="bold">优点：排序后直接返回，无需再回表</text>
+  <text x="240" y="210" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">缺点：字段多时 sort_buffer 能放的行数少</text>
+  <text x="240" y="240" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">适用于 InnoDB 表（减少磁盘访问）</text>
+</svg>
+</div>
+</div>
 
-> **[图：图3 rowid排序]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图3 rowid 排序流程（回顾）</div>
+<svg viewBox="0 0 480 260" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB3r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="arrowO3r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Step 1 -->
+  <rect x="10" y="10" width="130" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="75" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">索引定位</text>
+  <text x="75" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">找满足条件的 id</text>
+  <line x1="140" y1="30" x2="175" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB3r)"/>
+  <!-- Step 2 -->
+  <rect x="180" y="10" width="110" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="235" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">回表</text>
+  <text x="235" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">取排序键 + id</text>
+  <line x1="290" y1="30" x2="325" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB3r)"/>
+  <!-- sort_buffer -->
+  <rect x="330" y="5" width="130" height="50" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="395" y="25" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer</text>
+  <text x="395" y="42" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">排序键 + rowid</text>
+  <!-- sort -->
+  <rect x="120" y="80" width="240" height="32" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="240" y="101" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold">按排序字段排序 → 取前 N 行 id</text>
+  <!-- back to table -->
+  <line x1="240" y1="112" x2="240" y2="140" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowO3r)"/>
+  <rect x="120" y="145" width="240" height="32" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="240" y="166" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">再次回表取完整字段 → 返回</text>
+  <!-- notes -->
+  <text x="240" y="210" text-anchor="middle" font-size="10" fill="var(--d-orange)" font-weight="bold">优点：sort_buffer 可容纳更多行</text>
+  <text x="240" y="230" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">缺点：需要额外一次回表</text>
+  <text x="240" y="250" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">内存表回表无磁盘开销 → 优先选择 rowid 排序</text>
+</svg>
+</div>
+</div>
 
 
 然后，我再问你一个问题，你觉得对于临时内存表的排序来说，它会选择哪一种算法呢？回顾一下上一篇文章的一个结论：**对于InnoDB表来说** ，执行全字段排序会减少磁盘访问，因此会被优先选择。
@@ -105,7 +188,54 @@ select word from words order by rand() limit 3;
 
 现在，我来把完整的排序执行流程图画出来。
 
-> **[图：图4 随机排序完整流程图1]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图4 随机排序完整流程图（order by rand()）</div>
+<svg viewBox="0 0 520 440" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="arrowO4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Step 1: words table -->
+  <rect x="30" y="10" width="180" height="44" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="120" y="28" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">words 表（主键扫描）</text>
+  <text x="120" y="44" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">逐行取出 word 值</text>
+  <line x1="210" y1="32" x2="255" y2="32" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB4)"/>
+  <!-- Step 2: rand() + tmp table -->
+  <rect x="260" y="5" width="220" height="54" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="370" y="24" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">内存临时表（MEMORY 引擎）</text>
+  <text x="370" y="40" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">R = rand()  |  W = word</text>
+  <text x="370" y="54" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">扫描 10000 行</text>
+  <!-- Arrow down -->
+  <line x1="370" y1="59" x2="370" y2="90" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB4)"/>
+  <!-- Step 3: scan tmp table into sort_buffer -->
+  <rect x="140" y="95" width="340" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="310" y="115" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">全表扫描临时表 → 存入 sort_buffer</text>
+  <text x="310" y="133" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">sort_buffer 内容：R 值（double） + pos（位置信息）</text>
+  <!-- scan count -->
+  <text x="60" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">再扫描<tspan font-weight="bold" fill="var(--d-orange)">10000</tspan>行</text>
+  <!-- Arrow down -->
+  <line x1="310" y1="145" x2="310" y2="175" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowO4)"/>
+  <!-- Step 4: sort -->
+  <rect x="170" y="180" width="280" height="36" rx="6" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="310" y="203" text-anchor="middle" font-size="12" fill="var(--d-orange)" font-weight="bold">在 sort_buffer 中按 R 排序</text>
+  <!-- Arrow down -->
+  <line x1="310" y1="216" x2="310" y2="246" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB4)"/>
+  <!-- Step 5: take top 3 pos -->
+  <rect x="170" y="250" width="280" height="36" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="310" y="273" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">取前 3 个结果的 pos（位置信息）</text>
+  <!-- Arrow down -->
+  <line x1="310" y1="286" x2="310" y2="316" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowO4)"/>
+  <!-- Step 6: back to tmp table -->
+  <rect x="140" y="320" width="340" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="310" y="338" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">回临时表按 pos 取出 word → 返回客户端</text>
+  <text x="310" y="354" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">访问 3 行</text>
+  <!-- Total -->
+  <rect x="140" y="385" width="340" height="36" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="310" y="408" text-anchor="middle" font-size="12" fill="var(--d-green)" font-weight="bold">总扫描行数 = 10000 + 10000 + 3 = 20003</text>
+</svg>
+</div>
+</div>
 
 
 图中的pos就是位置信息，你可能会觉得奇怪，这里的“位置信息”是个什么概念？在上一篇文章中，我们对InnoDB表排序的时候，明明用的还是ID字段。
@@ -151,7 +281,27 @@ select word from words order by rand() limit 3;
 SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
 ```
 
-> **[图：图5 OPTIMIZER_TRACE部分结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图5 磁盘临时表的 OPTIMIZER_TRACE 部分结果</div>
+<pre style="margin:0;">"filesort_priority_queue_optimization": {
+  "usable":                      true,
+  <span style="color:var(--d-green);font-weight:bold;">"chosen":                      true</span>
+},
+"filesort_summary": {
+  "rows":                        3,
+  "examined_rows":               10000,
+  "number_of_tmp_files":         <span style="color:var(--d-green);font-weight:bold;">0</span>,
+  "sort_buffer_size":            32768,
+  "sort_mode":
+    "<span style="color:var(--d-orange);">&lt;sort_key, rowid&gt;</span>"
+}
+
+<span style="color:var(--d-text-muted);">-- chosen=true → 使用优先队列排序算法</span>
+<span style="color:var(--d-text-muted);">-- number_of_tmp_files=0 → 无需临时文件</span>
+<span style="color:var(--d-text-muted);">-- sort_mode=&lt;sort_key, rowid&gt; → rowid 排序</span></pre>
+</div>
+</div>
 
 
 然后，我们来看一下这次OPTIMIZER_TRACE的结果。
@@ -180,7 +330,62 @@ SELECT * FROM `information_schema`.`OPTIMIZER_TRACE`\G
 
 这里我简单画了一个优先队列排序过程的示意图。
 
-> **[图：图6 优先队列排序算法示例]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图6 优先队列排序算法示例（最大堆，取最小 3 个）</div>
+<svg viewBox="0 0 520 420" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB6" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+  </defs>
+  <!-- Input data -->
+  <text x="20" y="20" font-size="11" fill="var(--d-text-muted)">输入数据 (R, rowid):</text>
+  <rect x="20" y="28" width="480" height="28" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="260" y="47" text-anchor="middle" font-size="11" fill="var(--d-text)" font-family="'Courier New',monospace">
+    (0.9,1)  (0.3,2)  (0.7,3)  (0.1,4)  (0.5,5)  (0.2,6)
+  </text>
+  <!-- Step 1 -->
+  <text x="20" y="82" font-size="11" fill="var(--d-text)" font-weight="bold">Step 1: 取前 3 个构造最大堆</text>
+  <rect x="140" y="90" width="60" height="30" rx="4" fill="var(--d-orange)" fill-opacity="0.2" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="170" y="110" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">0.9</text>
+  <line x1="155" y1="120" x2="120" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="185" y1="120" x2="220" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+  <rect x="90" y="135" width="60" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="120" y="153" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">0.3</text>
+  <rect x="190" y="135" width="60" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="220" y="153" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">0.7</text>
+  <text x="300" y="130" font-size="10" fill="var(--d-text-muted)">堆顶 = 最大值 0.9</text>
+  <!-- Step 2 -->
+  <text x="20" y="190" font-size="11" fill="var(--d-text)" font-weight="bold">Step 2: 比较 0.1 &lt; 0.9(堆顶) → 替换</text>
+  <rect x="140" y="198" width="60" height="30" rx="4" fill="var(--d-orange)" fill-opacity="0.2" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="170" y="218" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">0.7</text>
+  <line x1="155" y1="228" x2="120" y2="243" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="185" y1="228" x2="220" y2="243" stroke="var(--d-border)" stroke-width="1"/>
+  <rect x="90" y="243" width="60" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="120" y="261" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">0.3</text>
+  <rect x="190" y="243" width="60" height="26" rx="4" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="220" y="261" text-anchor="middle" font-size="10" fill="var(--d-green)" font-weight="bold" font-family="'Courier New',monospace">0.1</text>
+  <text x="300" y="240" font-size="10" fill="var(--d-text-muted)">0.9 被替换，重新调整堆</text>
+  <!-- Step 3 -->
+  <text x="20" y="298" font-size="11" fill="var(--d-text)" font-weight="bold">Step 3: 比较 0.5 &lt; 0.7(堆顶) → 替换</text>
+  <rect x="140" y="306" width="60" height="30" rx="4" fill="var(--d-orange)" fill-opacity="0.2" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="170" y="326" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">0.5</text>
+  <line x1="155" y1="336" x2="120" y2="351" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="185" y1="336" x2="220" y2="351" stroke="var(--d-border)" stroke-width="1"/>
+  <rect x="90" y="351" width="60" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="120" y="369" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">0.3</text>
+  <rect x="190" y="351" width="60" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="220" y="369" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">0.1</text>
+  <!-- Step 4: final -->
+  <text x="20" y="402" font-size="11" fill="var(--d-text)" font-weight="bold">Step 4: 比较 0.2 &lt; 0.5(堆顶) → 替换</text>
+  <!-- Final result -->
+  <rect x="300" y="300" width="200" height="80" rx="6" fill="var(--d-green)" fill-opacity="0.1" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="400" y="320" text-anchor="middle" font-size="11" fill="var(--d-green)" font-weight="bold">最终堆中 3 个最小值:</text>
+  <text x="400" y="342" text-anchor="middle" font-size="12" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">0.1  0.2  0.3</text>
+  <text x="400" y="362" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">对应 rowid: 4, 6, 2</text>
+  <text x="400" y="378" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">按 pos 回临时表取 word</text>
+</svg>
+</div>
+</div>
 
 
 图6是模拟6个(R,rowid)行，通过优先队列排序找到最小的三个R值的行的过程。整个排序过程中，为了最快地拿到当前堆的最大值，总是保持最大值在堆顶，因此这是一个最大堆。

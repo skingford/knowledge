@@ -44,7 +44,32 @@ insert into t2(c,d) select c,d from t;
 
 其实，这个问题我们需要考虑的还是日志和数据的一致性。我们看下这个执行序列：
 
-> **[图：图1 并发insert场景]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 190" style="max-width:580px;width:100%;font-family:monospace">
+  <rect width="580" height="190" rx="8" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="290" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">并发 insert 场景</text>
+  <!-- Header -->
+  <rect x="20" y="36" width="60" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="50" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">时刻</text>
+  <rect x="85" y="36" width="240" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="205" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session A</text>
+  <rect x="330" y="36" width="230" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="445" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session B</text>
+  <!-- T1 -->
+  <text x="50" y="78" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">T1</text>
+  <rect x="330" y="64" width="230" height="22" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="340" y="79" font-size="9" fill="var(--d-blue)">insert into t2(c,d) select c,d from t</text>
+  <!-- T2 -->
+  <text x="50" y="108" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">T2</text>
+  <rect x="85" y="94" width="240" height="22" rx="3" fill="var(--d-orange)" opacity="0.15" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="95" y="109" font-size="9" fill="var(--d-orange)">insert into t values(-1,-1,-1)</text>
+  <!-- Explanation -->
+  <rect x="40" y="130" width="500" height="32" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1"/>
+  <text x="290" y="146" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">若无锁保护，session A 可能后写 binlog</text>
+  <text x="290" y="158" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">备库重放时 id=-1 被 session B 的 select 读到 → 主备不一致</text>
+  <text x="290" y="182" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">图 1  insert ... select 的并发场景</text>
+</svg>
+</div>
 
 
 实际的执行效果是，如果session B先执行，由于这个语句对表t主键索引加了(-∞,1]这个next-key lock，会在语句执行完成后，才允许session A的insert语句执行。
@@ -80,7 +105,20 @@ insert into t2(c,d)  (select c+1, d from t force index(c) order by c desc limit 
 
 这个语句执行的慢查询日志（`slow log`），如下图所示：
 
-> **[图：图2 慢查询日志--将数据插入表t2]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 120" style="max-width:580px;width:100%;font-family:monospace">
+  <rect width="580" height="120" rx="8" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="290" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">慢查询日志 — 插入表 t2</text>
+  <rect x="30" y="36" width="520" height="56" rx="6" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <g font-size="10" fill="var(--d-text)" font-family="monospace">
+    <text x="40" y="52">Query_time: 0.000  Lock_time: 0.000</text>
+    <text x="40" y="66">Rows_sent: 0  <tspan fill="var(--d-green)" font-weight="bold">Rows_examined: 1</tspan></text>
+    <text x="40" y="82" fill="var(--d-blue)">insert into t2(c,d) (select c+1,d from t</text>
+    <text x="40" y="82" fill="var(--d-blue)"><tspan dx="260">force index(c) order by c desc limit 1)</tspan></text>
+  </g>
+  <text x="290" y="112" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">图 2  插入表 t2 时扫描行数 = 1</text>
+</svg>
+</div>
 
 
 通过这个慢查询日志，我们看到Rows_examined=1，正好验证了执行这条语句的扫描行数为1。
@@ -96,7 +134,20 @@ insert into t(c,d)  (select c+1, d from t force index(c) order by c desc limit 1
 
 这时候，我们再看慢查询日志就会发现不对了。
 
-> **[图：图3 慢查询日志--将数据插入表t]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 120" style="max-width:580px;width:100%;font-family:monospace">
+  <rect width="580" height="120" rx="8" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="290" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">慢查询日志 — 插入表 t（同一表）</text>
+  <rect x="30" y="36" width="520" height="56" rx="6" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <g font-size="10" fill="var(--d-text)" font-family="monospace">
+    <text x="40" y="52">Query_time: 0.000  Lock_time: 0.000</text>
+    <text x="40" y="66">Rows_sent: 0  <tspan fill="var(--d-orange)" font-weight="bold">Rows_examined: 5</tspan></text>
+    <text x="40" y="82" fill="var(--d-blue)">insert into t(c,d) (select c+1,d from t</text>
+    <text x="40" y="82" fill="var(--d-blue)"><tspan dx="250">force index(c) order by c desc limit 1)</tspan></text>
+  </g>
+  <text x="290" y="112" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">图 3  插入同一表 t 时扫描行数 = 5（需临时表）</text>
+</svg>
+</div>
 
 
 可以看到，这时候的Rows_examined的值是5。
@@ -105,7 +156,70 @@ insert into t(c,d)  (select c+1, d from t force index(c) order by c desc limit 1
 
 如图4所示就是这条语句的explain结果。
 
-> **[图：图4 explain结果]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 130" style="max-width:620px;width:100%;font-family:monospace">
+  <rect width="620" height="130" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="310" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">EXPLAIN 结果</text>
+  <!-- Header -->
+  <g font-size="9" font-weight="bold" fill="var(--d-th-text)">
+    <rect x="10" y="34" width="30" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="25" y="48" text-anchor="middle">id</text>
+    <rect x="44" y="34" width="70" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="79" y="48" text-anchor="middle">select_type</text>
+    <rect x="118" y="34" width="40" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="138" y="48" text-anchor="middle">table</text>
+    <rect x="162" y="34" width="40" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="182" y="48" text-anchor="middle">type</text>
+    <rect x="206" y="34" width="60" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="236" y="48" text-anchor="middle">key</text>
+    <rect x="270" y="34" width="50" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="295" y="48" text-anchor="middle">key_len</text>
+    <rect x="324" y="34" width="40" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="344" y="48" text-anchor="middle">rows</text>
+    <rect x="368" y="34" width="240" height="20" rx="3" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+    <text x="488" y="48" text-anchor="middle">Extra</text>
+  </g>
+  <!-- Row 1 -->
+  <g font-size="9" fill="var(--d-text)">
+    <rect x="10" y="58" width="30" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="25" y="72" text-anchor="middle">1</text>
+    <rect x="44" y="58" width="70" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="79" y="72" text-anchor="middle">INSERT</text>
+    <rect x="118" y="58" width="40" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="138" y="72" text-anchor="middle">t</text>
+    <rect x="162" y="58" width="40" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="182" y="72" text-anchor="middle">ALL</text>
+    <rect x="206" y="58" width="60" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="236" y="72" text-anchor="middle">NULL</text>
+    <rect x="270" y="58" width="50" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="295" y="72" text-anchor="middle">NULL</text>
+    <rect x="324" y="58" width="40" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="344" y="72" text-anchor="middle">NULL</text>
+    <rect x="368" y="58" width="240" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="488" y="72" text-anchor="middle">NULL</text>
+  </g>
+  <!-- Row 2 -->
+  <g font-size="9" fill="var(--d-text)">
+    <rect x="10" y="82" width="30" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="25" y="96" text-anchor="middle">1</text>
+    <rect x="44" y="82" width="70" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="79" y="96" text-anchor="middle">INSERT</text>
+    <rect x="118" y="82" width="40" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="138" y="96" text-anchor="middle">t</text>
+    <rect x="162" y="82" width="40" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="182" y="96" text-anchor="middle">index</text>
+    <rect x="206" y="82" width="60" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="236" y="96" text-anchor="middle">c</text>
+    <rect x="270" y="82" width="50" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="295" y="96" text-anchor="middle">5</text>
+    <rect x="324" y="82" width="40" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="344" y="96" text-anchor="middle" fill="var(--d-orange)" font-weight="bold">1</text>
+    <rect x="368" y="82" width="240" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+    <text x="488" y="96" text-anchor="middle" fill="var(--d-orange)" font-weight="bold">Using temporary</text>
+  </g>
+  <text x="310" y="122" text-anchor="middle" font-size="11" fill="var(--d-text)">图 4  explain 结果（rows=1 受 limit 1 影响，实际扫描更多）</text>
+</svg>
+</div>
 
 
 从Extra字段可以看到“`Using temporary`”字样，表示这个语句用到了临时表。也就是说，执行过程中，需要把表t的内容读出来，写入临时表。
@@ -116,7 +230,29 @@ insert into t(c,d)  (select c+1, d from t force index(c) order by c desc limit 1
 
 从另一个角度考虑的话，我们可以看看InnoDB扫描了多少行。如图5所示，是在执行这个语句前后查看Innodb_rows_read的结果。
 
-> **[图：图5 查看 Innodb_rows_read变化]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 160" style="max-width:520px;width:100%;font-family:monospace">
+  <rect width="520" height="160" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">查看 Innodb_rows_read 变化</text>
+  <!-- Before -->
+  <rect x="20" y="38" width="480" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="30" y="53" font-size="10" fill="var(--d-th-text)" font-weight="bold">执行前：show status like 'Innodb_rows_read'</text>
+  <rect x="20" y="64" width="230" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="30" y="78" font-size="9" fill="var(--d-text)">Variable_name</text>
+  <rect x="254" y="64" width="246" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="264" y="78" font-size="9" fill="var(--d-text)">Value</text>
+  <rect x="20" y="86" width="230" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="30" y="100" font-size="9" fill="var(--d-text)">Innodb_rows_read</text>
+  <rect x="254" y="86" width="246" height="20" rx="3" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="264" y="100" font-size="9" fill="var(--d-green)" font-weight="bold">12</text>
+  <!-- After -->
+  <rect x="20" y="114" width="230" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="30" y="128" font-size="9" fill="var(--d-text)">执行后：Innodb_rows_read</text>
+  <rect x="254" y="114" width="246" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="264" y="128" font-size="9" fill="var(--d-orange)" font-weight="bold">16  （增加了 4，全表扫描表 t）</text>
+  <text x="260" y="152" text-anchor="middle" font-size="11" fill="var(--d-text)">图 5  执行前后 Innodb_rows_read 增加 4</text>
+</svg>
+</div>
 
 
 可以看到，这个语句执行前后，Innodb_rows_read的值增加了4。因为默认临时表是使用Memory引擎的，所以这4行查的都是表t，也就是说对表t做了全表扫描。
@@ -152,7 +288,36 @@ drop table temp_t;
 
 对于有唯一键的表，插入数据时出现唯一键冲突也是常见的情况了。我先给你举一个简单的唯一键冲突的例子。
 
-> **[图：图6 唯一键冲突加锁]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 200" style="max-width:620px;width:100%;font-family:monospace">
+  <rect width="620" height="200" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="310" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">唯一键冲突加锁</text>
+  <!-- Header -->
+  <rect x="15" y="36" width="50" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="40" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">时刻</text>
+  <rect x="70" y="36" width="260" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="200" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session A</text>
+  <rect x="335" y="36" width="270" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="470" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session B</text>
+  <!-- T1 -->
+  <text x="40" y="80" text-anchor="middle" font-size="10" fill="var(--d-text)">T1</text>
+  <rect x="70" y="66" width="260" height="22" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="80" y="81" font-size="9" fill="var(--d-text)">insert into t values(10,10,10);</text>
+  <!-- T2 -->
+  <text x="40" y="110" text-anchor="middle" font-size="10" fill="var(--d-text)">T2</text>
+  <rect x="335" y="96" width="270" height="36" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="345" y="111" font-size="9" fill="var(--d-text)">insert into t values(11,10,10);</text>
+  <text x="345" y="125" font-size="9" fill="var(--d-orange)">(Duplicate entry '10' for key 'c')</text>
+  <!-- T3 -->
+  <text x="40" y="156" text-anchor="middle" font-size="10" fill="var(--d-text)">T3</text>
+  <rect x="335" y="142" width="270" height="22" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="345" y="157" font-size="9" fill="var(--d-orange)">insert into t values(12,9,9); -- blocked</text>
+  <!-- Note -->
+  <rect x="50" y="172" width="520" height="18" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="310" y="185" text-anchor="middle" font-size="9" fill="var(--d-text)">session A 持有索引 c 上 (5,10] 共享 next-key lock（读锁），session B 被阻塞</text>
+  <text x="310" y="197" text-anchor="middle" font-size="11" fill="var(--d-text)">图 6  唯一键冲突加锁</text>
+</svg>
+</div>
 
 
 这个例子也是在可重复读（repeatable read）隔离级别下执行的。可以看到，session B要执行的insert语句进入了锁等待状态。
@@ -169,7 +334,43 @@ drop table temp_t;
 
 这里，我就先和你分享一个经典的死锁场景，如果你还遇到过其他唯一键冲突导致的死锁场景，也欢迎给我留言。
 
-> **[图：图7 唯一键冲突--死锁]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 230" style="max-width:720px;width:100%;font-family:monospace">
+  <rect width="720" height="230" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="360" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">唯一键冲突 -- 死锁</text>
+  <!-- Header -->
+  <rect x="10" y="36" width="40" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="30" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">时刻</text>
+  <rect x="54" y="36" width="210" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="159" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session A</text>
+  <rect x="268" y="36" width="220" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="378" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session B</text>
+  <rect x="492" y="36" width="218" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="601" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">session C</text>
+  <!-- T1 -->
+  <text x="30" y="80" text-anchor="middle" font-size="10" fill="var(--d-text)">T1</text>
+  <rect x="54" y="66" width="210" height="22" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="64" y="81" font-size="9" fill="var(--d-text)">insert into t values(null,5,5);</text>
+  <!-- T2 -->
+  <text x="30" y="110" text-anchor="middle" font-size="10" fill="var(--d-text)">T2</text>
+  <rect x="268" y="96" width="220" height="22" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="278" y="111" font-size="9" fill="var(--d-orange)">insert into t values(null,5,5);</text>
+  <rect x="492" y="96" width="218" height="22" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="502" y="111" font-size="9" fill="var(--d-orange)">insert into t values(null,5,5);</text>
+  <!-- T3 -->
+  <text x="30" y="142" text-anchor="middle" font-size="10" fill="var(--d-text)">T3</text>
+  <rect x="54" y="128" width="210" height="22" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="64" y="143" font-size="9" fill="var(--d-text)">rollback;</text>
+  <rect x="268" y="154" width="220" height="20" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="278" y="168" font-size="9" fill="var(--d-orange)">尝试写锁 → 等待 C</text>
+  <rect x="492" y="154" width="218" height="20" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="502" y="168" font-size="9" fill="var(--d-orange)">尝试写锁 → 等待 B</text>
+  <!-- Deadlock note -->
+  <rect x="100" y="182" width="520" height="20" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="360" y="196" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-orange)">Deadlock! session B 与 session C 互相等待对方释放读锁</text>
+  <text x="360" y="224" text-anchor="middle" font-size="11" fill="var(--d-text)">图 7  唯一键冲突 -- 死锁</text>
+</svg>
+</div>
 
 
 在session A执行rollback语句回滚的时候，session C几乎同时发现死锁并返回。
@@ -185,7 +386,50 @@ drop table temp_t;
 
 这个流程的状态变化图如下所示。
 
-> **[图：图8 状态变化图--死锁]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:monospace">
+  <rect width="560" height="340" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="280" y="24" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">状态变化图 -- 死锁</text>
+  <!-- Session A box -->
+  <rect x="200" y="42" width="160" height="36" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="280" y="57" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-text)">session A</text>
+  <text x="280" y="71" text-anchor="middle" font-size="9" fill="var(--d-text)">持有 c=5 记录写锁(X)</text>
+  <!-- Arrow down from A -->
+  <line x1="280" y1="78" x2="280" y2="100" stroke="var(--d-text)" stroke-width="1.5" marker-end="url(#arr8)"/>
+  <text x="340" y="94" font-size="9" fill="var(--d-text)">rollback</text>
+  <!-- T2: B and C get S lock -->
+  <rect x="60" y="106" width="180" height="36" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="150" y="121" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-text)">session B</text>
+  <text x="150" y="135" text-anchor="middle" font-size="9" fill="var(--d-orange)">唯一键冲突 → 申请 S lock</text>
+  <rect x="320" y="106" width="180" height="36" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="410" y="121" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-text)">session C</text>
+  <text x="410" y="135" text-anchor="middle" font-size="9" fill="var(--d-orange)">唯一键冲突 → 申请 S lock</text>
+  <!-- A rollback releases lock -->
+  <rect x="140" y="156" width="280" height="24" rx="5" fill="var(--d-green)" opacity="0.15" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="280" y="172" text-anchor="middle" font-size="10" fill="var(--d-green)">A rollback → B、C 均获得 S next-key lock (5,10]</text>
+  <!-- B wants X lock -->
+  <rect x="60" y="196" width="180" height="36" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="150" y="211" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-text)">session B</text>
+  <text x="150" y="225" text-anchor="middle" font-size="9" fill="var(--d-text)">继续插入 → 申请 X 写锁</text>
+  <rect x="320" y="196" width="180" height="36" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="410" y="211" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-text)">session C</text>
+  <text x="410" y="225" text-anchor="middle" font-size="9" fill="var(--d-text)">继续插入 → 申请 X 写锁</text>
+  <!-- Deadlock arrows -->
+  <defs>
+    <marker id="arr8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+  <path d="M240,228 C260,270 300,270 320,228" stroke="var(--d-orange)" stroke-width="2" fill="none" marker-end="url(#arr8)"/>
+  <text x="280" y="268" text-anchor="middle" font-size="9" fill="var(--d-orange)">B 等待 C 释放 S lock</text>
+  <path d="M320,240 C300,280 260,280 240,240" stroke="var(--d-orange)" stroke-width="2" fill="none" marker-end="url(#arr8)"/>
+  <text x="280" y="290" text-anchor="middle" font-size="9" fill="var(--d-orange)">C 等待 B 释放 S lock</text>
+  <!-- Deadlock label -->
+  <rect x="190" y="300" width="180" height="22" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="280" y="315" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-orange)">DEADLOCK!</text>
+  <text x="280" y="336" text-anchor="middle" font-size="11" fill="var(--d-text)">图 8  状态变化图 -- 死锁</text>
+</svg>
+</div>
 
 
 ## insert into … on duplicate key update
@@ -205,7 +449,35 @@ insert into t values(11,10,10) on duplicate key update d=100;
 
 现在表t里面已经有了(1,1,1)和(2,2,2)这两行，我们再来看看下面这个语句执行的效果：
 
-> **[图：图9 两个唯一键同时冲突]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 220" style="max-width:620px;width:100%;font-family:monospace">
+  <rect width="620" height="220" rx="8" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="310" y="22" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">两个唯一键同时冲突</text>
+  <!-- Table state -->
+  <rect x="20" y="36" width="580" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="310" y="51" text-anchor="middle" font-size="10" fill="var(--d-th-text)">表 t 已有数据：(1,1,1) 和 (2,2,2)</text>
+  <!-- SQL -->
+  <rect x="20" y="66" width="580" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="30" y="84" font-size="10" fill="var(--d-text)">insert into t values(2,1,1) on duplicate key update d=100;</text>
+  <!-- Conflict analysis -->
+  <rect x="20" y="102" width="280" height="46" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="30" y="118" font-size="9" fill="var(--d-orange)" font-weight="bold">主键冲突：id=2</text>
+  <text x="30" y="132" font-size="9" fill="var(--d-text)">主键索引先判断 → 命中 id=2 行</text>
+  <text x="30" y="144" font-size="9" fill="var(--d-text)">修改 id=2 这一行</text>
+  <rect x="320" y="102" width="280" height="46" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="330" y="118" font-size="9" fill="var(--d-orange)" font-weight="bold">唯一键冲突：c=1</text>
+  <text x="330" y="132" font-size="9" fill="var(--d-text)">唯一索引 c 也冲突，但主键先判断</text>
+  <text x="330" y="144" font-size="9" fill="var(--d-text)">因此不修改 id=1 行</text>
+  <!-- Result -->
+  <rect x="20" y="158" width="580" height="22" rx="4" fill="var(--d-th-bg)" stroke="var(--d-th-border)" stroke-width="1"/>
+  <text x="310" y="173" text-anchor="middle" font-size="10" fill="var(--d-th-text)">执行结果</text>
+  <rect x="20" y="184" width="290" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="30" y="198" font-size="9" fill="var(--d-text)">id=2 的行变为 (2, 1, <tspan fill="var(--d-green)" font-weight="bold">100</tspan>)</text>
+  <rect x="314" y="184" width="286" height="20" rx="3" fill="var(--d-stripe)" stroke="var(--d-blue-border)" stroke-width="0.5"/>
+  <text x="324" y="198" font-size="9" fill="var(--d-orange)">affected rows = 2（insert+update 各计 1）</text>
+  <text x="310" y="216" text-anchor="middle" font-size="11" fill="var(--d-text)">图 9  两个唯一键同时冲突</text>
+</svg>
+</div>
 
 
 可以看到，主键id是先判断的，MySQL认为这个语句跟id=2这一行冲突，所以修改的是id=2的行。
@@ -240,12 +512,10 @@ insert 语句如果出现唯一键冲突，会在冲突的唯一值上加共享�
 
 > @长杰 同学回答得非常准确。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：huolang]**
 
 
 [__ 8](<javascript:;>)
@@ -267,7 +537,6 @@ __ 作者回复
 
 2019-02-14
 
-> **[图：老杨同志]**
 
 
 [__ 4](<javascript:;>)
@@ -284,7 +553,6 @@ __ 作者回复
 
 2019-02-14
 
-> **[图：sonic]**
 
 
 [__ 3](<javascript:;>)
@@ -303,7 +571,6 @@ __ 作者回复
 
 2019-02-16
 
-> **[图：滔滔]**
 
 
 [__ 2](<javascript:;>)
@@ -345,7 +612,6 @@ __ 作者回复
 
 2019-02-13
 
-> **[图：王伯轩]**
 
 
 [__ 1](<javascript:;>)
@@ -369,7 +635,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：phpzheng-好客旅游网]**
 
 
 [__ 1](<javascript:;>)
@@ -389,7 +654,6 @@ select last_insert_id,
 
 2019-02-16
 
-> **[图：伟仔_Hoo]**
 
 
 [__ 0](<javascript:;>)
@@ -410,7 +674,6 @@ session A的select语句没有加 for update 或者 lock in share mode ?
 
 2019-03-16
 
-> **[图：猫小妖的尾巴]**
 
 
 [__ 0](<javascript:;>)
@@ -420,7 +683,6 @@ session A的select语句没有加 for update 或者 lock in share mode ?
 
 2019-03-10
 
-> **[图：涵涵妈 lilian]**
 
 
 [__ 0](<javascript:;>)
@@ -466,7 +728,6 @@ Record lock, heap no 1 PHYSICAL RECORD: n_fields 1; compact format; info bits 0
 
 2019-03-10
 
-> **[图：涵涵妈 lilian]**
 
 
 [__ 0](<javascript:;>)
@@ -481,7 +742,6 @@ __ 作者回复
 
 2019-03-09
 
-> **[图：轻松的鱼]**
 
 
 [__ 0](<javascript:;>)
@@ -493,7 +753,6 @@ __ 作者回复
 
 2019-03-06
 
-> **[图：张永志]**
 
 
 [__ 0](<javascript:;>)
@@ -508,7 +767,6 @@ __ 作者回复
 
 2019-02-28
 
-> **[图：Mr.Strive.Z.H.L]**
 
 
 [__ 0](<javascript:;>)
@@ -544,7 +802,6 @@ Gap lock + 排他的record 就称作 排他的next-key lock 吧😄
 
 2019-02-27
 
-> **[图：滔滔]**
 
 
 [__ 0](<javascript:;>)
@@ -561,7 +818,6 @@ __ 作者回复
 
 2019-02-25
 
-> **[图：发条橙子 ]**
 
 
 [__ 0](<javascript:;>)
@@ -590,7 +846,6 @@ __ 作者回复
 
 2019-02-23
 
-> **[图：滔滔]**
 
 
 [__ 0](<javascript:;>)
@@ -605,7 +860,6 @@ __ 作者回复
 
 2019-02-24
 
-> **[图：王伯轩]**
 
 
 [__ 0](<javascript:;>)
@@ -624,7 +878,6 @@ __ 作者回复
 
 2019-02-18
 
-> **[图：信信]**
 
 
 [__ 0](<javascript:;>)
@@ -643,7 +896,6 @@ __ 作者回复
 
 2019-02-17
 
-> **[图：Justin]**
 
 
 [__ 0](<javascript:;>)

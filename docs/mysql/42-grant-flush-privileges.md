@@ -31,7 +31,35 @@ create user 'ua'@'%' identified by 'pa';
 
 图1就是这个时刻用户ua在user表中的状态。
 
-> **[图：图1 mysql.user 数据行]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px;font-family:monospace">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 10px;text-align:left;color:var(--d-th-text)">Host</th>
+<th style="padding:6px 10px;text-align:left;color:var(--d-th-text)">User</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Select_priv</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Insert_priv</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Update_priv</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">...</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Super_priv</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding:6px 10px;color:var(--d-text);border-bottom:1px solid var(--d-border)">%</td>
+<td style="padding:6px 10px;color:var(--d-blue);font-weight:600;border-bottom:1px solid var(--d-border)">ua</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-orange);border-bottom:1px solid var(--d-border)">N</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-orange);border-bottom:1px solid var(--d-border)">N</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-orange);border-bottom:1px solid var(--d-border)">N</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">...</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-orange);border-bottom:1px solid var(--d-border)">N</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 1 &ensp;mysql.user 数据行</div>
+</div>
 
 
 在MySQL中，用户权限是有不同的范围的。接下来，我就按照用户权限范围从大到小的顺序依次和你说明。
@@ -95,7 +123,33 @@ grant all privileges on db1.* to 'ua'@'%' with grant option;
 
 图2就是这个时刻用户ua在db表中的状态。
 
-> **[图：图2 mysql.db 数据行]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px;font-family:monospace">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 10px;text-align:left;color:var(--d-th-text)">Host</th>
+<th style="padding:6px 10px;text-align:left;color:var(--d-th-text)">Db</th>
+<th style="padding:6px 10px;text-align:left;color:var(--d-th-text)">User</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Select_priv</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">Insert_priv</th>
+<th style="padding:6px 10px;text-align:center;color:var(--d-th-text)">...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding:6px 10px;color:var(--d-text);border-bottom:1px solid var(--d-border)">%</td>
+<td style="padding:6px 10px;color:var(--d-blue);font-weight:600;border-bottom:1px solid var(--d-border)">db1</td>
+<td style="padding:6px 10px;color:var(--d-blue);font-weight:600;border-bottom:1px solid var(--d-border)">ua</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-green);border-bottom:1px solid var(--d-border)">Y</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-green);border-bottom:1px solid var(--d-border)">Y</td>
+<td style="padding:6px 10px;text-align:center;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">... (全 Y)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 2 &ensp;mysql.db 数据行</div>
+</div>
 
 
 每次需要判断一个用户对一个数据库读写权限的时候，都需要遍历一次acl_dbs数组，根据user、host和db找到匹配的对象，然后根据对象的权限位来判断。
@@ -104,7 +158,59 @@ grant all privileges on db1.* to 'ua'@'%' with grant option;
 
 grant操作对于已经存在的连接的影响，在全局权限和基于db的权限效果是不同的。接下来，我们做一个对照试验来分别看一下。
 
-> **[图：图3 权限操作效果]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session A (root)</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session B (ua)</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session C (ua)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">grant super on&nbsp;*.*&nbsp;to&nbsp;'ua'@'%';<br>grant all on db1.* to&nbsp;'ua'@'%';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T2</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">连接成功<br>use db1;</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">连接成功<br>use db1;</td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T3</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">revoke super on *.* from 'ua'@'%';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T4</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-green);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">set global sync_binlog=1;<br><span style="color:var(--d-text-muted)">(成功 — 全局权限在线程中)</span></td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T5</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">revoke all on db1.* from 'ua'@'%';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T6</td>
+<td style="padding:5px 8px;color:var(--d-text-muted)"></td>
+<td style="padding:5px 8px;color:var(--d-orange);font-family:monospace;font-size:11px">use db1; select * from t;<br><span style="color:var(--d-text-muted)">(报错：权限不足)</span></td>
+<td style="padding:5px 8px;color:var(--d-green);font-family:monospace;font-size:11px">select * from t;<br><span style="color:var(--d-text-muted)">(成功 — use db1 缓存)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 3 &ensp;权限操作效果</div>
+</div>
 
 
 需要说明的是，图中set global sync_binlog这个操作是需要super权限的。
@@ -151,7 +257,52 @@ flush privileges命令会清空acl_users数组，然后从mysql.user表中读取
 
 这种不一致往往是由不规范的操作导致的，比如直接用DML语句操作系统权限表。我们来看一下下面这个场景：
 
-> **[图：图4 使用flush privileges]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">操作</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">create user 'ua'@'%' ... ;</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">创建用户成功</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T2</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">用 ua 连接</td>
+<td style="padding:5px 8px;color:var(--d-green);border-bottom:1px solid var(--d-border)">连接成功</td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T3</td>
+<td style="padding:5px 8px;color:var(--d-warn-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">delete from mysql.user where user='ua';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">磁盘删除，内存未同步</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T4</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">用 ua 连接</td>
+<td style="padding:5px 8px;color:var(--d-orange);border-bottom:1px solid var(--d-border)">仍然成功（内存中还在）</td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T5</td>
+<td style="padding:5px 8px;color:var(--d-blue);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px;font-weight:600">flush privileges;</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">内存重建 → 同步磁盘</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T6</td>
+<td style="padding:5px 8px;color:var(--d-text);font-family:monospace;font-size:11px">用 ua 连接</td>
+<td style="padding:5px 8px;color:var(--d-orange);font-weight:600">报错：无法访问</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 4 &ensp;使用 flush privileges</div>
+</div>
 
 
 可以看到，T3时刻虽然已经用delete语句删除了用户ua，但是在T4时刻，仍然可以用ua连接成功。原因就是，这时候内存中acl_users数组中还有这个用户，因此系统判断时认为用户还正常存在。
@@ -160,7 +311,47 @@ flush privileges命令会清空acl_users数组，然后从mysql.user表中读取
 
 直接操作系统表是不规范的操作，这个不一致状态也会导致一些更“诡异”的现象发生。比如，前面这个通过delete语句删除用户的例子，就会出现下面的情况：
 
-> **[图：图5 不规范权限操作导致的异常]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">操作</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">create user 'ua'@'%' ... ;</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)">创建用户</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T2</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">grant super on *.* to 'ua'@'%';</td>
+<td style="padding:5px 8px;color:var(--d-green);border-bottom:1px solid var(--d-border)">磁盘 + 内存同步</td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T3</td>
+<td style="padding:5px 8px;color:var(--d-warn-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">delete from mysql.user where user='ua';</td>
+<td style="padding:5px 8px;color:var(--d-orange);border-bottom:1px solid var(--d-border)">仅磁盘删除</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T4</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">grant select on *.* to 'ua'@'%';</td>
+<td style="padding:5px 8px;color:var(--d-orange);font-weight:600;border-bottom:1px solid var(--d-border)">失败 — 表中无此行</td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T5</td>
+<td style="padding:5px 8px;color:var(--d-text);font-family:monospace;font-size:11px">create user 'ua'@'%' ... ;</td>
+<td style="padding:5px 8px;color:var(--d-orange);font-weight:600">失败 — 内存中已存在</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 5 &ensp;不规范权限操作导致的异常</div>
+</div>
 
 
 可以看到，由于在T3时刻直接删除了数据表的记录，而内存的数据还存在。这就导致了：
@@ -222,12 +413,10 @@ mysqlbinlog $binlog_file | mysql -h$host -P$port -u$user -p$pwd
 > @poppy 、@库淘淘 两位同学提到了第一个场景；  
 >  @王显伟 @lionetes 两位同学帮忙回答了 @undifined 同学的疑问，拷贝出来的文件要确保MySQL进程可以读。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：undifined]**
 
 
 [__ 7](<javascript:;>)
@@ -243,7 +432,6 @@ __ 作者回复
 
 2019-02-18
 
-> **[图：夜空中最亮的星（华仔）]**
 
 
 [__ 3](<javascript:;>)
@@ -258,7 +446,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：way]**
 
 
 [__ 1](<javascript:;>)
@@ -283,7 +470,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：XD]**
 
 
 [__ 1](<javascript:;>)
@@ -338,7 +524,6 @@ grant all privileges on `db%`.* to ... 表示所有以db为前缀的库。
 
 2019-02-19
 
-> **[图：萤火虫]**
 
 
 [__ 0](<javascript:;>)
@@ -354,7 +539,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：wljs]**
 
 
 [__ 0](<javascript:;>)
@@ -363,7 +547,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：舜]**
 
 
 [__ 0](<javascript:;>)
@@ -380,7 +563,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：旭东]**
 
 
 [__ 0](<javascript:;>)
@@ -397,7 +579,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：XD]**
 
 
 [__ 0](<javascript:;>)
@@ -428,7 +609,6 @@ xxxx
 
 2019-02-18
 
-> **[图：发芽的紫菜]**
 
 
 [__ 0](<javascript:;>)
@@ -447,7 +627,6 @@ __ 作者回复
 
 2019-02-18
 
-> **[图：晨思暮语]**
 
 
 [__ 0](<javascript:;>)
@@ -561,7 +740,6 @@ select order_key ,createtime FROM aaa force index(createtime) group by order_key
 
 2019-02-18
 
-> **[图：Leon📷]**
 
 
 [__ 0](<javascript:;>)
@@ -585,7 +763,6 @@ delete就是我们说的不规范操作
 
 2019-02-18
 
-> **[图：爸爸回来了]**
 
 
 [__ 0](<javascript:;>)

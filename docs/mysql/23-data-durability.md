@@ -23,7 +23,44 @@ description: "极客时间《MySQL 实战 45 讲》第 23 讲笔记整理"
 
 事务提交的时候，执行器把binlog cache里的完整事务写入到binlog中，并清空binlog cache。状态如图1所示。
 
-> **[图：图1 binlog写盘状态]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+  <style>
+    .title{font-size:14px;font-weight:600;fill:var(--d-text)}
+    .label{font-size:11px;fill:var(--d-text)}
+    .sub{font-size:10px;fill:var(--d-text-muted)}
+    .arrow{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah1)}
+  </style>
+  <defs><marker id="ah1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
+  <text x="260" y="20" text-anchor="middle" class="title">图 1 &nbsp; binlog 写盘状态</text>
+  <!-- Thread caches -->
+  <rect x="20" y="40" width="90" height="50" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="65" y="60" text-anchor="middle" class="label">Thread 1</text>
+  <text x="65" y="76" text-anchor="middle" class="sub">binlog cache</text>
+  <rect x="20" y="100" width="90" height="50" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="65" y="120" text-anchor="middle" class="label">Thread 2</text>
+  <text x="65" y="136" text-anchor="middle" class="sub">binlog cache</text>
+  <rect x="20" y="160" width="90" height="50" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="65" y="180" text-anchor="middle" class="label">Thread N</text>
+  <text x="65" y="196" text-anchor="middle" class="sub">binlog cache</text>
+  <!-- Arrows to binlog files -->
+  <line x1="110" y1="65" x2="190" y2="120" class="arrow"/>
+  <line x1="110" y1="125" x2="190" y2="125" class="arrow"/>
+  <line x1="110" y1="185" x2="190" y2="135" class="arrow"/>
+  <!-- Binlog files (page cache) -->
+  <rect x="195" y="90" width="120" height="70" rx="4" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1"/>
+  <text x="255" y="116" text-anchor="middle" class="label">binlog files</text>
+  <text x="255" y="132" text-anchor="middle" class="sub">(page cache)</text>
+  <text x="255" y="148" text-anchor="middle" class="sub">write</text>
+  <!-- Arrow to disk -->
+  <line x1="315" y1="125" x2="390" y2="125" class="arrow"/>
+  <text x="352" y="118" text-anchor="middle" class="sub">fsync</text>
+  <!-- Disk -->
+  <rect x="395" y="95" width="105" height="60" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="447" y="122" text-anchor="middle" class="label">Disk</text>
+  <text x="447" y="138" text-anchor="middle" class="sub">(持久化)</text>
+</svg>
+</div>
 
 
 可以看到，每个线程有自己binlog cache，但是共用同一份binlog文件。
@@ -63,7 +100,45 @@ write 和fsync的时机，是由参数sync_binlog控制的：
 
 这个问题，要从redo log可能存在的三种状态说起。这三种状态，对应的就是图2 中的三个颜色块。
 
-> **[图：图2 MySQL redo log存储状态]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 520 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+  <style>
+    .t2{font-size:14px;font-weight:600;fill:var(--d-text)}
+    .lb2{font-size:11px;fill:var(--d-text)}
+    .sb2{font-size:10px;fill:var(--d-text-muted)}
+    .ar2{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah2)}
+  </style>
+  <defs><marker id="ah2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
+  <text x="260" y="20" text-anchor="middle" class="t2">图 2 &nbsp; MySQL redo log 存储状态</text>
+  <!-- MySQL process memory (red) -->
+  <rect x="15" y="45" width="145" height="65" rx="5" fill="#fce4e4" stroke="#e57373" stroke-width="1.5"/>
+  <text x="87" y="68" text-anchor="middle" class="lb2" fill="#c62828">redo log buffer</text>
+  <text x="87" y="84" text-anchor="middle" class="sb2" fill="#c62828">MySQL 进程内存</text>
+  <text x="87" y="100" text-anchor="middle" style="font-size:10px;fill:#e57373;font-weight:600">&#9632; 红色</text>
+  <!-- FS page cache (yellow) -->
+  <rect x="190" y="45" width="145" height="65" rx="5" fill="#fff8e1" stroke="#ffb74d" stroke-width="1.5"/>
+  <text x="262" y="68" text-anchor="middle" class="lb2" fill="#e65100">FS page cache</text>
+  <text x="262" y="84" text-anchor="middle" class="sb2" fill="#e65100">write 但未 fsync</text>
+  <text x="262" y="100" text-anchor="middle" style="font-size:10px;fill:#ffb74d;font-weight:600">&#9632; 黄色</text>
+  <!-- Hard disk (green) -->
+  <rect x="365" y="45" width="140" height="65" rx="5" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="435" y="68" text-anchor="middle" class="lb2" fill="#2e7d32">Hard Disk</text>
+  <text x="435" y="84" text-anchor="middle" class="sb2" fill="#2e7d32">持久化到磁盘</text>
+  <text x="435" y="100" text-anchor="middle" style="font-size:10px;fill:#66bb6a;font-weight:600">&#9632; 绿色</text>
+  <!-- Arrows -->
+  <line x1="160" y1="77" x2="188" y2="77" class="ar2"/>
+  <text x="174" y="72" text-anchor="middle" class="sb2">write</text>
+  <line x1="335" y1="77" x2="363" y2="77" class="ar2"/>
+  <text x="349" y="72" text-anchor="middle" class="sb2">fsync</text>
+  <!-- Labels below -->
+  <text x="87" y="135" text-anchor="middle" class="sb2">innodb_flush_log_at_trx_commit=0</text>
+  <text x="87" y="148" text-anchor="middle" class="sb2">留在 buffer</text>
+  <text x="262" y="135" text-anchor="middle" class="sb2">innodb_flush_log_at_trx_commit=2</text>
+  <text x="262" y="148" text-anchor="middle" class="sb2">写到 page cache</text>
+  <text x="435" y="135" text-anchor="middle" class="sb2">innodb_flush_log_at_trx_commit=1</text>
+  <text x="435" y="148" text-anchor="middle" class="sb2">持久化到磁盘</text>
+</svg>
+</div>
 
 
 这三种状态分别是：
@@ -115,7 +190,43 @@ LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行�
 
 如图3所示，是三个并发事务(trx1, trx2, trx3)在prepare 阶段，都写完redo `log buffer`，持久化到磁盘的过程，对应的LSN分别是50、120 和160。
 
-> **[图：图3 `redo log` 组提交]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+  <style>
+    .t3{font-size:14px;font-weight:600;fill:var(--d-text)}
+    .lb3{font-size:11px;fill:var(--d-text)}
+    .sb3{font-size:10px;fill:var(--d-text-muted)}
+    .ar3{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah3)}
+  </style>
+  <defs><marker id="ah3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
+  <text x="240" y="20" text-anchor="middle" class="t3">图 3 &nbsp; redo log 组提交</text>
+  <!-- Timeline -->
+  <line x1="30" y1="50" x2="450" y2="50" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="30" y="44" class="sb3">时间 →</text>
+  <!-- trx1 -->
+  <rect x="50" y="60" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="100" y="79" text-anchor="middle" class="lb3">trx1 LSN=50</text>
+  <!-- trx2 -->
+  <rect x="110" y="95" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="160" y="114" text-anchor="middle" class="lb3">trx2 LSN=120</text>
+  <!-- trx3 -->
+  <rect x="140" y="130" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="190" y="149" text-anchor="middle" class="lb3">trx3 LSN=160</text>
+  <!-- Leader bracket -->
+  <text x="55" y="56" class="sb3" fill="var(--d-orange)">leader</text>
+  <!-- Group write -->
+  <line x1="155" y1="74" x2="280" y2="74" class="ar3"/>
+  <rect x="280" y="60" width="150" height="50" rx="5" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="355" y="82" text-anchor="middle" class="lb3" fill="#2e7d32">fsync LSN=160</text>
+  <text x="355" y="98" text-anchor="middle" class="sb3" fill="#2e7d32">一次刷盘，三个事务</text>
+  <!-- Return arrows -->
+  <line x1="430" y1="80" x2="455" y2="80" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="455" y="75" class="sb3" fill="var(--d-green)">done</text>
+  <!-- Legend -->
+  <text x="50" y="190" class="sb3">trx1 是 leader，写盘时带上 trx2、trx3</text>
+  <text x="50" y="206" class="sb3">LSN &le; 160 的 redo log 全部持久化，trx2/trx3 直接返回</text>
+</svg>
+</div>
 
 
 从图中可以看到，
@@ -135,7 +246,38 @@ LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行�
 
 为了让一次fsync带的组员更多，MySQL有一个很有趣的优化：拖时间。在介绍两阶段提交的时候，我曾经给你画了一个图，现在我把它截过来。
 
-> **[图：图4 两阶段提交]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+  <style>
+    .t4{font-size:14px;font-weight:600;fill:var(--d-text)}
+    .lb4{font-size:11px;fill:var(--d-text)}
+    .sb4{font-size:10px;fill:var(--d-text-muted)}
+    .ar4{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah4)}
+  </style>
+  <defs><marker id="ah4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
+  <text x="210" y="22" text-anchor="middle" class="t4">图 4 &nbsp; 两阶段提交</text>
+  <!-- Step 1: redo log prepare -->
+  <rect x="40" y="45" width="150" height="40" rx="5" fill="#fff8e1" stroke="#ffb74d" stroke-width="1.5"/>
+  <text x="115" y="62" text-anchor="middle" class="lb4">redo log</text>
+  <text x="115" y="77" text-anchor="middle" class="sb4" fill="#e65100">prepare</text>
+  <!-- Arrow down -->
+  <line x1="115" y1="85" x2="115" y2="105" class="ar4"/>
+  <!-- Step 2: write binlog -->
+  <rect x="40" y="108" width="150" height="40" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="115" y="125" text-anchor="middle" class="lb4">写 binlog</text>
+  <text x="115" y="140" text-anchor="middle" class="sb4">持久化到磁盘</text>
+  <!-- Arrow down -->
+  <line x1="115" y1="148" x2="115" y2="168" class="ar4"/>
+  <!-- Step 3: redo log commit -->
+  <rect x="40" y="171" width="150" height="40" rx="5" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="115" y="188" text-anchor="middle" class="lb4">redo log</text>
+  <text x="115" y="203" text-anchor="middle" class="sb4" fill="#2e7d32">commit</text>
+  <!-- Side labels -->
+  <text x="210" y="68" class="sb4">① prepare 阶段</text>
+  <text x="210" y="132" class="sb4">② 写 binlog</text>
+  <text x="210" y="194" class="sb4">③ commit 阶段</text>
+</svg>
+</div>
 
 
 图中，我把“写binlog”当成一个动作。但实际上，写binlog是分成两步的：
@@ -147,7 +289,43 @@ LSN也会写到InnoDB的数据页中，来确保数据页不会被多次执行�
 
 MySQL为了让组提交的效果更好，把redo log做fsync的时间拖到了步骤1之后。也就是说，上面的图变成了这样：
 
-> **[图：图5 两阶段提交细化]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 440 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+  <style>
+    .t5{font-size:14px;font-weight:600;fill:var(--d-text)}
+    .lb5{font-size:11px;fill:var(--d-text)}
+    .sb5{font-size:10px;fill:var(--d-text-muted)}
+    .ar5{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah5)}
+  </style>
+  <defs><marker id="ah5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
+  <text x="220" y="22" text-anchor="middle" class="t5">图 5 &nbsp; 两阶段提交细化</text>
+  <!-- Step 1: redo log prepare -->
+  <rect x="40" y="40" width="170" height="36" rx="5" fill="#fff8e1" stroke="#ffb74d" stroke-width="1.5"/>
+  <text x="125" y="63" text-anchor="middle" class="lb5">1. redo log prepare</text>
+  <line x1="125" y1="76" x2="125" y2="92" class="ar5"/>
+  <!-- Step 2: binlog write to page cache -->
+  <rect x="40" y="95" width="170" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="125" y="118" text-anchor="middle" class="lb5">2. redo log fsync</text>
+  <line x1="125" y1="131" x2="125" y2="147" class="ar5"/>
+  <!-- Step 3: binlog write -->
+  <rect x="40" y="150" width="170" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="125" y="173" text-anchor="middle" class="lb5">3. binlog write</text>
+  <line x1="125" y1="186" x2="125" y2="202" class="ar5"/>
+  <!-- Step 4: binlog fsync -->
+  <rect x="40" y="205" width="170" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="125" y="228" text-anchor="middle" class="lb5">4. binlog fsync</text>
+  <line x1="125" y1="241" x2="125" y2="257" class="ar5"/>
+  <!-- Step 5: redo log commit -->
+  <rect x="40" y="260" width="170" height="36" rx="5" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="125" y="283" text-anchor="middle" class="lb5">5. redo log commit</text>
+  <!-- Side annotations -->
+  <text x="230" y="62" class="sb5">← redo log 组提交的时机</text>
+  <text x="230" y="118" class="sb5">← fsync 拖到 binlog write 之后</text>
+  <text x="230" y="173" class="sb5">← binlog 写入 page cache</text>
+  <text x="230" y="228" class="sb5">← binlog 组提交的时机</text>
+  <text x="230" y="283" class="sb5">← write only（不需要 fsync）</text>
+</svg>
+</div>
 
 
 这么一来，binlog也可以组提交了。在执行图5中第4步把binlog fsync到磁盘时，如果有多个事务的binlog已经写完了，也是一起持久化的，这样也可以减少IOPS的消耗。
@@ -254,12 +432,9 @@ MySQL为了让组提交的效果更好，把redo log做fsync的时间拖到了�
 
 > @Vincent 同学提了一个好问题，用文中提到的DDL方案，会导致binlog里面少了这个DDL语句，后续影响备份恢复的功能。由于需要另一个知识点（主备同步协议），我放在后面的文章中说明。
 
-> **[图：示意图]**
-
 
 ##  精选留言
 
-> **[图：锅子]**
 
 
 [__ 2](<javascript:;>)
@@ -277,7 +452,6 @@ Page cache是操作系统文件系统上的😄
 
 2019-01-04
 
-> **[图：倪大人]**
 
 
 [__ 4](<javascript:;>)
@@ -326,7 +500,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：一大只😴]**
 
 
 [__ 2](<javascript:;>)
@@ -348,7 +521,6 @@ __ 作者回复
 
 2019-01-05
 
-> **[图：alias cd=rm -rf]**
 
 
 [__ 1](<javascript:;>)
@@ -372,7 +544,6 @@ __ 作者回复
 
 2019-01-28
 
-> **[图：某、人]**
 
 
 [__ 1](<javascript:;>)
@@ -406,7 +577,6 @@ __ 作者回复
 
 2019-01-06
 
-> **[图：永恒记忆]**
 
 
 [__ 1](<javascript:;>)
@@ -421,7 +591,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 1](<javascript:;>)
@@ -430,7 +599,6 @@ redolog 里面有已经提交事物日志，还有未提交事物日志都持久
 
 2019-01-04
 
-> **[图：miu]**
 
 
 [__ 0](<javascript:;>)
@@ -465,7 +633,6 @@ __ 作者回复
 
 2019-02-04
 
-> **[图：alias cd=rm -rf]**
 
 
 [__ 0](<javascript:;>)
@@ -484,7 +651,6 @@ redolog已经被持久化到磁盘了，那么当前事务提交时候，
 
 2019-01-28
 
-> **[图：alias cd=rm -rf]**
 
 
 [__ 0](<javascript:;>)
@@ -503,7 +669,6 @@ __ 作者回复
 
 2019-01-28
 
-> **[图：嘻嘻]**
 
 
 [__ 0](<javascript:;>)
@@ -523,7 +688,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：Geek_527020]**
 
 
 [__ 0](<javascript:;>)
@@ -539,7 +703,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：J!]**
 
 
 [__ 0](<javascript:;>)
@@ -554,7 +717,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：Komine]**
 
 
 [__ 0](<javascript:;>)
@@ -574,7 +736,6 @@ __ 作者回复
 
 2019-01-22
 
-> **[图：就是个渣渣]**
 
 
 [__ 0](<javascript:;>)
@@ -590,7 +751,6 @@ max_binlog_cache_size只是用来限制设置binlog_cache_size的时候的上限
 
 2019-01-19
 
-> **[图：似水流年]**
 
 
 [__ 0](<javascript:;>)
@@ -615,7 +775,6 @@ __ 作者回复
 
 2019-01-10
 
-> **[图：roaming]**
 
 
 [__ 0](<javascript:;>)

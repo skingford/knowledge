@@ -25,7 +25,52 @@ description: "极客时间《MySQL 实战 45 讲》第 12 讲笔记整理"
 
 接下来，我们用一个示意图来展示一下“孔乙己赊账”的整个操作过程。假设原来孔乙己欠账10文，这次又要赊9文。
 
-> **[图：图1 “孔乙己赊账”更新和flush过程]**
+<div style=”display:flex;justify-content:center;padding:20px 0;”>
+<div style=”font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:500px;width:100%;”>
+  <!-- 标题 -->
+  <div style=”text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);”>图1 “孔乙己赊账”更新和flush过程</div>
+  <svg viewBox=”0 0 500 300” style=”width:100%;height:auto;”>
+    <!-- 背景区域：粉板（内存/redo log） -->
+    <rect x=”20” y=”40” width=”180” height=”220” rx=”10” style=”fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5”/>
+    <text x=”110” y=”30” text-anchor=”middle” style=”font-size:14px;font-weight:bold;fill:var(--d-blue);”>粉板（redo log）</text>
+    <text x=”110” y=”55” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>顺序写 · 速度快</text>
+    <!-- 粉板内容 -->
+    <rect x=”40” y=”70” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-border);stroke-width:1”/>
+    <text x=”110” y=”90” text-anchor=”middle” style=”font-size:12px;fill:var(--d-text);”>孔乙己：欠10文</text>
+    <rect x=”40” y=”110” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-orange);stroke-width:1.5”/>
+    <text x=”110” y=”130” text-anchor=”middle” style=”font-size:12px;fill:var(--d-orange);font-weight:bold;”>+ 赊账 9文</text>
+    <text x=”110” y=”165” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>① 先写日志（WAL）</text>
+    <!-- 返回客户端 -->
+    <rect x=”40” y=”180” width=”140” height=”28” rx=”4” style=”fill:var(--d-green);opacity:0.15;stroke:var(--d-green);stroke-width:1”/>
+    <text x=”110” y=”199” text-anchor=”middle” style=”font-size:12px;fill:var(--d-green);font-weight:bold;”>✓ 返回更新成功</text>
+    <text x=”110” y=”230” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>内存数据页已更新</text>
+    <text x=”110” y=”248” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>（此时为”脏页”）</text>
+    <!-- 中间：flush 箭头 -->
+    <defs>
+      <marker id=”arrowF1” markerWidth=”8” markerHeight=”6” refX=”8” refY=”3” orient=”auto”>
+        <path d=”M0,0 L8,3 L0,6” style=”fill:var(--d-orange)”/>
+      </marker>
+    </defs>
+    <line x1=”210” y1=”150” x2=”290” y2=”150” style=”stroke:var(--d-orange);stroke-width:2;stroke-dasharray:6,3” marker-end=”url(#arrowF1)”/>
+    <text x=”250” y=”140” text-anchor=”middle” style=”font-size:12px;fill:var(--d-orange);font-weight:bold;”>flush</text>
+    <text x=”250” y=”170” text-anchor=”middle” style=”font-size:10px;fill:var(--d-text-muted);”>② 空闲时刷盘</text>
+    <!-- 账本（磁盘/数据文件） -->
+    <rect x=”300” y=”40” width=”180” height=”220” rx=”10” style=”fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.5”/>
+    <text x=”390” y=”30” text-anchor=”middle” style=”font-size:14px;font-weight:bold;fill:var(--d-text);”>账本（数据文件）</text>
+    <text x=”390” y=”55” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>随机写 · 速度慢</text>
+    <!-- 账本内容：flush前 -->
+    <rect x=”320” y=”75” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-border);stroke-width:1”/>
+    <text x=”390” y=”95” text-anchor=”middle” style=”font-size:12px;fill:var(--d-text-sub);”>孔乙己：欠10文</text>
+    <text x=”390” y=”120” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>flush 前（旧值）</text>
+    <!-- 账本内容：flush后 -->
+    <text x=”390” y=”155” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-dim);”>▼ flush 后</text>
+    <rect x=”320” y=”165” width=”140” height=”30” rx=”4” style=”fill:var(--d-bg);stroke:var(--d-green);stroke-width:1.5”/>
+    <text x=”390” y=”185” text-anchor=”middle” style=”font-size:12px;fill:var(--d-green);font-weight:bold;”>孔乙己：欠19文</text>
+    <text x=”390” y=”215” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>内存 = 磁盘</text>
+    <text x=”390” y=”233” text-anchor=”middle” style=”font-size:11px;fill:var(--d-text-muted);”>（变为”干净页”）</text>
+  </svg>
+</div>
+</div>
 
 
 回到文章开头的问题，你不难想象，平时执行很快的更新操作，其实就是在写内存和日志，而MySQL偶尔“抖”一下的那个瞬间，可能就是在刷脏页（flush）。
@@ -37,7 +82,82 @@ description: "极客时间《MySQL 实战 45 讲》第 12 讲笔记整理"
 - 第一种场景是，粉板满了，记不下了。这时候如果再有人来赊账，掌柜就只得放下手里的活儿，将粉板上的记录擦掉一些，留出空位以便继续记账。当然在擦掉之前，他必须先将正确的账目记录到账本中才行。  
 这个场景，对应的就是InnoDB的redo log写满了。这时候系统会停止所有更新操作，把checkpoint往前推进，redo log留出空间可以继续写。我在第二讲画了一个redo log的示意图，这里我改成环形，便于大家理解。
 
-> **[图：图2 redo log状态图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:500px;width:100%;">
+  <!-- 标题 -->
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">图2 redo log 状态图</div>
+  <div style="position:relative;width:300px;height:300px;margin:0 auto;">
+    <svg viewBox="0 0 300 300" style="width:100%;height:100%;">
+      <!-- 圆环背景 -->
+      <circle cx="150" cy="150" r="110" fill="none" style="stroke:var(--d-svg-ring)" stroke-width="30"/>
+      <!-- file 0 (右上) -->
+      <path d="M 150 40 A 110 110 0 0 1 260 150" fill="none" style="stroke:var(--d-blue-bg)" stroke-width="28"/>
+      <!-- file 1 (右下) -->
+      <path d="M 260 150 A 110 110 0 0 1 150 260" fill="none" style="stroke:var(--d-blue-border)" stroke-width="28" opacity="0.5"/>
+      <!-- file 2 (左下) -->
+      <path d="M 150 260 A 110 110 0 0 1 40 150" fill="none" style="stroke:var(--d-blue-bg)" stroke-width="28"/>
+      <!-- file 3 (左上) -->
+      <path d="M 40 150 A 110 110 0 0 1 150 40" fill="none" style="stroke:var(--d-blue-border)" stroke-width="28" opacity="0.5"/>
+      <!-- 已写入待落盘区域：checkpoint(CP) → write_pos 顺时针 -->
+      <!-- CP 在左上约 135°位置，write_pos 在右下约 315°位置 -->
+      <!-- CP ≈ (72, 88), write_pos ≈ (228, 212) -->
+      <path d="M 72 88 A 110 110 0 1 1 228 212" fill="none" style="stroke:var(--d-svg-pending)" stroke-width="28" opacity="0.6"/>
+      <!-- 分隔线（4个文件边界） -->
+      <line x1="150" y1="26" x2="150" y2="54" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="274" y1="150" x2="246" y2="150" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="150" y1="274" x2="150" y2="246" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="26" y1="150" x2="54" y2="150" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <!-- write pos 标记点 -->
+      <circle cx="228" cy="212" r="7" style="fill:var(--d-orange)"/>
+      <!-- checkpoint (CP) 标记点 -->
+      <circle cx="72" cy="88" r="7" style="fill:var(--d-blue)"/>
+      <!-- checkpoint' (CP') 标记点 - 推进后的位置 -->
+      <circle cx="55" cy="195" r="6" style="fill:var(--d-green)"/>
+      <!-- 顺时针方向箭头 -->
+      <path d="M 215 60 L 225 45 L 230 65" fill="none" style="stroke:var(--d-text-muted)" stroke-width="1.5"/>
+      <!-- 标注文字 -->
+      <text x="248" y="225" style="font-size:11px;font-weight:bold;fill:var(--d-orange);">write pos</text>
+      <text x="20" y="78" style="font-size:11px;font-weight:bold;fill:var(--d-blue);">CP</text>
+      <text x="10" y="205" style="font-size:11px;font-weight:bold;fill:var(--d-green);">CP'</text>
+    </svg>
+    <!-- 文件标签 -->
+    <div style="position:absolute;top:55px;right:18px;font-size:11px;color:var(--d-blue);">ib_logfile_0</div>
+    <div style="position:absolute;bottom:55px;right:18px;font-size:11px;color:var(--d-deep-blue);">ib_logfile_1</div>
+    <div style="position:absolute;bottom:55px;left:18px;font-size:11px;color:var(--d-blue);">ib_logfile_2</div>
+    <div style="position:absolute;top:55px;left:18px;font-size:11px;color:var(--d-deep-blue);">ib_logfile_3</div>
+    <!-- 中心文字 -->
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+      <div style="font-weight:bold;font-size:13px;color:var(--d-text);">redo log</div>
+      <div style="font-size:11px;color:var(--d-text-muted);">循环写入</div>
+    </div>
+  </div>
+  <!-- 图例 -->
+  <div style="display:flex;justify-content:center;gap:16px;margin-top:12px;font-size:12px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:4px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--d-orange);"></span>
+      <span style="color:var(--d-orange);font-weight:bold;">write pos</span>
+      <span style="color:var(--d-text-muted);">写入位置</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--d-blue);"></span>
+      <span style="color:var(--d-blue);font-weight:bold;">CP</span>
+      <span style="color:var(--d-text-muted);">checkpoint</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--d-green);"></span>
+      <span style="color:var(--d-green);font-weight:bold;">CP'</span>
+      <span style="color:var(--d-text-muted);">推进后</span>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--d-text-muted);">
+    <span style="display:inline-block;width:14px;height:8px;background:var(--d-svg-pending);opacity:0.6;border-radius:2px;vertical-align:middle;"></span>
+    CP → write pos（顺时针）：已写入待落盘 ｜ 其余：可写入空间
+  </div>
+  <div style="text-align:center;margin-top:4px;font-size:12px;color:var(--d-text-muted);">
+    CP → CP' 之间的脏页须先 flush 到磁盘，才能释放 redo log 空间
+  </div>
+</div>
+</div>
 
 
 checkpoint可不是随便往前修改一下位置就可以的。比如图2中，把checkpoint位置从CP推进到CP’，就需要将两个点之间的日志（浅绿色部分），对应的所有脏页都flush到磁盘上。之后，图中从write pos到CP’之间就是可以再写入的redo log的区域。
@@ -129,7 +249,54 @@ InnoDB每次写入的日志都有一个序号，当前写入的序号跟checkpoi
 
 上述的计算流程比较抽象，不容易理解，所以我画了一个简单的流程图。图中的F1、F2就是上面我们通过脏页比例和redo log写入速度算出来的两个值。
 
-> **[图：图3 InnoDB刷脏页速度策略]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:500px;width:100%;">
+  <!-- 标题 -->
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">图3 InnoDB 刷脏页速度策略</div>
+  <svg viewBox="0 0 460 260" style="width:100%;height:auto;">
+    <defs>
+      <marker id="arrowF3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6" style="fill:var(--d-text-sub)"/>
+      </marker>
+    </defs>
+    <!-- 输入因素1：脏页比例 -->
+    <rect x="10" y="20" width="150" height="60" rx="8" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5"/>
+    <text x="85" y="42" text-anchor="middle" style="font-size:12px;font-weight:bold;fill:var(--d-blue);">脏页比例 M</text>
+    <text x="85" y="60" text-anchor="middle" style="font-size:10px;fill:var(--d-text-muted);">innodb_max_dirty_pages_pct</text>
+    <!-- 输入因素2：redo log 写入量 -->
+    <rect x="10" y="120" width="150" height="60" rx="8" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5"/>
+    <text x="85" y="142" text-anchor="middle" style="font-size:12px;font-weight:bold;fill:var(--d-blue);">redo log 写入量 N</text>
+    <text x="85" y="160" text-anchor="middle" style="font-size:10px;fill:var(--d-text-muted);">sequence差值(LSN)</text>
+    <!-- 箭头：因素1 → F1(M) -->
+    <line x1="160" y1="50" x2="195" y2="50" style="stroke:var(--d-text-sub);stroke-width:1.5" marker-end="url(#arrowF3)"/>
+    <!-- 箭头：因素2 → F2(N) -->
+    <line x1="160" y1="150" x2="195" y2="150" style="stroke:var(--d-text-sub);stroke-width:1.5" marker-end="url(#arrowF3)"/>
+    <!-- F1(M) 计算框 -->
+    <rect x="200" y="28" width="80" height="44" rx="6" style="fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.5"/>
+    <text x="240" y="55" text-anchor="middle" style="font-size:13px;font-weight:bold;fill:var(--d-orange);">F1(M)</text>
+    <!-- F2(N) 计算框 -->
+    <rect x="200" y="128" width="80" height="44" rx="6" style="fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.5"/>
+    <text x="240" y="155" text-anchor="middle" style="font-size:13px;font-weight:bold;fill:var(--d-orange);">F2(N)</text>
+    <!-- 箭头：F1 → max -->
+    <line x1="280" y1="50" x2="310" y2="95" style="stroke:var(--d-text-sub);stroke-width:1.5" marker-end="url(#arrowF3)"/>
+    <!-- 箭头：F2 → max -->
+    <line x1="280" y1="150" x2="310" y2="105" style="stroke:var(--d-text-sub);stroke-width:1.5" marker-end="url(#arrowF3)"/>
+    <!-- max 合并框 -->
+    <rect x="315" y="78" width="60" height="44" rx="22" style="fill:var(--d-orange);opacity:0.15;stroke:var(--d-orange);stroke-width:1.5"/>
+    <text x="345" y="105" text-anchor="middle" style="font-size:13px;font-weight:bold;fill:var(--d-orange);">R=max</text>
+    <!-- 箭头：max → 输出 -->
+    <line x1="375" y1="100" x2="395" y2="100" style="stroke:var(--d-text-sub);stroke-width:1.5" marker-end="url(#arrowF3)"/>
+    <!-- 输出：实际刷盘速度 -->
+    <rect x="400" y="20" width="55" height="160" rx="8" style="fill:var(--d-green);opacity:0.12;stroke:var(--d-green);stroke-width:1.5"/>
+    <text x="427" y="75" text-anchor="middle" style="font-size:11px;fill:var(--d-text-sub);font-weight:bold;" transform="rotate(90,427,75)">实际刷盘速度</text>
+    <text x="427" y="145" text-anchor="middle" style="font-size:10px;fill:var(--d-green);font-weight:bold;" transform="rotate(90,427,145)">io_capacity × R%</text>
+    <!-- 底部说明 -->
+    <text x="230" y="215" text-anchor="middle" style="font-size:12px;fill:var(--d-text-sub);">R = max( F1(M), F2(N) )</text>
+    <text x="230" y="235" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">刷脏页速度 = innodb_io_capacity × R%</text>
+    <text x="230" y="253" text-anchor="middle" style="font-size:11px;fill:var(--d-text-muted);">取两者中较大的值，确保不会落后太多</text>
+  </svg>
+</div>
+</div>
 
 
 现在你知道了，InnoDB会在后台刷脏页，而刷脏页的过程是要将内存页写入磁盘。所以，无论是你的查询语句在需要内存的时候可能要求淘汰一个脏页，还是由于刷脏页的逻辑会占用IO资源并可能影响到了你的更新语句，都可能是造成你从业务端感知到MySQL“抖”了一下的原因。

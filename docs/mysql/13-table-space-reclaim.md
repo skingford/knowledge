@@ -36,7 +36,49 @@ description: "极客时间《MySQL 实战 45 讲》第 13 讲笔记整理"
 
 我们先再来看一下InnoDB中一个索引的示意图。在前面[第4](<https://time.geekbang.org/column/article/69236>)和[第5](<https://time.geekbang.org/column/article/69636>)篇文章中，我和你介绍索引时曾经提到过，InnoDB里的数据都是用B+树的结构组织的。
 
-> **[图：图1 B+树索引示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<div style="text-align:center;font-size:14px;font-weight:600;color:var(--d-text);margin-bottom:12px;">图1 B+树索引示意图</div>
+<svg viewBox="0 0 560 320" style="width:100%;height:auto;">
+<!-- Root node -->
+<rect x="210" y="10" width="140" height="36" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="280" y="33" text-anchor="middle" font-size="13" font-family="system-ui,sans-serif" fill="var(--d-text)">300 | 600</text>
+<!-- Internal nodes -->
+<rect x="80" y="80" width="120" height="36" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="140" y="103" text-anchor="middle" font-size="13" font-family="system-ui,sans-serif" fill="var(--d-text)">100 | 200</text>
+<rect x="360" y="80" width="120" height="36" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="420" y="103" text-anchor="middle" font-size="13" font-family="system-ui,sans-serif" fill="var(--d-text)">700 | 900</text>
+<!-- Lines from root to internal -->
+<line x1="250" y1="46" x2="140" y2="80" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="310" y1="46" x2="420" y2="80" stroke="var(--d-border)" stroke-width="1.2"/>
+<!-- Leaf nodes (data pages) -->
+<rect x="10" y="170" width="130" height="100" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="75" y="189" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Page A</text>
+<text x="75" y="208" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R1 (ID=100)</text>
+<text x="75" y="224" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R2 (ID=200)</text>
+<text x="75" y="240" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R3 (ID=300)</text>
+<text x="75" y="256" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text-muted)" text-decoration="line-through">R4 (ID=400) ✕</text>
+<rect x="215" y="170" width="130" height="100" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="280" y="189" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Page B</text>
+<text x="280" y="208" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R5 (ID=500)</text>
+<text x="280" y="224" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R6 (ID=600)</text>
+<rect x="420" y="170" width="130" height="100" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="485" y="189" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Page C</text>
+<text x="485" y="208" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R7 (ID=700)</text>
+<text x="485" y="224" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R8 (ID=900)</text>
+<!-- Lines from internal to leaf -->
+<line x1="110" y1="116" x2="75" y2="170" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="170" y1="116" x2="280" y2="170" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="390" y1="116" x2="485" y2="170" stroke="var(--d-border)" stroke-width="1.2"/>
+<!-- Leaf links -->
+<line x1="140" y1="230" x2="215" y2="230" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,3"/>
+<line x1="345" y1="230" x2="420" y2="230" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,3"/>
+<!-- Label -->
+<text x="280" y="305" text-anchor="middle" font-size="12" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">叶子节点 = 数据页（Data Pages）</text>
+<text x="75" y="284" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-orange)">R4 已标记删除，空间未回收</text>
+</svg>
+</div>
+</div>
 
 
 假设，我们要删掉R4这个记录，InnoDB引擎只会把R4这个记录标记为删除。如果之后要再插入一个ID在300和600之间的记录时，可能会复用这个位置。但是，磁盘文件的大小并不会缩小。
@@ -63,7 +105,46 @@ description: "极客时间《MySQL 实战 45 讲》第 13 讲笔记整理"
 
 假设图1中page A已经满了，这时我要再插入一行数据，会怎样呢？
 
-> **[图：图2 插入数据导致页分裂]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<div style="text-align:center;font-size:14px;font-weight:600;color:var(--d-text);margin-bottom:12px;">图2 插入数据导致页分裂</div>
+<svg viewBox="0 0 560 340" style="width:100%;height:auto;">
+<!-- Before: Page A full -->
+<text x="130" y="18" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">Before: Page A (已满)</text>
+<rect x="30" y="26" width="200" height="120" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="130" y="50" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R1 (ID=100)</text>
+<text x="130" y="68" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R3 (ID=300)</text>
+<text x="130" y="86" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R4 (ID=500)</text>
+<text x="130" y="104" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R5 (ID=600)</text>
+<text x="130" y="136" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">页已满，无法插入</text>
+<!-- Insert arrow -->
+<text x="280" y="55" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-orange)">插入 ID=550</text>
+<line x1="280" y1="62" x2="280" y2="90" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowOrange2)"/>
+<text x="280" y="108" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-orange)">触发页分裂 ↓</text>
+<defs><marker id="arrowOrange2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/></marker></defs>
+<!-- After state -->
+<text x="280" y="160" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">After: 页分裂</text>
+<!-- Page A after split -->
+<rect x="30" y="172" width="200" height="140" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="130" y="192" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Page A</text>
+<text x="130" y="212" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R1 (ID=100)</text>
+<text x="130" y="230" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R3 (ID=300)</text>
+<text x="130" y="248" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R4 (ID=500)</text>
+<!-- Hole -->
+<rect x="55" y="258" width="150" height="22" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="130" y="274" text-anchor="middle" font-size="11" font-weight="500" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">空洞 (Hole)</text>
+<text x="130" y="304" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">末尾空间未利用</text>
+<!-- Page B after split -->
+<rect x="330" y="172" width="200" height="120" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+<text x="430" y="192" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-green)">Page B (新页)</text>
+<text x="430" y="216" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R4_new (ID=550)</text>
+<text x="430" y="236" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text)">R5 (ID=600)</text>
+<!-- Arrow between pages -->
+<line x1="230" y1="232" x2="330" y2="232" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#arrowGray2)"/>
+<defs><marker id="arrowGray2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-border)"/></marker></defs>
+</svg>
+</div>
+</div>
 
 
 可以看到，由于page A满了，再插入一个ID是550的数据时，就不得不再申请一个新的页面page B来保存数据了。页分裂完成后，page A的末尾就留下了空洞（注意：实际上，可能不止1个记录的位置是空洞）。
@@ -84,7 +165,55 @@ description: "极客时间《MySQL 实战 45 讲》第 13 讲笔记整理"
 
 这里，你可以使用alter table A engine=InnoDB命令来重建表。在MySQL 5.5版本之前，这个命令的执行流程跟我们前面描述的差不多，区别只是这个临时表B不需要你自己创建，MySQL会自动完成转存数据、交换表名、删除旧表的操作。
 
-> **[图：图3 改锁表DDL]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<div style="text-align:center;font-size:14px;font-weight:600;color:var(--d-text);margin-bottom:12px;">图3 改锁表DDL（MySQL 5.5 之前的 DDL 流程）</div>
+<svg viewBox="0 0 560 220" style="width:100%;height:auto;">
+<defs>
+<marker id="arrowBlue3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-blue)"/></marker>
+<marker id="arrowGreen3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/></marker>
+</defs>
+<!-- Lock icon -->
+<rect x="0" y="0" width="560" height="220" rx="8" fill="none" stroke="var(--d-warn-border)" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="280" y="20" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">🔒 整个过程表被锁定，不允许 DML 操作</text>
+<!-- Table A -->
+<rect x="30" y="50" width="140" height="130" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="100" y="72" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Table A (原表)</text>
+<text x="100" y="94" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行</text>
+<text x="100" y="110" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行</text>
+<rect x="55" y="120" width="90" height="18" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="100" y="134" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">空洞</text>
+<text x="100" y="156" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行</text>
+<rect x="55" y="160" width="90" height="14" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="100" y="172" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">空洞</text>
+<!-- Arrow 1 -->
+<line x1="170" y1="105" x2="220" y2="105" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowBlue3)"/>
+<text x="195" y="98" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-blue)">逐行</text>
+<text x="195" y="120" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-blue)">拷贝</text>
+<!-- tmp_table -->
+<rect x="220" y="50" width="140" height="130" rx="5" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+<text x="290" y="72" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-cur-text)">tmp_table</text>
+<text x="290" y="90" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">(Server 层临时表)</text>
+<text x="290" y="112" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="290" y="128" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="290" y="144" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="290" y="166" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-green)">无空洞 ✓</text>
+<!-- Arrow 2 -->
+<line x1="360" y1="105" x2="410" y2="105" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#arrowGreen3)"/>
+<text x="385" y="98" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-green)">交换</text>
+<text x="385" y="120" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-green)">表名</text>
+<!-- Result -->
+<rect x="410" y="50" width="130" height="130" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+<text x="475" y="72" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-green)">Table A (新)</text>
+<text x="475" y="94" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="475" y="110" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="475" y="126" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据行 (紧凑)</text>
+<text x="475" y="150" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-green)">空间已回收 ✓</text>
+<!-- Bottom note -->
+<text x="280" y="208" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">整个过程需要锁表，耗时较长</text>
+</svg>
+</div>
+</div>
 
 
 显然，花时间最多的步骤是往临时表插入数据的过程，如果在这个过程中，有新的数据要写入到表A的话，就会造成数据丢失。因此，在整个DDL过程中，表A中不能有更新。也就是说，这个DDL不是Online的。
@@ -103,7 +232,69 @@ description: "极客时间《MySQL 实战 45 讲》第 13 讲笔记整理"
 
   5. 用临时文件替换表A的数据文件。
 
-> **[图：图4 Online DDL]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<div style="text-align:center;font-size:14px;font-weight:600;color:var(--d-text);margin-bottom:12px;">图4 Online DDL（MySQL 5.6+ Online DDL 流程）</div>
+<svg viewBox="0 0 560 360" style="width:100%;height:auto;">
+<defs>
+<marker id="arrowB4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-blue)"/></marker>
+<marker id="arrowG4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/></marker>
+</defs>
+<!-- State 1 -->
+<rect x="10" y="10" width="160" height="70" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="90" y="30" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">State 1: 获取锁</text>
+<text x="90" y="48" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">获取 MDL 写锁</text>
+<text x="90" y="64" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">→ 降级为 MDL 读锁</text>
+<line x1="170" y1="45" x2="200" y2="45" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrowB4)"/>
+<!-- State 2 -->
+<rect x="200" y="10" width="165" height="70" rx="5" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+<text x="282" y="30" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-cur-text)">State 2: 拷贝数据</text>
+<text x="282" y="48" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">扫描 Table A → tmp_file</text>
+<text x="282" y="64" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">记录变更到 row log</text>
+<line x1="365" y1="45" x2="395" y2="45" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrowB4)"/>
+<!-- State 3 -->
+<rect x="395" y="10" width="155" height="70" rx="5" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+<text x="472" y="30" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-cur-text)">State 3: 应用日志</text>
+<text x="472" y="48" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">将 row log 应用</text>
+<text x="472" y="64" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">到 tmp_file</text>
+<!-- DML allowed indicator -->
+<rect x="200" y="90" width="350" height="24" rx="4" fill="var(--d-green)" opacity="0.12"/>
+<text x="375" y="107" text-anchor="middle" font-size="11" font-weight="500" font-family="system-ui,sans-serif" fill="var(--d-green)">✓ State 2 ~ 3 期间允许 DML 操作（增删改）</text>
+<!-- Detailed flow below -->
+<!-- Table A -->
+<rect x="20" y="140" width="140" height="110" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="90" y="162" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">Table A</text>
+<text x="90" y="180" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">数据页 + 空洞</text>
+<text x="90" y="196" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">主键索引</text>
+<rect x="45" y="205" width="90" height="16" rx="3" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="90" y="217" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">空洞</text>
+<text x="90" y="242" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">(InnoDB 引擎内部)</text>
+<!-- Arrow to tmp_file -->
+<line x1="160" y1="190" x2="210" y2="190" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrowB4)"/>
+<text x="185" y="183" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-blue)">扫描</text>
+<!-- tmp_file -->
+<rect x="210" y="140" width="140" height="110" rx="5" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+<text x="280" y="162" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-cur-text)">tmp_file</text>
+<text x="280" y="180" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">(InnoDB 内部临时文件)</text>
+<text x="280" y="196" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">紧凑 B+ 树</text>
+<text x="280" y="216" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-green)">无空洞 ✓</text>
+<!-- Row log -->
+<rect x="400" y="140" width="140" height="70" rx="5" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="1.5"/>
+<text x="470" y="162" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-engine-text)">Row Log</text>
+<text x="470" y="180" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">记录拷贝期间</text>
+<text x="470" y="196" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text)">的 DML 操作</text>
+<!-- Arrow from row log to tmp_file -->
+<line x1="400" y1="195" x2="350" y2="205" stroke="var(--d-green)" stroke-width="1.2" marker-end="url(#arrowG4)"/>
+<text x="385" y="218" text-anchor="middle" font-size="9" font-family="system-ui,sans-serif" fill="var(--d-green)">回放</text>
+<!-- State 4 -->
+<rect x="130" y="280" width="300" height="40" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="280" y="305" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-blue)">State 4: 用 tmp_file 替换 Table A 的数据文件</text>
+<line x1="280" y1="250" x2="280" y2="280" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrowB4)"/>
+<!-- Bottom label -->
+<text x="280" y="345" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">整个过程在 InnoDB 内部完成 = inplace</text>
+</svg>
+</div>
+</div>
 
 
 可以看到，与图3过程的不同之处在于，由于日志文件记录和重放操作这个功能的存在，这个方案在重建表的过程中，允许对表A做增删改操作。这也就是Online DDL名字的来源。
@@ -204,7 +395,41 @@ alter table t add FULLTEXT(field_name);
 
 每次事务提交都要写redo log，如果设置太小，很快就会被写满，也就是下面这个图的状态，这个“环”将很快被写满，write pos一直追着CP。
 
-> **[图：相关示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<div style="text-align:center;font-size:14px;font-weight:600;color:var(--d-text);margin-bottom:12px;">Redo Log 环形缓冲区（设置过小时）</div>
+<svg viewBox="0 0 360 320" style="width:100%;height:auto;">
+<defs>
+<marker id="arrowRedo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/></marker>
+</defs>
+<!-- Outer ring -->
+<circle cx="180" cy="150" r="100" fill="none" stroke="var(--d-border)" stroke-width="18" opacity="0.15"/>
+<!-- Used portion (almost full circle) - from checkpoint to write_pos -->
+<circle cx="180" cy="150" r="100" fill="none" stroke="var(--d-orange)" stroke-width="18" opacity="0.3"
+  stroke-dasharray="596 628" stroke-dashoffset="0" transform="rotate(-85 180 150)"/>
+<!-- Small free gap -->
+<circle cx="180" cy="150" r="100" fill="none" stroke="var(--d-green)" stroke-width="18" opacity="0.25"
+  stroke-dasharray="32 628" stroke-dashoffset="0" transform="rotate(-85 180 150)"/>
+<!-- write_pos marker -->
+<circle cx="180" cy="50" r="8" fill="var(--d-orange)" stroke="var(--d-bg)" stroke-width="2"/>
+<text x="180" y="30" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-orange)">write pos</text>
+<!-- checkpoint marker (very close to write_pos) -->
+<circle cx="160" cy="52" r="8" fill="var(--d-green)" stroke="var(--d-bg)" stroke-width="2"/>
+<text x="110" y="38" text-anchor="middle" font-size="11" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-green)">checkpoint</text>
+<!-- Arrow showing direction -->
+<path d="M 275 120 A 100 100 0 0 1 260 190" fill="none" stroke="var(--d-text-muted)" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrowRedo)"/>
+<text x="300" y="160" text-anchor="start" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-muted)">写入方向</text>
+<!-- Center labels -->
+<text x="180" y="135" text-anchor="middle" font-size="12" font-weight="600" font-family="system-ui,sans-serif" fill="var(--d-text)">Redo Log</text>
+<text x="180" y="155" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">ib_logfile_0</text>
+<text x="180" y="172" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-text-sub)">ib_logfile_1</text>
+<!-- Warning annotation -->
+<rect x="60" y="270" width="240" height="40" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+<text x="180" y="288" text-anchor="middle" font-size="11" font-weight="500" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">write pos 追上 checkpoint</text>
+<text x="180" y="304" text-anchor="middle" font-size="10" font-family="system-ui,sans-serif" fill="var(--d-warn-text)">必须停下来刷脏页，导致性能下跌</text>
+</svg>
+</div>
+</div>
 
 
 这时，你看到的现象就是**磁盘压力很小，但是数据库出现间歇性的性能下跌。**

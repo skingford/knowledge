@@ -38,7 +38,56 @@ description: "极客时间《MySQL 实战 45 讲》第 14 讲笔记整理"
 
 我们假设从上到下是按照时间顺序执行的，同一行语句是在同一时刻执行的。
 
-> **[图：图1 会话A、B、C的执行流程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 1 — 会话 A、B、C 的执行流程</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:28%;color:var(--d-th-text);">会话 A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:28%;color:var(--d-th-text);">会话 B</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:29%;color:var(--d-th-text);">会话 C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">begin;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">INSERT INTO t VALUES(...);<br>（自动提交）</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">begin;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">INSERT INTO t VALUES(...);</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T5</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">SELECT COUNT(*) FROM t;<br>结果：<strong style="color:var(--d-orange);">10000</strong></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">SELECT COUNT(*) FROM t;<br>结果：<strong style="color:var(--d-orange);">10002</strong></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">SELECT COUNT(*) FROM t;<br>结果：<strong style="color:var(--d-orange);">10001</strong></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;font-size:12px;color:var(--d-text-sub);text-align:center;">
+    同一时刻三个会话各自看到的行数不同 — 这就是 MVCC 导致 InnoDB 无法直接存储 count(*) 的原因
+  </div>
+</div>
+</div>
 
 
 你会看到，在最后一个时刻，三个会话A、B、C会同时查询表t的总行数，但拿到的结果却不同。
@@ -95,7 +144,45 @@ Redis的数据不能永久地留在内存里，所以你会找一个地方把这
 
 我们一起来看看这个时序图。
 
-> **[图：图2 会话A、B执行时序图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 2 — 会话 A、B 执行时序图</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:42%;color:var(--d-th-text);">会话 A（插入逻辑）</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:43%;color:var(--d-th-text);">会话 B（查询逻辑）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">INSERT INTO 数据表;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">读 Redis 计数值<br>读数据表最近 100 条<br><strong style="color:var(--d-orange);">⚠ 数据表已有新行 R，但计数未 +1</strong></td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">Redis 计数 +1;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;padding:8px 12px;background:var(--d-warn-bg);border:1px solid var(--d-warn-border);border-radius:4px;font-size:12px;color:var(--d-warn-text);">
+    先写数据表、再改 Redis → T3 时刻查到了新行 R，但 Redis 计数还没 +1，数据不一致
+  </div>
+</div>
+</div>
 
 
 图2中，会话A是一个插入交易记录的逻辑，往数据表里插入一行R，然后Redis计数加1；会话B就是查询页面显示时需要的数据。
@@ -104,7 +191,45 @@ Redis的数据不能永久地留在内存里，所以你会找一个地方把这
 
 你一定会说，这是因为我们执行新增记录逻辑时候，是先写数据表，再改Redis计数。而读的时候是先读Redis，再读数据表，这个顺序是相反的。那么，如果保持顺序一样的话，是不是就没问题了？我们现在把会话A的更新顺序换一下，再看看执行结果。
 
-> **[图：图3 调整顺序后，会话A、B的执行时序图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 3 — 调整顺序后，会话 A、B 的执行时序图</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:42%;color:var(--d-th-text);">会话 A（插入逻辑）</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:43%;color:var(--d-th-text);">会话 B（查询逻辑）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">Redis 计数 +1;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">读 Redis 计数值<br>读数据表最近 100 条<br><strong style="color:var(--d-orange);">⚠ 计数已 +1，但新行 R 还未插入</strong></td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">INSERT INTO 数据表;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;padding:8px 12px;background:var(--d-warn-bg);border:1px solid var(--d-warn-border);border-radius:4px;font-size:12px;color:var(--d-warn-text);">
+    先改 Redis、再写数据表 → T3 时刻计数已 +1，但查不到新行 R，仍然不一致
+  </div>
+</div>
+</div>
 
 
 你会发现，这时候反过来了，会话B在T3时刻查询的时候，Redis计数加了1了，但还查不到新插入的R这一行，也是数据不一致的情况。
@@ -129,7 +254,45 @@ Redis的数据不能永久地留在内存里，所以你会找一个地方把这
 
 所谓以子之矛攻子之盾，现在我们就利用“事务”这个特性，把问题解决掉。
 
-> **[图：图4 会话A、B的执行时序图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图 4 — 用数据库计数表后，会话 A、B 的执行时序图</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:15%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:42%;color:var(--d-th-text);">会话 A（插入逻辑）</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:43%;color:var(--d-th-text);">会话 B（查询逻辑）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">begin;<br>计数表值 +1;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">INSERT INTO 数据表;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">begin;<br>读计数表<br>读数据表最近 100 条<br><strong style="color:var(--d-green);">✓ 事务未提交，计数 +1 不可见，新行也不可见</strong></td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">commit;</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:4px;font-size:12px;color:var(--d-blue);">
+    利用 InnoDB 事务的隔离性：会话 A 未提交前，会话 B 既看不到计数变化，也看不到新行 — 逻辑一致
+  </div>
+</div>
+</div>
 
 
 我们来看下现在的执行结果。虽然会话B的读操作仍然是在T3执行的，但是因为这时候更新事务还没有提交，所以计数值加1这个操作对会话B还不可见。

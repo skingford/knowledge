@@ -35,19 +35,47 @@ max_connections的计算，不是看谁在running，是只要连着就占用一�
 
 但是需要注意，在show processlist的结果里，踢掉显示为sleep的线程，可能是有损的。我们来看下面这个例子。
 
-> **[图：图1 sleep线程的两种状态]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<table style="width:100%;border-collapse:collapse;font-family:monospace;font-size:13px;border:1px solid var(--d-border)">
+<caption style="font-weight:600;color:var(--d-text);margin-bottom:.5em;font-size:14px">图 1 &nbsp; sleep 线程的两种状态</caption>
+<tr><th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:6px 10px;text-align:left;width:80px">时刻</th><th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:6px 10px;text-align:left">Session A</th><th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:6px 10px;text-align:left">Session B</th></tr>
+<tr><td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-bg)">T</td><td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-bg)"><code>begin;<br>insert into t values(1,1);</code><br><span style="color:var(--d-text-muted)">(事务未提交，处于 Sleep)</span></td><td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-bg)"><code>select 1;</code><br><span style="color:var(--d-text-muted)">(执行完毕，处于 Sleep)</span></td></tr>
+</table>
+</div>
 
 
 在上面这个例子里，如果断开session A的连接，因为这时候session A还没有提交，所以MySQL只能按照回滚事务来处理；而断开session B的连接，就没什么大影响。所以，如果按照优先级来说，你应该优先断开像session B这样的事务外空闲的连接。
 
 但是，怎么判断哪些是事务外空闲的呢？session C在T时刻之后的30秒执行show processlist，看到的结果是这样的。
 
-> **[图：图2 sleep线程的两种状态，show pr]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:14px 18px;text-align:left;font-family:monospace;font-size:13px;line-height:1.7;overflow-x:auto">
+<div style="font-weight:600;color:var(--d-text);margin-bottom:8px;font-size:14px;font-family:sans-serif">图 2 &nbsp; show processlist 结果</div>
+<span style="color:var(--d-text-muted)">mysql&gt;</span> <span style="color:var(--d-blue)">show processlist;</span><br>
+<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:12px">
+<tr style="border-bottom:1px solid var(--d-border-dash)"><th style="text-align:left;padding:3px 8px;color:var(--d-text-sub)">Id</th><th style="text-align:left;padding:3px 8px;color:var(--d-text-sub)">User</th><th style="text-align:left;padding:3px 8px;color:var(--d-text-sub)">Command</th><th style="text-align:left;padding:3px 8px;color:var(--d-text-sub)">Time</th><th style="text-align:left;padding:3px 8px;color:var(--d-text-sub)">State</th></tr>
+<tr style="background:var(--d-stripe)"><td style="padding:3px 8px">4</td><td style="padding:3px 8px">root</td><td style="padding:3px 8px;color:var(--d-orange)">Sleep</td><td style="padding:3px 8px">30</td><td style="padding:3px 8px"></td></tr>
+<tr><td style="padding:3px 8px">5</td><td style="padding:3px 8px">root</td><td style="padding:3px 8px;color:var(--d-orange)">Sleep</td><td style="padding:3px 8px">30</td><td style="padding:3px 8px"></td></tr>
+</table>
+</div>
+</div>
 
 
 图中id=4和id=5的两个会话都是Sleep 状态。而要看事务具体状态的话，你可以查information_schema库的innodb_trx表。
 
-> **[图：图3 从information_schema.]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:14px 18px;text-align:left;font-family:monospace;font-size:13px;line-height:1.7;overflow-x:auto">
+<div style="font-weight:600;color:var(--d-text);margin-bottom:8px;font-size:14px;font-family:sans-serif">图 3 &nbsp; 从 information_schema.innodb_trx 查事务状态</div>
+<span style="color:var(--d-text-muted)">mysql&gt;</span> <span style="color:var(--d-blue)">select * from information_schema.innodb_trx\G</span><br>
+<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:12px">
+<tr style="border-bottom:1px dashed var(--d-border-dash)"><td style="padding:3px 8px;color:var(--d-text-sub);white-space:nowrap">trx_id</td><td style="padding:3px 8px">281479663498720</td></tr>
+<tr style="border-bottom:1px dashed var(--d-border-dash)"><td style="padding:3px 8px;color:var(--d-text-sub);white-space:nowrap">trx_mysql_thread_id</td><td style="padding:3px 8px;color:var(--d-orange);font-weight:600">4</td></tr>
+<tr style="border-bottom:1px dashed var(--d-border-dash)"><td style="padding:3px 8px;color:var(--d-text-sub);white-space:nowrap">trx_state</td><td style="padding:3px 8px">RUNNING</td></tr>
+<tr><td style="padding:3px 8px;color:var(--d-text-sub);white-space:nowrap">trx_query</td><td style="padding:3px 8px;color:var(--d-text-muted)">NULL</td></tr>
+</table>
+<div style="margin-top:8px;color:var(--d-text-muted);font-size:12px;font-family:sans-serif">id=4 的线程还处在事务中，id=5 的线程不在事务中</div>
+</div>
+</div>
 
 
 这个结果里，trx_mysql_thread_id=4，表示id=4的线程还处在事务中。
@@ -119,7 +147,18 @@ call query_rewrite.flush_rewrite_rules();
 
 这里，call query_rewrite.flush_rewrite_rules()这个存储过程，是让插入的新规则生效，也就是我们说的“查询重写”。你可以用图4中的方法来确认改写规则是否生效。
 
-> **[图：图4 查询重写效果]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:14px 18px;text-align:left;font-family:monospace;font-size:13px;line-height:1.7;overflow-x:auto">
+<div style="font-weight:600;color:var(--d-text);margin-bottom:8px;font-size:14px;font-family:sans-serif">图 4 &nbsp; 查询重写效果</div>
+<span style="color:var(--d-text-muted)">mysql&gt;</span> <span style="color:var(--d-blue)">select * from t where id + 1 = 10000;</span><br>
+<span style="color:var(--d-text-muted)">mysql&gt;</span> <span style="color:var(--d-blue)">show warnings\G</span><br>
+<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:12px">
+<tr style="border-bottom:1px dashed var(--d-border-dash)"><td style="padding:3px 8px;color:var(--d-text-sub)">Level</td><td style="padding:3px 8px">Note</td></tr>
+<tr style="border-bottom:1px dashed var(--d-border-dash)"><td style="padding:3px 8px;color:var(--d-text-sub)">Code</td><td style="padding:3px 8px">1105</td></tr>
+<tr><td style="padding:3px 8px;color:var(--d-text-sub)">Message</td><td style="padding:3px 8px;color:var(--d-green)">Query 'select * from t where id + 1 = 10000'<br>rewritten to 'select * from t where id = 10000 - 1'</td></tr>
+</table>
+</div>
+</div>
 
 
 **导致慢查询的第三种可能，就是碰上了我们在第10篇文章**[**《MySQL为什么有时候会选错索引？》**](<https://time.geekbang.org/column/article/71173>)**中提到的情况，MySQL选错了索引。**
@@ -189,8 +228,6 @@ DBA虽然可以通过语句重写来暂时处理问题，但是这本身是一�
 
 前两期我给你留的问题是，下面这个图的执行序列中，为什么session B的insert语句会被堵住。
 
-> **[图：相关示意图]**
-
 
   1. 由于是order by c desc，第一个要定位的是索引c上“最右边的”c=20的行，所以会加上间隙锁(20,25)和next-key lock (15,20]。
 
@@ -222,12 +259,8 @@ DBA虽然可以通过语句重写来暂时处理问题，但是这本身是一�
 
 最后，我要为元旦期间还坚持学习的同学们，点个赞 ^_^
 
-> **[图：示意图]**
-
 
 ##  精选留言
-
-> **[图：某、人]**
 
 
 [__ 4](<javascript:;>)
@@ -264,8 +297,6 @@ Binlog 这么大，说明是大事务，崩溃恢复的时候要处理的redolog
 后面可以考虑这种方案，强制重启还是有点伤的，不过核心还是做好监控，不让出现磁盘100%写满的情况
 
 2019-01-03
-
-> **[图：Long]**
 
 
 [__ 9](<javascript:;>)
@@ -316,8 +347,6 @@ __ 作者回复
 
 2019-01-02
 
-> **[图：某、人]**
-
 
 [__ 4](<javascript:;>)
 
@@ -340,8 +369,6 @@ __ 作者回复
 
 2019-01-02
 
-> **[图：Tony Du]**
-
 
 [__ 4](<javascript:;>)
 
@@ -359,8 +386,6 @@ __ 作者回复
 C=10还是要锁的，如果不锁可能被删除
 
 2019-01-02
-
-> **[图：Tony Du]**
 
 
 [__ 2](<javascript:;>)
@@ -388,8 +413,6 @@ __ 作者回复
 嗯，因为执行索引遍历的顺序不一样，其实锁范围不一样也算合理啦😄
 
 2019-01-03
-
-> **[图：Long]**
 
 
 [__ 1](<javascript:;>)
@@ -431,8 +454,6 @@ __ 作者回复
 
 2019-01-03
 
-> **[图：曾剑]**
-
 
 [__ 1](<javascript:;>)
 
@@ -448,7 +469,6 @@ __ 作者回复
 
 2019-01-02
 
-> **[图：Invictus_CD ]**
 
 
 [__ 0](<javascript:;>)
@@ -466,7 +486,6 @@ __ 作者回复
 
 2019-02-09
 
-> **[图：刘昆]**
 
 
 [__ 0](<javascript:;>)
@@ -498,7 +517,6 @@ insert into t values(7,5,6) 是（c=5, id=7);
 
 2019-02-03
 
-> **[图：Moby]**
 
 
 [__ 0](<javascript:;>)
@@ -523,7 +541,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：Moby]**
 
 
 [__ 0](<javascript:;>)
@@ -544,7 +561,6 @@ begin; select * from t where c>=15 and c<=20 order by c desc lock in share mode;
 
 2019-01-21
 
-> **[图：unlock]**
 
 
 [__ 0](<javascript:;>)
@@ -562,7 +578,6 @@ InnoDB可不存在“没有索引的表”哦
 
 2019-01-18
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 0](<javascript:;>)
@@ -589,7 +604,6 @@ Show variables like “output”
 
 2019-01-04
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 0](<javascript:;>)
@@ -608,7 +622,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：堕落天使]**
 
 
 [__ 0](<javascript:;>)
@@ -651,7 +664,6 @@ __ 作者回复
 
 2019-01-10
 
-> **[图：不二]**
 
 
 [__ 0](<javascript:;>)
@@ -672,7 +684,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：张永志]**
 
 
 [__ 0](<javascript:;>)
@@ -690,7 +701,6 @@ CTAS不是好用法😄
 
 2019-01-04
 
-> **[图：张永志]**
 
 
 [__ 0](<javascript:;>)
@@ -712,7 +722,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：张永志]**
 
 
 [__ 0](<javascript:;>)
@@ -731,7 +740,6 @@ __ 作者回复
 
 2019-01-04
 
-> **[图：张永志]**
 
 
 [__ 0](<javascript:;>)

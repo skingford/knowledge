@@ -27,7 +27,17 @@ PARTITION p_others VALUES LESS THAN MAXVALUE ENGINE = InnoDB);
 insert into t values('2017-4-1',1),('2018-4-1',1);
 ```
 
-> **[图：图1 表t的磁盘文件]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:14px 18px;font-family:monospace;font-size:13px;text-align:left;line-height:1.8;color:var(--d-text)">
+<div style="color:var(--d-text-muted);margin-bottom:6px">$ ls db1/</div>
+<div><span style="color:var(--d-blue)">t.frm</span></div>
+<div><span style="color:var(--d-green)">t#P#p_2017.ibd</span></div>
+<div><span style="color:var(--d-green)">t#P#p_2018.ibd</span></div>
+<div><span style="color:var(--d-green)">t#P#p_2019.ibd</span></div>
+<div><span style="color:var(--d-green)">t#P#p_others.ibd</span></div>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 1 &ensp;表 t 的磁盘文件</div>
+</div>
 
 
 我在表t中初始化插入了两行记录，按照定义的分区规则，这两行记录分别落在p_2018和p_2019这两个分区上。
@@ -44,21 +54,95 @@ insert into t values('2017-4-1',1),('2018-4-1',1);
 
 我先给你举个在分区表加间隙锁的例子，目的是说明对于InnoDB来说，这是4个表。
 
-> **[图：图2 分区表间隙锁示例]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session A</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">begin;<br>select * from t where<br>ftime='2017-5-1' for update;</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T2</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">insert into t values('2018-2-1',1);<br><span style="color:var(--d-green)">(成功)</span></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T3</td>
+<td style="padding:5px 8px;color:var(--d-text-muted)"></td>
+<td style="padding:5px 8px;color:var(--d-text);font-family:monospace;font-size:11px">insert into t values('2017-12-1',1);<br><span style="color:var(--d-orange)">(阻塞 — 等待间隙锁)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 2 &ensp;分区表间隙锁示例</div>
+</div>
 
 
 这里顺便复习一下，我在[第21篇文章](<https://time.geekbang.org/column/article/75659>)和你介绍的间隙锁加锁规则。
 
 我们初始化表t的时候，只插入了两行数据， ftime的值分别是，‘2017-4-1’ 和’2018-4-1’ 。session A的select语句对索引ftime上这两个记录之间的间隙加了锁。如果是一个普通表的话，那么T1时刻，在表t的ftime索引上，间隙和加锁状态应该是图3这样的。
 
-> **[图：图3 普通表的加锁范围]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<svg viewBox="0 0 480 70" style="width:100%;font-family:system-ui,sans-serif">
+<!-- Number line -->
+<line x1="20" y1="35" x2="460" y2="35" stroke="var(--d-border)" stroke-width="2"/>
+<!-- Markers -->
+<circle cx="60" cy="35" r="4" fill="var(--d-text-muted)"/>
+<text x="60" y="58" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">-&infin;</text>
+<circle cx="160" cy="35" r="5" fill="var(--d-blue)"/>
+<text x="160" y="58" text-anchor="middle" fill="var(--d-blue)" font-size="10">2017-4-1</text>
+<circle cx="320" cy="35" r="5" fill="var(--d-blue)"/>
+<text x="320" y="58" text-anchor="middle" fill="var(--d-blue)" font-size="10">2018-4-1</text>
+<circle cx="440" cy="35" r="4" fill="var(--d-text-muted)"/>
+<text x="440" y="58" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">+&infin;</text>
+<!-- Lock range highlight -->
+<rect x="160" y="25" width="160" height="20" rx="4" fill="var(--d-green)" opacity="0.25"/>
+<text x="240" y="18" text-anchor="middle" fill="var(--d-green)" font-size="10" font-weight="600">间隙锁</text>
+</svg>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 3 &ensp;普通表的加锁范围</div>
+</div>
 
 
 也就是说，‘2017-4-1’ 和’2018-4-1’ 这两个记录之间的间隙是会被锁住的。那么，sesion B的两条插入语句应该都要进入锁等待状态。
 
 但是，从上面的实验效果可以看出，session B的第一个insert语句是可以执行成功的。这是因为，对于引擎来说，p_2018和p_2019是两个不同的表，也就是说2017-4-1的下一个记录并不是2018-4-1，而是p_2018分区的supremum。所以T1时刻，在表t的ftime索引上，间隙和加锁的状态其实是图4这样的：
 
-> **[图：图4 分区表t的加锁范围]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<svg viewBox="0 0 480 140" style="width:100%;font-family:system-ui,sans-serif">
+<!-- p_2018 partition -->
+<text x="20" y="18" fill="var(--d-blue)" font-size="11" font-weight="600">p_2018</text>
+<line x1="20" y1="35" x2="460" y2="35" stroke="var(--d-border)" stroke-width="2"/>
+<circle cx="60" cy="35" r="4" fill="var(--d-text-muted)"/>
+<text x="60" y="55" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">-&infin;</text>
+<circle cx="180" cy="35" r="5" fill="var(--d-blue)"/>
+<text x="180" y="55" text-anchor="middle" fill="var(--d-blue)" font-size="10">2017-4-1</text>
+<circle cx="380" cy="35" r="4" fill="var(--d-text-muted)"/>
+<text x="380" y="55" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">supremum</text>
+<!-- Lock range -->
+<rect x="180" y="25" width="200" height="20" rx="4" fill="var(--d-green)" opacity="0.3"/>
+<text x="280" y="18" text-anchor="middle" fill="var(--d-green)" font-size="10" font-weight="600">间隙锁（加锁范围）</text>
+<!-- p_2019 partition -->
+<text x="20" y="88" fill="var(--d-blue)" font-size="11" font-weight="600">p_2019</text>
+<line x1="20" y1="105" x2="460" y2="105" stroke="var(--d-border)" stroke-width="2"/>
+<circle cx="60" cy="105" r="4" fill="var(--d-text-muted)"/>
+<text x="60" y="125" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">-&infin;</text>
+<circle cx="180" cy="105" r="5" fill="var(--d-blue)"/>
+<text x="180" y="125" text-anchor="middle" fill="var(--d-blue)" font-size="10">2018-4-1</text>
+<circle cx="380" cy="105" r="4" fill="var(--d-text-muted)"/>
+<text x="380" y="125" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">supremum</text>
+<text x="240" y="88" text-anchor="middle" fill="var(--d-text-muted)" font-size="10">（未加锁）</text>
+</svg>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 4 &ensp;分区表 t 的加锁范围</div>
+</div>
 
 
 由于分区表的规则，session A的select语句其实只操作了分区p_2018，因此加锁范围就是图4中深绿色的部分。
@@ -67,14 +151,55 @@ insert into t values('2017-4-1',1),('2018-4-1',1);
 
 图5就是这时候的show engine innodb status的部分结果。
 
-> **[图：图5 session B被锁住信息]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:14px 18px;font-family:monospace;font-size:11px;text-align:left;line-height:1.7;color:var(--d-text)">
+<div style="color:var(--d-text-muted);margin-bottom:4px">--- TRANSACTION ..., ACTIVE ... sec inserting</div>
+<div>mysql tables in use 1, locked 1</div>
+<div>LOCK WAIT 2 lock struct(s), heap size 1136, 1 row lock(s)</div>
+<div style="color:var(--d-orange)">------- TRX HAS BEEN WAITING ... SEC FOR THIS LOCK TO BE GRANTED:</div>
+<div>RECORD LOCKS space id ... page no ... n bits ... index ftime</div>
+<div>&nbsp;&nbsp;of table `db1`.`t` <span style="color:var(--d-blue);font-weight:600">/* Partition p_2018 */</span></div>
+<div>&nbsp;&nbsp;trx id ... lock_mode X locks <span style="color:var(--d-orange);font-weight:600">gap before rec insert intention waiting</span></div>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 5 &ensp;session B 被锁住信息</div>
+</div>
 
 
 看完InnoDB引擎的例子，我们再来一个MyISAM分区表的例子。
 
 我首先用alter table t engine=myisam，把表t改成MyISAM表；然后，我再用下面这个例子说明，对于MyISAM引擎来说，这是4个表。
 
-> **[图：图6 用MyISAM表锁验证]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session A</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">alter table t engine=myisam;<br>update t set c=sleep(100)<br>where ftime='2017-4-1';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T2</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">select * from t where<br>ftime='2018-4-1';<br><span style="color:var(--d-green)">(成功 — 不同分区)</span></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T3</td>
+<td style="padding:5px 8px;color:var(--d-text-muted)"></td>
+<td style="padding:5px 8px;color:var(--d-text);font-family:monospace;font-size:11px">select * from t where<br>ftime='2017-4-1';<br><span style="color:var(--d-orange)">(阻塞 — 同分区被锁)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 6 &ensp;用 MyISAM 表锁验证</div>
+</div>
 
 
 在session A里面，我用sleep(100)将这条语句的执行时间设置为100秒。由于MyISAM引擎只支持表锁，所以这条update语句会锁住整个表t上的读。
@@ -99,7 +224,14 @@ insert into t values('2017-4-1',1),('2018-4-1',1);
 
 下图就是我创建的一个包含了很多分区的表t_myisam，执行一条插入语句后报错的情况。
 
-> **[图：图 7 insert 语句报错]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:14px 18px;font-family:monospace;font-size:12px;text-align:left;line-height:1.7;color:var(--d-text)">
+<div style="color:var(--d-text-muted)">mysql&gt;</div>
+<div>insert into t_myisam partition(p_others) values(MAXVALUE, 1);</div>
+<div style="color:var(--d-orange);font-weight:600;margin-top:4px">ERROR 1016 (HY000): Can't open file: './db1/t_myisam#P#p_...' (errno: 24 - Too many open files)</div>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 7 &ensp;insert 语句报错</div>
+</div>
 
 
 可以看到，这条insert语句，明显只需要访问一个分区，但语句却无法执行。
@@ -122,9 +254,50 @@ MySQL从5.7.17开始，将MyISAM分区表标记为即将弃用(deprecated)，意
 
 这句话是什么意思呢？接下来，我就用下面这个例子来和你说明。如图8和图9所示，分别是这个例子的操作序列和执行结果图。
 
-> **[图：图8 分区表的MDL锁]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:12px">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:center;width:40px"></th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session A</th>
+<th style="padding:6px 8px;color:var(--d-th-text);text-align:left">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center;border-bottom:1px solid var(--d-border)">T1</td>
+<td style="padding:5px 8px;color:var(--d-text);border-bottom:1px solid var(--d-border);font-family:monospace;font-size:11px">begin;<br>select * from t where<br>ftime='2018-4-1';</td>
+<td style="padding:5px 8px;color:var(--d-text-muted);border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:5px 8px;color:var(--d-text-muted);text-align:center">T2</td>
+<td style="padding:5px 8px;color:var(--d-text-muted)"></td>
+<td style="padding:5px 8px;color:var(--d-text);font-family:monospace;font-size:11px">alter table t truncate partition p_2017;<br><span style="color:var(--d-orange)">(阻塞 — 等待 MDL 锁)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 8 &ensp;分区表的 MDL 锁</div>
+</div>
 
-> **[图：图9 show processlist结果]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:14px 18px;font-family:monospace;font-size:11px;text-align:left;line-height:1.7;color:var(--d-text)">
+<div style="color:var(--d-text-muted);margin-bottom:4px">mysql&gt; show processlist;</div>
+<table style="width:100%;border-collapse:collapse;margin-top:6px">
+<tr style="color:var(--d-th-text);border-bottom:1px solid var(--d-border)">
+<td style="padding:3px 6px">Id</td><td style="padding:3px 6px">db</td><td style="padding:3px 6px">Command</td><td style="padding:3px 6px">State</td><td style="padding:3px 6px">Info</td>
+</tr>
+<tr style="border-bottom:1px solid var(--d-border)">
+<td style="padding:3px 6px">4</td><td style="padding:3px 6px">db1</td><td style="padding:3px 6px">Sleep</td><td style="padding:3px 6px"></td><td style="padding:3px 6px;color:var(--d-text-muted)">NULL</td>
+</tr>
+<tr>
+<td style="padding:3px 6px">5</td><td style="padding:3px 6px">db1</td><td style="padding:3px 6px">Query</td><td style="padding:3px 6px;color:var(--d-orange)">Waiting for table metadata lock</td><td style="padding:3px 6px">alter table t truncate partition p_2017</td>
+</tr>
+</table>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 9 &ensp;show processlist 结果</div>
+</div>
 
 
 可以看到，虽然session B只需要操作p_2107这个分区，但是由于session A持有整个表t的MDL锁，就导致了session B的alter语句被堵住。
@@ -187,7 +360,6 @@ MySQL从5.7.17开始，将MyISAM分区表标记为即将弃用(deprecated)，意
 
 @夹心面包 提到了在grant的时候是支持通配符的："_"表示一个任意字符，“%”表示任意字符串。这个技巧在一个分库分表方案里面，同一个分库上有多个db的时候，是挺方便的。不过我个人认为，权限赋值的时候，控制的精确性还是要优先考虑的。
 
-> **[图：示意图]**
 
 
 ##  精选留言
@@ -219,7 +391,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：aliang]**
 
 
 [__ 2](<javascript:;>)
@@ -239,7 +410,6 @@ __ 作者回复
 
 2019-02-21
 
-> **[图：怀刚]**
 
 
 [__ 1](<javascript:;>)
@@ -256,7 +426,6 @@ __ 作者回复
 
 2019-03-09
 
-> **[图：权恒星]**
 
 
 [__ 1](<javascript:;>)
@@ -271,7 +440,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：One day]**
 
 
 [__ 1](<javascript:;>)
@@ -289,7 +457,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：于欣磊]**
 
 
 [__ 0](<javascript:;>)
@@ -298,7 +465,6 @@ __ 作者回复
 
 2019-02-25
 
-> **[图：☞]**
 
 
 [__ 0](<javascript:;>)
@@ -314,8 +480,6 @@ __ 作者回复
 
 
 2019-02-25
-
-- ![](http://thirdwx.qlogo.cn/mmopen/vi_32/NjF5F2UZEbd3iclteRmVL6aRlW9wv9GHOte3QFjF4cUvb5hWeNZBPmaNrlJJbSUdqTMF6MmI10icMLuDQOsb6ERA/132)
 
 启程
 
@@ -345,7 +509,6 @@ __ 作者回复
 
 2019-02-26
 
-> **[图：NICK]**
 
 
 [__ 0](<javascript:;>)
@@ -360,7 +523,6 @@ __ 作者回复
 
 2019-02-25
 
-> **[图：锋芒]**
 
 
 [__ 0](<javascript:;>)
@@ -375,7 +537,6 @@ __ 作者回复
 
 2019-02-23
 
-> **[图：daka]**
 
 
 [__ 0](<javascript:;>)
@@ -383,8 +544,6 @@ __ 作者回复
 本期提到了ndb，了解了下，这个存储引擎高可用及读写可扩展性功能都是自带，感觉是不错，为什么很少见人使用呢？生产不可靠？ 
 
 2019-02-21
-
-- ![](http://thirdwx.qlogo.cn/mmopen/vi_32/MSV5CclX2Zct7U0F7bVwd0Zg4y6AK1qf8GVic5W3tCNaLhL6wTqD7CUnWxarW4DiaVbVic1G3gpZ3ud0ELWhuxnrg/132)
 
 helloworld.xs
 
@@ -400,7 +559,6 @@ update的话，主要应该第一次执行的时候，数据都读入到了
 
 2019-02-21
 
-> **[图：万勇]**
 
 
 [__ 0](<javascript:;>)
@@ -425,7 +583,6 @@ __ 作者回复
 
 2019-02-21
 
-> **[图：Q]**
 
 
 [__ 0](<javascript:;>)
@@ -462,7 +619,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：undifined]**
 
 
 [__ 0](<javascript:;>)
@@ -507,7 +663,6 @@ __ 作者回复
 
 2019-02-20
 
-> **[图：郭江伟]**
 
 
 [__ 0](<javascript:;>)
@@ -562,7 +717,6 @@ __ 作者回复
 
 2019-02-24
 
-> **[图：wljs]**
 
 
 [__ 0](<javascript:;>)

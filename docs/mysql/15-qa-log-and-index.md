@@ -25,7 +25,70 @@ description: "极客时间《MySQL 实战 45 讲》第 15 讲笔记整理"
 
 我再放一次两阶段提交的图，方便你学习下面的内容。
 
-> **[图：图1 两阶段提交示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:560px;width:100%;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">图1 两阶段提交示意图</div>
+  <svg viewBox="0 0 520 340" style="width:100%;height:auto;">
+    <!-- 步骤框 -->
+    <!-- 1. 写 redo log (prepare) -->
+    <rect x="160" y="10" width="200" height="44" rx="6" style="fill:var(--d-engine-bg);stroke:var(--d-engine-border);stroke-width:2"/>
+    <text x="260" y="30" text-anchor="middle" style="fill:var(--d-engine-text);font-size:13px;font-weight:bold;">写 redo log</text>
+    <text x="260" y="46" text-anchor="middle" style="fill:var(--d-orange);font-size:11px;font-weight:bold;">prepare</text>
+    <!-- 箭头1 -->
+    <line x1="260" y1="54" x2="260" y2="80" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead1)"/>
+    <!-- 时刻A 标记 -->
+    <rect x="370" y="56" width="80" height="22" rx="4" style="fill:var(--d-warn-bg);stroke:var(--d-warn-border);stroke-width:1"/>
+    <text x="410" y="71" text-anchor="middle" style="fill:var(--d-orange);font-size:11px;font-weight:bold;">时刻 A</text>
+    <line x1="370" y1="67" x2="360" y2="67" style="stroke:var(--d-warn-border);stroke-width:1;stroke-dasharray:3,2"/>
+    <!-- 2. 写 binlog -->
+    <rect x="160" y="80" width="200" height="44" rx="6" style="fill:var(--d-exec-bg);stroke:none"/>
+    <text x="260" y="106" text-anchor="middle" style="fill:#fff;font-size:13px;font-weight:bold;">写 binlog</text>
+    <!-- 箭头2 -->
+    <line x1="260" y1="124" x2="260" y2="150" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead1)"/>
+    <!-- 时刻B 标记 -->
+    <rect x="370" y="126" width="80" height="22" rx="4" style="fill:var(--d-warn-bg);stroke:var(--d-warn-border);stroke-width:1"/>
+    <text x="410" y="141" text-anchor="middle" style="fill:var(--d-orange);font-size:11px;font-weight:bold;">时刻 B</text>
+    <line x1="370" y1="137" x2="360" y2="137" style="stroke:var(--d-warn-border);stroke-width:1;stroke-dasharray:3,2"/>
+    <!-- 3. 写 redo log (commit) -->
+    <rect x="160" y="150" width="200" height="44" rx="6" style="fill:var(--d-engine-bg);stroke:var(--d-engine-border);stroke-width:2"/>
+    <text x="260" y="170" text-anchor="middle" style="fill:var(--d-engine-text);font-size:13px;font-weight:bold;">写 redo log</text>
+    <text x="260" y="186" text-anchor="middle" style="fill:var(--d-green);font-size:11px;font-weight:bold;">commit</text>
+    <!-- 崩溃恢复判断规则 -->
+    <line x1="260" y1="194" x2="260" y2="220" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead1)"/>
+    <rect x="60" y="220" width="400" height="110" rx="8" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5;opacity:0.85"/>
+    <text x="260" y="242" text-anchor="middle" style="fill:var(--d-text);font-size:13px;font-weight:bold;">崩溃恢复判断规则</text>
+    <!-- 规则1 -->
+    <text x="80" y="262" style="fill:var(--d-green);font-size:12px;font-weight:bold;">1.</text>
+    <text x="98" y="262" style="fill:var(--d-text);font-size:12px;">redo log 有 commit 标识 → 直接提交</text>
+    <!-- 规则2 -->
+    <text x="80" y="282" style="fill:var(--d-orange);font-size:12px;font-weight:bold;">2.</text>
+    <text x="98" y="282" style="fill:var(--d-text);font-size:12px;">redo log 只有 prepare → 检查 binlog 是否完整：</text>
+    <text x="110" y="300" style="fill:var(--d-green);font-size:12px;">a. binlog 完整 → 提交事务</text>
+    <text x="110" y="318" style="fill:var(--d-orange);font-size:12px;">b. binlog 不完整 → 回滚事务</text>
+    <!-- arrowhead marker -->
+    <defs>
+      <marker id="arrowhead1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M 0 0 L 8 3 L 0 6 Z" style="fill:var(--d-text-dim)"/>
+      </marker>
+    </defs>
+  </svg>
+  <!-- 图例 -->
+  <div style="display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:12px;">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="display:inline-block;width:14px;height:14px;background:var(--d-engine-bg);border:2px solid var(--d-engine-border);border-radius:3px;"></span>
+      <span style="color:var(--d-text-muted);">InnoDB 引擎</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="display:inline-block;width:14px;height:14px;background:var(--d-exec-bg);border-radius:3px;"></span>
+      <span style="color:var(--d-text-muted);">Server 层（执行器）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="display:inline-block;width:14px;height:10px;background:var(--d-warn-bg);border:1px solid var(--d-warn-border);border-radius:2px;"></span>
+      <span style="color:var(--d-text-muted);">crash 时刻</span>
+    </div>
+  </div>
+</div>
+</div>
 
 
 这里，我要先和你解释一个误会式的问题。有同学在评论区问到，这个图不是一个update语句的执行流程吗，怎么还会调用commit语句？
@@ -106,7 +169,66 @@ InnoDB接入了MySQL后，发现既然binlog没有崩溃恢复的能力，那就
 
 而如果说**实现上的原因** 的话，就有很多了。就按照问题中说的，只用binlog来实现崩溃恢复的流程，我画了一张示意图，这里就没有redo log了。
 
-> **[图：图2 只用binlog支持崩溃恢复]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:600px;width:100%;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">图2 只用 binlog 支持崩溃恢复（流程示意）</div>
+  <svg viewBox="0 0 580 370" style="width:100%;height:auto;">
+    <defs>
+      <marker id="arrowhead2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M 0 0 L 8 3 L 0 6 Z" style="fill:var(--d-text-dim)"/>
+      </marker>
+      <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <path d="M 0 0 L 8 3 L 0 6 Z" style="fill:var(--d-orange)"/>
+      </marker>
+    </defs>
+    <!-- 时间轴线 -->
+    <line x1="40" y1="30" x2="40" y2="350" style="stroke:var(--d-border);stroke-width:2"/>
+    <text x="40" y="18" text-anchor="middle" style="fill:var(--d-text-muted);font-size:11px;">时间线</text>
+    <!-- 事务1：已提交 -->
+    <rect x="70" y="30" width="220" height="40" rx="6" style="fill:var(--d-exec-bg);stroke:none"/>
+    <text x="180" y="48" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:bold;">事务1：数据更新到内存</text>
+    <text x="180" y="62" text-anchor="middle" style="fill:rgba(255,255,255,0.8);font-size:11px;">（已提交，但数据页未落盘）</text>
+    <circle cx="40" cy="50" r="5" style="fill:var(--d-green)"/>
+    <line x1="180" y1="70" x2="180" y2="90" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead2)"/>
+    <!-- 写 binlog1 -->
+    <rect x="70" y="90" width="220" height="34" rx="6" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5"/>
+    <text x="180" y="112" text-anchor="middle" style="fill:var(--d-text);font-size:12px;font-weight:bold;">写 binlog1 ✓ 已提交</text>
+    <circle cx="40" cy="107" r="5" style="fill:var(--d-green)"/>
+    <!-- 事务2 -->
+    <line x1="180" y1="124" x2="180" y2="150" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead2)"/>
+    <rect x="70" y="150" width="220" height="34" rx="6" style="fill:var(--d-exec-bg);stroke:none"/>
+    <text x="180" y="172" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:bold;">事务2：数据更新到内存</text>
+    <circle cx="40" cy="167" r="5" style="fill:var(--d-blue)"/>
+    <line x1="180" y1="184" x2="180" y2="210" style="stroke:var(--d-text-dim);stroke-width:1.5" marker-end="url(#arrowhead2)"/>
+    <!-- 写 binlog2 -->
+    <rect x="70" y="210" width="220" height="34" rx="6" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5"/>
+    <text x="180" y="232" text-anchor="middle" style="fill:var(--d-text);font-size:12px;font-weight:bold;">写 binlog2（未提交）</text>
+    <circle cx="40" cy="227" r="5" style="fill:var(--d-blue)"/>
+    <!-- Crash 标记 -->
+    <line x1="30" y1="260" x2="300" y2="260" style="stroke:var(--d-orange);stroke-width:2;stroke-dasharray:6,3"/>
+    <rect x="120" y="250" width="120" height="22" rx="4" style="fill:var(--d-warn-bg);stroke:var(--d-warn-border);stroke-width:1.5"/>
+    <text x="180" y="265" text-anchor="middle" style="fill:var(--d-orange);font-size:12px;font-weight:bold;">MySQL Crash!</text>
+    <!-- 恢复过程 -->
+    <rect x="320" y="80" width="240" height="180" rx="8" style="fill:var(--d-warn-bg);stroke:var(--d-warn-border);stroke-width:1.5;opacity:0.7"/>
+    <text x="440" y="102" text-anchor="middle" style="fill:var(--d-text);font-size:13px;font-weight:bold;">崩溃恢复过程</text>
+    <text x="340" y="126" style="fill:var(--d-green);font-size:12px;">事务2：回滚 → 应用 binlog2 补回</text>
+    <text x="340" y="146" style="fill:var(--d-green);font-size:12px;">  → 看似 OK ✓</text>
+    <line x1="340" y1="158" x2="540" y2="158" style="stroke:var(--d-border);stroke-width:1;stroke-dasharray:3,2"/>
+    <text x="340" y="178" style="fill:var(--d-orange);font-size:12px;font-weight:bold;">事务1：已提交，不再应用 binlog1</text>
+    <text x="340" y="198" style="fill:var(--d-orange);font-size:12px;">  但数据页可能未落盘！</text>
+    <text x="340" y="218" style="fill:var(--d-orange);font-size:12px;">  binlog 无法恢复数据页</text>
+    <text x="340" y="244" style="fill:var(--d-orange);font-size:13px;font-weight:bold;">  → 数据丢失！✗</text>
+    <!-- 连接线 -->
+    <line x1="290" y1="107" x2="320" y2="120" style="stroke:var(--d-green);stroke-width:1.5;stroke-dasharray:4,2" marker-end="url(#arrowhead2)"/>
+    <line x1="290" y1="227" x2="320" y2="170" style="stroke:var(--d-orange);stroke-width:1.5;stroke-dasharray:4,2" marker-end="url(#arrowRed)"/>
+    <!-- 底部说明 -->
+    <rect x="60" y="290" width="460" height="65" rx="8" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.5;opacity:0.85"/>
+    <text x="290" y="312" text-anchor="middle" style="fill:var(--d-text);font-size:12px;font-weight:bold;">核心问题：binlog 没有能力恢复"数据页"</text>
+    <text x="290" y="330" text-anchor="middle" style="fill:var(--d-text-muted);font-size:11px;">InnoDB 使用 WAL 技术，写完内存和日志就算提交。崩溃后需要日志恢复数据页，</text>
+    <text x="290" y="346" text-anchor="middle" style="fill:var(--d-text-muted);font-size:11px;">而 binlog 记录的是逻辑操作，无法恢复物理数据页。这正是 redo log 的职责。</text>
+  </svg>
+</div>
+</div>
 
 
 这样的流程下，binlog还是不能支持崩溃恢复的。我说一个不支持的点吧：binlog没有能力恢复“数据页”。
@@ -231,7 +353,49 @@ CREATE TABLE `friend` (
 
 现在，我用你已经熟悉的时刻顺序表的形式，把这两个事务的执行语句列出来：  
 
-> **[图：图3 并发“喜欢”逻辑操作顺序]**
+<div style=”display:flex;justify-content:center;padding:20px 0;”>
+<div style=”font-family:system-ui,sans-serif;max-width:620px;width:100%;”>
+<table style=”width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--d-border);”>
+<caption style=”font-weight:700;font-size:15px;padding:10px;color:var(--d-text);text-align:left;”>图3 并发”喜欢”逻辑操作顺序</caption>
+<thead>
+<tr style=”background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border);”>
+<th style=”padding:8px 12px;text-align:center;color:var(--d-th-text);width:60px;”>时刻</th>
+<th style=”padding:8px 12px;text-align:left;color:var(--d-th-text);”>Session 1（A 关注 B）</th>
+<th style=”padding:8px 12px;text-align:left;color:var(--d-th-text);”>Session 2（B 关注 A）</th>
+</tr>
+</thead>
+<tbody>
+<tr style=”background:var(--d-bg);”>
+<td style=”padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);”>T1</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);”><code>select * from like where user_id=B and liker_id=A;</code><br><span style=”color:var(--d-blue);font-size:12px;”>结果：空（B 未关注 A）</span></td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);”>—</td>
+</tr>
+<tr style=”background:var(--d-stripe);”>
+<td style=”padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);”>T2</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);”>—</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);”><code>select * from like where user_id=A and liker_id=B;</code><br><span style=”color:var(--d-blue);font-size:12px;”>结果：空（A 未关注 B）</span></td>
+</tr>
+<tr style=”background:var(--d-bg);”>
+<td style=”padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);”>T3</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);”><code>insert into like(user_id,liker_id) values(A,B);</code><br><span style=”color:var(--d-orange);font-size:12px;”>只插入单向关注（未成为好友）</span></td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);”>—</td>
+</tr>
+<tr style=”background:var(--d-stripe);”>
+<td style=”padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);”>T4</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);”>—</td>
+<td style=”padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);”><code>insert into like(user_id,liker_id) values(B,A);</code><br><span style=”color:var(--d-orange);font-size:12px;”>只插入单向关注（未成为好友）</span></td>
+</tr>
+<tr style=”background:var(--d-bg);border-left:3px solid var(--d-orange);”>
+<td style=”padding:8px 12px;text-align:center;font-weight:600;color:var(--d-text-sub);”>T5</td>
+<td colspan=”2” style=”padding:8px 12px;color:var(--d-orange);font-weight:bold;text-align:center;”>
+结果：like 表中有两条单向关注记录，但 friend 表无记录！<br>
+<span style=”font-weight:normal;font-size:12px;color:var(--d-text-muted);”>原因：T1/T2 时刻双方都查不到对方的关注记录，各自判定为”单向关注”，跳过了插入 friend 表的逻辑</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
 由于一开始A和B之间没有关注关系，所以两个事务里面的select语句查出来的结果都是空。
@@ -320,7 +484,6 @@ mysql> update t set a=2 where id=1;
 
 你会看到这样的结果：
 
-> **[图：结果显示]**
 
 
 仅从现象上看，MySQL内部在处理这个命令的时候，可以有以下三种选择：

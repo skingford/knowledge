@@ -24,7 +24,145 @@ engine=InnoDB;
 insert into T values(100,1, 'aa'),(200,2,'bb'),(300,3,'cc'),(500,5,'ee'),(600,6,'ff'),(700,7,'gg');
 ```
 
-> **[图：图1 InnoDB的索引组织结构]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">图1 InnoDB的索引组织结构</text>
+
+  <!-- ===== Left: Primary Key Index ===== -->
+  <text x="130" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="var(--d-blue)">主键索引（Primary Key）</text>
+
+  <!-- Root node -->
+  <rect x="95" y="50" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="130" y="67" text-anchor="middle" font-size="10" fill="var(--d-text)">300</text>
+
+  <!-- Level 2 nodes -->
+  <rect x="40" y="100" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="75" y="117" text-anchor="middle" font-size="10" fill="var(--d-text)">100 200</text>
+  <rect x="150" y="100" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="185" y="117" text-anchor="middle" font-size="10" fill="var(--d-text)">500 600</text>
+
+  <!-- Lines root -> L2 -->
+  <line x1="115" y1="76" x2="75" y2="100" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="145" y1="76" x2="185" y2="100" stroke="var(--d-border)" stroke-width="1"/>
+
+  <!-- Leaf nodes (primary key) -->
+  <rect x="2" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="23" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=100</text>
+  <text x="23" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R1,k=1</text>
+  <text x="23" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">aa</text>
+
+  <rect x="48" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="69" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=200</text>
+  <text x="69" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R2,k=2</text>
+  <text x="69" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">bb</text>
+
+  <rect x="94" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="115" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=300</text>
+  <text x="115" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R3,k=3</text>
+  <text x="115" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">cc</text>
+
+  <rect x="140" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="161" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=500</text>
+  <text x="161" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R4,k=5</text>
+  <text x="161" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">ee</text>
+
+  <rect x="186" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="207" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=600</text>
+  <text x="207" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R5,k=6</text>
+  <text x="207" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">ff</text>
+
+  <rect x="232" y="155" width="42" height="44" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="253" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-blue)">ID=700</text>
+  <text x="253" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">R6,k=7</text>
+  <text x="253" y="193" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">gg</text>
+
+  <!-- Lines L2 -> leaves -->
+  <line x1="58" y1="126" x2="23" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="75" y1="126" x2="69" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="92" y1="126" x2="115" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="168" y1="126" x2="161" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="185" y1="126" x2="207" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="202" y1="126" x2="253" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+
+  <!-- Leaf arrows (linked list) -->
+  <line x1="44" y1="177" x2="48" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7" marker-end="url(#arrowSmall)"/>
+  <line x1="90" y1="177" x2="94" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7"/>
+  <line x1="136" y1="177" x2="140" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7"/>
+  <line x1="182" y1="177" x2="186" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7"/>
+  <line x1="228" y1="177" x2="232" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7"/>
+
+  <!-- ===== Right: Secondary Index k ===== -->
+  <text x="420" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="var(--d-indigo)">非主键索引（索引 k）</text>
+
+  <!-- Root -->
+  <rect x="385" y="50" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-indigo)" stroke-width="1.2"/>
+  <text x="420" y="67" text-anchor="middle" font-size="10" fill="var(--d-text)">3</text>
+
+  <!-- Level 2 -->
+  <rect x="330" y="100" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-indigo)" stroke-width="1.2"/>
+  <text x="365" y="117" text-anchor="middle" font-size="10" fill="var(--d-text)">1  2</text>
+  <rect x="440" y="100" width="70" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-indigo)" stroke-width="1.2"/>
+  <text x="475" y="117" text-anchor="middle" font-size="10" fill="var(--d-text)">5  6</text>
+
+  <line x1="405" y1="76" x2="365" y2="100" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="435" y1="76" x2="475" y2="100" stroke="var(--d-border)" stroke-width="1"/>
+
+  <!-- Leaf nodes (secondary index) -->
+  <rect x="298" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="317" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=1</text>
+  <text x="317" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=100</text>
+
+  <rect x="340" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="359" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=2</text>
+  <text x="359" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=200</text>
+
+  <rect x="382" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="401" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=3</text>
+  <text x="401" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=300</text>
+
+  <rect x="424" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="443" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=5</text>
+  <text x="443" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=500</text>
+
+  <rect x="466" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="485" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=6</text>
+  <text x="485" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=600</text>
+
+  <rect x="508" y="155" width="38" height="38" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="527" y="170" text-anchor="middle" font-size="8" font-weight="600" fill="var(--d-indigo)">k=7</text>
+  <text x="527" y="182" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">ID=700</text>
+
+  <!-- Lines L2 -> leaves -->
+  <line x1="348" y1="126" x2="317" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="365" y1="126" x2="359" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="382" y1="126" x2="401" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="458" y1="126" x2="443" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="475" y1="126" x2="485" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="492" y1="126" x2="527" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+
+  <!-- 回表 arrow -->
+  <defs>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+    <marker id="arrowSmall" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-text-muted)"/>
+    </marker>
+  </defs>
+
+  <!-- 回表 curved arrow from secondary index to primary index -->
+  <path d="M 401 199 C 401 260, 280 280, 130 260 C 100 255, 115 210, 115 199" stroke="var(--d-orange)" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#arrowOrange)"/>
+  <text x="280" y="285" text-anchor="middle" font-size="11" font-weight="600" fill="var(--d-orange)">回表查询</text>
+
+  <!-- Labels at bottom -->
+  <text x="130" y="220" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">叶子节点存储整行数据</text>
+  <text x="420" y="220" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">叶子节点存储主键值</text>
+
+  <!-- Separator line -->
+  <line x1="280" y1="38" x2="280" y2="230" stroke="var(--d-border-dash)" stroke-width="0.8" stroke-dasharray="4,3"/>
+</svg>
+</div>
 
 
 现在，我们一起来看看这条SQL查询语句的执行流程：
@@ -86,7 +224,84 @@ CREATE TABLE `tuser` (
 
 为了直观地说明这个概念，我们用（name，age）这个联合索引来分析。
 
-> **[图：图2 （name，age）索引示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 560 300" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-border)"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">图2 （name，age）联合索引示意图</text>
+
+  <!-- Root node -->
+  <rect x="230" y="36" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="280" y="54" text-anchor="middle" font-size="10" fill="var(--d-text)">（张三, 10）</text>
+
+  <!-- Level 2 -->
+  <rect x="100" y="90" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="150" y="108" text-anchor="middle" font-size="10" fill="var(--d-text)">（张六, 30）</text>
+  <rect x="360" y="90" width="100" height="28" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="410" y="108" text-anchor="middle" font-size="10" fill="var(--d-text)">（李四, 20）</text>
+
+  <!-- Lines root -> L2 -->
+  <line x1="255" y1="64" x2="170" y2="90" stroke="var(--d-border)" stroke-width="1"/>
+  <line x1="305" y1="64" x2="390" y2="90" stroke="var(--d-border)" stroke-width="1"/>
+
+  <!-- Leaf nodes -->
+  <rect x="18" y="155" width="92" height="52" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="64" y="172" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-blue)">张六, 30</text>
+  <text x="64" y="186" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID1</text>
+  <line x1="18" y1="195" x2="110" y2="195" stroke="var(--d-border)" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <text x="64" y="204" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">sorted: 张&lt;张三</text>
+
+  <rect x="120" y="155" width="92" height="52" rx="4" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.2"/>
+  <text x="166" y="172" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-cur-text)">张三, 10</text>
+  <text x="166" y="186" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID3</text>
+  <line x1="120" y1="195" x2="212" y2="195" stroke="var(--d-border)" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <text x="166" y="204" text-anchor="middle" font-size="7" fill="var(--d-green)">name同→按age排</text>
+
+  <rect x="222" y="155" width="92" height="52" rx="4" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.2"/>
+  <text x="268" y="172" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-cur-text)">张三, 20</text>
+  <text x="268" y="186" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID4</text>
+  <line x1="222" y1="195" x2="314" y2="195" stroke="var(--d-border)" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <text x="268" y="204" text-anchor="middle" font-size="7" fill="var(--d-green)">name同→按age排</text>
+
+  <rect x="324" y="155" width="92" height="52" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="370" y="172" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-blue)">李四, 20</text>
+  <text x="370" y="186" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID2</text>
+  <line x1="324" y1="195" x2="416" y2="195" stroke="var(--d-border)" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <text x="370" y="204" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">李 &gt; 张</text>
+
+  <rect x="426" y="155" width="92" height="52" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="472" y="172" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-blue)">王五, 25</text>
+  <text x="472" y="186" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID5</text>
+  <line x1="426" y1="195" x2="518" y2="195" stroke="var(--d-border)" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <text x="472" y="204" text-anchor="middle" font-size="7" fill="var(--d-text-muted)">王 &gt; 李</text>
+
+  <!-- Lines L2 -> leaves -->
+  <line x1="125" y1="118" x2="64" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="150" y1="118" x2="166" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="175" y1="118" x2="268" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="385" y1="118" x2="370" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+  <line x1="435" y1="118" x2="472" y2="155" stroke="var(--d-border)" stroke-width="0.8"/>
+
+  <!-- Linked list arrows -->
+  <line x1="110" y1="177" x2="120" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7" marker-end="url(#arrow2)"/>
+  <line x1="212" y1="177" x2="222" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7" marker-end="url(#arrow2)"/>
+  <line x1="314" y1="177" x2="324" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7" marker-end="url(#arrow2)"/>
+  <line x1="416" y1="177" x2="426" y2="177" stroke="var(--d-text-muted)" stroke-width="0.7" marker-end="url(#arrow2)"/>
+
+  <!-- Highlight bracket for "张%" prefix -->
+  <path d="M 22 215 L 22 222 L 310 222 L 310 215" stroke="var(--d-orange)" stroke-width="1.5" fill="none"/>
+  <text x="166" y="238" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-orange)">WHERE name LIKE '张%' 可利用索引定位</text>
+
+  <!-- Sort explanation -->
+  <text x="280" y="260" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">排序规则：先按 name 排序，name 相同时按 age 排序</text>
+  <text x="280" y="276" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">叶子节点间通过链表顺序连接</text>
+</svg>
+</div>
 
 
 可以看到，索引项是按照索引定义里面出现的字段顺序排序的。
@@ -130,9 +345,135 @@ mysql> select * from tuser where name like '张%' and age=10 and ismale=1;
 
 图3和图4，是这两个过程的执行流程图。
 
-> **[图：图3 无索引下推执行流程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
 
-> **[图：图4 索引下推执行流程]**
+  <!-- Title -->
+  <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">图3 无索引下推执行流程</text>
+  <text x="280" y="34" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">MySQL 5.6 之前：不检查 age，全部回表</text>
+
+  <!-- Left: (name,age) index -->
+  <rect x="20" y="50" width="200" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="120" y="66" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-blue)">(name, age) 索引</text>
+
+  <!-- Index entries - show name only, age is ignored -->
+  <rect x="30" y="86" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="40" y="100" font-size="9" fill="var(--d-text)">张三, <tspan fill="var(--d-text-dim)" text-decoration="line-through">10</tspan></text>
+  <text x="155" y="100" font-size="8" fill="var(--d-text-sub)">→ ID3</text>
+  <text x="40" y="114" font-size="7" fill="var(--d-text-muted)">age 未检查</text>
+
+  <rect x="30" y="126" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="40" y="140" font-size="9" fill="var(--d-text)">张三, <tspan fill="var(--d-text-dim)" text-decoration="line-through">20</tspan></text>
+  <text x="155" y="140" font-size="8" fill="var(--d-text-sub)">→ ID4</text>
+  <text x="40" y="154" font-size="7" fill="var(--d-text-muted)">age 未检查</text>
+
+  <rect x="30" y="166" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="40" y="180" font-size="9" fill="var(--d-text)">张六, <tspan fill="var(--d-text-dim)" text-decoration="line-through">30</tspan></text>
+  <text x="155" y="180" font-size="8" fill="var(--d-text-sub)">→ ID8</text>
+  <text x="40" y="194" font-size="7" fill="var(--d-text-muted)">age 未检查</text>
+
+  <rect x="30" y="206" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="40" y="220" font-size="9" fill="var(--d-text)">张七, <tspan fill="var(--d-text-dim)" text-decoration="line-through">18</tspan></text>
+  <text x="155" y="220" font-size="8" fill="var(--d-text-sub)">→ ID9</text>
+  <text x="40" y="234" font-size="7" fill="var(--d-text-muted)">age 未检查</text>
+
+  <!-- Right: Primary key index -->
+  <rect x="340" y="50" width="200" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-indigo)" stroke-width="1.2"/>
+  <text x="440" y="66" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-indigo)">主键索引（回表）</text>
+
+  <!-- Primary key results -->
+  <rect x="350" y="86" width="180" height="30" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="360" y="105" font-size="9" fill="var(--d-text)">ID3: 张三, 10, male → 匹配 ✓</text>
+
+  <rect x="350" y="126" width="180" height="30" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="360" y="145" font-size="9" fill="var(--d-text)">ID4: 张三, 20, male → 不匹配</text>
+
+  <rect x="350" y="166" width="180" height="30" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="360" y="185" font-size="9" fill="var(--d-text)">ID8: 张六, 30, female → 不匹配</text>
+
+  <rect x="350" y="206" width="180" height="30" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-indigo)" stroke-width="1"/>
+  <text x="360" y="225" font-size="9" fill="var(--d-text)">ID9: 张七, 18, male → 不匹配</text>
+
+  <!-- 4 dashed arrows: all go to 回表 -->
+  <line x1="210" y1="100" x2="348" y2="100" stroke="var(--d-orange)" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+  <line x1="210" y1="140" x2="348" y2="140" stroke="var(--d-orange)" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+  <line x1="210" y1="180" x2="348" y2="180" stroke="var(--d-orange)" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+  <line x1="210" y1="220" x2="348" y2="220" stroke="var(--d-orange)" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arrow3)"/>
+
+  <!-- Summary -->
+  <rect x="120" y="265" width="320" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-orange)" stroke-width="1.2"/>
+  <text x="280" y="284" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-orange)">回表 4 次</text>
+  <text x="280" y="300" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">所有 name LIKE '张%' 的记录都需要回表后再判断 age</text>
+</svg>
+</div>
+
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="280" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">图4 索引下推执行流程</text>
+  <text x="280" y="34" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">MySQL 5.6+：在索引中先检查 age=10，过滤后再回表</text>
+
+  <!-- Left: (name,age) index -->
+  <rect x="20" y="50" width="200" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="120" y="66" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-blue)">(name, age) 索引</text>
+
+  <!-- Index entry 1: age=10, PASS -->
+  <rect x="30" y="86" width="180" height="34" rx="3" fill="var(--d-cur-bg)" stroke="var(--d-green)" stroke-width="1.2"/>
+  <text x="40" y="100" font-size="9" fill="var(--d-text)">张三, <tspan font-weight="bold" fill="var(--d-green)">10</tspan></text>
+  <text x="155" y="100" font-size="8" fill="var(--d-text-sub)">→ ID3</text>
+  <text x="40" y="114" font-size="7" font-weight="600" fill="var(--d-green)">age=10 ✓ 需要回表</text>
+
+  <!-- Index entry 2: age=20, FILTERED OUT -->
+  <rect x="30" y="126" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1" opacity="0.6"/>
+  <text x="40" y="140" font-size="9" fill="var(--d-text-dim)">张三, <tspan font-weight="bold">20</tspan></text>
+  <text x="155" y="140" font-size="8" fill="var(--d-text-dim)">→ ID4</text>
+  <text x="40" y="154" font-size="7" font-weight="600" fill="var(--d-orange)">age≠10 ✗ 跳过</text>
+
+  <!-- Index entry 3: age=30, FILTERED OUT -->
+  <rect x="30" y="166" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1" opacity="0.6"/>
+  <text x="40" y="180" font-size="9" fill="var(--d-text-dim)">张六, <tspan font-weight="bold">30</tspan></text>
+  <text x="155" y="180" font-size="8" fill="var(--d-text-dim)">→ ID8</text>
+  <text x="40" y="194" font-size="7" font-weight="600" fill="var(--d-orange)">age≠10 ✗ 跳过</text>
+
+  <!-- Index entry 4: age=18, FILTERED OUT -->
+  <rect x="30" y="206" width="180" height="34" rx="3" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1" opacity="0.6"/>
+  <text x="40" y="220" font-size="9" fill="var(--d-text-dim)">张七, <tspan font-weight="bold">18</tspan></text>
+  <text x="155" y="220" font-size="8" fill="var(--d-text-dim)">→ ID9</text>
+  <text x="40" y="234" font-size="7" font-weight="600" fill="var(--d-orange)">age≠10 ✗ 跳过</text>
+
+  <!-- Right: Primary key index -->
+  <rect x="340" y="50" width="200" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-indigo)" stroke-width="1.2"/>
+  <text x="440" y="66" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-indigo)">主键索引（回表）</text>
+
+  <!-- Only 1 primary key result -->
+  <rect x="350" y="86" width="180" height="30" rx="3" fill="var(--d-cur-bg)" stroke="var(--d-green)" stroke-width="1.2"/>
+  <text x="360" y="105" font-size="9" fill="var(--d-text)">ID3: 张三, 10, male → 匹配 ✓</text>
+
+  <!-- X marks on filtered rows (no arrow) -->
+  <text x="278" y="144" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--d-orange)">✗</text>
+  <text x="278" y="184" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--d-orange)">✗</text>
+  <text x="278" y="224" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--d-orange)">✗</text>
+
+  <!-- Only 1 dashed arrow for 回表 -->
+  <line x1="210" y1="100" x2="348" y2="100" stroke="var(--d-green)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow4)"/>
+
+  <!-- Summary -->
+  <rect x="120" y="265" width="320" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.2"/>
+  <text x="280" y="284" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-green)">回表仅 1 次（减少 75%）</text>
+  <text x="280" y="300" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">索引下推：在索引内部先判断 age=10，不满足直接跳过</text>
+</svg>
+</div>
 
 
 在图3和4这两个图里面，每一个虚线箭头表示回表一次。

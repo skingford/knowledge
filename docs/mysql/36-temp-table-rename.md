@@ -34,7 +34,34 @@ select * from t1 join temp_t on (t1.b=temp_t.b);
 
 为了便于理解，我们来看下下面这个操作序列：
 
-> **[图：图1 临时表特性示例]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <text x="290" y="24" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">临时表特性示例</text>
+  <!-- Session A -->
+  <rect x="30" y="44" width="240" height="240" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="150" y="64" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="bold">Session A</text>
+  <rect x="46" y="76" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="95" text-anchor="middle" fill="var(--d-text)" font-size="11">create temporary table t(...)</text>
+  <rect x="46" y="112" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="131" text-anchor="middle" fill="var(--d-text)" font-size="11">show create table t; ✅ 临时表</text>
+  <rect x="46" y="148" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="167" text-anchor="middle" fill="var(--d-text)" font-size="11">show tables; → 不显示临时表</text>
+  <rect x="46" y="184" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="203" text-anchor="middle" fill="var(--d-text)" font-size="11">insert into t values(1,1);</text>
+  <rect x="46" y="220" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="239" text-anchor="middle" fill="var(--d-text)" font-size="11">select * from t; → 访问临时表</text>
+  <!-- Session B -->
+  <rect x="310" y="44" width="240" height="140" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="430" y="64" text-anchor="middle" fill="var(--d-text-sub)" font-size="13" font-weight="bold">Session B</text>
+  <rect x="326" y="76" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="95" text-anchor="middle" fill="var(--d-text)" font-size="11">show create table t; → 普通表 t</text>
+  <rect x="326" y="112" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="131" text-anchor="middle" fill="var(--d-text-muted)" font-size="11">❌ 看不到 A 的临时表</text>
+  <rect x="326" y="148" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="167" text-anchor="middle" fill="var(--d-text)" font-size="11">可创建同名临时表 t ✅</text>
+  <text x="290" y="310" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">临时表只对创建它的 session 可见，可与普通表同名</text>
+</svg>
+</div>
 
 
 可以看到，临时表在使用上有以下几个特点：
@@ -65,7 +92,37 @@ select * from t1 join temp_t on (t1.b=temp_t.b);
 
 一般分库分表的场景，就是要把一个逻辑上的大表分散到不同的数据库实例上。比如。将一个大表ht，按照字段f，拆分成1024个分表，然后分布到32个数据库实例上。如下图所示：
 
-> **[图：图2 分库分表简图]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <text x="290" y="24" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">分库分表简图（32库 × 1024表）</text>
+  <!-- Proxy -->
+  <rect x="200" y="42" width="180" height="36" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="290" y="65" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="bold">Proxy 层</text>
+  <!-- Arrows -->
+  <line x1="230" y1="78" x2="80" y2="118" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#arrow36)"/>
+  <line x1="270" y1="78" x2="230" y2="118" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#arrow36)"/>
+  <line x1="310" y1="78" x2="350" y2="118" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#arrow36)"/>
+  <line x1="350" y1="78" x2="500" y2="118" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#arrow36)"/>
+  <defs><marker id="arrow36" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--d-border)"/></marker></defs>
+  <!-- DB instances -->
+  <rect x="20" y="118" width="120" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="80" y="141" text-anchor="middle" fill="var(--d-text)" font-size="12">DB-0</text>
+  <rect x="170" y="118" width="120" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="230" y="141" text-anchor="middle" fill="var(--d-text)" font-size="12">DB-1</text>
+  <text x="330" y="141" text-anchor="middle" fill="var(--d-text-muted)" font-size="16">…</text>
+  <rect x="370" y="118" width="120" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="430" y="141" text-anchor="middle" fill="var(--d-text)" font-size="12">DB-N</text>
+  <!-- Sub-tables -->
+  <rect x="20" y="168" width="120" height="32" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="80" y="189" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">ht_0 … ht_31</text>
+  <rect x="170" y="168" width="120" height="32" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="230" y="189" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">ht_32 … ht_63</text>
+  <rect x="370" y="168" width="120" height="32" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="430" y="189" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">ht_992 … ht_1023</text>
+  <text x="290" y="228" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">大表 ht 按字段 f 拆分为 1024 个分表，分布到 32 个数据库实例</text>
+  <text x="290" y="248" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">分区规则：f % 1024 → 分表号，分表号 / 32 → 数据库实例</text>
+</svg>
+</div>
 
 
 一般情况下，这种分库分表系统都有一个中间层proxy。不过，也有一些方案会让客户端直接连接数据库，也就是没有proxy这一层。
@@ -123,7 +180,41 @@ select v from temp_ht order by t_modified desc limit 100;
 
 这个过程对应的流程图如下所示：
 
-> **[图：图3 跨库查询流程示意图]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <defs><marker id="arrow36b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--d-blue)"/></marker></defs>
+  <text x="290" y="24" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">跨库查询流程（使用临时表汇总）</text>
+  <!-- DB instances -->
+  <rect x="20" y="50" width="110" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="75" y="73" text-anchor="middle" fill="var(--d-text)" font-size="11">分库 ht_0</text>
+  <rect x="155" y="50" width="110" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="210" y="73" text-anchor="middle" fill="var(--d-text)" font-size="11">分库 ht_1</text>
+  <text x="310" y="73" text-anchor="middle" fill="var(--d-text-muted)" font-size="16">…</text>
+  <rect x="340" y="50" width="110" height="36" rx="5" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="395" y="73" text-anchor="middle" fill="var(--d-text)" font-size="11">分库 ht_N</text>
+  <!-- Arrows down to temp table -->
+  <line x1="75" y1="86" x2="250" y2="140" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrow36b)"/>
+  <line x1="210" y1="86" x2="275" y2="140" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrow36b)"/>
+  <line x1="395" y1="86" x2="320" y2="140" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrow36b)"/>
+  <!-- Step labels -->
+  <text x="490" y="116" fill="var(--d-text-muted)" font-size="10">① 各分库执行查询</text>
+  <text x="490" y="132" fill="var(--d-text-muted)" font-size="10">   返回 limit 100</text>
+  <!-- Temp table -->
+  <rect x="190" y="140" width="200" height="42" rx="6" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="290" y="160" text-anchor="middle" fill="var(--d-text)" font-size="12" font-weight="bold">汇总临时表 temp_ht</text>
+  <text x="290" y="176" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">(v, k, t_modified)</text>
+  <!-- Arrow to result -->
+  <line x1="290" y1="182" x2="290" y2="210" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrow36b)"/>
+  <text x="490" y="200" fill="var(--d-text-muted)" font-size="10">② 结果插入 temp_ht</text>
+  <!-- Sort + return -->
+  <rect x="190" y="210" width="200" height="36" rx="6" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="290" y="233" text-anchor="middle" fill="var(--d-text)" font-size="11">ORDER BY t_modified LIMIT 100</text>
+  <line x1="290" y1="246" x2="290" y2="272" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#arrow36b)"/>
+  <text x="490" y="240" fill="var(--d-text-muted)" font-size="10">③ 在汇总表上排序</text>
+  <rect x="230" y="272" width="120" height="28" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <text x="290" y="291" text-anchor="middle" fill="var(--d-blue)" font-size="12" font-weight="bold">返回结果</text>
+</svg>
+</div>
 
 
 **在实践中，我们往往会发现每个分库的计算量都不饱和，所以会直接把临时表temp_ht放到32个分库中的某一个上。** 这时的查询逻辑与图3类似，你可以自己再思考一下具体的流程。
@@ -155,7 +246,31 @@ create temporary table temp_t(id int primary key)engine=innodb;
 
 为了便于后面讨论，我先来举一个例子。
 
-> **[图：图4 临时表的表名]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <text x="290" y="24" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">临时表的文件命名（进程号 1234）</text>
+  <!-- Session A -->
+  <rect x="30" y="48" width="240" height="110" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="150" y="68" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="bold">Session A（thread_id=4）</text>
+  <text x="150" y="90" text-anchor="middle" fill="var(--d-text)" font-size="11">create temporary table t1 …</text>
+  <rect x="46" y="100" width="208" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="117" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">#sql1234_4_0.frm</text>
+  <rect x="46" y="130" width="208" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="150" y="147" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">table_def_key = db1+t1+1234+4</text>
+  <!-- Session B -->
+  <rect x="310" y="48" width="240" height="110" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="430" y="68" text-anchor="middle" fill="var(--d-text-sub)" font-size="13" font-weight="bold">Session B（thread_id=5）</text>
+  <text x="430" y="90" text-anchor="middle" fill="var(--d-text)" font-size="11">create temporary table t1 …</text>
+  <rect x="326" y="100" width="208" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="117" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">#sql1234_5_0.frm</text>
+  <rect x="326" y="130" width="208" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="147" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">table_def_key = db1+t1+1234+5</text>
+  <!-- Note -->
+  <text x="290" y="190" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">文件名前缀：#sql{进程id}_{线程id}_{序列号}</text>
+  <text x="290" y="210" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">table_def_key = 库名 + 表名 + server_id + thread_id</text>
+  <text x="290" y="228" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">不同 session 的同名临时表，磁盘文件和内存 key 均不同</text>
+</svg>
+</div>
 
 
 这个进程的进程号是1234，session A的线程id是4，session B的线程id是5。所以你看到了，session A和session B创建的临时表，在磁盘上的文件不会重名。
@@ -220,7 +335,42 @@ DROP TABLE `t_normal` /* generated by server */
 
 现在，我给你举个例子，下面的序列中实例S是M的备库。
 
-> **[图：图5 主备关系中的临时表操作]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <defs><marker id="arrow36c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--d-blue)"/></marker></defs>
+  <text x="290" y="24" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">主备复制中的临时表操作</text>
+  <!-- Master M -->
+  <rect x="20" y="44" width="260" height="160" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="150" y="64" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="bold">主库 M</text>
+  <!-- Session A -->
+  <rect x="32" y="76" width="112" height="56" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="88" y="96" text-anchor="middle" fill="var(--d-text)" font-size="10" font-weight="bold">Session A</text>
+  <text x="88" y="112" text-anchor="middle" fill="var(--d-text-sub)" font-size="9">create temp t1</text>
+  <text x="88" y="124" text-anchor="middle" fill="var(--d-text-sub)" font-size="9">thread_id = 4</text>
+  <!-- Session B -->
+  <rect x="156" y="76" width="112" height="56" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="212" y="96" text-anchor="middle" fill="var(--d-text)" font-size="10" font-weight="bold">Session B</text>
+  <text x="212" y="112" text-anchor="middle" fill="var(--d-text-sub)" font-size="9">create temp t1</text>
+  <text x="212" y="124" text-anchor="middle" fill="var(--d-text-sub)" font-size="9">thread_id = 5</text>
+  <!-- Binlog -->
+  <rect x="36" y="144" width="236" height="28" rx="4" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="154" y="163" text-anchor="middle" fill="var(--d-text)" font-size="10">binlog: 记录 thread_id 到日志</text>
+  <!-- Arrow to slave -->
+  <line x1="280" y1="158" x2="320" y2="158" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrow36c)"/>
+  <!-- Slave S -->
+  <rect x="320" y="44" width="240" height="200" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border-dash)" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="440" y="64" text-anchor="middle" fill="var(--d-text-sub)" font-size="13" font-weight="bold">备库 S</text>
+  <rect x="336" y="80" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="440" y="99" text-anchor="middle" fill="var(--d-text)" font-size="10">应用线程（共用）</text>
+  <rect x="336" y="118" width="208" height="44" rx="4" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="440" y="136" text-anchor="middle" fill="var(--d-text)" font-size="9">t1 → key: db+t1+serverid+thread4</text>
+  <text x="440" y="152" text-anchor="middle" fill="var(--d-text)" font-size="9">t1 → key: db+t1+serverid+thread5</text>
+  <rect x="336" y="172" width="208" height="28" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="440" y="191" text-anchor="middle" fill="var(--d-text-sub)" font-size="9">两个 t1 的 table_def_key 不同 ✅</text>
+  <text x="290" y="278" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">备库用主库线程 id 构造不同的 table_def_key</text>
+  <text x="290" y="296" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">同名临时表在备库应用线程中不会冲突</text>
+</svg>
+</div>
 
 
 主库M上的两个session创建了同名的临时表t1，这两个create temporary table t1 语句都会被传到备库S上。
@@ -252,7 +402,23 @@ MySQL在记录binlog的时候，会把主库执行这个语句的线程id写到b
 
 下面的语句序列是创建一个临时表，并将其改名：
 
-> **[图：图6 关于临时表改名的思考题]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:monospace;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:12px">
+  <text x="290" y="22" text-anchor="middle" fill="var(--d-text)" font-size="14" font-weight="bold">临时表改名：alter vs rename</text>
+  <!-- alter table -->
+  <rect x="30" y="42" width="240" height="56" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="150" y="62" text-anchor="middle" fill="var(--d-text)" font-size="11">alter table temp_t rename to temp_t2;</text>
+  <text x="150" y="82" text-anchor="middle" fill="var(--d-green)" font-size="12" font-weight="bold">Query OK ✅</text>
+  <!-- rename table -->
+  <rect x="310" y="42" width="240" height="56" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="430" y="62" text-anchor="middle" fill="var(--d-text)" font-size="11">rename table temp_t2 to temp_t3;</text>
+  <text x="430" y="82" text-anchor="middle" fill="var(--d-orange)" font-size="12" font-weight="bold">ERROR ❌</text>
+  <!-- Explanation -->
+  <text x="290" y="124" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">alter table → 修改 table_def_key，能找到临时表</text>
+  <text x="290" y="144" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">rename table → 按 库名/表名.frm 找磁盘文件，找不到临时表文件</text>
+  <text x="290" y="164" text-anchor="middle" fill="var(--d-text-dim)" font-size="11">临时表的 frm 在 tmpdir 下，且文件名是 #sql{进程id}_... 格式</text>
+</svg>
+</div>
 
 
 可以看到，我们可以使用alter table语法修改临时表的表名，而不能使用rename语法。你知道这是什么原因吗？
@@ -293,196 +459,3 @@ select * from t1 join t2 on(t1.a=t2.a) join t3 on (t2.b=t3.b) where t1.c>=X and 
 >  @poppy同学做了很不错的分析；  
 >  @dzkk 同学在评论中介绍了MariaDB支持的hash join，大家可以了解一下；  
 >  @老杨同志提了一个好问题，如果语句使用了索引a，结果还要对a排序，就不用MRR优化了，否则回表完还要增加额外的排序过程，得不偿失。
-
-> **[图：执行结果]**
-
-
-##  精选留言
-
-> **[图：尘封]**
-
-
-[__ 1](<javascript:;>)
-
-新年快乐 
-
-2019-02-04
-
-__ 作者回复
-
-新年快乐🤝
-
-2019-02-04
-
-> **[图：亮]**
-
-
-[__ 1](<javascript:;>)
-
-老师过年好呀，祝您猪年大吉，财源广进；老师咱们这个课结束后，再开一期好不好啊，没学够啊，这是我的新年愿望哦 
-
-2019-02-04
-
-__ 作者回复
-
-新年快乐，共同进步😄
-
-2019-02-04
-
-> **[图：辣椒]**
-
-
-[__ 0](<javascript:;>)
-
-老师，不同线程可以使用同名的临时表，这个没有问题。但是如果在程序中，用的是连接池中的连接来操作的，而这些连接不会释放，和数据库保持长连接。这样使用临时表会有问题吗?。 
-
-2019-02-07
-
-__ 作者回复
-
-会，“临时表会自动回收”这个功能，主要用于“应用程序异常断开、MySQL异常重启”后，不需要主动去删除表。  
-  
-而平时正常使用的时候，用完删除，还是应该有的好习惯。😆  
-  
-好问题，新年快乐~
-
-2019-02-07
-
-> **[图：老杨同志]**
-
-
-[__ 0](<javascript:;>)
-
-新年快乐，老师好勤奋！  
-有个问题，insert into select语句好像会给select的表加锁，如果没有索引，就锁全表，是不是这样？什么时候可以大胆的用这类语句？ 
-
-2019-02-04
-
-__ 作者回复
-
-新年好！  
-  
-“insert into select语句好像会给select的表加锁，如果没有索引，就锁全表”，是的。  
-  
-这类最好不要很大胆😆，如果不是业务急需的，从源表导出来再写到目标表也是好的。  
-  
-后面第40篇会说到哈。  
-  
-
-
-2019-02-05
-
-- ![](http://thirdwx.qlogo.cn/mmopen/vi_32/A94RKUfWfwzRzb68T9xskctQ43TBgXSBIL78p0N0ria2tQxmsTTJebYmefhkbHK7zwpoxokxs43UxpgDTdwm5tg/132)
-
-慕塔
-
-[__ 0](<javascript:;>)
-
-打卡 新年快乐😲😲😲 
-
-2019-02-04
-
-__ 作者回复
-
-新年快乐、共同进步🤝  
-  
-好勤奋呀😆
-
-2019-02-05
-
-> **[图：cheriston]**
-
-
-[__ 0](<javascript:;>)
-
-老师辛苦了，大年三十还给我们分享技术，老师新年好🎉. 
-
-2019-02-04
-
-__ 作者回复
-
-同祝新年好，共同进步😄
-
-2019-02-05
-
-> **[图：长杰]**
-
-
-[__ 0](<javascript:;>)
-
-老师，新年快乐，万事如意！ 
-
-2019-02-04
-
-__ 作者回复
-
-新春快乐～
-
-2019-02-05
-
-> **[图：杰]**
-
-
-[__ 0](<javascript:;>)
-
-丁大大新春快乐 
-
-2019-02-04
-
-__ 作者回复
-
-新年快乐 工作顺利~
-
-2019-02-04
-
-> **[图：某、人]**
-
-
-[__ 0](<javascript:;>)
-
-老师，新年快乐。由于自身原因，错过几期精彩的内容，年后上班以后在好好补补。 
-
-2019-02-04
-
-__ 作者回复
-
-春节快乐 新年身体健康哈
-
-2019-02-04
-
-> **[图：poppy]**
-
-
-[__ 0](<javascript:;>)
-
-老师，新年快乐。  
-关于思考题，alter table temp_t rename to temp_t2,我的理解是mysql直接修改的是table_def_key，而对于rename table temp_t2 to temp_t3,mysql直接去mysql的data目录下该数据库的目录(例如老师实验用的应该是test数据库，所以对应的是test目录)下寻找名为temp_t2.frm的文件去修改名称，所以就出现了"Can't find file './test/temp_t2.frm'(errno: 2 - No such file or directory) 
-
-2019-02-04
-
-__ 作者回复
-
-春节快乐  
-  
-👍  
-
-
-2019-02-04
-
-> **[图：亮]**
-
-
-[__ 0](<javascript:;>)
-
-老师您好，在25课里面的置顶留言“6.表上无主键的情况(主库利用索引更改数据,备库回放只能用全表扫描,这种情况可以调整slave_rows_search_algorithms参数适当优化下)”  
-为啥会存在无主键的表呢，就算dba没创建主键，Innodb可以用rowid给自动建一个虚拟主键呀，这样不就是所有的表都有主键了吗？ 
-
-2019-02-04
-
-__ 作者回复
-
-用户没有显示指定主键的话，InnoDB引擎会自己创建一个隐藏的主键，但是这个主键对Server层是透明的，优化器用不上。  
-  
-新年快乐~
-
-2019-02-04

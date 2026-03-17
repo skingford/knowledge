@@ -19,7 +19,55 @@ MySQL的行锁是在引擎层由各个引擎自己实现的。但并不是所有
 
 我先给你举个例子。在下面的操作序列中，事务B的update语句执行时会是什么现象呢？假设字段id是表t的主键。  
 
-> **[图：相关示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<table style="width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--d-border);">
+<caption style="font-weight:700;font-size:15px;padding:10px;color:var(--d-text);text-align:left;">两阶段锁协议：锁在需要时获取，在 COMMIT 时统一释放</caption>
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border);">
+<th style="padding:8px 12px;text-align:center;color:var(--d-th-text);width:60px;">时刻</th>
+<th style="padding:8px 12px;text-align:left;color:var(--d-th-text);">事务 A</th>
+<th style="padding:8px 12px;text-align:left;color:var(--d-th-text);">事务 B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T1</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>BEGIN;</code></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T2</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>UPDATE t SET k=k+1 WHERE id=1;</code><br><span style="color:var(--d-green);font-size:12px;">🔒 获取 id=1 行锁</span></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T3</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>UPDATE t SET k=k+1 WHERE id=2;</code><br><span style="color:var(--d-green);font-size:12px;">🔒 获取 id=2 行锁</span></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T4</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);"><code>UPDATE t SET k=k+1 WHERE id=1;</code><br><span style="color:var(--d-orange);font-weight:600;font-size:12px;">⏳ blocked! 等待 id=1 行锁</span></td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T5</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>COMMIT;</code><br><span style="color:var(--d-blue);font-size:12px;">🔓 释放 id=1 和 id=2 的行锁</span></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 12px;text-align:center;font-weight:600;color:var(--d-text-sub);">T6</td>
+<td style="padding:8px 12px;color:var(--d-text-muted);">—</td>
+<td style="padding:8px 12px;color:var(--d-text);"><span style="color:var(--d-green);font-size:12px;">🔒 获取 id=1 行锁</span><br>执行成功</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:12px;padding:10px 14px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;font-size:13px;color:var(--d-text);">
+<strong>关键点：</strong>行锁在<em>需要时</em>逐个获取（T2、T3），但全部在 <code>COMMIT</code> 时才<em>统一释放</em>（T5）。这就是<strong>两阶段锁协议</strong>。
+</div>
+</div>
+</div>
 
 
 这个问题的结论取决于事务A在执行完两条update语句后，持有哪些锁，以及在什么时候释放。你可以验证一下：实际上事务B的update语句会被阻塞，直到事务A执行commit之后，事务B才能继续执行。
@@ -55,7 +103,70 @@ MySQL的行锁是在引擎层由各个引擎自己实现的。但并不是所有
 
 当并发系统中不同线程出现循环资源依赖，涉及的线程都在等待别的线程释放资源时，就会导致这几个线程都进入无限等待的状态，称为死锁。这里我用数据库中的行锁举个例子。  
 
-> **[图：示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<table style="width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--d-border);">
+<caption style="font-weight:700;font-size:15px;padding:10px;color:var(--d-text);text-align:left;">死锁产生过程</caption>
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border);">
+<th style="padding:8px 12px;text-align:center;color:var(--d-th-text);width:60px;">时刻</th>
+<th style="padding:8px 12px;text-align:left;color:var(--d-th-text);">事务 A</th>
+<th style="padding:8px 12px;text-align:left;color:var(--d-th-text);">事务 B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T1</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>BEGIN;</code></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>BEGIN;</code></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T2</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>UPDATE t SET k=k+1 WHERE id=1;</code><br><span style="color:var(--d-green);font-size:12px;">🔒 获取 id=1 行锁</span></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T3</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text);"><code>UPDATE t SET k=k+1 WHERE id=2;</code><br><span style="color:var(--d-green);font-size:12px;">🔒 获取 id=2 行锁</span></td>
+</tr>
+<tr style="background:var(--d-warn-bg);border-left:3px solid var(--d-orange);">
+<td style="padding:8px 12px;text-align:center;border-bottom:1px solid var(--d-border);font-weight:600;color:var(--d-text-sub);">T4</td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);"><code>UPDATE t SET k=k+1 WHERE id=2;</code><br><span style="color:var(--d-orange);font-weight:600;font-size:12px;">⏳ 等待 id=2 行锁</span></td>
+<td style="padding:8px 12px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted);">—</td>
+</tr>
+<tr style="background:var(--d-warn-bg);border-left:3px solid var(--d-orange);">
+<td style="padding:8px 12px;text-align:center;font-weight:600;color:var(--d-text-sub);">T5</td>
+<td style="padding:8px 12px;color:var(--d-text-muted);">—</td>
+<td style="padding:8px 12px;"><code>UPDATE t SET k=k+1 WHERE id=1;</code><br><span style="color:var(--d-orange);font-weight:600;font-size:12px;">⏳ 等待 id=1 行锁</span></td>
+</tr>
+</tbody>
+</table>
+<!-- Deadlock cycle diagram -->
+<div style="margin-top:16px;">
+<svg viewBox="0 0 420 180" style="width:100%;max-width:420px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow-a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="var(--d-orange)"/></marker>
+<marker id="arrow-b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="var(--d-orange)"/></marker>
+</defs>
+<!-- Box A -->
+<rect x="30" y="50" width="120" height="50" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="2"/>
+<text x="90" y="80" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)" font-family="system-ui,sans-serif">事务 A</text>
+<!-- Box B -->
+<rect x="270" y="50" width="120" height="50" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="2"/>
+<text x="330" y="80" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)" font-family="system-ui,sans-serif">事务 B</text>
+<!-- Arrow A -> B (top) -->
+<path d="M150,60 Q210,15 270,60" fill="none" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#arrow-a)"/>
+<text x="210" y="28" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="600" font-family="system-ui,sans-serif">等待 id=2 行锁</text>
+<!-- Arrow B -> A (bottom) -->
+<path d="M270,90 Q210,135 150,90" fill="none" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#arrow-b)"/>
+<text x="210" y="148" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="600" font-family="system-ui,sans-serif">等待 id=1 行锁</text>
+<!-- Label -->
+<text x="210" y="174" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-orange)" font-family="system-ui,sans-serif">循环等待 → 死锁！</text>
+</svg>
+</div>
+</div>
+</div>
 
 
 这时候，事务A在等待事务B释放id=2的行锁，而事务B在等待事务A释放id=1的行锁。 事务A和事务B在互相等待对方的资源释放，就是进入了死锁状态。当出现死锁以后，有两种策略：

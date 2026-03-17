@@ -64,7 +64,19 @@ mysqldump -h$host -P$port -u$user --add-locks=0 --no-create-info --single-transa
 
 通过这条mysqldump命令生成的t.sql文件中就包含了如图1所示的INSERT语句。
 
-> **[图：图1 mysqldump输出文件的部分结果]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:8px;padding:16px;font-family:monospace;font-size:13px;text-align:left;line-height:1.7;color:var(--d-text)">
+<div style="color:var(--d-text-muted);margin-bottom:8px">-- mysqldump 输出文件 t.sql (部分)</div>
+<div style="color:var(--d-green)">INSERT INTO `t` VALUES</div>
+<div style="padding-left:1em">(901,901,901),</div>
+<div style="padding-left:1em">(902,902,902),</div>
+<div style="padding-left:1em">(903,903,903),</div>
+<div style="padding-left:1em;color:var(--d-text-muted)">... ...</div>
+<div style="padding-left:1em">(999,999,999),</div>
+<div style="padding-left:1em">(1000,1000,1000);</div>
+</div>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 1 &ensp;mysqldump 输出文件的部分结果</div>
+</div>
 
 
 可以看到，一条INSERT语句里面会包含多个value对，这是为了后续用这个文件来写入数据的时候，执行速度可以更快。
@@ -149,7 +161,43 @@ b. 再执行load data语句，往备库的db2.t表中插入跟主库相同的数
 
 执行流程如图2所示：
 
-> **[图：图2 load data的同步流程]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<svg viewBox="0 0 520 340" style="width:100%;font-family:system-ui,sans-serif">
+<defs>
+  <marker id="arr41" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-text-muted)"/></marker>
+</defs>
+<!-- Master -->
+<rect x="10" y="10" width="240" height="60" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="130" y="35" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="600">Master</text>
+<text x="130" y="52" text-anchor="middle" fill="var(--d-text-sub)" font-size="11">① 执行完成后，将 t.csv 内容</text>
+<text x="130" y="65" text-anchor="middle" fill="var(--d-text-sub)" font-size="11">写入 binlog</text>
+<!-- Binlog -->
+<rect x="10" y="100" width="240" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+<text x="130" y="122" text-anchor="middle" fill="var(--d-text)" font-size="13" font-weight="600">Binlog</text>
+<text x="130" y="138" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">② 写入 load data local infile ...</text>
+<!-- Arrow Master→Binlog -->
+<line x1="130" y1="70" x2="130" y2="98" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41)"/>
+<!-- Arrow Binlog→Slave -->
+<line x1="250" y1="125" x2="278" y2="125" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41)"/>
+<text x="264" y="118" text-anchor="middle" fill="var(--d-text-muted)" font-size="10">③</text>
+<!-- Slave -->
+<rect x="280" y="90" width="230" height="70" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="395" y="112" text-anchor="middle" fill="var(--d-blue)" font-size="13" font-weight="600">Slave (apply 线程)</text>
+<text x="395" y="130" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">③ 接收 binlog</text>
+<text x="395" y="145" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">传到备库</text>
+<!-- Step a -->
+<rect x="280" y="190" width="230" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+<text x="395" y="212" text-anchor="middle" fill="var(--d-text)" font-size="11">④a 读出 t.csv → 写入本地</text>
+<text x="395" y="228" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">/tmp/SQL_LOAD_MB-1-0</text>
+<line x1="395" y1="160" x2="395" y2="188" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41)"/>
+<!-- Step b -->
+<rect x="280" y="270" width="230" height="50" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="395" y="292" text-anchor="middle" fill="var(--d-text)" font-size="11">④b 执行 load data <tspan font-weight="600" fill="var(--d-orange)">local</tspan></text>
+<text x="395" y="308" text-anchor="middle" fill="var(--d-text-sub)" font-size="10">插入备库 db2.t</text>
+<line x1="395" y1="240" x2="395" y2="268" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41)"/>
+</svg>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 2 &ensp;load data 的同步流程</div>
+</div>
 
 
 注意，这里备库执行的load data语句里面，多了一个“local”。它的意思是“将执行这条命令的客户端所在机器的本地文件/tmp/SQL_LOAD_MB-1-0的内容，加载到目标表db2.t中”。
@@ -199,7 +247,48 @@ mysqldump -h$host -P$port -u$user ---single-transaction  --set-gtid-purged=OFF d
 
 至此，拷贝表数据的操作就完成了。这个流程的执行过程图如下：
 
-> **[图：图3 物理拷贝表]**
+<div style="text-align:center;max-width:580px;margin:1.5em auto">
+<svg viewBox="0 0 520 420" style="width:100%;font-family:system-ui,sans-serif">
+<defs>
+  <marker id="arr41b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-text-muted)"/></marker>
+</defs>
+<!-- Step 1 -->
+<rect x="120" y="5" width="280" height="38" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="260" y="29" text-anchor="middle" fill="var(--d-text)" font-size="12">① CREATE TABLE r LIKE t</text>
+<line x1="260" y1="43" x2="260" y2="58" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Step 2 -->
+<rect x="120" y="60" width="280" height="38" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+<text x="260" y="84" text-anchor="middle" fill="var(--d-text)" font-size="12">② ALTER TABLE r DISCARD TABLESPACE</text>
+<text x="510" y="84" text-anchor="end" fill="var(--d-text-muted)" font-size="10" font-style="italic">删除 r.ibd</text>
+<line x1="260" y1="98" x2="260" y2="113" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Step 3 -->
+<rect x="120" y="115" width="280" height="38" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="260" y="139" text-anchor="middle" fill="var(--d-text)" font-size="12">③ FLUSH TABLE t FOR EXPORT</text>
+<text x="510" y="139" text-anchor="end" fill="var(--d-text-muted)" font-size="10" font-style="italic">生成 t.cfg</text>
+<line x1="260" y1="153" x2="260" y2="168" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Step 4 -->
+<rect x="120" y="170" width="280" height="50" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.5"/>
+<text x="260" y="192" text-anchor="middle" fill="var(--d-warn-text)" font-size="12" font-weight="600">④ cp t.cfg r.cfg; cp t.ibd r.ibd</text>
+<text x="260" y="210" text-anchor="middle" fill="var(--d-text-muted)" font-size="10">需确保 MySQL 进程有读写权限</text>
+<line x1="260" y1="220" x2="260" y2="235" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Step 5 -->
+<rect x="120" y="237" width="280" height="38" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+<text x="260" y="261" text-anchor="middle" fill="var(--d-text)" font-size="12">⑤ UNLOCK TABLES</text>
+<text x="510" y="261" text-anchor="end" fill="var(--d-text-muted)" font-size="10" font-style="italic">删除 t.cfg</text>
+<line x1="260" y1="275" x2="260" y2="290" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Step 6 -->
+<rect x="120" y="292" width="280" height="38" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<text x="260" y="316" text-anchor="middle" fill="var(--d-text)" font-size="12">⑥ ALTER TABLE r IMPORT TABLESPACE</text>
+<line x1="260" y1="330" x2="260" y2="345" stroke="var(--d-text-muted)" stroke-width="1.5" marker-end="url(#arr41b)"/>
+<!-- Done -->
+<rect x="180" y="347" width="160" height="34" rx="17" fill="var(--d-green)" stroke="none"/>
+<text x="260" y="369" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">拷贝完成 ✓</text>
+<!-- Timeline bracket -->
+<line x1="100" y1="115" x2="100" y2="275" stroke="var(--d-orange)" stroke-width="2" stroke-dasharray="4,3"/>
+<text x="95" y="200" text-anchor="end" fill="var(--d-orange)" font-size="10" font-weight="600">t 表只读</text>
+</svg>
+<div style="margin-top:6px;font-size:12px;color:var(--d-text-sub)">图 3 &ensp;物理拷贝表</div>
+</div>
 
 
 关于拷贝表的这个流程，有以下几个注意点：
@@ -249,12 +338,7 @@ mysqldump -h$host -P$port -u$user ---single-transaction  --set-gtid-purged=OFF d
 
 @老杨同志 的回答提到了我们本文中说到的几个方法。
 
-> **[图：示意图]**
-
-
 ##  精选留言
-
-> **[图：poppy]**
 
 
 [__ 4](<javascript:;>)
@@ -269,7 +353,6 @@ __ 作者回复
 
 2019-02-16
 
-> **[图：☆appleう]**
 
 
 [__ 3](<javascript:;>)
@@ -302,7 +385,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：undifined]**
 
 
 [__ 3](<javascript:;>)
@@ -339,7 +421,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：lionetes]**
 
 
 [__ 2](<javascript:;>)
@@ -431,7 +512,6 @@ import动作 不会自动删除cfg文件，我图改一下
 
 2019-02-15
 
-> **[图：☆appleう]**
 
 
 [__ 2](<javascript:;>)
@@ -448,7 +528,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：AstonPutting]**
 
 
 [__ 1](<javascript:;>)
@@ -463,7 +542,6 @@ __ 作者回复
 
 2019-02-23
 
-> **[图：PengfeiWang]**
 
 
 [__ 1](<javascript:;>)
@@ -482,7 +560,6 @@ __ 作者回复
 
 2019-02-19
 
-> **[图：长杰]**
 
 
 [__ 1](<javascript:;>)
@@ -498,7 +575,6 @@ __ 作者回复
 
 2019-02-18
 
-> **[图：尘封]**
 
 
 [__ 1](<javascript:;>)
@@ -516,7 +592,6 @@ __ 作者回复
 
 2019-02-28
 
-> **[图：佳]**
 
 
 [__ 0](<javascript:;>)
@@ -532,7 +607,6 @@ __ 作者回复
 
 2019-03-16
 
-> **[图：xxj123go]**
 
 
 [__ 0](<javascript:;>)
@@ -547,7 +621,6 @@ __ 作者回复
 
 2019-03-13
 
-> **[图：王显伟]**
 
 
 [__ 0](<javascript:;>)
@@ -562,7 +635,6 @@ __ 作者回复
 
 2019-02-17
 
-> **[图：夜空中最亮的星（华仔）]**
 
 
 [__ 0](<javascript:;>)
@@ -571,7 +643,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：undifined]**
 
 
 [__ 0](<javascript:;>)
@@ -590,7 +661,6 @@ __ 作者回复
 
 2019-02-16
 
-> **[图：晨思暮语]**
 
 
 [__ 0](<javascript:;>)
@@ -606,7 +676,6 @@ mysql> select * from t where id=1;
 
 2019-02-15
 
-> **[图：晨思暮语]**
 
 
 [__ 0](<javascript:;>)
@@ -626,7 +695,6 @@ __ 作者回复
 
 2019-02-16
 
-> **[图：晨思暮语]**
 
 
 [__ 0](<javascript:;>)
@@ -741,7 +809,6 @@ Rows matched: 1 C
 
 2019-02-15
 
-> **[图：库淘淘]**
 
 
 [__ 0](<javascript:;>)
@@ -757,7 +824,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：lionetes]**
 
 
 [__ 0](<javascript:;>)
@@ -774,7 +840,6 @@ __ 作者回复
 
 2019-02-15
 
-> **[图：Ryoma]**
 
 
 [__ 0](<javascript:;>)

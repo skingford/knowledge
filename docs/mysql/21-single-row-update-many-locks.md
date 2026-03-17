@@ -55,7 +55,40 @@ insert into t values(0,0,0),(5,5,5),
 
 第一个例子是关于等值条件操作间隙：
 
-> **[图：图1 等值查询的间隙锁]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 1 等值查询的间隙锁</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>UPDATE t SET d=d+1 WHERE id=7;<br><span style="color:var(--d-text-sub);font-size:12px;">id=7 不存在，加间隙锁 (5,10)</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(8,8,8);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在间隙 (5,10) 内</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;">UPDATE t SET d=d+1 WHERE id=10;<br><span style="color:var(--d-green);font-weight:600;">OK — id=10 不在间隙锁范围内</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>锁分析：</strong>next-key lock (5,10] → 等值查询 id=7 不满足 id=10，优化 2 退化为间隙锁 (5,10)
+</div>
+</div>
+</div>
 
 
 由于表t中没有id=7的记录，所以用我们上面提到的加锁规则判断一下的话：
@@ -71,7 +104,40 @@ insert into t values(0,0,0),(5,5,5),
 
 第二个例子是关于覆盖索引上的锁：
 
-> **[图：图2 只加在非唯一索引上的锁]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 2 只加在非唯一索引上的锁</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT id FROM t WHERE c=5 LOCK IN SHARE MODE;<br><span style="color:var(--d-text-sub);font-size:12px;">覆盖索引，只锁索引 c</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;">UPDATE t SET d=d+1 WHERE id=5;<br><span style="color:var(--d-green);font-weight:600;">OK — 主键索引上无锁</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(7,7,7);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在间隙锁 (5,10) 内</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>锁分析：</strong>索引 c 上 next-key lock (0,5]，向右遍历到 c=10 加 (5,10]，优化 2 退化为间隙锁 (5,10)。覆盖索引不访问主键，主键无锁。
+</div>
+</div>
+</div>
 
 
 看到这个例子，你是不是有一种“该锁的不锁，不该锁的乱锁”的感觉？我们来分析一下吧。
@@ -109,7 +175,45 @@ mysql> select * from t where id>=10 and id<11 for update;
 
 在逻辑上，这两条查语句肯定是等价的，但是它们的加锁规则不太一样。现在，我们就让session A执行第二个查询语句，来看看加锁效果。
 
-> **[图：图3 主键索引上范围查询的锁]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 3 主键索引上范围查询的锁</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT * FROM t WHERE id&gt;=10 AND id&lt;11 FOR UPDATE;<br><span style="color:var(--d-text-sub);font-size:12px;">行锁 id=10 + next-key lock (10,15]</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;">INSERT INTO t VALUES(8,8,8);<br><span style="color:var(--d-green);font-weight:600;">OK — 不在锁范围内</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(13,13,13);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在 (10,15] 内</span></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">UPDATE t SET d=d+1 WHERE id=15;<br><span style="color:var(--d-orange);font-weight:600;">blocked — id=15 被 next-key lock 锁住</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>锁分析：</strong>id=10 等值查询，优化 1 退化为行锁；范围查询向后扫描到 id=15，加 next-key lock (10,15]。
+</div>
+</div>
+</div>
 
 
 现在我们就用前面提到的加锁规则，来分析一下session A 会加什么锁呢？
@@ -129,7 +233,40 @@ mysql> select * from t where id>=10 and id<11 for update;
 
 需要注意的是，与案例三不同的是，案例四中查询语句的where部分用的是字段c。
 
-> **[图：图4 非唯一索引范围锁]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 4 非唯一索引范围锁</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT * FROM t WHERE c&gt;=10 AND c&lt;11 FOR UPDATE;<br><span style="color:var(--d-text-sub);font-size:12px;">索引 c 上 (5,10] + (10,15]</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(8,8,8);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在 (5,10] 内</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">UPDATE t SET d=d+1 WHERE c=15;<br><span style="color:var(--d-orange);font-weight:600;">blocked — c=15 被 next-key lock 锁住</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>锁分析：</strong>非唯一索引 c=10 等值查询不触发优化 1，加 next-key lock (5,10]；向右扫描到 c=15，加 next-key lock (10,15]。
+</div>
+</div>
+</div>
 
 
 这次session A用字段c来判断，加锁规则跟案例三唯一的不同是：在第一次用c=10定位记录的时候，索引c上加了(5,10]这个next-key lock后，由于索引c是非唯一索引，没有优化规则，也就是说不会蜕变为行锁，因此最终sesion A加的锁是，索引c上的(5,10] 和(10,15] 这两个next-key lock。
@@ -142,7 +279,67 @@ mysql> select * from t where id>=10 and id<11 for update;
 
 前面的四个案例，我们已经用到了加锁规则中的两个原则和两个优化，接下来再看一个关于加锁规则中bug的案例。
 
-> **[图：图5 唯一索引范围锁的bug]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 5 唯一索引范围锁的 bug</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT * FROM t WHERE id&gt;10 AND id&lt;=15 FOR UPDATE;<br><span style="color:var(--d-text-sub);font-size:12px;">理论只需 (10,15]，实际多锁了 (15,20]</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">UPDATE t SET d=d+1 WHERE id=20;<br><span style="color:var(--d-orange);font-weight:600;">blocked — 被 bug 导致的 (15,20] 锁住</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(16,16,16);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在 (15,20] 内</span></td>
+</tr>
+</tbody>
+</table>
+<!-- 主键索引数轴示意 -->
+<div style="margin-top:12px;padding:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;">
+<div style="text-align:center;font-size:12px;color:var(--d-text-sub);margin-bottom:8px;">主键索引 id 上的锁范围</div>
+<svg viewBox="0 0 500 60" style="width:100%;max-width:500px;display:block;margin:0 auto;">
+<line x1="30" y1="30" x2="470" y2="30" stroke="var(--d-border)" stroke-width="1.5"/>
+<g font-size="11" fill="var(--d-text)" text-anchor="middle">
+<line x1="50" y1="25" x2="50" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="50" y="48">0</text>
+<line x1="120" y1="25" x2="120" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="120" y="48">5</text>
+<line x1="190" y1="25" x2="190" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="190" y="48">10</text>
+<line x1="260" y1="25" x2="260" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="260" y="48">15</text>
+<line x1="330" y1="25" x2="330" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="330" y="48">20</text>
+<line x1="400" y1="25" x2="400" y2="35" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="400" y="48">25</text>
+</g>
+<!-- 正常锁 (10,15] -->
+<line x1="190" y1="18" x2="260" y2="18" stroke="var(--d-blue)" stroke-width="3"/>
+<circle cx="190" cy="18" r="3" fill="var(--d-bg)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<circle cx="260" cy="18" r="3" fill="var(--d-blue)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<text x="225" y="12" font-size="9" fill="var(--d-blue)" text-anchor="middle">(10,15]</text>
+<!-- Bug 多锁 (15,20] -->
+<line x1="260" y1="18" x2="330" y2="18" stroke="var(--d-orange)" stroke-width="3"/>
+<circle cx="330" cy="18" r="3" fill="var(--d-orange)" stroke="var(--d-orange)" stroke-width="1.5"/>
+<text x="295" y="12" font-size="9" fill="var(--d-orange)" text-anchor="middle">(15,20] bug!</text>
+</svg>
+</div>
+</div>
+</div>
 
 
 session A是一个范围查询，按照原则1的话，应该是索引id上只加(10,15]这个next-key lock，并且因为id是唯一键，所以循环判断到id=15这一行就应该停止了。
@@ -166,7 +363,48 @@ mysql> insert into t values(30,10,30);
 
 新插入的这一行c=10，也就是说现在表里有两个c=10的行。那么，这时候索引c上的间隙是什么状态了呢？你要知道，由于非唯一索引上包含主键的值，所以是不可能存在“相同”的两行的。
 
-> **[图：图6 非唯一索引等值的例子]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 6 非唯一索引上存在"等值"的例子</div>
+<div style="padding:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;">
+<div style="text-align:center;font-size:12px;color:var(--d-text-sub);margin-bottom:8px;">索引 c 上的记录排列（含主键 id）</div>
+<svg viewBox="0 0 520 80" style="width:100%;max-width:520px;display:block;margin:0 auto;">
+<line x1="20" y1="40" x2="500" y2="40" stroke="var(--d-border)" stroke-width="1.5"/>
+<g font-size="10" text-anchor="middle">
+<!-- c=0 -->
+<line x1="50" y1="34" x2="50" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="50" y="58" fill="var(--d-text)">c=0</text>
+<text x="50" y="70" fill="var(--d-text-muted)" font-size="9">id=0</text>
+<!-- c=5 -->
+<line x1="120" y1="34" x2="120" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="120" y="58" fill="var(--d-text)">c=5</text>
+<text x="120" y="70" fill="var(--d-text-muted)" font-size="9">id=5</text>
+<!-- c=10,id=10 -->
+<line x1="210" y1="34" x2="210" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="210" y="58" fill="var(--d-text)">c=10</text>
+<text x="210" y="70" fill="var(--d-text-muted)" font-size="9">id=10</text>
+<!-- c=10,id=30 (新插入) -->
+<line x1="280" y1="34" x2="280" y2="46" stroke="var(--d-orange)" stroke-width="1.5"/>
+<text x="280" y="58" fill="var(--d-orange)" font-weight="600">c=10</text>
+<text x="280" y="70" fill="var(--d-orange)" font-size="9">id=30 (新)</text>
+<!-- c=15 -->
+<line x1="360" y1="34" x2="360" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="360" y="58" fill="var(--d-text)">c=15</text>
+<text x="360" y="70" fill="var(--d-text-muted)" font-size="9">id=15</text>
+<!-- c=20 -->
+<line x1="430" y1="34" x2="430" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="430" y="58" fill="var(--d-text)">c=20</text>
+<text x="430" y="70" fill="var(--d-text-muted)" font-size="9">id=20</text>
+</g>
+<!-- 间隙标注 -->
+<text x="245" y="26" font-size="9" fill="var(--d-blue)" text-anchor="middle">← 间隙 →</text>
+</svg>
+</div>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+插入 (30,10,30) 后，索引 c 上有两个 c=10 的记录，但主键 id 不同（10 和 30），它们之间存在间隙。
+</div>
+</div>
+</div>
 
 
 可以看到，虽然有两个c=10，但是它们的主键值id是不同的（分别是10和30），因此这两个c=10的记录之间，也是有间隙的。
@@ -177,7 +415,32 @@ mysql> insert into t values(30,10,30);
 
 这次我们用delete语句来验证。注意，delete语句加锁的逻辑，其实跟select ... for update 是类似的，也就是我在文章开始总结的两个“原则”、两个“优化”和一个“bug”。
 
-> **[图：图7 delete 示例]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 7 delete 示例</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>DELETE FROM t WHERE c=10;<br><span style="color:var(--d-text-sub);font-size:12px;">遍历索引 c，锁住 (c=5,id=5) 到 (c=15,id=15)</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(12,12,12);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 落在锁范围内</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>锁分析：</strong>索引 c 上 next-key lock (c=5,id=5) → (c=10,id=10)，继续遍历到 (c=10,id=30)，再到 (c=15,id=15) 退化为间隙锁。
+</div>
+</div>
+</div>
 
 
 这时，session A在遍历的时候，先访问第一个c=10的记录。同样地，根据原则1，这里加的是(c=5,id=5)到(c=10,id=10)这个next-key lock。
@@ -186,7 +449,50 @@ mysql> insert into t values(30,10,30);
 
 也就是说，这个delete语句在索引c上的加锁范围，就是下图中蓝色区域覆盖的部分。  
 
-> **[图：图8 delete加锁效果示例]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 8 delete 加锁效果示例</div>
+<div style="padding:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;">
+<div style="text-align:center;font-size:12px;color:var(--d-text-sub);margin-bottom:8px;">索引 c 上的加锁范围（蓝色区域）</div>
+<svg viewBox="0 0 520 80" style="width:100%;max-width:520px;display:block;margin:0 auto;">
+<line x1="20" y1="40" x2="500" y2="40" stroke="var(--d-border)" stroke-width="1.5"/>
+<!-- 蓝色锁范围 -->
+<rect x="120" y="28" width="240" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1" stroke-dasharray="4,2" opacity="0.7"/>
+<g font-size="10" text-anchor="middle">
+<line x1="50" y1="34" x2="50" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="50" y="60" fill="var(--d-text)">c=0</text>
+<text x="50" y="72" fill="var(--d-text-muted)" font-size="9">id=0</text>
+<line x1="120" y1="34" x2="120" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="120" y="60" fill="var(--d-text)">c=5</text>
+<text x="120" y="72" fill="var(--d-text-muted)" font-size="9">id=5</text>
+<circle cx="120" cy="40" r="3" fill="var(--d-bg)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="210" y1="34" x2="210" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="210" y="60" fill="var(--d-text)">c=10</text>
+<text x="210" y="72" fill="var(--d-text-muted)" font-size="9">id=10</text>
+<circle cx="210" cy="40" r="3" fill="var(--d-blue)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="280" y1="34" x2="280" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="280" y="60" fill="var(--d-orange)">c=10</text>
+<text x="280" y="72" fill="var(--d-orange)" font-size="9">id=30</text>
+<circle cx="280" cy="40" r="3" fill="var(--d-blue)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="360" y1="34" x2="360" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="360" y="60" fill="var(--d-text)">c=15</text>
+<text x="360" y="72" fill="var(--d-text-muted)" font-size="9">id=15</text>
+<circle cx="360" cy="40" r="3" fill="var(--d-bg)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="430" y1="34" x2="430" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="430" y="60" fill="var(--d-text)">c=20</text>
+<text x="430" y="72" fill="var(--d-text-muted)" font-size="9">id=20</text>
+</g>
+<!-- 开区间标注 -->
+<text x="120" y="22" font-size="9" fill="var(--d-blue)" text-anchor="middle">开</text>
+<text x="360" y="22" font-size="9" fill="var(--d-blue)" text-anchor="middle">开</text>
+<text x="240" y="16" font-size="9" fill="var(--d-blue)" text-anchor="middle">锁范围：(c=5,id=5) — (c=15,id=15)</text>
+</svg>
+</div>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+蓝色区域左右两边都是虚线（开区间），即 (c=5,id=5) 和 (c=15,id=15) 这两行上都没有锁。
+</div>
+</div>
+</div>
 
 
 这个蓝色区域左右两边都是虚线，表示开区间，即(c=5,id=5)和(c=15,id=15)这两行上都没有锁。
@@ -195,7 +501,32 @@ mysql> insert into t values(30,10,30);
 
 例子6也有一个对照案例，场景如下所示：
 
-> **[图：图9 limit 语句加锁]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 9 limit 语句加锁</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>DELETE FROM t WHERE c=10 LIMIT 2;<br><span style="color:var(--d-text-sub);font-size:12px;">limit 2 → 扫描到 (c=10,id=30) 即停止</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;">INSERT INTO t VALUES(12,12,12);<br><span style="color:var(--d-green);font-weight:600;">OK — 不在锁范围内！</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>对比案例六：</strong>加了 LIMIT 2 后，扫描到 (c=10,id=30) 满足两条即停止，锁范围缩小，c=12 的插入不再被阻塞。
+</div>
+</div>
+</div>
 
 
 这个例子里，session A的delete语句加了 limit 2。你知道表t里c=10的记录其实只有两条，因此加不加limit 2，删除的效果都是一样的，但是加锁的效果却不同。可以看到，session B的insert语句执行通过了，跟案例六的结果不同。
@@ -204,7 +535,51 @@ mysql> insert into t values(30,10,30);
 
 因此，索引c上的加锁范围就变成了从（c=5,id=5)到（c=10,id=30)这个前开后闭区间，如下图所示：  
 
-> **[图：图10 带limit 2的加锁效果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 10 带 limit 2 的加锁效果</div>
+<div style="padding:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;">
+<div style="text-align:center;font-size:12px;color:var(--d-text-sub);margin-bottom:8px;">索引 c 上的加锁范围（limit 2 后缩小）</div>
+<svg viewBox="0 0 520 80" style="width:100%;max-width:520px;display:block;margin:0 auto;">
+<line x1="20" y1="40" x2="500" y2="40" stroke="var(--d-border)" stroke-width="1.5"/>
+<!-- 缩小的锁范围 -->
+<rect x="120" y="28" width="160" height="24" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1" opacity="0.7"/>
+<g font-size="10" text-anchor="middle">
+<line x1="50" y1="34" x2="50" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="50" y="60" fill="var(--d-text)">c=0</text>
+<text x="50" y="72" fill="var(--d-text-muted)" font-size="9">id=0</text>
+<line x1="120" y1="34" x2="120" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="120" y="60" fill="var(--d-text)">c=5</text>
+<text x="120" y="72" fill="var(--d-text-muted)" font-size="9">id=5</text>
+<circle cx="120" cy="40" r="3" fill="var(--d-bg)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="210" y1="34" x2="210" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="210" y="60" fill="var(--d-text)">c=10</text>
+<text x="210" y="72" fill="var(--d-text-muted)" font-size="9">id=10</text>
+<circle cx="210" cy="40" r="3" fill="var(--d-blue)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="280" y1="34" x2="280" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="280" y="60" fill="var(--d-text)">c=10</text>
+<text x="280" y="72" fill="var(--d-text-muted)" font-size="9">id=30</text>
+<circle cx="280" cy="40" r="3" fill="var(--d-blue)" stroke="var(--d-blue)" stroke-width="1.5"/>
+<line x1="360" y1="34" x2="360" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="360" y="60" fill="var(--d-text)">c=15</text>
+<text x="360" y="72" fill="var(--d-text-muted)" font-size="9">id=15</text>
+<line x1="430" y1="34" x2="430" y2="46" stroke="var(--d-text-dim)" stroke-width="1"/>
+<text x="430" y="60" fill="var(--d-text)">c=20</text>
+<text x="430" y="72" fill="var(--d-text-muted)" font-size="9">id=20</text>
+</g>
+<!-- 标注 -->
+<text x="120" y="22" font-size="9" fill="var(--d-blue)" text-anchor="middle">开</text>
+<text x="280" y="22" font-size="9" fill="var(--d-blue)" text-anchor="middle">闭</text>
+<text x="200" y="16" font-size="9" fill="var(--d-blue)" text-anchor="middle">(c=5,id=5) — (c=10,id=30]</text>
+<!-- 未锁区域标注 -->
+<text x="360" y="22" font-size="9" fill="var(--d-green)" text-anchor="middle">未锁</text>
+</svg>
+</div>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+(c=10,id=30) 之后的间隙不在锁范围内，因此 INSERT c=12 可以执行成功。<strong>实践建议：删除数据时尽量加 limit。</strong>
+</div>
+</div>
+</div>
 
 
 可以看到，(c=10,id=30）之后的这个间隙并没有在加锁范围里，因此insert语句插入c=12是可以执行成功的。
@@ -217,7 +592,40 @@ mysql> insert into t values(30,10,30);
 
 你一定会疑惑，这个概念不是一开始就说了吗？不要着急，我们先来看下面这个例子：
 
-> **[图：图11 案例八的操作序列]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 11 案例八的操作序列</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;width:50px;">时刻</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;text-align:center;font-weight:600;">T1</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT id FROM t WHERE c=10 LOCK IN SHARE MODE;<br><span style="color:var(--d-text-sub);font-size:12px;">索引 c 上加 next-key lock (5,10] + 间隙锁 (10,15)</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;text-align:center;font-weight:600;">T2</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">UPDATE t SET d=d+1 WHERE c=10;<br><span style="color:var(--d-orange);font-weight:600;">blocked — 需要 next-key lock (5,10]，行锁 c=10 被 A 持有</span><br><span style="color:var(--d-text-sub);font-size:11px;">间隙锁 (5,10) 加锁成功，行锁 c=10 等待中</span></td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;text-align:center;font-weight:600;">T3</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(8,8,8);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 被 B 的间隙锁 (5,10) 锁住</span><br><span style="color:var(--d-text-sub);font-size:11px;color:var(--d-orange);">死锁！InnoDB 让 B 回滚</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-warn-bg);border-left:3px solid var(--d-warn-border);font-size:12px;color:var(--d-warn-text);border-radius:0 4px 4px 0;">
+<strong>关键点：</strong>next-key lock 分两步执行——先加间隙锁，再加行锁。B 的间隙锁 (5,10) 已成功，但行锁等待 A；A 的插入又被 B 的间隙锁阻塞，形成死锁。
+</div>
+</div>
+</div>
 
 
 现在，我们按时间顺序来分析一下为什么是这样的结果。
@@ -255,7 +663,35 @@ mysql> insert into t values(30,10,30);
 
 我把题目重新描述和简化一下：还是我们在文章开头初始化的表t，里面有6条记录，图12的语句序列中，为什么session B的insert操作，会被锁住呢？  
 
-> **[图：图12 锁分析思考题]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:620px;width:100%;">
+<div style="text-align:center;font-weight:700;color:var(--d-text);margin-bottom:12px;">图 12 锁分析思考题</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead>
+<tr style="background:var(--d-th-bg);color:var(--d-th-text);">
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;width:50px;">时刻</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session A</th>
+<th style="border:1px solid var(--d-th-border);padding:6px 8px;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 8px;text-align:center;font-weight:600;">T1</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-blue-bg);">BEGIN;<br>SELECT * FROM t WHERE c&gt;=15 AND c&lt;=20 ORDER BY c DESC LOCK IN SHARE MODE;</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 8px;text-align:center;font-weight:600;">T2</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;color:var(--d-text-muted);text-align:center;">—</td>
+<td style="border:1px solid var(--d-border);padding:6px 8px;background:var(--d-warn-bg);">INSERT INTO t VALUES(6,6,6);<br><span style="color:var(--d-orange);font-weight:600;">blocked — 为什么会被锁住？</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:8px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);font-size:12px;color:var(--d-text-sub);border-radius:0 4px 4px 0;">
+<strong>思考提示：</strong>ORDER BY c DESC 会影响索引扫描方向。向左遍历时，访问到的对象不同，加锁范围也会发生变化。
+</div>
+</div>
+</div>
 
 
 另外，如果你有兴趣多做一些实验的话，可以设计好语句序列，在执行之前先自己分析一下，然后实际地验证结果是否跟你的分析一致。
@@ -289,12 +725,9 @@ select * from t where d=5 for update; /*Q1*/
 
 > @ 某、人 、@郭江伟 两位同学尝试分析了上期问题，并给了有启发性的解答。
 
-> **[图：示意图]**
 
 
 ##  精选留言
-
-> **[图：堕落天使]**
 
 
 [__ 1](<javascript:;>)
@@ -354,16 +787,12 @@ __ 作者回复
 
 2019-01-03
 
-> **[图：张三]**
-
 
 [__ 25](<javascript:;>)
 
 Happy New Year !这个专栏绝对是极客时间最好我买过最值的专栏。 
 
 2018-12-31
-
-> **[图：约书亚]**
 
 
 [__ 12](<javascript:;>)
@@ -377,8 +806,6 @@ __ 作者回复
 风雨无阻 节假日不休，包括元旦和春节😄
 
 2018-12-31
-
-> **[图：HuaMax]**
 
 
 [__ 4](<javascript:;>)
@@ -395,8 +822,6 @@ __ 作者回复
 对的👍🏿
 
 2019-01-01
-
-> **[图：郭江伟]**
 
 
 [__ 4](<javascript:;>)
@@ -417,8 +842,6 @@ __ 作者回复
 重新分析下😄
 
 2018-12-31
-
-> **[图：undifined]**
 
 
 [__ 3](<javascript:;>)
@@ -463,8 +886,6 @@ __ 作者回复
 
 2019-01-10
 
-> **[图：乾坤]**
-
 
 [__ 3](<javascript:;>)
 
@@ -477,8 +898,6 @@ __ 作者回复
 感觉没大差别，嗯嗯，理解就好😄
 
 2019-01-02
-
-> **[图：Geek_9ca34e]**
 
 
 [__ 2](<javascript:;>)
@@ -501,7 +920,6 @@ Gap是一个动态的概念
 
 2019-01-09
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 2](<javascript:;>)
@@ -530,7 +948,6 @@ select id from t where c=6 for update;
 
 2019-01-23
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 1](<javascript:;>)
@@ -558,8 +975,6 @@ Explain结果发一下，还有show variables 结果也发下
 
 2019-01-02
 
-> **[图：是我的海]**
-
 
 [__ 0](<javascript:;>)
 
@@ -574,8 +989,6 @@ __ 作者回复
 如果面试的时候能够让大家回答更有底气，那就太好啦👍
 
 2019-01-31
-
-> **[图：时隐时现]**
 
 
 [__ 0](<javascript:;>)
@@ -625,8 +1038,6 @@ b) 如果满足，才进入锁等待
 新春快乐~
 
 2019-02-04
-
-> **[图：Leon📷]**
 
 
 [__ 0](<javascript:;>)
@@ -686,8 +1097,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：alias cd=rm -rf]**
-
 
 [__ 0](<javascript:;>)
 
@@ -714,8 +1123,6 @@ c>=15这个条件，只会向左匹配到c=10这个记录，
 
 2019-01-17
 
-> **[图：J!]**
-
 
 [__ 0](<javascript:;>)
 
@@ -731,8 +1138,6 @@ __ 作者回复
 
 2019-01-16
 
-> **[图：任洋]**
-
 
 [__ 0](<javascript:;>)
 
@@ -746,8 +1151,6 @@ update 没索引就是锁住主键索引上所有的行和间隙
 锁的内容太多了， 这样确实容易出现死锁哦
 
 2019-01-15
-
-> **[图：陈]**
 
 
 [__ 0](<javascript:;>)

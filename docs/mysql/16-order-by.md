@@ -39,14 +39,69 @@ select city,name,age from t where city='杭州' order by name limit 1000  ;
 
 在city字段上创建索引之后，我们用explain命令来看看这个语句的执行情况。
 
-> **[图：图1 使用explain命令查看语句的执行情况]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图1 使用 explain 命令查看语句的执行情况</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+       where city='杭州' order by name limit 1000;
+
++----+-------------+-------+-------+---------------+------+---------+
+| id | select_type | table | type  | possible_keys | key  | key_len |
++----+-------------+-------+-------+---------------+------+---------+
+|  1 | SIMPLE      | t     | ref   | city          | city | 50      |
++----+-------------+-------+-------+---------------+------+---------+
+|  rows |  filtered | Extra                           |
++-------+-----------+---------------------------------+
+|  4000 |    100.00 | Using index condition;          |
+|       |           | <span style="color:var(--d-orange);">Using filesort</span>                  |
++-------+-----------+---------------------------------+</pre>
+</div>
+</div>
 
 
 Extra这个字段中的“`Using filesort`”表示的就是需要排序，MySQL会给每个线程分配一块内存用于排序，称为sort_buffer。
 
 为了说明这个SQL查询语句的执行过程，我们先来看一下city这个索引的示意图。
 
-> **[图：图2 city字段的索引示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图2 city 字段的索引示意图（B+ 树）</div>
+<svg viewBox="0 0 520 220" style="width:100%;height:auto;">
+  <!-- Tree root -->
+  <rect x="190" y="10" width="140" height="32" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="31" text-anchor="middle" font-size="12" fill="var(--d-text)" font-family="system-ui,sans-serif">city 索引根节点</text>
+  <!-- Branches -->
+  <line x1="220" y1="42" x2="100" y2="75" stroke="var(--d-border)" stroke-width="1.2"/>
+  <line x1="260" y1="42" x2="260" y2="75" stroke="var(--d-border)" stroke-width="1.2"/>
+  <line x1="300" y1="42" x2="420" y2="75" stroke="var(--d-border)" stroke-width="1.2"/>
+  <!-- Leaf nodes -->
+  <rect x="20" y="75" width="160" height="28" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="100" y="94" text-anchor="middle" font-size="11" fill="var(--d-text-sub)" font-family="'Courier New',monospace">... | 上海 | ...</text>
+  <rect x="185" y="75" width="150" height="28" rx="5" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="260" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">杭州 | 杭州 | 杭州</text>
+  <rect x="340" y="75" width="160" height="28" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="420" y="94" text-anchor="middle" font-size="11" fill="var(--d-text-sub)" font-family="'Courier New',monospace">... | 苏州 | ...</text>
+  <!-- Detail: leaf entries for 杭州 -->
+  <line x1="210" y1="103" x2="130" y2="130" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="260" y1="103" x2="260" y2="130" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="310" y1="103" x2="390" y2="130" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <rect x="60" y="130" width="130" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="125" y="146" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">city=杭州</text>
+  <text x="125" y="160" text-anchor="middle" font-size="10" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=<tspan font-weight="bold" fill="var(--d-orange)">ID_X</tspan></text>
+  <rect x="195" y="130" width="130" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="260" y="146" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">city=杭州</text>
+  <text x="260" y="160" text-anchor="middle" font-size="10" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=...</text>
+  <rect x="325" y="130" width="130" height="36" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="390" y="146" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">city=杭州</text>
+  <text x="390" y="160" text-anchor="middle" font-size="10" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=<tspan font-weight="bold" fill="var(--d-orange)">ID_Y</tspan></text>
+  <!-- Arrow showing range -->
+  <line x1="125" y1="175" x2="390" y2="175" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#arrowOrange16)"/>
+  <text x="260" y="195" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold" font-family="system-ui,sans-serif">满足 city='杭州' 的记录范围</text>
+  <text x="260" y="212" text-anchor="middle" font-size="10" fill="var(--d-text-muted)" font-family="system-ui,sans-serif">从 ID_X 到 ID_Y（name 无序）</text>
+  <defs><marker id="arrowOrange16" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker></defs>
+</svg>
+</div>
+</div>
 
 
 从图中可以看到，满足city='杭州’条件的行，是从ID_X到ID_(X+N)的这些记录。
@@ -70,7 +125,59 @@ Extra这个字段中的“`Using filesort`”表示的就是需要排序，MySQL
 
 我们暂且把这个排序过程，称为全字段排序，执行流程的示意图如下所示，下一篇文章中我们还会用到这个排序。
 
-> **[图：图3 全字段排序]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图3 全字段排序流程</div>
+<svg viewBox="0 0 520 370" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="arrowG3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-green)"/></marker>
+  </defs>
+  <!-- Step 1: city index -->
+  <rect x="10" y="10" width="140" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="80" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">city 索引</text>
+  <text x="80" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">找 city='杭州' 的 id</text>
+  <!-- Arrow to primary key -->
+  <line x1="150" y1="30" x2="190" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB3)"/>
+  <!-- Step 2: primary key -->
+  <rect x="195" y="10" width="140" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="265" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">主键索引（回表）</text>
+  <text x="265" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">取 name, city, age</text>
+  <!-- Arrow to sort_buffer -->
+  <line x1="335" y1="30" x2="375" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB3)"/>
+  <!-- Step 3: sort_buffer -->
+  <rect x="380" y="5" width="130" height="50" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="445" y="24" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer</text>
+  <text x="445" y="40" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">name | city | age</text>
+  <!-- Loop arrow -->
+  <path d="M265,50 Q265,70 80,70 Q60,70 60,50" fill="none" stroke="var(--d-text-muted)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="170" y="85" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">重复直到不满足条件</text>
+  <!-- sort_buffer content detail -->
+  <rect x="120" y="110" width="280" height="120" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="260" y="130" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer 内容（全字段）</text>
+  <line x1="140" y1="140" x2="380" y2="140" stroke="var(--d-border)" stroke-width="0.5"/>
+  <text x="170" y="158" text-anchor="middle" font-size="10" fill="var(--d-th-text)" font-weight="bold">name</text>
+  <text x="260" y="158" text-anchor="middle" font-size="10" fill="var(--d-th-text)" font-weight="bold">city</text>
+  <text x="350" y="158" text-anchor="middle" font-size="10" fill="var(--d-th-text)" font-weight="bold">age</text>
+  <line x1="140" y1="164" x2="380" y2="164" stroke="var(--d-border)" stroke-width="0.5"/>
+  <text x="170" y="180" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">张三</text>
+  <text x="260" y="180" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">杭州</text>
+  <text x="350" y="180" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">25</text>
+  <text x="170" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">李四</text>
+  <text x="260" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">杭州</text>
+  <text x="350" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">30</text>
+  <text x="260" y="218" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">... (4000 行)</text>
+  <!-- Arrow: sort -->
+  <line x1="260" y1="230" x2="260" y2="265" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowB3)"/>
+  <text x="310" y="252" text-anchor="start" font-size="11" fill="var(--d-orange)" font-weight="bold">按 name 快速排序</text>
+  <!-- Result -->
+  <rect x="160" y="270" width="200" height="40" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="260" y="294" text-anchor="middle" font-size="12" fill="var(--d-text)" font-weight="bold">取前 1000 行返回客户端</text>
+  <!-- Note -->
+  <text x="260" y="340" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">排序可能在内存完成，也可能使用磁盘临时文件（取决于 sort_buffer_size）</text>
+</svg>
+</div>
+</div>
 
 
 图中“按name排序”这个动作，可能在内存中完成，也可能需要使用外部排序，这取决于排序所需的内存和参数sort_buffer_size。
@@ -102,7 +209,19 @@ select @b-@a;
 
 这个方法是通过查看 OPTIMIZER_TRACE 的结果来确认的，你可以从 number_of_tmp_files中看到是否使用了临时文件。
 
-> **[图：图4 全排序的OPTIMIZER_TRACE部分结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图4 全字段排序的 OPTIMIZER_TRACE 部分结果</div>
+<pre style="margin:0;">"filesort_summary": {
+  "rows":                        4000,
+  "examined_rows":               4000,
+  "number_of_tmp_files":         <span style="color:var(--d-orange);font-weight:bold;">12</span>,
+  "sort_buffer_size":            32768,
+  "sort_mode":
+    "<span style="color:var(--d-green);">&lt;sort_key, packed_additional_fields&gt;</span>"
+}</pre>
+</div>
+</div>
 
 
 number_of_tmp_files表示的是，排序过程中使用的临时文件数。你一定奇怪，为什么需要12个文件？内存放不下时，就需要使用外部排序，外部排序一般使用归并排序算法。可以这么简单理解，**MySQL将需要排序的数据分成12份，每一份单独排序后存在这些临时文件中。然后把这12个有序文件再合并成一个有序的大文件。**
@@ -163,7 +282,61 @@ city、name、age 这三个字段的定义总长度是36，我把max_length_for_
 
 这个执行流程的示意图如下，我把它称为rowid排序。
 
-> **[图：图5 rowid排序]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图5 rowid 排序流程</div>
+<svg viewBox="0 0 520 400" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="arrowO5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Step 1: city index -->
+  <rect x="10" y="10" width="140" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="80" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">city 索引</text>
+  <text x="80" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">找 city='杭州' 的 id</text>
+  <!-- Arrow -->
+  <line x1="150" y1="30" x2="190" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB5)"/>
+  <!-- Step 2: primary key -->
+  <rect x="195" y="10" width="140" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="265" y="27" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">主键索引（回表）</text>
+  <text x="265" y="42" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">取 name, id</text>
+  <!-- Arrow -->
+  <line x1="335" y1="30" x2="375" y2="30" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB5)"/>
+  <!-- sort_buffer (only name + id) -->
+  <rect x="380" y="5" width="130" height="50" rx="6" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="445" y="24" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer</text>
+  <text x="445" y="40" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">name | id</text>
+  <!-- Loop -->
+  <path d="M265,50 Q265,70 80,70 Q60,70 60,50" fill="none" stroke="var(--d-text-muted)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="170" y="85" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">重复直到不满足条件</text>
+  <!-- sort_buffer detail -->
+  <rect x="160" y="110" width="200" height="90" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="260" y="130" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">sort_buffer（仅排序字段 + id）</text>
+  <line x1="175" y1="138" x2="345" y2="138" stroke="var(--d-border)" stroke-width="0.5"/>
+  <text x="220" y="155" text-anchor="middle" font-size="10" fill="var(--d-th-text)" font-weight="bold">name</text>
+  <text x="310" y="155" text-anchor="middle" font-size="10" fill="var(--d-th-text)" font-weight="bold">id</text>
+  <line x1="175" y1="161" x2="345" y2="161" stroke="var(--d-border)" stroke-width="0.5"/>
+  <text x="220" y="177" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">张三</text>
+  <text x="310" y="177" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">101</text>
+  <text x="260" y="195" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">... (4000 行)</text>
+  <!-- Sort arrow -->
+  <line x1="260" y1="200" x2="260" y2="235" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowO5)"/>
+  <text x="310" y="222" text-anchor="start" font-size="11" fill="var(--d-orange)" font-weight="bold">按 name 排序</text>
+  <!-- Take top 1000 ids -->
+  <rect x="160" y="240" width="200" height="35" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="262" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">取前 1000 行的 id</text>
+  <!-- Arrow: back to table -->
+  <line x1="260" y1="275" x2="260" y2="305" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowO5)"/>
+  <text x="320" y="295" text-anchor="start" font-size="11" fill="var(--d-orange)" font-weight="bold">再次回表</text>
+  <!-- Final result -->
+  <rect x="120" y="310" width="280" height="40" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="328" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">主键索引：按 id 取 city, name, age</text>
+  <text x="260" y="344" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">返回客户端</text>
+  <!-- Note -->
+  <text x="260" y="380" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">比全字段排序多一次回表，但 sort_buffer 可容纳更多行</text>
+</svg>
+</div>
+</div>
 
 
 对比图3的全字段排序流程图你会发现，rowid排序多访问了一次表t的主键索引，就是步骤7。
@@ -178,7 +351,19 @@ city、name、age 这三个字段的定义总长度是36，我把max_length_for_
 
 因为这时候除了排序过程外，在排序完成后，还要根据id去原表取值。由于语句是limit 1000，因此会多读1000行。
 
-> **[图：图6 rowid排序的OPTIMIZER_TRACE部分输出]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图6 rowid 排序的 OPTIMIZER_TRACE 部分输出</div>
+<pre style="margin:0;">"filesort_summary": {
+  "rows":                        4000,
+  "examined_rows":               4000,
+  "number_of_tmp_files":         <span style="color:var(--d-orange);font-weight:bold;">10</span>,
+  "sort_buffer_size":            32768,
+  "sort_mode":
+    "<span style="color:var(--d-green);">&lt;sort_key, rowid&gt;</span>"
+}</pre>
+</div>
+</div>
 
 
 从OPTIMIZER_TRACE的结果中，你还能看到另外两个信息也变了。
@@ -218,7 +403,49 @@ alter table t add index city_user(city, name);
 
 作为与city索引的对比，我们来看看这个索引的示意图。
 
-> **[图：图7 city和name联合索引示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图7 city 和 name 联合索引示意图（B+ 树）</div>
+<svg viewBox="0 0 520 230" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowG7" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-green)"/></marker>
+  </defs>
+  <!-- Root -->
+  <rect x="170" y="8" width="180" height="32" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="29" text-anchor="middle" font-size="12" fill="var(--d-text)" font-family="system-ui,sans-serif" font-weight="bold">(city, name) 联合索引</text>
+  <!-- Branches -->
+  <line x1="220" y1="40" x2="90" y2="70" stroke="var(--d-border)" stroke-width="1.2"/>
+  <line x1="260" y1="40" x2="260" y2="70" stroke="var(--d-border)" stroke-width="1.2"/>
+  <line x1="300" y1="40" x2="430" y2="70" stroke="var(--d-border)" stroke-width="1.2"/>
+  <!-- Leaf: other -->
+  <rect x="10" y="70" width="160" height="28" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="90" y="89" text-anchor="middle" font-size="10" fill="var(--d-text-sub)" font-family="'Courier New',monospace">... 上海 ...</text>
+  <!-- Leaf: 杭州 (sorted by name) -->
+  <rect x="175" y="70" width="170" height="28" rx="5" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="260" y="89" text-anchor="middle" font-size="10" fill="var(--d-text)" font-weight="bold" font-family="'Courier New',monospace">杭州,name 有序排列</text>
+  <!-- Leaf: other -->
+  <rect x="350" y="70" width="160" height="28" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="430" y="89" text-anchor="middle" font-size="10" fill="var(--d-text-sub)" font-family="'Courier New',monospace">... 苏州 ...</text>
+  <!-- Expanded entries for 杭州 -->
+  <line x1="210" y1="98" x2="80" y2="125" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="260" y1="98" x2="260" y2="125" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="310" y1="98" x2="440" y2="125" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="3,3"/>
+  <rect x="15" y="125" width="130" height="40" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="80" y="142" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">杭州, <tspan font-weight="bold" fill="var(--d-green)">Alice</tspan></text>
+  <text x="80" y="158" text-anchor="middle" font-size="9" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=101</text>
+  <rect x="195" y="125" width="130" height="40" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="260" y="142" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">杭州, <tspan font-weight="bold" fill="var(--d-green)">Bob</tspan></text>
+  <text x="260" y="158" text-anchor="middle" font-size="9" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=305</text>
+  <rect x="375" y="125" width="130" height="40" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="440" y="142" text-anchor="middle" font-size="10" fill="var(--d-text)" font-family="'Courier New',monospace">杭州, <tspan font-weight="bold" fill="var(--d-green)">Carl</tspan></text>
+  <text x="440" y="158" text-anchor="middle" font-size="9" fill="var(--d-text-muted)" font-family="'Courier New',monospace">id=520</text>
+  <!-- Arrow showing order -->
+  <line x1="80" y1="175" x2="440" y2="175" stroke="var(--d-green)" stroke-width="2" marker-end="url(#arrowG7)"/>
+  <text x="260" y="195" text-anchor="middle" font-size="11" fill="var(--d-green)" font-weight="bold" font-family="system-ui,sans-serif">name 天然有序 → 无需排序!</text>
+  <text x="260" y="215" text-anchor="middle" font-size="10" fill="var(--d-text-muted)" font-family="system-ui,sans-serif">同一 city 内，name 已按 B+ 树顺序排列</text>
+</svg>
+</div>
+</div>
 
 
 在这个索引里面，我们依然可以用树搜索的方式定位到第一个满足city='杭州’的记录，并且额外确保了，接下来按顺序取“下一条记录”的遍历过程中，只要city的值是杭州，name的值就一定是有序的。
@@ -233,12 +460,59 @@ alter table t add index city_user(city, name);
 
   4. 重复步骤2、3，直到查到第1000条记录，或者是不满足city='杭州’条件时循环结束。
 
-> **[图：图8 引入(city,name)联合索引后，查]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图8 引入 (city, name) 联合索引后的查询流程</div>
+<svg viewBox="0 0 480 240" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowB8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+  </defs>
+  <!-- Step 1 -->
+  <rect x="10" y="10" width="180" height="44" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="100" y="28" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">(city, name) 索引</text>
+  <text x="100" y="44" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">找第一个 city='杭州' 的 id</text>
+  <!-- Arrow -->
+  <line x1="190" y1="32" x2="230" y2="32" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#arrowB8)"/>
+  <!-- Step 2 -->
+  <rect x="235" y="10" width="170" height="44" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="320" y="28" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">主键索引（回表）</text>
+  <text x="320" y="44" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">取 name, city, age 直接返回</text>
+  <!-- Loop back -->
+  <path d="M320,54 Q320,80 100,80 Q80,80 80,54" fill="none" stroke="var(--d-text-muted)" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="200" y="95" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">取下一条记录，重复</text>
+  <!-- Result -->
+  <rect x="90" y="120" width="300" height="36" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="240" y="143" text-anchor="middle" font-size="12" fill="var(--d-text)" font-weight="bold">直到第 1000 条或不满足条件 → 返回</text>
+  <!-- Key point -->
+  <rect x="90" y="175" width="300" height="36" rx="6" fill="var(--d-orange)" fill-opacity="0.1" stroke="var(--d-orange)" stroke-width="1.2"/>
+  <text x="240" y="192" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold">无需排序 · 无需临时表 · 只扫描 1000 行</text>
+  <text x="240" y="230" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">name 在索引中已有序，天然满足 ORDER BY</text>
+</svg>
+</div>
+</div>
 
 
 可以看到，这个查询过程不需要临时表，也不需要排序。接下来，我们用explain的结果来印证一下。
 
-> **[图：图9 引入(city,name)联合索引后，查]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图9 引入 (city, name) 联合索引后的 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+       where city='杭州' order by name limit 1000;
+
++----+-------------+-------+------+-----------+-----------+
+| id | select_type | table | type | key       | key_len   |
++----+-------------+-------+------+-----------+-----------+
+|  1 | SIMPLE      | t     | ref  | city_user | 50        |
++----+-------------+-------+------+-----------+-----------+
+| rows | filtered | Extra                                  |
++------+----------+----------------------------------------+
+| 1000 |   100.00 | <span style="color:var(--d-green);font-weight:bold;">Using index condition</span>                 |
++------+----------+----------------------------------------+
+
+<span style="color:var(--d-text-muted);">-- Extra 中没有 Using filesort，说明无需排序</span></pre>
+</div>
+</div>
 
 
 从图中可以看到，Extra字段中没有Using filesort了，也就是不需要排序了。而且由于(city,name)这个联合索引本身有序，所以这个查询也不用把4000行全都读一遍，只要找到满足条件的前1000条记录就可以退出了。也就是说，在我们这个例子里，只需要扫描1000次。
@@ -264,12 +538,53 @@ alter table t add index city_user_age(city, name, age);
 
   3. 重复执行步骤2，直到查到第1000条记录，或者是不满足city='杭州’条件时循环结束。
 
-> **[图：图10 引入(city,name,age)联合索]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:580px;width:100%;">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:12px;text-align:center;">图10 引入 (city, name, age) 覆盖索引后的查询流程</div>
+<svg viewBox="0 0 480 200" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowG10" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-green)"/></marker>
+  </defs>
+  <!-- Single step: index only -->
+  <rect x="60" y="10" width="360" height="50" rx="6" fill="var(--d-green)" fill-opacity="0.1" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="240" y="32" text-anchor="middle" font-size="12" fill="var(--d-text)" font-weight="bold">(city, name, age) 覆盖索引</text>
+  <text x="240" y="50" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">索引中直接包含 city, name, age 三个字段</text>
+  <!-- Arrow -->
+  <line x1="240" y1="60" x2="240" y2="90" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#arrowG10)"/>
+  <!-- Result -->
+  <rect x="60" y="95" width="360" height="50" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="240" y="116" text-anchor="middle" font-size="11" fill="var(--d-text)" font-weight="bold">直接从索引取出 city, name, age 返回</text>
+  <text x="240" y="134" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">无需回表 · 无需排序 · 顺序读取前 1000 条</text>
+  <!-- Highlight box -->
+  <rect x="100" y="160" width="280" height="30" rx="6" fill="var(--d-orange)" fill-opacity="0.1" stroke="var(--d-orange)" stroke-width="1.2"/>
+  <text x="240" y="180" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold">Using index（覆盖索引）· 性能最优</text>
+</svg>
+</div>
+</div>
 
 
 然后，我们再来看看explain的结果。
 
-> **[图：图11 引入(city,name,age)联合索]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图11 引入 (city, name, age) 覆盖索引后的 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select city,name,age from t
+       where city='杭州' order by name limit 1000;
+
++----+-------------+-------+------+---------------+------+
+| id | select_type | table | type | key           | rows |
++----+-------------+-------+------+---------------+------+
+|  1 | SIMPLE      | t     | ref  | city_user_age | 1000 |
++----+-------------+-------+------+---------------+------+
+| filtered | Extra                                        |
++----------+----------------------------------------------+
+|   100.00 | <span style="color:var(--d-green);font-weight:bold;">Using where; Using index</span>                    |
++----------+----------------------------------------------+
+
+<span style="color:var(--d-text-muted);">-- Using index = 覆盖索引，无需回表</span>
+<span style="color:var(--d-text-muted);">-- 无 Using filesort，说明无需排序</span></pre>
+</div>
+</div>
 
 
 可以看到，Extra字段里面多了“`Using index`”，表示的就是使用了覆盖索引，性能上会快很多。
@@ -309,7 +624,24 @@ mysql> select * from t where city in ('杭州',"苏州") order by name limit 100
 
 假设，当前表t里的值是(1,2)。
 
-> **[图：图12 锁验证方式]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图12 锁验证方式</div>
+<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+┌─────────────────────────┬─────────────────────────────┐
+│                         │                             │
+│ <span style="color:var(--d-blue);">begin;</span>                  │                             │
+│ <span style="color:var(--d-blue);">update t set a=2</span>        │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│                         │                             │
+│                         │ <span style="color:var(--d-orange);">update t set a=2</span>            │
+│                         │ <span style="color:var(--d-orange);">  where id=1;</span>               │
+│                         │ <span style="color:var(--d-orange);font-weight:bold;">(blocked)</span>                   │
+│                         │                             │
+└─────────────────────────┴─────────────────────────────┘
+<span style="color:var(--d-text-muted);">-- session B 被锁住，说明 MySQL 确实执行了更新（加锁）</span></pre>
+</div>
+</div>
 
 
 session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的，所以排除选项1。
@@ -318,7 +650,31 @@ session B的update 语句被blocked了，加锁这个动作是InnoDB才能做的
 
 假设当前表里的值是(1,2)。
 
-> **[图：图13 可见性验证方式]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图13 可见性验证方式</div>
+<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+┌─────────────────────────┬─────────────────────────────┐
+│                         │                             │
+│ <span style="color:var(--d-blue);">begin;</span>                  │                             │
+│ <span style="color:var(--d-blue);">select * from t</span>         │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│ → 返回 <span style="color:var(--d-green);">(1, 2)</span>           │                             │
+│                         │                             │
+│                         │ <span style="color:var(--d-orange);">update t set a=3</span>            │
+│                         │ <span style="color:var(--d-orange);">  where id=1;</span>               │
+│                         │                             │
+│ <span style="color:var(--d-blue);">update t set a=2</span>        │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│                         │                             │
+│ <span style="color:var(--d-blue);">select * from t</span>         │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│ → 返回 <span style="color:var(--d-orange);font-weight:bold;">(1, 3)</span>           │                             │
+│                         │                             │
+└─────────────────────────┴─────────────────────────────┘
+<span style="color:var(--d-text-muted);">-- 一致性读看到 (1,3)，说明 session A 的 update 生成了新版本</span></pre>
+</div>
+</div>
 
 
 session A的第二个select 语句是一致性读（快照读)，它是不能看见session B的更新的。
@@ -333,7 +689,29 @@ session A的第二个select 语句是一致性读（快照读)，它是不能看
 
 作为验证，你可以看一下下面这个例子。
 
-> **[图：图14 可见性验证方式--对照]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图14 可见性验证方式 -- 对照</div>
+<pre style="margin:0;"><span style="color:var(--d-th-text);font-weight:bold;">        session A                     session B</span>
+┌─────────────────────────┬─────────────────────────────┐
+│                         │                             │
+│ <span style="color:var(--d-blue);">begin;</span>                  │                             │
+│ <span style="color:var(--d-blue);">select * from t</span>         │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│ → 返回 <span style="color:var(--d-green);">(1, 2)</span>           │                             │
+│                         │                             │
+│                         │ <span style="color:var(--d-orange);">update t set a=3</span>            │
+│                         │ <span style="color:var(--d-orange);">  where id=1;</span>               │
+│                         │                             │
+│ <span style="color:var(--d-blue);">select * from t</span>         │                             │
+│ <span style="color:var(--d-blue);">  where id=1;</span>           │                             │
+│ → 返回 <span style="color:var(--d-green);font-weight:bold;">(1, 2)</span>           │                             │
+│                         │                             │
+└─────────────────────────┴─────────────────────────────┘
+<span style="color:var(--d-text-muted);">-- 未执行 update 时，一致性读仍为 (1,2)，证明上例的</span>
+<span style="color:var(--d-text-muted);">-- (1,3) 确实是 session A 的 update 产生的新版本</span></pre>
+</div>
+</div>
 
 
 **补充说明：**
@@ -348,7 +726,24 @@ session A的第二个select 语句是一致性读（快照读)，它是不能看
 
 对应的代码如图15所示。这是MySQL 5.6版本引入的，在此之前我没有看过。所以，特此说明。
 
-> **[图：图15 `binlog_row_image`=F]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图15 binlog_row_image=FULL 时的判断逻辑（MySQL 5.6+）</div>
+<pre style="margin:0;"><span style="color:var(--d-text-muted);">/* mysql-server/sql/sql_update.cc */</span>
+
+if (<span style="color:var(--d-blue);">binlog_row_image</span> != BINLOG_ROW_IMAGE_MINIMAL) {
+  <span style="color:var(--d-text-muted);">// 需要读出所有字段用于 binlog 记录</span>
+  <span style="color:var(--d-orange);">bitmap_set_all</span>(table->read_set);
+}
+
+<span style="color:var(--d-text-muted);">// 读取了所有字段后，MySQL 会对比新旧值</span>
+<span style="color:var(--d-text-muted);">// 如果发现值没变，则不会实际执行更新</span>
+if (<span style="color:var(--d-green);">table->compare_records</span>()) {
+  <span style="color:var(--d-text-muted);">// 值相同，跳过更新</span>
+  return;
+}</pre>
+</div>
+</div>
 
 
 类似的，@mahonebags 同学提到了timestamp字段的问题。结论是：如果表中有timestamp字段而且设置了自动更新的话，那么更新“别的字段”的时候，MySQL会读入所有涉及的字段，这样通过判断，就会发现不需要修改。

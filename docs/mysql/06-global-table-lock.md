@@ -35,7 +35,41 @@ description: "极客时间《MySQL 实战 45 讲》第 06 讲笔记整理"
 
 如果时间顺序上是先备份账户余额表(u_account)，然后用户购买，然后备份用户课程表(u_course)，会怎么样呢？你可以看一下这个图：
 
-> **[图：图1 业务和备份状态图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:620px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">图1 业务和备份状态图</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:12%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:44%;color:var(--d-th-text);">备份系统</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:44%;color:var(--d-th-text);">用户购买操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">备份 u_account 表<br><span style="color:var(--d-text-muted);font-size:12px;">（余额 = 200）</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">购买课程：扣余额 <strong style="color:var(--d-orange);">200 → 100</strong>，加课程</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">备份 u_course 表<br><span style="color:var(--d-text-muted);font-size:12px;">（已有新课程）</span></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:6px;text-align:center;font-size:12px;color:var(--d-text-muted);">结果：备份中余额 = 200（未扣），但课程表已有新课程 → <strong style="color:var(--d-orange);">数据不一致！</strong></div>
+  <div style="margin-top:12px;padding:10px 14px;border-left:4px solid var(--d-warn-border);background:var(--d-warn-bg);border-radius:4px;color:var(--d-warn-text);font-size:13px;">
+    ⚠ 恢复数据后：用户余额没扣，但课程表多了一门课 → <strong>逻辑不一致</strong>
+  </div>
+</div>
+</div>
 
 
 可以看到，这个备份结果里，用户A的数据状态是“账户余额没扣，但是用户课程表里面已经多了一门课”。如果后面用这个备份来恢复数据的话，用户A就发现，自己赚了。
@@ -91,7 +125,62 @@ MySQL里面表级别的锁有两种：一种是表锁，一种是元数据锁（
 
 > 备注：这里的实验环境是MySQL 5.6。
 
-> **[图：示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:620px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">MDL 锁阻塞场景示意图</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 6px;border:1px solid var(--d-th-border);width:10%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 6px;border:1px solid var(--d-th-border);width:22%;color:var(--d-th-text);">Session A</th>
+        <th style="padding:8px 6px;border:1px solid var(--d-th-border);width:22%;color:var(--d-th-text);">Session B</th>
+        <th style="padding:8px 6px;border:1px solid var(--d-th-border);width:24%;color:var(--d-th-text);">Session C</th>
+        <th style="padding:8px 6px;border:1px solid var(--d-th-border);width:22%;color:var(--d-th-text);">Session D</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px;border:1px solid var(--d-border);"><code style="font-size:12px;">BEGIN;</code></td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px;border:1px solid var(--d-border);"><code style="font-size:12px;">SELECT * FROM t</code><br><span style="font-size:11px;color:var(--d-green);">获取 MDL 读锁 ✓</span></td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);"><code style="font-size:12px;">SELECT * FROM t</code><br><span style="font-size:11px;color:var(--d-green);">获取 MDL 读锁 ✓</span></td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);"><code style="font-size:12px;">ALTER TABLE t ADD col</code><br><span style="font-size:11px;color:var(--d-orange);font-weight:bold;">需要 MDL 写锁 — blocked!</span></td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T5</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px;border:1px solid var(--d-border);"><code style="font-size:12px;">SELECT * FROM t</code><br><span style="font-size:11px;color:var(--d-orange);font-weight:bold;">需要 MDL 读锁 — blocked!</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="margin-top:10px;padding:10px 14px;border-left:4px solid var(--d-warn-border);background:var(--d-warn-bg);border-radius:4px;color:var(--d-warn-text);font-size:12px;">
+    ⚠ Session C 申请 MDL 写锁被 A 的读锁阻塞后，后续所有新的 MDL 读锁请求（Session D 等）也会被排在写锁之后，导致表完全不可读写。
+  </div>
+</div>
+</div>
 
 
 我们可以看到session A先启动，这时候会对表t加一个MDL读锁。由于session B需要的也是MDL读锁，因此可以正常执行。

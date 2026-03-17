@@ -25,7 +25,72 @@ description: "极客时间《MySQL 实战 45 讲》第 04 讲笔记整理"
 
 假设，你现在维护着一个身份证信息和姓名的表，需要根据身份证号查找对应的名字，这时对应的哈希索引的示意图如下所示：
 
-> **[图：图1 哈希表示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <!-- Title -->
+  <text x="280" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图1 哈希表示意图</text>
+  <!-- Hash function label -->
+  <rect x="200" y="44" width="120" height="30" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="64" text-anchor="middle" font-size="12" fill="var(--d-blue)">hash(ID_card)</text>
+  <!-- Array on the left -->
+  <rect x="40" y="90" width="70" height="220" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="75" y="82" text-anchor="middle" font-size="11" fill="var(--d-text-sub)" font-weight="bold">数组</text>
+  <!-- Index 0 -->
+  <line x1="40" y1="130" x2="110" y2="130" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="55" y="118" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">0</text>
+  <!-- Index 1 -->
+  <line x1="40" y1="170" x2="110" y2="170" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="55" y="158" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">1</text>
+  <!-- Index ... -->
+  <text x="55" y="195" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">...</text>
+  <!-- Index N -->
+  <line x1="40" y1="210" x2="110" y2="210" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="55" y="230" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">N</text>
+  <!-- Index ... -->
+  <line x1="40" y1="250" x2="110" y2="250" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="55" y="270" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">...</text>
+  <!-- User1 at index 0 -->
+  <rect x="140" y="98" width="72" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="176" y="117" text-anchor="middle" font-size="11" fill="var(--d-text)">User1</text>
+  <line x1="110" y1="112" x2="140" y2="112" stroke="var(--d-blue-border)" stroke-width="1.5" marker-end="url(#arrowBlue1)"/>
+  <!-- User3 at index 1 -->
+  <rect x="140" y="138" width="72" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="176" y="157" text-anchor="middle" font-size="11" fill="var(--d-text)">User3</text>
+  <line x1="110" y1="152" x2="140" y2="152" stroke="var(--d-blue-border)" stroke-width="1.5" marker-end="url(#arrowBlue1)"/>
+  <!-- User2 at index N -->
+  <rect x="140" y="216" width="72" height="28" rx="6" fill="var(--d-orange)" stroke="var(--d-orange)" stroke-width="1.5" fill-opacity="0.15"/>
+  <text x="176" y="235" text-anchor="middle" font-size="11" fill="var(--d-text)">User2</text>
+  <line x1="110" y1="230" x2="140" y2="230" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowOrange1)"/>
+  <!-- User4 linked after User2 (collision) -->
+  <rect x="250" y="216" width="72" height="28" rx="6" fill="var(--d-orange)" stroke="var(--d-orange)" stroke-width="1.5" fill-opacity="0.15"/>
+  <text x="286" y="235" text-anchor="middle" font-size="11" fill="var(--d-text)">User4</text>
+  <line x1="212" y1="230" x2="250" y2="230" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#arrowOrange1)"/>
+  <!-- Collision label -->
+  <text x="220" y="260" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">链表(冲突)</text>
+  <!-- Hash arrows from ID_card to array -->
+  <text x="380" y="112" font-size="10" fill="var(--d-text-sub)">ID_card_n1</text>
+  <path d="M 375,108 C 300,108 200,70 75,92" fill="none" stroke="var(--d-blue-border)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowBlue1)"/>
+  <text x="380" y="152" font-size="10" fill="var(--d-text-sub)">ID_card_n3</text>
+  <path d="M 375,148 C 300,148 200,130 75,135" fill="none" stroke="var(--d-blue-border)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowBlue1)"/>
+  <text x="380" y="210" font-size="10" fill="var(--d-text-sub)">ID_card_n2</text>
+  <path d="M 375,206 C 300,206 200,210 75,213" fill="none" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowOrange1)"/>
+  <text x="380" y="240" font-size="10" fill="var(--d-text-sub)">ID_card_n4</text>
+  <path d="M 375,236 C 300,250 200,240 75,222" fill="none" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowOrange1)"/>
+  <!-- Both hash to N label -->
+  <text x="460" y="225" font-size="9" fill="var(--d-orange)">→ 都映射到 N</text>
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowBlue1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-blue-border)"/>
+    </marker>
+    <marker id="arrowOrange1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+</div>
 
 
 图中，User2和User4根据身份证号算出来的值都是N，但没关系，后面还跟了一个链表。假设，这时候你要查ID_card_n2对应的名字是什么，处理步骤就是：首先，将ID_card_n2通过哈希函数算出N；然后，按顺序遍历，找到User2。
@@ -38,7 +103,56 @@ description: "极客时间《MySQL 实战 45 讲》第 04 讲笔记整理"
 
 而**有序数组在等值查询和范围查询场景中的性能就都非常优秀** 。还是上面这个根据身份证号查名字的例子，如果我们使用有序数组来实现的话，示意图如下所示：
 
-> **[图：图2 有序数组示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <!-- Title -->
+  <text x="280" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图2 有序数组示意图</text>
+  <!-- Array cells -->
+  <rect x="30" y="60" width="90" height="50" rx="0" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <rect x="120" y="60" width="90" height="50" rx="0" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="2"/>
+  <rect x="210" y="60" width="90" height="50" rx="0" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <rect x="300" y="60" width="90" height="50" rx="0" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <rect x="390" y="60" width="90" height="50" rx="0" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <rect x="480" y="60" width="50" height="50" rx="0" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <!-- Cell content - ID_card values -->
+  <text x="75" y="80" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ID_card_n1</text>
+  <text x="75" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">User1</text>
+  <text x="165" y="80" text-anchor="middle" font-size="9" fill="var(--d-cur-text)">ID_card_n2</text>
+  <text x="165" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-cur-text)">User2</text>
+  <text x="255" y="80" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ID_card_n3</text>
+  <text x="255" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">User3</text>
+  <text x="345" y="80" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ID_card_n4</text>
+  <text x="345" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">User4</text>
+  <text x="435" y="80" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ID_card_n5</text>
+  <text x="435" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">User5</text>
+  <text x="505" y="90" text-anchor="middle" font-size="14" fill="var(--d-text-muted)">...</text>
+  <!-- Sorted indicator arrow -->
+  <line x1="50" y1="125" x2="470" y2="125" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#arrowGreen2)"/>
+  <text x="260" y="142" text-anchor="middle" font-size="10" fill="var(--d-green)">按 ID_card_n 递增排序</text>
+  <!-- Binary search arrow -->
+  <path d="M 165,55 L 165,40" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#arrowOrange2)"/>
+  <text x="165" y="35" text-anchor="middle" font-size="10" fill="var(--d-orange)">二分查找 O(log N)</text>
+  <!-- Index labels -->
+  <text x="75" y="55" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+  <text x="165" y="55" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">1</text>
+  <text x="255" y="55" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">2</text>
+  <text x="345" y="55" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">3</text>
+  <text x="435" y="55" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">4</text>
+  <!-- Range query hint -->
+  <rect x="100" y="160" width="320" height="28" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1"/>
+  <text x="260" y="179" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">支持等值查询与范围查询，但更新代价高（需挪动数据）</text>
+  <defs>
+    <marker id="arrowGreen2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/>
+    </marker>
+    <marker id="arrowOrange2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+</div>
 
 
 这里我们假设身份证号没有重复，这个数组就是按照身份证号递增的顺序保存的。这时候如果你要查ID_card_n2对应的名字，用二分法就可以快速得到，这个时间复杂度是O(log(N))。
@@ -51,7 +165,54 @@ description: "极客时间《MySQL 实战 45 讲》第 04 讲笔记整理"
 
 二叉搜索树也是课本里的经典数据结构了。还是上面根据身份证号查名字的例子，如果我们用二叉搜索树来实现的话，示意图如下所示：
 
-> **[图：图3 二叉搜索树示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:560px;width:100%;">
+<svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowSearch3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+  <!-- Title -->
+  <text x="280" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图3 二叉搜索树示意图</text>
+  <!-- Level 0: Root - UserA -->
+  <circle cx="280" cy="70" r="28" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="2"/>
+  <text x="280" y="75" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserA</text>
+  <!-- Level 1: UserC (left), UserE (right) -->
+  <!-- Edge: UserA -> UserC (search path) -->
+  <line x1="255" y1="90" x2="160" y2="140" stroke="var(--d-orange)" stroke-width="2.5"/>
+  <!-- Edge: UserA -> UserE -->
+  <line x1="305" y1="90" x2="400" y2="140" stroke="var(--d-border)" stroke-width="1.5"/>
+  <circle cx="155" cy="160" r="28" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="2"/>
+  <text x="155" y="165" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserC</text>
+  <circle cx="405" cy="160" r="28" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="405" y="165" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserE</text>
+  <!-- Level 2: UserF, UserG (children of UserC), User2, UserD (children of UserE) -->
+  <!-- Edge: UserC -> UserF (search path) -->
+  <line x1="133" y1="182" x2="85" y2="230" stroke="var(--d-orange)" stroke-width="2.5"/>
+  <!-- Edge: UserC -> UserG -->
+  <line x1="177" y1="182" x2="225" y2="230" stroke="var(--d-border)" stroke-width="1.5"/>
+  <!-- Edge: UserE -> User2 -->
+  <line x1="383" y1="182" x2="335" y2="230" stroke="var(--d-border)" stroke-width="1.5"/>
+  <!-- Edge: UserE -> UserD -->
+  <line x1="427" y1="182" x2="475" y2="230" stroke="var(--d-border)" stroke-width="1.5"/>
+  <circle cx="80" cy="250" r="28" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-width="2"/>
+  <text x="80" y="255" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserF</text>
+  <circle cx="230" cy="250" r="28" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="230" y="255" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserG</text>
+  <circle cx="330" cy="250" r="28" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="330" y="255" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">User2</text>
+  <circle cx="480" cy="250" r="28" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="480" y="255" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">UserD</text>
+  <!-- Search path: UserF -> User2 -->
+  <line x1="105" y1="260" x2="300" y2="260" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowSearch3)"/>
+  <text x="200" y="278" text-anchor="middle" font-size="9" fill="var(--d-orange)">继续搜索</text>
+  <!-- Search path annotation -->
+  <rect x="130" y="300" width="300" height="28" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1"/>
+  <text x="280" y="319" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">搜索路径：UserA → UserC → UserF → User2 O(log N)</text>
+</svg>
+</div>
+</div>
 
 
 二叉搜索树的特点是：每个节点的左儿子小于父节点，父节点又小于右儿子。这样如果你要查ID_card_n2的话，按照图中的搜索顺序就是按照UserA -> UserC -> UserF -> User2这个路径得到。这个时间复杂度是O(log(N))。
@@ -99,7 +260,159 @@ index (k))engine=InnoDB;
 
 表中R1~R5的(ID,k)值分别为(100,1)、(200,2)、(300,3)、(500,5)和(600,6)，两棵树的示例示意图如下。
 
-> **[图：图4 InnoDB的索引组织结构]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:720px;width:100%;">
+<svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrowDown4" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 5 10 L 10 0 z" fill="var(--d-blue-border)"/>
+    </marker>
+    <marker id="arrowDown4g" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 5 10 L 10 0 z" fill="var(--d-green)"/>
+    </marker>
+  </defs>
+  <!-- Title -->
+  <text x="360" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图4 InnoDB 的索引组织结构</text>
+
+  <!-- ===== LEFT: Primary Key Index ===== -->
+  <text x="180" y="50" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-blue)">主键索引 (ID)</text>
+  <text x="180" y="65" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">聚簇索引 — 叶子节点存整行数据</text>
+
+  <!-- Root node -->
+  <rect x="120" y="80" width="120" height="32" rx="6" fill="var(--d-indigo)" fill-opacity="0.12" stroke="var(--d-indigo)" stroke-width="1.5"/>
+  <text x="180" y="101" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">300</text>
+
+  <!-- Internal nodes level 2 -->
+  <rect x="40" y="145" width="100" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="90" y="164" text-anchor="middle" font-size="10" fill="var(--d-text)">100  200</text>
+  <rect x="210" y="145" width="100" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="260" y="164" text-anchor="middle" font-size="10" fill="var(--d-text)">500  600</text>
+
+  <!-- Edges root -> internal -->
+  <line x1="150" y1="112" x2="90" y2="145" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+  <line x1="210" y1="112" x2="260" y2="145" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+
+  <!-- Leaf nodes (contain full rows) -->
+  <rect x="8" y="210" width="62" height="65" rx="6" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+  <text x="39" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-cur-text)">R1</text>
+  <text x="39" y="242" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID=100</text>
+  <text x="39" y="255" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">k=1</text>
+  <text x="39" y="268" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">name…</text>
+
+  <rect x="78" y="210" width="62" height="65" rx="6" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+  <text x="109" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-cur-text)">R2</text>
+  <text x="109" y="242" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID=200</text>
+  <text x="109" y="255" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">k=2</text>
+  <text x="109" y="268" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">name…</text>
+
+  <rect x="148" y="210" width="62" height="65" rx="6" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+  <text x="179" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-cur-text)">R3</text>
+  <text x="179" y="242" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID=300</text>
+  <text x="179" y="255" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">k=3</text>
+  <text x="179" y="268" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">name…</text>
+
+  <rect x="218" y="210" width="62" height="65" rx="6" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+  <text x="249" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-cur-text)">R4</text>
+  <text x="249" y="242" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID=500</text>
+  <text x="249" y="255" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">k=5</text>
+  <text x="249" y="268" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">name…</text>
+
+  <rect x="288" y="210" width="62" height="65" rx="6" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.5"/>
+  <text x="319" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-cur-text)">R5</text>
+  <text x="319" y="242" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">ID=600</text>
+  <text x="319" y="255" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">k=6</text>
+  <text x="319" y="268" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">name…</text>
+
+  <!-- Edges internal -> leaves (left group) -->
+  <line x1="65" y1="173" x2="39" y2="210" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <line x1="90" y1="173" x2="109" y2="210" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <line x1="115" y1="173" x2="179" y2="210" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <!-- Edges internal -> leaves (right group) -->
+  <line x1="240" y1="173" x2="249" y2="210" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <line x1="280" y1="173" x2="319" y2="210" stroke="var(--d-blue-border)" stroke-width="1"/>
+
+  <!-- Leaf linked list arrows -->
+  <line x1="70" y1="242" x2="78" y2="242" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="140" y1="242" x2="148" y2="242" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="210" y1="242" x2="218" y2="242" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="280" y1="242" x2="288" y2="242" stroke="var(--d-border-dash)" stroke-width="1"/>
+
+  <!-- ===== RIGHT: Secondary Index on k ===== -->
+  <text x="540" y="50" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-green)">非主键索引 (k)</text>
+  <text x="540" y="65" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">二级索引 — 叶子节点存主键值</text>
+
+  <!-- Root node -->
+  <rect x="480" y="80" width="120" height="32" rx="6" fill="var(--d-green)" fill-opacity="0.12" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="540" y="101" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">3</text>
+
+  <!-- Internal nodes level 2 -->
+  <rect x="410" y="145" width="80" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-green)" stroke-width="1.5" fill-opacity="0.6"/>
+  <text x="450" y="164" text-anchor="middle" font-size="10" fill="var(--d-text)">1  2</text>
+  <rect x="560" y="145" width="80" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-green)" stroke-width="1.5" fill-opacity="0.6"/>
+  <text x="600" y="164" text-anchor="middle" font-size="10" fill="var(--d-text)">5  6</text>
+
+  <!-- Edges root -> internal -->
+  <line x1="510" y1="112" x2="450" y2="145" stroke="var(--d-green)" stroke-width="1.2"/>
+  <line x1="570" y1="112" x2="600" y2="145" stroke="var(--d-green)" stroke-width="1.2"/>
+
+  <!-- Leaf nodes (contain k value + primary key) -->
+  <rect x="385" y="210" width="52" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="411" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-text)">k=1</text>
+  <text x="411" y="248" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">ID:100</text>
+
+  <rect x="443" y="210" width="52" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="469" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-text)">k=2</text>
+  <text x="469" y="248" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">ID:200</text>
+
+  <rect x="501" y="210" width="52" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="527" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-text)">k=3</text>
+  <text x="527" y="248" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">ID:300</text>
+
+  <rect x="559" y="210" width="52" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="585" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-text)">k=5</text>
+  <text x="585" y="248" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">ID:500</text>
+
+  <rect x="617" y="210" width="52" height="50" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="643" y="228" text-anchor="middle" font-size="9" font-weight="bold" fill="var(--d-text)">k=6</text>
+  <text x="643" y="248" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">ID:600</text>
+
+  <!-- Edges internal -> leaves (left group) -->
+  <line x1="430" y1="173" x2="411" y2="210" stroke="var(--d-green)" stroke-width="1"/>
+  <line x1="450" y1="173" x2="469" y2="210" stroke="var(--d-green)" stroke-width="1"/>
+  <line x1="470" y1="173" x2="527" y2="210" stroke="var(--d-green)" stroke-width="1"/>
+  <!-- Edges internal -> leaves (right group) -->
+  <line x1="585" y1="173" x2="585" y2="210" stroke="var(--d-green)" stroke-width="1"/>
+  <line x1="615" y1="173" x2="643" y2="210" stroke="var(--d-green)" stroke-width="1"/>
+
+  <!-- Leaf linked list arrows -->
+  <line x1="437" y1="235" x2="443" y2="235" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="495" y1="235" x2="501" y2="235" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="553" y1="235" x2="559" y2="235" stroke="var(--d-border-dash)" stroke-width="1"/>
+  <line x1="611" y1="235" x2="617" y2="235" stroke="var(--d-border-dash)" stroke-width="1"/>
+
+  <!-- Back-reference arrow from secondary to primary (回表) -->
+  <path d="M 585,260 C 585,340 319,340 319,280" fill="none" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowOrange4)"/>
+  <text x="452" y="350" text-anchor="middle" font-size="10" fill="var(--d-orange)" font-weight="bold">回表：通过 ID 查主键索引获取整行</text>
+
+  <!-- Separator line -->
+  <line x1="370" y1="45" x2="370" y2="290" stroke="var(--d-border-dash)" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Legend -->
+  <rect x="140" y="295" width="12" height="12" rx="2" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1"/>
+  <text x="158" y="306" font-size="9" fill="var(--d-text-sub)">叶子存整行数据</text>
+  <rect x="280" y="295" width="12" height="12" rx="2" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="298" y="306" font-size="9" fill="var(--d-text-sub)">叶子存主键 ID</text>
+  <line x1="420" y1="301" x2="450" y2="301" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="458" y="306" font-size="9" fill="var(--d-text-sub)">回表查询</text>
+
+  <defs>
+    <marker id="arrowOrange4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+</div>
 
 
 从图中不难看出，根据叶子节点的内容，索引类型分为主键索引和非主键索引。

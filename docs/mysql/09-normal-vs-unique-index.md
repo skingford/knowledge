@@ -32,7 +32,105 @@ select name from CUser where id_card = 'xxxxxxxyyyyyyzzzzz';
 
 简单起见，我们还是用第4篇文章[《深入浅出索引（上）》](<https://time.geekbang.org/column/article/69236>)中的例子来说明，假设字段 k 上的值都不重复。
 
-> **[图：图1 InnoDB的索引组织结构]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
+  <style>
+    .title{font-size:13px;font-weight:700;fill:var(--d-text)}
+    .node{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2}
+    .leaf{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2}
+    .cur{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1.5}
+    .txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+    .stxt{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+    .label{font-size:11px;fill:var(--d-text-sub);text-anchor:middle;font-weight:600}
+    .arrow{stroke:var(--d-text-muted);stroke-width:1;fill:none;marker-end:url(#ah)}
+  </style>
+  <defs><marker id="ah" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
+  <!-- Title -->
+  <text x="280" y="18" class="title" text-anchor="middle">图1 InnoDB的索引组织结构</text>
+  <!-- Left: Primary Key Index -->
+  <text x="130" y="42" class="label">主键索引 (ID)</text>
+  <!-- Root -->
+  <rect x="90" y="50" width="80" height="24" rx="4" class="node"/>
+  <text x="130" y="65" class="txt">300</text>
+  <!-- Level 2 -->
+  <rect x="40" y="100" width="60" height="24" rx="4" class="node"/>
+  <text x="70" y="115" class="txt">100, 200</text>
+  <rect x="160" y="100" width="60" height="24" rx="4" class="node"/>
+  <text x="190" y="115" class="txt">500, 600</text>
+  <line x1="110" y1="74" x2="70" y2="100" class="arrow"/>
+  <line x1="150" y1="74" x2="190" y2="100" class="arrow"/>
+  <!-- Leaf nodes -->
+  <rect x="5" y="155" width="50" height="44" rx="4" class="leaf"/>
+  <text x="30" y="170" class="stxt">R1</text>
+  <text x="30" y="182" class="stxt">ID=100</text>
+  <text x="30" y="193" class="stxt">k=1</text>
+  <rect x="60" y="155" width="50" height="44" rx="4" class="leaf"/>
+  <text x="85" y="170" class="stxt">R2</text>
+  <text x="85" y="182" class="stxt">ID=200</text>
+  <text x="85" y="193" class="stxt">k=2</text>
+  <rect x="115" y="155" width="50" height="44" rx="4" class="leaf"/>
+  <text x="140" y="170" class="stxt">R3</text>
+  <text x="140" y="182" class="stxt">ID=300</text>
+  <text x="140" y="193" class="stxt">k=3</text>
+  <rect x="170" y="155" width="50" height="44" rx="4" class="cur"/>
+  <text x="195" y="170" class="stxt">R4</text>
+  <text x="195" y="182" class="stxt">ID=500</text>
+  <text x="195" y="193" class="stxt">k=5</text>
+  <rect x="225" y="155" width="50" height="44" rx="4" class="leaf"/>
+  <text x="250" y="170" class="stxt">R5</text>
+  <text x="250" y="182" class="stxt">ID=600</text>
+  <text x="250" y="193" class="stxt">k=6</text>
+  <line x1="55" y1="124" x2="30" y2="155" class="arrow"/>
+  <line x1="70" y1="124" x2="85" y2="155" class="arrow"/>
+  <line x1="85" y1="124" x2="140" y2="155" class="arrow"/>
+  <line x1="180" y1="124" x2="195" y2="155" class="arrow"/>
+  <line x1="200" y1="124" x2="250" y2="155" class="arrow"/>
+  <!-- Leaf chain arrows -->
+  <line x1="55" y1="177" x2="60" y2="177" class="arrow" style="marker-end:none"/>
+  <line x1="110" y1="177" x2="115" y2="177" class="arrow" style="marker-end:none"/>
+  <line x1="165" y1="177" x2="170" y2="177" class="arrow" style="marker-end:none"/>
+  <line x1="220" y1="177" x2="225" y2="177" class="arrow" style="marker-end:none"/>
+  <!-- Right: Secondary Index on k -->
+  <text x="420" y="42" class="label">非主键索引 (k)</text>
+  <!-- Root -->
+  <rect x="380" y="50" width="80" height="24" rx="4" class="node"/>
+  <text x="420" y="65" class="txt">3</text>
+  <!-- Level 2 -->
+  <rect x="330" y="100" width="60" height="24" rx="4" class="node"/>
+  <text x="360" y="115" class="txt">1, 2</text>
+  <rect x="450" y="100" width="60" height="24" rx="4" class="node"/>
+  <text x="480" y="115" class="txt">5, 6</text>
+  <line x1="400" y1="74" x2="360" y2="100" class="arrow"/>
+  <line x1="440" y1="74" x2="480" y2="100" class="arrow"/>
+  <!-- Leaf nodes with (k, ID) pairs -->
+  <rect x="300" y="155" width="40" height="38" rx="4" class="leaf"/>
+  <text x="320" y="170" class="stxt">(1,100)</text>
+  <rect x="345" y="155" width="40" height="38" rx="4" class="leaf"/>
+  <text x="365" y="170" class="stxt">(2,200)</text>
+  <rect x="390" y="155" width="40" height="38" rx="4" class="leaf"/>
+  <text x="410" y="170" class="stxt">(3,300)</text>
+  <rect x="435" y="155" width="40" height="38" rx="4" class="cur"/>
+  <text x="455" y="170" class="stxt">(5,500)</text>
+  <rect x="480" y="155" width="40" height="38" rx="4" class="leaf"/>
+  <text x="500" y="170" class="stxt">(6,600)</text>
+  <line x1="345" y1="124" x2="320" y2="155" class="arrow"/>
+  <line x1="360" y1="124" x2="365" y2="155" class="arrow"/>
+  <line x1="375" y1="124" x2="410" y2="155" class="arrow"/>
+  <line x1="470" y1="124" x2="455" y2="155" class="arrow"/>
+  <line x1="490" y1="124" x2="500" y2="155" class="arrow"/>
+  <!-- Leaf chain -->
+  <line x1="340" y1="174" x2="345" y2="174" class="arrow" style="marker-end:none"/>
+  <line x1="385" y1="174" x2="390" y2="174" class="arrow" style="marker-end:none"/>
+  <line x1="430" y1="174" x2="435" y2="174" class="arrow" style="marker-end:none"/>
+  <line x1="475" y1="174" x2="480" y2="174" class="arrow" style="marker-end:none"/>
+  <!-- Annotation -->
+  <text x="130" y="225" class="stxt" style="fill:var(--d-text-muted)">叶子节点存储完整行数据</text>
+  <text x="420" y="225" class="stxt" style="fill:var(--d-text-muted)">叶子节点存储 (k值, 主键ID)</text>
+  <!-- Back-query arrow -->
+  <path d="M455,195 C455,260 195,260 195,200" class="arrow" style="stroke:var(--d-orange);stroke-dasharray:4,3"/>
+  <text x="325" y="275" class="stxt" style="fill:var(--d-orange)">回表查询：通过ID找完整行</text>
+</svg>
+</div>
 
 
 接下来，我们就从这两种索引对查询语句和更新语句的性能影响来进行分析。
@@ -134,7 +232,84 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 
 这里，我们假设当前k索引树的状态，查找到位置后，k1所在的数据页在内存(`InnoDB` `buffer pool`)中，k2所在的数据页不在内存中。如图2所示是带change buffer的更新状态图。
 
-> **[图：图2 带change buffer的更新过程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 370" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
+  <style>
+    .t2{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+    .lbl2{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
+    .box2{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
+    .inner2{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
+    .cb2{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
+    .disk2{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
+    .st2{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
+    .st2s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+    .num{font-size:11px;font-weight:700;text-anchor:middle}
+    .arr2{stroke-width:1.5;fill:none;marker-end:url(#ah2)}
+    .dash2{stroke-dasharray:5,3;stroke-width:1.2;fill:none;marker-end:url(#ah2)}
+  </style>
+  <defs><marker id="ah2" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
+  <text x="280" y="18" class="t2">图2 带change buffer的更新过程</text>
+  <!-- Memory region -->
+  <rect x="10" y="30" width="240" height="180" class="box2" style="fill:var(--d-bg-alt)"/>
+  <text x="130" y="48" class="lbl2">内存 (Memory)</text>
+  <!-- Buffer Pool -->
+  <rect x="20" y="58" width="100" height="60" class="inner2"/>
+  <text x="70" y="74" class="st2">Buffer Pool</text>
+  <text x="70" y="90" class="st2s">Page 1</text>
+  <text x="70" y="102" class="st2s" style="fill:var(--d-green)">(内存中)</text>
+  <!-- Change Buffer -->
+  <rect x="135" y="58" width="105" height="60" class="cb2"/>
+  <text x="187" y="74" class="st2">Change Buffer</text>
+  <text x="187" y="90" class="st2s">"插入 Page 2"</text>
+  <text x="187" y="102" class="st2s" style="fill:var(--d-orange)">(记录变更)</text>
+  <!-- Disk region -->
+  <rect x="280" y="30" width="270" height="280" class="box2" style="fill:var(--d-bg)"/>
+  <text x="415" y="48" class="lbl2">磁盘 (Disk)</text>
+  <!-- Data tablespace -->
+  <rect x="295" y="58" width="110" height="70" class="disk2"/>
+  <text x="350" y="76" class="st2">数据表空间</text>
+  <text x="350" y="90" class="st2s">(t.ibd)</text>
+  <rect x="305" y="98" width="40" height="22" rx="3" style="fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:0.8"/>
+  <text x="325" y="113" class="st2s">Page 1</text>
+  <rect x="355" y="98" width="40" height="22" rx="3" style="fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:0.8"/>
+  <text x="375" y="113" class="st2s">Page 2</text>
+  <!-- System tablespace -->
+  <rect x="420" y="58" width="120" height="70" class="disk2"/>
+  <text x="480" y="76" class="st2">系统表空间</text>
+  <text x="480" y="92" class="st2s">(ibdata1)</text>
+  <text x="480" y="108" class="st2s">change buffer</text>
+  <text x="480" y="120" class="st2s">持久化数据</text>
+  <!-- Redo log -->
+  <rect x="310" y="150" width="220" height="50" class="disk2" style="fill:var(--d-cur-bg);stroke:var(--d-cur-border)"/>
+  <text x="420" y="172" class="st2">Redo Log (ib_log_fileX)</text>
+  <text x="420" y="186" class="st2s">顺序写入</text>
+  <!-- Arrow 1: Update Page 1 in memory -->
+  <circle cx="38" cy="140" r="10" fill="var(--d-blue)" opacity="0.15" stroke="var(--d-blue)" stroke-width="1"/>
+  <text x="38" y="144" class="num" style="fill:var(--d-blue)">1</text>
+  <line x1="50" y1="140" x2="70" y2="118" class="arr2" style="stroke:var(--d-blue)"/>
+  <text x="30" y="165" class="st2s" style="fill:var(--d-blue)">更新Page 1</text>
+  <!-- Arrow 2: Record in change buffer -->
+  <circle cx="187" cy="140" r="10" fill="var(--d-orange)" opacity="0.15" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="187" y="144" class="num" style="fill:var(--d-orange)">2</text>
+  <line x1="187" y1="130" x2="187" y2="118" class="arr2" style="stroke:var(--d-orange)"/>
+  <text x="187" y="165" class="st2s" style="fill:var(--d-orange)">记录变更</text>
+  <!-- Arrow 3: Redo log for Page 1 -->
+  <circle cx="100" cy="195" r="10" fill="var(--d-green)" opacity="0.15" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="100" y="199" class="num" style="fill:var(--d-green)">3</text>
+  <path d="M112,195 L300,178" class="arr2" style="stroke:var(--d-green)"/>
+  <!-- Arrow 4: Redo log for change buffer -->
+  <circle cx="155" cy="195" r="10" fill="var(--d-green)" opacity="0.15" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="155" y="199" class="num" style="fill:var(--d-green)">4</text>
+  <path d="M167,195 L310,183" class="arr2" style="stroke:var(--d-green)"/>
+  <!-- Dashed: background flush to disk -->
+  <path d="M70,118 Q70,240 325,240 Q325,230 325,120" class="dash2" style="stroke:var(--d-text-muted)"/>
+  <text x="195" y="252" class="st2s" style="fill:var(--d-text-muted)">后台刷盘</text>
+  <path d="M210,118 Q240,260 480,260 Q480,245 480,130" class="dash2" style="stroke:var(--d-text-muted)"/>
+  <text x="370" y="275" class="st2s" style="fill:var(--d-text-muted)">后台刷盘</text>
+  <!-- Legend -->
+  <text x="280" y="340" class="st2s" style="fill:var(--d-text-muted)">实线箭头：事务执行步骤 | 虚线箭头：后台操作（不影响响应时间）</text>
+</svg>
+</div>
 
 
 分析这条更新语句，你会发现它涉及了四个部分：内存、`redo log`（ib_log_fileX）、 数据表空间（t.ibd）、系统表空间（ibdata1）。
@@ -158,7 +333,72 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 
 如果读语句发生在更新语句后不久，内存中的数据都还在，那么此时的这两个读操作就与系统表空间（ibdata1）和 `redo log`（ib_log_fileX）无关了。所以，我在图中就没画出这两部分。
 
-> **[图：图3 带change buffer的读过程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
+  <style>
+    .t3{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+    .lbl3{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
+    .box3{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
+    .inner3{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
+    .cb3{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
+    .disk3{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
+    .st3{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
+    .st3s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+    .n3{font-size:11px;font-weight:700;text-anchor:middle}
+    .a3{stroke-width:1.5;fill:none;marker-end:url(#ah3)}
+  </style>
+  <defs><marker id="ah3" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
+  <text x="280" y="18" class="t3">图3 带change buffer的读过程</text>
+  <!-- Memory -->
+  <rect x="30" y="35" width="300" height="180" class="box3"/>
+  <text x="180" y="53" class="lbl3">内存 (Memory)</text>
+  <!-- Buffer Pool: Page 1 -->
+  <rect x="45" y="63" width="110" height="55" class="inner3"/>
+  <text x="100" y="80" class="st3">Buffer Pool</text>
+  <text x="100" y="94" class="st3s">Page 1</text>
+  <text x="100" y="106" class="st3s" style="fill:var(--d-green)">已在内存中 ✓</text>
+  <!-- Change Buffer -->
+  <rect x="175" y="63" width="140" height="55" class="cb3"/>
+  <text x="245" y="80" class="st3">Change Buffer</text>
+  <text x="245" y="94" class="st3s">Page 2 的变更记录</text>
+  <!-- Page 2 merging area -->
+  <rect x="100" y="135" width="170" height="55" rx="4" style="fill:var(--d-bg);stroke:var(--d-orange);stroke-width:1.2;stroke-dasharray:4,2"/>
+  <text x="185" y="153" class="st3" style="fill:var(--d-orange)">Page 2 (merge 合并中)</text>
+  <text x="185" y="168" class="st3s">磁盘数据 + change buffer</text>
+  <text x="185" y="181" class="st3s" style="fill:var(--d-green)">→ 生成正确版本</text>
+  <!-- Disk -->
+  <rect x="380" y="35" width="160" height="100" class="box3" style="fill:var(--d-bg)"/>
+  <text x="460" y="53" class="lbl3">磁盘 (Disk)</text>
+  <rect x="395" y="63" width="130" height="55" class="disk3"/>
+  <text x="460" y="80" class="st3">数据表空间</text>
+  <text x="460" y="94" class="st3s">(t.ibd)</text>
+  <text x="460" y="108" class="st3s">Page 2</text>
+  <!-- Step 1: Read Page 1 from memory -->
+  <circle cx="48" cy="148" r="10" fill="var(--d-blue)" opacity="0.15" stroke="var(--d-blue)" stroke-width="1"/>
+  <text x="48" y="152" class="n3" style="fill:var(--d-blue)">1</text>
+  <path d="M48,138 L75,118" class="a3" style="stroke:var(--d-blue)"/>
+  <text x="48" y="172" class="st3s" style="fill:var(--d-blue)">直接读取</text>
+  <text x="48" y="184" class="st3s" style="fill:var(--d-blue)">返回结果</text>
+  <!-- Step 2: Read Page 2 from disk -->
+  <circle cx="370" cy="155" r="10" fill="var(--d-orange)" opacity="0.15" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="370" y="159" class="n3" style="fill:var(--d-orange)">2</text>
+  <path d="M395,100 L380,145" class="a3" style="stroke:var(--d-orange)"/>
+  <text x="425" y="157" class="st3s" style="fill:var(--d-orange)">从磁盘读入</text>
+  <!-- Step 3: Apply change buffer -->
+  <circle cx="295" cy="133" r="10" fill="var(--d-orange)" opacity="0.15" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="295" y="137" class="n3" style="fill:var(--d-orange)">3</text>
+  <path d="M270,118 L270,135" class="a3" style="stroke:var(--d-orange)"/>
+  <text x="295" y="120" class="st3s" style="fill:var(--d-orange)">merge</text>
+  <!-- Step 4: Return result -->
+  <circle cx="78" cy="205" r="10" fill="var(--d-green)" opacity="0.15" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="78" y="209" class="n3" style="fill:var(--d-green)">4</text>
+  <path d="M100,190 L88,200" class="a3" style="stroke:var(--d-green)"/>
+  <text x="120" y="215" class="st3s" style="fill:var(--d-green)">返回合并后的正确结果</text>
+  <!-- Legend -->
+  <text x="280" y="260" class="st3s" style="fill:var(--d-text-muted)">① Page 1 已在内存，直接返回 → ② Page 2 从磁盘读入</text>
+  <text x="280" y="275" class="st3s" style="fill:var(--d-text-muted)">③ 应用 change buffer 合并 → ④ 返回正确结果</text>
+</svg>
+</div>
 
 
 从图中可以看到：
@@ -195,12 +435,87 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 
 上期的问题是：如何构造一个“数据无法修改”的场景。评论区里已经有不少同学给出了正确答案，这里我再描述一下。
 
-> **[图：这样]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
+<div style="text-align:center;font-size:13px;font-weight:700;color:var(--d-text);margin-bottom:10px;">构造"数据无法修改"的场景</div>
+<table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--d-th-border);">
+<thead>
+<tr>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:15%;">时刻</th>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:42%;">Session A</th>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:42%;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T1</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-blue-bg);color:var(--d-text);font-size:11px;">start transaction with consistent snapshot;</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T2</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-cur-bg);color:var(--d-text);font-size:11px;">update t set c=c+1 where id=1;<br><span style="color:var(--d-green);font-size:10px;">(自动提交)</span></td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T3</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-blue-bg);color:var(--d-text);font-size:11px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-size:10px;">→ 看到旧值（一致性读）</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T4</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-blue-bg);color:var(--d-text);font-size:11px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-size:10px;">→ 仍然看到旧值</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
 其实，还有另外一种场景，同学们在留言区都还没有提到。
 
-> **[图：示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
+<div style="text-align:center;font-size:13px;font-weight:700;color:var(--d-text);margin-bottom:10px;">活跃事务的可见性判断（Session B' 先启动后提交）</div>
+<table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--d-th-border);">
+<thead>
+<tr>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:15%;">时刻</th>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:42%;">Session A</th>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 10px;text-align:center;width:42%;">Session B'</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T1</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-cur-bg);color:var(--d-text);font-size:11px;">start transaction with consistent snapshot;</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T2</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-cur-bg);color:var(--d-text);font-size:11px;">update t set c=c+1 where id=1;<br><span style="color:var(--d-orange);font-size:10px;">（未提交）</span></td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T3</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-blue-bg);color:var(--d-text);font-size:11px;">start transaction with consistent snapshot;<br><span style="color:var(--d-text-muted);font-size:10px;">（此时 B' 是活跃事务）</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T4</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-cur-bg);color:var(--d-text);font-size:11px;">commit;<br><span style="color:var(--d-green);font-size:10px;">（提交）</span></td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:6px 10px;text-align:center;color:var(--d-text-sub);">T5</td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;background:var(--d-blue-bg);color:var(--d-text);font-size:11px;">select * from t where id=1;<br><span style="color:var(--d-orange);font-size:10px;">→ 看到旧值（B' 在 A 视图创建时是活跃的，属于"版本未提交，不可见"）</span></td>
+<td style="border:1px solid var(--d-border);padding:6px 10px;color:var(--d-text-muted);text-align:center;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
 这个操作序列跑出来，session A看的内容也是能够复现我截图的效果的。这个session B’启动的事务比A要早，其实是上期我们描述事务版本的可见性规则时留的彩蛋，因为规则里还有一个“活跃事务的判断”，我是准备留到这里再补充的。

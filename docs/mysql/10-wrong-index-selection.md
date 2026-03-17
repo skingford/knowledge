@@ -58,14 +58,54 @@ mysql> select * from t where a between 10000 and 20000;
 
 你说得没错，图1显示的就是使用explain命令看到的这条语句的执行情况。
 
-> **[图：图1 使用explain命令查看语句执行情况]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:560px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">EXPLAIN 输出 — select * from t where a between 10000 and 20000</div>
+<pre style="margin:0;white-space:pre-wrap;">+----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+| id | select_type | table | type  | possible_keys | key | key_len | ref  | rows  | Extra                 |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+|  1 | SIMPLE      | t     | range | a             | a   | 5       | NULL | 10001 | Using index condition |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+</pre>
+</div>
+</div>
 
 
 从图1看上去，这条查询语句的执行也确实符合预期，key这个字段值是’a’，表示优化器选择了索引a。
 
 不过别急，这个案例不会这么简单。在我们已经准备好的包含了10万行数据的表上，我们再做如下操作。
 
-> **[图：图2 session A和session B的执行流程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<table style="border-collapse:collapse;font-size:13px;font-family:'Courier New',monospace;min-width:480px;background:var(--d-bg);color:var(--d-text);">
+<thead>
+<tr>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 16px;text-align:center;">Session A</th>
+<th style="background:var(--d-th-bg);color:var(--d-th-text);border:1px solid var(--d-th-border);padding:8px 16px;text-align:center;">Session B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid var(--d-border);padding:8px 16px;background:var(--d-blue-bg);">start transaction with consistent snapshot;</td>
+<td style="border:1px solid var(--d-border);padding:8px 16px;"></td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:8px 16px;"></td>
+<td style="border:1px solid var(--d-border);padding:8px 16px;">delete from t;</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:8px 16px;"></td>
+<td style="border:1px solid var(--d-border);padding:8px 16px;">call idata();</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:8px 16px;"></td>
+<td style="border:1px solid var(--d-border);padding:8px 16px;background:var(--d-blue-bg);">explain select * from t where a between 10000 and 20000;</td>
+</tr>
+<tr>
+<td style="border:1px solid var(--d-border);padding:8px 16px;">commit;</td>
+<td style="border:1px solid var(--d-border);padding:8px 16px;"></td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 这里，session A的操作你已经很熟悉了，它就是开启了一个事务。随后，session B把数据都删除后，又调用了 idata这个存储过程，插入了10万行数据。
@@ -90,7 +130,18 @@ select * from t force index(a) where a between 10000 and 20000;/*Q2*/
 
 如图3所示是这三条SQL语句执行完成后的慢查询日志。
 
-> **[图：图3 slow log结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:600px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">Slow Query Log 输出</div>
+<pre style="margin:0;white-space:pre-wrap;"><span style="color:var(--d-text-muted);"># Query_time: 0.040000  Lock_time: 0.000100  Rows_sent: 10001  Rows_examined: <span style="color:var(--d-orange);font-weight:bold;">100000</span></span>
+SET timestamp=1551007510;
+select * from t where a between 10000 and 20000;
+
+<span style="color:var(--d-text-muted);"># Query_time: 0.021000  Lock_time: 0.000080  Rows_sent: 10001  Rows_examined: <span style="color:var(--d-green);font-weight:bold;">10001</span></span>
+SET timestamp=1551007510;
+select * from t force index(a) where a between 10000 and 20000;</pre>
+</div>
+</div>
 
 
 可以看到，Q1扫描了10万行，显然是走了全表扫描，执行时间是40毫秒。Q2扫描了10001行，执行了21毫秒。也就是说，我们在没有使用force index的时候，MySQL用错了索引，导致了更长的执行时间。
@@ -115,7 +166,18 @@ MySQL在真正开始执行语句之前，并不能精确地知道满足这个条
 
 我们可以使用show index方法，看到一个索引的基数。如图4所示，就是表t的show index 的结果 。虽然这个表的每一行的三个字段值都是一样的，但是在统计信息中，这三个索引的基数值并不同，而且其实都不准确。
 
-> **[图：图4 表t的show index 结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:680px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">SHOW INDEX FROM t 结果</div>
+<pre style="margin:0;white-space:pre-wrap;">+-------+------------+----------+--------------+-------------+-----+-------------+
+| Table | Non_unique | Key_name | Seq_in_index | Column_name |     | Cardinality |
++-------+------------+----------+--------------+-------------+-----+-------------+
+| t     |          0 | PRIMARY  |            1 | id          | ... |      100000 |
+| t     |          1 | a        |            1 | a           | ... |      <span style="color:var(--d-orange);font-weight:bold;">104620</span> |
+| t     |          1 | b        |            1 | b           | ... |      <span style="color:var(--d-orange);font-weight:bold;">100373</span> |
++-------+------------+----------+--------------+-------------+-----+-------------+</pre>
+</div>
+</div>
 
 
 那么，**MySQL是怎样得到索引的基数的呢？** 这里，我给你简单介绍一下MySQL采样统计的方法。
@@ -142,7 +204,22 @@ MySQL在真正开始执行语句之前，并不能精确地知道满足这个条
 
 接下来，我们再一起看看优化器预估的，这两个语句的扫描行数是多少。
 
-> **[图：图5 意外的explain结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">Q1: EXPLAIN select * from t where a between 10000 and 20000</div>
+<pre style="margin:0;white-space:pre-wrap;">+----+-------------+-------+------+---------------+-----+---------+------+--------+-------------+
+| id | select_type | table | type | possible_keys | key | key_len | ref  | rows   | Extra       |
++----+-------------+-------+------+---------------+-----+---------+------+--------+-------------+
+|  1 | SIMPLE      | t     | ALL  | a             | NULL| NULL    | NULL | <span style="color:var(--d-orange);font-weight:bold;">104620</span> | Using where |
++----+-------------+-------+------+---------------+-----+---------+------+--------+-------------+</pre>
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;margin-top:16px;">Q2: EXPLAIN select * from t force index(a) where a between 10000 and 20000</div>
+<pre style="margin:0;white-space:pre-wrap;">+----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+| id | select_type | table | type  | possible_keys | key | key_len | ref  | rows  | Extra                 |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+|  1 | SIMPLE      | t     | range | a             | a   | 5       | NULL | <span style="color:var(--d-orange);font-weight:bold;">37116</span> | Using index condition |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+</pre>
+</div>
+</div>
 
 
 rows这个字段表示的是预计扫描行数。
@@ -163,7 +240,24 @@ rows这个字段表示的是预计扫描行数。
 
 既然是统计信息不对，那就修正。analyze table t 命令，可以用来重新统计索引信息。我们来看一下执行效果。
 
-> **[图：图6 执行analyze table t 命令]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">执行 analyze table t 后重新 EXPLAIN</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql&gt; analyze table t;
++------+---------+----------+----------+
+| Table| Op      | Msg_type | Msg_text |
++------+---------+----------+----------+
+| test.t | analyze | status | <span style="color:var(--d-green);font-weight:bold;">OK</span>     |
++------+---------+----------+----------+
+
+mysql&gt; explain select * from t where a between 10000 and 20000;
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+| id | select_type | table | type  | possible_keys | key | key_len | ref  | rows  | Extra                 |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+|  1 | SIMPLE      | t     | range | a             | <span style="color:var(--d-green);font-weight:bold;">a</span>   | 5       | NULL | <span style="color:var(--d-green);font-weight:bold;">10001</span> | Using index condition |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+</pre>
+</div>
+</div>
 
 
 这回对了。
@@ -185,7 +279,73 @@ mysql> select * from t where (a between 1 and 1000)  and (b between 50000 and 10
 
 为了便于分析，我们先来看一下a、b这两个索引的结构图。
 
-> **[图：图7 a、b索引的结构图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 640 320" style="max-width:640px;width:100%;font-family:'Courier New',monospace;" xmlns="http://www.w3.org/2000/svg">
+<!-- Index a -->
+<text x="160" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-blue)">索引 a</text>
+<!-- Root -->
+<rect x="110" y="30" width="100" height="30" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="160" y="50" text-anchor="middle" font-size="11" fill="var(--d-text)">root</text>
+<!-- Level 1 -->
+<line x1="135" y1="60" x2="70" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="160" y1="60" x2="160" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="185" y1="60" x2="250" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<rect x="20" y="85" width="100" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="70" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">1 ~ 500</text>
+<rect x="130" y="85" width="60" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="160" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">...</text>
+<rect x="200" y="85" width="100" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="250" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">99501~100000</text>
+<!-- Leaf -->
+<line x1="45" y1="111" x2="30" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+<line x1="95" y1="111" x2="110" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+<rect x="5" y="135" width="50" height="24" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="30" y="151" text-anchor="middle" font-size="9" fill="var(--d-text)">1,2,3...</text>
+<rect x="85" y="135" width="50" height="24" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="110" y="151" text-anchor="middle" font-size="9" fill="var(--d-text)">...500</text>
+<!-- Arrow between leaves -->
+<line x1="55" y1="147" x2="85" y2="147" stroke="var(--d-border)" stroke-width="1" marker-end="url(#arrow)"/>
+<!-- Scan range highlight -->
+<rect x="5" y="165" width="300" height="22" rx="4" fill="none" stroke="var(--d-green)" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="160" y="181" text-anchor="middle" font-size="10" fill="var(--d-green)">a between 1 and 1000 → 扫描 1000 行</text>
+
+<!-- Index b -->
+<text x="480" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-orange)">索引 b</text>
+<!-- Root -->
+<rect x="430" y="30" width="100" height="30" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="480" y="50" text-anchor="middle" font-size="11" fill="var(--d-text)">root</text>
+<!-- Level 1 -->
+<line x1="455" y1="60" x2="390" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="480" y1="60" x2="480" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<line x1="505" y1="60" x2="570" y2="85" stroke="var(--d-border)" stroke-width="1.2"/>
+<rect x="340" y="85" width="100" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="390" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">1 ~ 500</text>
+<rect x="450" y="85" width="60" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="480" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">...</text>
+<rect x="520" y="85" width="100" height="26" rx="4" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="570" y="103" text-anchor="middle" font-size="10" fill="var(--d-text)">99501~100000</text>
+<!-- Leaf -->
+<line x1="545" y1="111" x2="530" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+<line x1="595" y1="111" x2="610" y2="135" stroke="var(--d-border)" stroke-width="1"/>
+<rect x="505" y="135" width="50" height="24" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="530" y="151" text-anchor="middle" font-size="9" fill="var(--d-text)">...99501</text>
+<rect x="585" y="135" width="50" height="24" rx="3" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)"/>
+<text x="610" y="151" text-anchor="middle" font-size="9" fill="var(--d-text)">100000</text>
+<!-- Arrow between leaves -->
+<line x1="555" y1="147" x2="585" y2="147" stroke="var(--d-border)" stroke-width="1" marker-end="url(#arrow)"/>
+<!-- Scan range highlight -->
+<rect x="320" y="165" width="320" height="22" rx="4" fill="none" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="480" y="181" text-anchor="middle" font-size="10" fill="var(--d-orange)">b between 50000 and 100000 → 扫描 50001 行</text>
+
+<!-- Summary -->
+<rect x="80" y="210" width="480" height="60" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)"/>
+<text x="320" y="233" text-anchor="middle" font-size="12" fill="var(--d-text)">使用索引 a：扫描前 1000 个值 + 回表 → <tspan fill="var(--d-green)" font-weight="bold">1000 行</tspan></text>
+<text x="320" y="257" text-anchor="middle" font-size="12" fill="var(--d-text)">使用索引 b：扫描后 50001 个值 + 回表 → <tspan fill="var(--d-orange)" font-weight="bold">50001 行</tspan></text>
+
+<!-- Arrow marker -->
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--d-border)"/></marker></defs>
+</svg>
+</div>
 
 
 如果使用索引a进行查询，那么就是扫描索引a的前1000个值，然后取到对应的id，再到主键索引上去查出每一行，然后根据字段b来过滤。显然这样需要扫描1000行。
@@ -200,7 +360,16 @@ mysql> select * from t where (a between 1 and 1000)  and (b between 50000 and 10
 mysql> explain select * from t where (a between 1 and 1000) and (b between 50000 and 100000) order by b limit 1;
 ```
 
-> **[图：图8 使用explain方法查看执行计划 2]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">EXPLAIN 输出 — order by b limit 1</div>
+<pre style="margin:0;white-space:pre-wrap;">+----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+| id | select_type | table | type  | possible_keys | key | key_len | ref  | rows  | Extra                 |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+
+|  1 | SIMPLE      | t     | range | a,b           | <span style="color:var(--d-orange);font-weight:bold;">b</span>   | 5       | NULL | <span style="color:var(--d-orange);font-weight:bold;">50198</span> | Using index condition |
++----+-------------+-------+-------+---------------+-----+---------+------+-------+-----------------------+</pre>
+</div>
+</div>
 
 
 可以看到，返回结果中key字段显示，这次优化器选择了索引b，而rows字段显示需要扫描的行数是50198。
@@ -220,7 +389,21 @@ mysql> explain select * from t where (a between 1 and 1000) and (b between 50000
 
 我们来看看第二个例子。刚开始分析时，我们认为选择索引a会更好。现在，我们就来看看执行效果：
 
-> **[图：图9 使用不同索引的语句执行耗时]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">不同索引的执行耗时对比</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql&gt; select * from t where (a between 1 and 1000)
+       and (b between 50000 and 100000) order by b limit 1;
+Empty set (<span style="color:var(--d-orange);font-weight:bold;">2.23 sec</span>)
+
+mysql&gt; select * from t force index(a) where (a between 1 and 1000)
+       and (b between 50000 and 100000) order by b limit 1;
+Empty set (<span style="color:var(--d-green);font-weight:bold;">0.05 sec</span>)</pre>
+<div style="margin-top:10px;padding:8px 12px;background:var(--d-blue-bg);border-left:3px solid var(--d-blue-border);border-radius:0 4px 4px 0;font-size:12px;color:var(--d-text-sub);">
+force index(a) 比优化器自动选择快 <strong>40 多倍</strong>
+</div>
+</div>
+</div>
 
 
 可以看到，原本语句需要执行2.23秒，而当你使用force index(a)的时候，只用了0.05秒，比优化器的选择快了40多倍。
@@ -237,7 +420,18 @@ mysql> explain select * from t where (a between 1 and 1000) and (b between 50000
 
 我们来看看改之后的效果：
 
-> **[图：图10 order by b,a limit 1 执行结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:620px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">EXPLAIN 输出 — order by b,a limit 1</div>
+<pre style="margin:0;white-space:pre-wrap;">mysql&gt; explain select * from t where (a between 1 and 1000)
+       and (b between 50000 and 100000) order by b,a limit 1;
++----+-------------+-------+-------+---------------+-----+---------+------+------+-----------------------+
+| id | select_type | table | type  | possible_keys | key | key_len | ref  | rows | Extra                 |
++----+-------------+-------+-------+---------------+-----+---------+------+------+-----------------------+
+|  1 | SIMPLE      | t     | range | a,b           | <span style="color:var(--d-green);font-weight:bold;">a</span>   | 5       | NULL | <span style="color:var(--d-green);font-weight:bold;">1000</span> | Using index condition |
++----+-------------+-------+-------+---------------+-----+---------+------+------+-----------------------+</pre>
+</div>
+</div>
 
 
 之前优化器选择使用索引b，是因为它认为使用索引b可以避免排序（b本身是索引，已经是有序的了，如果选择索引b的话，不需要再做排序，只需要遍历），所以即使扫描行数多，也判定为代价更小。
@@ -252,7 +446,17 @@ mysql> explain select * from t where (a between 1 and 1000) and (b between 50000
 mysql> select * from  (select * from t where (a between 1 and 1000)  and (b between 50000 and 100000) order by b limit 100)alias limit 1;
 ```
 
-> **[图：图11 改写SQL的explain]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:13px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:680px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;">EXPLAIN 输出 — 子查询改写 limit 100</div>
+<pre style="margin:0;white-space:pre-wrap;">+----+-------------+------------+-------+---------------+-----+---------+------+------+-------------+
+| id | select_type | table      | type  | possible_keys | key | key_len | ref  | rows | Extra       |
++----+-------------+------------+-------+---------------+-----+---------+------+------+-------------+
+|  1 | PRIMARY     | &lt;derived2&gt; | ALL   | NULL          | NULL| NULL    | NULL |  100 | NULL        |
+|  2 | DERIVED     | t          | range | a,b           | <span style="color:var(--d-green);font-weight:bold;">a</span>   | 5       | NULL | <span style="color:var(--d-green);font-weight:bold;">1000</span> | Using where |
++----+-------------+------------+-------+---------------+-----+---------+------+------+-------------+</pre>
+</div>
+</div>
 
 
 在这个例子里，我们用limit 100让优化器意识到，使用b索引代价是很高的。其实是我们根据数据特征诱导了一下优化器，也不具备通用性。

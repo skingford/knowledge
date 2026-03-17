@@ -58,7 +58,46 @@ select * from t where id>9 and id<12 order by id desc for update;
 
 如图1所示，是这个表的索引id的示意图。
 
-> **[图：图1 索引id示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg width="520" height="220" viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="idx1-arrow" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8z" fill="var(--d-blue)"/></marker>
+  </defs>
+  <text x="260" y="18" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图 1 — 索引 id 示意图（B+ 树叶子节点）</text>
+  <!-- Leaf node boxes -->
+  <rect x="10" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="40" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">0</text>
+  <rect x="90" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="120" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">5</text>
+  <rect x="170" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="200" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">10</text>
+  <rect x="250" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="280" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">15</text>
+  <rect x="330" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="360" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">20</text>
+  <rect x="410" y="40" width="60" height="40" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="440" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-blue)">25</text>
+  <!-- Arrows between leaves -->
+  <line x1="72" y1="60" x2="88" y2="60" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#idx1-arrow)"/>
+  <line x1="152" y1="60" x2="168" y2="60" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#idx1-arrow)"/>
+  <line x1="232" y1="60" x2="248" y2="60" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#idx1-arrow)"/>
+  <line x1="312" y1="60" x2="328" y2="60" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#idx1-arrow)"/>
+  <line x1="392" y1="60" x2="408" y2="60" stroke="var(--d-blue)" stroke-width="1.2" marker-end="url(#idx1-arrow)"/>
+  <!-- Search path annotation -->
+  <path d="M280,40 Q280,20 240,20 Q200,20 200,40" fill="none" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="240" y="14" text-anchor="middle" font-size="10" fill="var(--d-orange)">搜索 id=12 落入间隙</text>
+  <!-- Gap highlight (10,15) -->
+  <rect x="232" y="85" width="78" height="22" rx="4" fill="var(--d-orange)" fill-opacity="0.12" stroke="var(--d-orange)" stroke-dasharray="3,2"/>
+  <text x="271" y="100" text-anchor="middle" font-size="10" fill="var(--d-orange)">间隙 (10, 15)</text>
+  <!-- Lock ranges -->
+  <text x="260" y="132" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">加锁范围（order by id desc）</text>
+  <rect x="10" y="142" width="300" height="24" rx="4" fill="var(--d-green)" fill-opacity="0.10" stroke="var(--d-green)" stroke-dasharray="3,2"/>
+  <text x="160" y="158" text-anchor="middle" font-size="10" fill="var(--d-green)">next-key lock (0,5] + (5,10]</text>
+  <rect x="232" y="170" width="78" height="24" rx="4" fill="var(--d-orange)" fill-opacity="0.10" stroke="var(--d-orange)" stroke-dasharray="3,2"/>
+  <text x="271" y="186" text-anchor="middle" font-size="10" fill="var(--d-orange)">间隙锁 (10,15)</text>
+  <text x="260" y="210" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">优化 2：id=15 不满足条件，退化为间隙锁</text>
+</svg>
+</div>
 
 
   1. 首先这个查询语句的语义是order by id desc，要拿到满足条件的所有行，优化器必须先找到“第一个id<12的值”。
@@ -82,7 +121,42 @@ select id from t where c in(5,20,10) lock in share mode;
 
 这条查询语句里用的是in，我们先来看这条语句的explain结果。  
 
-> **[图：图2 in语句的explain结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);">
+<div style="font-weight:bold;text-align:center;margin-bottom:10px;">图 2 — in 语句的 explain 结果</div>
+<table style="border-collapse:collapse;font-size:12px;min-width:700px;">
+<thead>
+<tr style="background:var(--d-th-bg);border:1px solid var(--d-th-border);color:var(--d-th-text);">
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">id</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">select_type</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">table</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">type</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">possible_keys</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">key</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">key_len</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">ref</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">rows</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border);">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);text-align:center;">1</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">SIMPLE</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">t</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">range</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">c</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);font-weight:bold;color:var(--d-blue);">c</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">5</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">NULL</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);font-weight:bold;color:var(--d-orange);">3</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);">Using where; Using index</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:6px;font-size:11px;color:var(--d-text-muted);text-align:center;">rows=3 说明三个值均通过 B+ 树搜索定位，type=range 使用索引 c</div>
+</div>
+</div>
 
 
 可以看到，这条in语句使用了索引c并且rows=3，说明这三个值都是通过B+树搜索定位的。
@@ -122,7 +196,45 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 图3是在出现死锁后，执行show engine innodb status命令得到的部分输出。这个命令会输出很多信息，有一节LATESTDETECTED DEADLOCK，就是记录的最后一次死锁信息。  
 
-> **[图：图3 死锁现场]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg width="600" height="340" viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="dl-arrow" viewBox="0 0 10 8" refX="10" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <text x="300" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图 3 — 死锁现场（show engine innodb status）</text>
+  <!-- Transaction 1 -->
+  <rect x="20" y="40" width="260" height="130" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="150" y="60" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-blue)">(1) TRANSACTION — lock in share mode</text>
+  <text x="36" y="82" font-size="11" fill="var(--d-text)">HOLDS: c=5 记录锁</text>
+  <rect x="30" y="90" width="100" height="20" rx="3" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-dasharray="3,2"/>
+  <text x="80" y="104" text-anchor="middle" font-size="10" fill="var(--d-green)">持有 c=5</text>
+  <text x="36" y="132" font-size="11" fill="var(--d-text)">WAITING: index c, c=10</text>
+  <rect x="30" y="140" width="120" height="20" rx="3" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-dasharray="3,2"/>
+  <text x="90" y="154" text-anchor="middle" font-size="10" fill="var(--d-orange)">等待 c=10 S lock</text>
+  <!-- Transaction 2 -->
+  <rect x="320" y="40" width="260" height="130" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="450" y="60" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-blue)">(2) TRANSACTION — for update</text>
+  <text x="336" y="82" font-size="11" fill="var(--d-text)">HOLDS: c=10, c=20 记录锁</text>
+  <rect x="330" y="90" width="100" height="20" rx="3" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-dasharray="3,2"/>
+  <text x="380" y="104" text-anchor="middle" font-size="10" fill="var(--d-green)">持有 c=10</text>
+  <rect x="440" y="90" width="100" height="20" rx="3" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-dasharray="3,2"/>
+  <text x="490" y="104" text-anchor="middle" font-size="10" fill="var(--d-green)">持有 c=20</text>
+  <text x="336" y="132" font-size="11" fill="var(--d-text)">WAITING: index c, c=5</text>
+  <rect x="330" y="140" width="120" height="20" rx="3" fill="var(--d-orange)" fill-opacity="0.15" stroke="var(--d-orange)" stroke-dasharray="3,2"/>
+  <text x="390" y="154" text-anchor="middle" font-size="10" fill="var(--d-orange)">等待 c=5 X lock</text>
+  <!-- Deadlock arrows -->
+  <path d="M150,170 C150,210 450,210 450,170" fill="none" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#dl-arrow)"/>
+  <path d="M450,170 C450,230 150,230 150,170" fill="none" stroke="var(--d-orange)" stroke-width="2" marker-end="url(#dl-arrow)"/>
+  <text x="300" y="205" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-orange)">DEADLOCK!</text>
+  <!-- Resolution -->
+  <rect x="120" y="255" width="360" height="50" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="300" y="275" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-orange)">WE ROLL BACK TRANSACTION (1)</text>
+  <text x="300" y="295" text-anchor="middle" font-size="11" fill="var(--d-text)">for update 持有资源多，回滚 lock in share mode 成本更小</text>
+  <!-- Lock order labels -->
+  <text x="150" y="330" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">加锁顺序：c=5 → c=10 → c=20</text>
+  <text x="450" y="330" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">加锁顺序：c=20 → c=10 → c=5</text>
+</svg>
+</div>
 
 
 我们来看看这图中的几个关键信息。
@@ -172,14 +284,95 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 在第21篇文章的评论区，@Geek_9ca34e 同学做了一个有趣验证，我把复现步骤列出来：
 
-> **[图：图4 delete导致间隙变化]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);">
+<div style="font-weight:bold;text-align:center;margin-bottom:10px;">图 4 — delete 导致间隙变化</div>
+<table style="border-collapse:collapse;font-size:12px;min-width:520px;">
+<thead>
+<tr style="background:var(--d-th-bg);border:1px solid var(--d-th-border);color:var(--d-th-text);">
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">session A</th>
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">session B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">begin;<br>select * from t where c&gt;=15 and c&lt;=20<br>order by c desc lock in share mode;</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);color:var(--d-text-muted);"></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);"></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">delete from t where id=10;<br><span style="color:var(--d-green);">(OK)</span></td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);"></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">insert into t values(10,10,10);<br><span style="color:var(--d-orange);font-weight:bold;">(blocked)</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:14px;">
+<svg width="440" height="80" viewBox="0 0 440 80" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+  <text x="220" y="14" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">间隙变化示意（主键 id）</text>
+  <!-- Before delete -->
+  <text x="10" y="38" font-size="10" fill="var(--d-text-muted)">删除前:</text>
+  <line x1="70" y1="35" x2="420" y2="35" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <circle cx="110" cy="35" r="4" fill="var(--d-blue)"/><text x="110" y="50" text-anchor="middle" font-size="9" fill="var(--d-blue)">5</text>
+  <circle cx="200" cy="35" r="4" fill="var(--d-blue)"/><text x="200" y="50" text-anchor="middle" font-size="9" fill="var(--d-blue)">10</text>
+  <circle cx="290" cy="35" r="4" fill="var(--d-blue)"/><text x="290" y="50" text-anchor="middle" font-size="9" fill="var(--d-blue)">15</text>
+  <rect x="113" y="27" width="84" height="6" rx="2" fill="var(--d-green)" fill-opacity="0.2"/>
+  <rect x="203" y="27" width="84" height="6" rx="2" fill="var(--d-green)" fill-opacity="0.2"/>
+  <text x="155" y="26" text-anchor="middle" font-size="8" fill="var(--d-green)">(5,10)</text>
+  <text x="245" y="26" text-anchor="middle" font-size="8" fill="var(--d-green)">(10,15)</text>
+  <!-- After delete -->
+  <text x="10" y="72" font-size="10" fill="var(--d-text-muted)">删除后:</text>
+  <line x1="70" y1="69" x2="420" y2="69" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <circle cx="110" cy="69" r="4" fill="var(--d-blue)"/><text x="110" y="64" text-anchor="middle" font-size="9" fill="var(--d-blue)">5</text>
+  <circle cx="200" cy="69" r="4" fill="none" stroke="var(--d-orange)" stroke-dasharray="2,2"/><text x="200" y="64" text-anchor="middle" font-size="8" fill="var(--d-orange)">10(已删)</text>
+  <circle cx="290" cy="69" r="4" fill="var(--d-blue)"/><text x="290" y="64" text-anchor="middle" font-size="9" fill="var(--d-blue)">15</text>
+  <rect x="113" y="71" width="174" height="6" rx="2" fill="var(--d-orange)" fill-opacity="0.2"/>
+  <text x="200" y="80" text-anchor="middle" font-size="8" fill="var(--d-orange)">间隙扩大为 (5, 15)</text>
+</svg>
+</div>
+</div>
+</div>
 
 
 可以看到，由于session A并没有锁住c=10这个记录，所以session B删除id=10这一行是可以的。但是之后，session B再想insert id=10这一行回去就不行了。
 
 现在我们一起看一下此时show engine innodb status的结果，看看能不能给我们一些提示。锁信息是在这个命令输出结果的TRANSACTIONS这一节。你可以在文稿中看到这张图片  
 
-> **[图：图 5 锁等待信息]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="max-width:680px;width:100%;font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);">
+<div style="font-weight:bold;text-align:center;margin-bottom:10px;">图 5 — 锁等待信息（show engine innodb status）</div>
+<div style="background:var(--d-bg);border:1px solid var(--d-th-border);border-radius:8px;padding:16px 20px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;overflow-x:auto;">
+<span style="color:var(--d-text-muted);">---TRANSACTION 1299, ACTIVE 30 sec inserting</span>
+<span style="color:var(--d-text);">mysql tables in use 1, locked 1</span>
+<span style="color:var(--d-text);">LOCK WAIT 2 lock struct(s), heap size 1136, 1 row lock(s)</span>
+<span style="color:var(--d-text);">MySQL thread id 12, OS thread handle 123456, query id 200</span>
+<span style="color:var(--d-text);">insert into t values(10,10,10)</span>
+<span style="color:var(--d-text-muted);">------- TRX HAS BEEN WAITING 7 SEC FOR THIS LOCK TO BE GRANTED:</span>
+<span style="font-weight:bold;color:var(--d-orange);">RECORD LOCKS space id 74 page no 3 n bits 80</span>
+<span style="font-weight:bold;color:var(--d-orange);">  index PRIMARY of table `test`.`t` trx id 1299</span>
+<span style="font-weight:bold;color:var(--d-orange);">  lock_mode X locks gap before rec insert intention waiting</span>
+<span style="color:var(--d-text);">Record lock, heap no 5 PHYSICAL RECORD: n_fields 5; compact format; info bits 0</span>
+<span style="color:var(--d-blue);"> 0: len 4; hex <b>0000000f</b>; asc     ;; </span><span style="color:var(--d-text-muted);">← 主键 id=15</span>
+<span style="color:var(--d-text);"> 1: len 6; hex 000000000513; asc       ;; </span><span style="color:var(--d-text-muted);">← trx id</span>
+<span style="color:var(--d-text);"> 2: len 7; hex b0000001250134; asc     % 4;; </span><span style="color:var(--d-text-muted);">← 回滚段</span>
+<span style="color:var(--d-text);"> 3: len 4; hex 0000000f; asc     ;; </span><span style="color:var(--d-text-muted);">← c=15</span>
+<span style="color:var(--d-text);"> 4: len 4; hex 0000000f; asc     ;; </span><span style="color:var(--d-text-muted);">← d=15</span>
+</div>
+<div style="margin-top:10px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+<div style="background:var(--d-warn-bg);border-radius:6px;padding:6px 14px;font-size:11px;">
+<span style="font-weight:bold;color:var(--d-orange);">gap before rec</span><span style="color:var(--d-text);"> → 间隙锁，不是记录锁</span>
+</div>
+<div style="background:var(--d-warn-bg);border-radius:6px;padding:6px 14px;font-size:11px;">
+<span style="font-weight:bold;color:var(--d-orange);">insert intention</span><span style="color:var(--d-text);"> → 插入意向锁</span>
+</div>
+<div style="background:var(--d-blue-bg);border-radius:6px;padding:6px 14px;font-size:11px;">
+<span style="font-weight:bold;color:var(--d-blue);">id=15</span><span style="color:var(--d-text);"> → 间隙在 id=15 之前，即 (5, 15)</span>
+</div>
+</div>
+</div>
+</div>
 
 
 我们来看几个关键信息。
@@ -215,7 +408,38 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 看过了insert和delete的加锁例子，我们再来看一个update语句的案例。在留言区中@信信 同学做了这个试验：
 
-> **[图：图 6 update 的例子]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);">
+<div style="font-weight:bold;text-align:center;margin-bottom:10px;">图 6 — update 的例子</div>
+<table style="border-collapse:collapse;font-size:12px;min-width:540px;">
+<thead>
+<tr style="background:var(--d-th-bg);border:1px solid var(--d-th-border);color:var(--d-th-text);">
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);width:60px;"></th>
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">session A</th>
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">session B</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);text-align:center;font-weight:bold;color:var(--d-blue);">T1</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">begin;<br>select * from t where c&gt;5<br>lock in share mode;</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);color:var(--d-text-muted);"></td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);text-align:center;font-weight:bold;color:var(--d-blue);">T2</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);"></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">update t set c=1 where c=5;<br><span style="color:var(--d-green);">(OK，c=5 不在 A 的锁范围内)</span></td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);text-align:center;font-weight:bold;color:var(--d-blue);">T3</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);"></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">update t set c=5 where c=1;<br><span style="color:var(--d-orange);font-weight:bold;">(blocked)</span></td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:10px;font-size:11px;color:var(--d-text-muted);text-align:center;">session A 加锁范围：索引 c 上 (5,10]、(10,15]、(15,20]、(20,25]、(25, supremum]</div>
+</div>
+</div>
 
 
 你可以自己分析一下，session A的加锁范围是索引c上的 (5,10]、(10,15]、(15,20]、(20,25]和(25,supremum]。
@@ -231,7 +455,59 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 按照我们上一节说的，索引c上(5,10)间隙是由这个间隙右边的记录，也就是c=10定义的。所以通过这个操作，session A的加锁范围变成了图7所示的样子：  
 
-> **[图：图 7 session B修改后， sessio]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);">
+<div style="font-weight:bold;text-align:center;margin-bottom:10px;">图 7 — session B 修改后，session A 的加锁范围</div>
+<table style="border-collapse:collapse;font-size:12px;min-width:540px;">
+<thead>
+<tr style="background:var(--d-th-bg);border:1px solid var(--d-th-border);color:var(--d-th-text);">
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">操作</th>
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">索引 c 上的变化</th>
+<th style="padding:6px 14px;border:1px solid var(--d-th-border);">加锁范围影响</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;">初始状态</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;">… 0, <b>5</b>, 10, 15, 20, 25 …</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;">锁：(5,10], (10,15], (15,20], (20,25], (25, sup]</td>
+</tr>
+<tr style="background:var(--d-stripe);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;color:var(--d-orange);">update c=5→c=1</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;">… 0, <span style="color:var(--d-orange);font-weight:bold;">1</span>, <s style="color:var(--d-text-muted);">5</s>, 10, 15, 20, 25 …<br><span style="font-size:10px;color:var(--d-text-muted);">插入 c=1，删除 c=5</span></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;">间隙 (5,10) 右端由 c=10 定义<br>→ c=5 删除后间隙扩大为 <span style="font-weight:bold;color:var(--d-orange);">(1, 10)</span></td>
+</tr>
+<tr style="background:var(--d-bg);">
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-family:monospace;font-size:11px;color:var(--d-orange);">update c=1→c=5<br>(blocked!)</td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;">试图插入 (c=5, id=5)<br>→ 落入间隙 <span style="font-weight:bold;color:var(--d-orange);">(1, 10)</span></td>
+<td style="padding:8px 14px;border:1px solid var(--d-th-border);font-size:11px;color:var(--d-orange);font-weight:bold;">被 session A 的间隙锁阻塞</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top:14px;">
+<svg width="480" height="90" viewBox="0 0 480 90" xmlns="http://www.w3.org/2000/svg" style="font-family:system-ui,sans-serif">
+  <text x="240" y="14" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-text)">索引 c 加锁范围变化示意</text>
+  <!-- Before -->
+  <text x="6" y="40" font-size="10" fill="var(--d-text-muted)">修改前:</text>
+  <line x1="60" y1="37" x2="460" y2="37" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <circle cx="100" cy="37" r="4" fill="var(--d-blue)"/><text x="100" y="52" text-anchor="middle" font-size="9" fill="var(--d-blue)">5</text>
+  <circle cx="180" cy="37" r="4" fill="var(--d-blue)"/><text x="180" y="52" text-anchor="middle" font-size="9" fill="var(--d-blue)">10</text>
+  <circle cx="260" cy="37" r="4" fill="var(--d-blue)"/><text x="260" y="52" text-anchor="middle" font-size="9" fill="var(--d-blue)">15</text>
+  <rect x="103" y="30" width="74" height="5" rx="2" fill="var(--d-green)" fill-opacity="0.25"/>
+  <text x="140" y="28" text-anchor="middle" font-size="8" fill="var(--d-green)">(5, 10]</text>
+  <!-- After -->
+  <text x="6" y="78" font-size="10" fill="var(--d-text-muted)">修改后:</text>
+  <line x1="60" y1="75" x2="460" y2="75" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <circle cx="80" cy="75" r="4" fill="var(--d-orange)"/><text x="80" y="70" text-anchor="middle" font-size="9" fill="var(--d-orange)">1</text>
+  <circle cx="100" cy="75" r="4" fill="none" stroke="var(--d-text-muted)" stroke-dasharray="2,2"/><text x="100" y="70" text-anchor="middle" font-size="8" fill="var(--d-text-muted)">5(已删)</text>
+  <circle cx="180" cy="75" r="4" fill="var(--d-blue)"/><text x="180" y="70" text-anchor="middle" font-size="9" fill="var(--d-blue)">10</text>
+  <circle cx="260" cy="75" r="4" fill="var(--d-blue)"/><text x="260" y="70" text-anchor="middle" font-size="9" fill="var(--d-blue)">15</text>
+  <rect x="83" y="77" width="94" height="5" rx="2" fill="var(--d-orange)" fill-opacity="0.25"/>
+  <text x="130" y="90" text-anchor="middle" font-size="8" fill="var(--d-orange)">间隙扩大为 (1, 10)</text>
+</svg>
+</div>
+</div>
+</div>
 
 
 好，接下来session B要执行 update t set c = 5 where c = 1这个语句了，一样地可以拆成两步：
@@ -272,12 +548,10 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 这些都是很好的经验，你也可以根据具体的业务场景借鉴适合自己的方案。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：令狐少侠]**
 
 
 [__ 2](<javascript:;>)
@@ -297,7 +571,6 @@ lock_mode X locks rec but not gap是只有行锁；
 
 2019-01-23
 
-> **[图：Ryoma]**
 
 
 [__ 2](<javascript:;>)
@@ -318,7 +591,6 @@ __ 作者回复
 
 2019-01-22
 
-> **[图：☞]**
 
 
 [__ 1](<javascript:;>)
@@ -344,7 +616,6 @@ order by就是要用做小的值来找第一个；
 
 2019-01-22
 
-> **[图：老杨同志]**
 
 
 [__ 1](<javascript:;>)
@@ -369,7 +640,6 @@ show engine innodb status 有惊喜😆
 
 2019-01-21
 
-> **[图：Long]**
 
 
 [__ 0](<javascript:;>)
@@ -384,7 +654,6 @@ __ 作者回复
 
 2019-01-28
 
-> **[图：滔滔]**
 
 
 [__ 0](<javascript:;>)
@@ -399,7 +668,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：尘封]**
 
 
 [__ 0](<javascript:;>)
@@ -418,7 +686,6 @@ __ 作者回复
 
 2019-02-04
 
-> **[图：长杰]**
 
 
 [__ 0](<javascript:;>)
@@ -435,7 +702,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：堕落天使]**
 
 
 [__ 0](<javascript:;>)
@@ -473,7 +739,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：Ivan]**
 
 
 [__ 0](<javascript:;>)
@@ -497,7 +762,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：PengfeiWang]**
 
 
 [__ 0](<javascript:;>)
@@ -516,7 +780,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：Justin]**
 
 
 [__ 0](<javascript:;>)
@@ -531,7 +794,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：ServerCoder]**
 
 
 [__ 0](<javascript:;>)
@@ -595,7 +857,6 @@ b) 如果是小查询，可能proxy先打到瓶颈
 
 2019-01-23
 
-> **[图：Jason_鹏]**
 
 
 [__ 0](<javascript:;>)
@@ -612,7 +873,6 @@ __ 作者回复
 
 2019-01-22
 
-> **[图：长杰]**
 
 
 [__ 0](<javascript:;>)
@@ -637,7 +897,6 @@ select * from t where id>10 and id<=15 for update；
 
 2019-01-22
 
-> **[图：库淘淘]**
 
 
 [__ 0](<javascript:;>)
@@ -694,7 +953,6 @@ QPS就看所有从库的读能力加和
 
 2019-01-22
 
-> **[图：HuaMax]**
 
 
 [__ 0](<javascript:;>)
@@ -709,7 +967,6 @@ __ 作者回复
 
 2019-01-21
 
-> **[图：llx]**
 
 
 [__ 0](<javascript:;>)

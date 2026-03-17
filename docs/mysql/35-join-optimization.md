@@ -62,7 +62,44 @@ select * from t1 where a>=1 and a<=100;
 
 主键索引是一棵B+树，在这棵树上，每次只能根据一个主键id查到一行数据。因此，回表肯定是一行行搜索主键索引的，基本流程如图1所示。
 
-> **[图：图1 基本回表流程]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 220" style="max-width:580px;width:100%;height:auto;font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="b1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="b1o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Index a -->
+  <rect x="20" y="30" width="140" height="130" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="90" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-blue)">索引 a</text>
+  <text x="90" y="50" text-anchor="middle" font-size="10" fill="var(--d-text)">a=1 → id=100</text>
+  <text x="90" y="68" text-anchor="middle" font-size="10" fill="var(--d-text)">a=2 → id=30</text>
+  <text x="90" y="86" text-anchor="middle" font-size="10" fill="var(--d-text)">a=3 → id=78</text>
+  <text x="90" y="104" text-anchor="middle" font-size="10" fill="var(--d-text)">a=4 → id=12</text>
+  <text x="90" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">…</text>
+  <text x="90" y="135" text-anchor="middle" font-size="10" fill="var(--d-text)">a=100 → id=55</text>
+  <text x="90" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">顺序扫描</text>
+  <!-- Arrows to primary key (random) -->
+  <line x1="160" y1="45" x2="230" y2="120" stroke="var(--d-orange)" stroke-width="1" marker-end="url(#b1o)" stroke-dasharray="4"/>
+  <line x1="160" y1="63" x2="230" y2="55" stroke="var(--d-orange)" stroke-width="1" marker-end="url(#b1o)" stroke-dasharray="4"/>
+  <line x1="160" y1="81" x2="230" y2="95" stroke="var(--d-orange)" stroke-width="1" marker-end="url(#b1o)" stroke-dasharray="4"/>
+  <line x1="160" y1="99" x2="230" y2="40" stroke="var(--d-orange)" stroke-width="1" marker-end="url(#b1o)" stroke-dasharray="4"/>
+  <text x="200" y="165" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-orange)">随机 IO</text>
+  <!-- Primary key index -->
+  <rect x="235" y="30" width="140" height="130" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="305" y="22" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">主键索引</text>
+  <text x="305" y="48" text-anchor="middle" font-size="10" fill="var(--d-text)">id=12 → row</text>
+  <text x="305" y="65" text-anchor="middle" font-size="10" fill="var(--d-text)">id=30 → row</text>
+  <text x="305" y="82" text-anchor="middle" font-size="10" fill="var(--d-text)">id=55 → row</text>
+  <text x="305" y="99" text-anchor="middle" font-size="10" fill="var(--d-text)">id=78 → row</text>
+  <text x="305" y="116" text-anchor="middle" font-size="10" fill="var(--d-text)">id=100 → row</text>
+  <text x="305" y="132" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">…</text>
+  <line x1="375" y1="80" x2="410" y2="80" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#b1)"/>
+  <rect x="415" y="50" width="90" height="60" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="460" y="75" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-green)">结果集</text>
+  <text x="460" y="95" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">整行数据</text>
+  <text x="260" y="210" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">图 1 基本回表流程 — id 值随机，磁盘随机读</text>
+</svg>
+</div>
 
 
 如果随着a的值递增顺序查询的话，id的值就变成随机的，那么就会出现随机访问，性能相对较差。虽然“按行查”这个机制不能改，但是调整查询的顺序，还是能够加速的。
@@ -84,9 +121,60 @@ select * from t1 where a>=1 and a<=100;
 
 下面两幅图就是使用了MRR优化后的执行流程和explain结果。
 
-> **[图：图2 MRR执行流程]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 230" style="max-width:580px;width:100%;height:auto;font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="b2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue)"/></marker>
+    <marker id="b2g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-green)"/></marker>
+  </defs>
+  <!-- Step 1: Index a -->
+  <rect x="10" y="30" width="110" height="80" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="65" y="22" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-blue)">1. 索引 a</text>
+  <text x="65" y="52" text-anchor="middle" font-size="10" fill="var(--d-text)">范围扫描</text>
+  <text x="65" y="68" text-anchor="middle" font-size="10" fill="var(--d-text)">a∈[1,100]</text>
+  <text x="65" y="85" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">取出 id 值</text>
+  <!-- Arrow -->
+  <line x1="120" y1="70" x2="155" y2="70" stroke="var(--d-blue)" stroke-width="1.5" marker-end="url(#b2)"/>
+  <!-- Step 2: read_rnd_buffer -->
+  <rect x="160" y="30" width="130" height="80" rx="6" fill="var(--d-orange)" fill-opacity="0.1" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="225" y="22" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-orange)">2. read_rnd_buffer</text>
+  <text x="225" y="52" text-anchor="middle" font-size="10" fill="var(--d-text)">收集 id 值</text>
+  <text x="225" y="70" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-green)">排序 id ↑</text>
+  <text x="225" y="88" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">12,30,55,78,100…</text>
+  <!-- Arrow -->
+  <line x1="290" y1="70" x2="325" y2="70" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#b2g)"/>
+  <!-- Step 3: Primary key -->
+  <rect x="330" y="30" width="110" height="80" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="385" y="22" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-green)">3. 主键索引</text>
+  <text x="385" y="52" text-anchor="middle" font-size="10" fill="var(--d-text)">按排序后 id</text>
+  <text x="385" y="70" text-anchor="middle" font-size="10" fill="var(--d-green)">顺序访问</text>
+  <text x="385" y="88" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">接近顺序读盘</text>
+  <!-- Arrow -->
+  <line x1="440" y1="70" x2="470" y2="70" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#b2g)"/>
+  <rect x="475" y="45" width="55" height="50" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="502" y="70" text-anchor="middle" font-size="10" fill="var(--d-green)">结果</text>
+  <text x="502" y="85" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">按 id 序</text>
+  <!-- Comparison -->
+  <rect x="60" y="130" width="180" height="40" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4"/>
+  <text x="150" y="148" text-anchor="middle" font-size="9" fill="var(--d-orange)">对比: 排序前 = 随机 IO</text>
+  <text x="150" y="162" text-anchor="middle" font-size="9" fill="var(--d-orange)">排序后 = 顺序 IO (快)</text>
+  <rect x="300" y="130" width="180" height="40" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1" stroke-dasharray="4"/>
+  <text x="390" y="148" text-anchor="middle" font-size="9" fill="var(--d-green)">结果集按主键 id 递增</text>
+  <text x="390" y="162" text-anchor="middle" font-size="9" fill="var(--d-green)">与基本回表顺序相反</text>
+  <text x="270" y="215" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">图 2 MRR 执行流程 — 先排序 id，再顺序回表</text>
+</svg>
+</div>
 
-> **[图：图3 MRR执行流程的explain结果]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 80" style="max-width:580px;width:100%;height:auto;font-family:'Courier New',monospace">
+  <rect x="5" y="5" width="550" height="70" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="15" y="22" font-size="10" font-weight="bold" fill="var(--d-text)">explain select * from t1 where a>=1 and a<=100;</text>
+  <text x="15" y="40" font-size="9" fill="var(--d-text-muted)">|id|table|type |key|rows|Extra                          |</text>
+  <text x="15" y="55" font-size="9" fill="var(--d-green)">| 1|t1   |range|a  | 100|Using index condition; Using MRR|</text>
+  <text x="15" y="68" font-size="9" fill="var(--d-text-muted)">                                        ↑ MRR 优化已启用</text>
+</svg>
+<div style="font-size:12px;color:var(--d-text-sub);margin-top:0.3em">图 3 MRR 执行流程的 explain 结果 — Extra 显示 Using MRR</div>
+</div>
 
 
 从图3的explain结果中，我们可以看到Extra字段多了Using `MRR`，表示的是用上了MRR优化。而且，由于我们在read_rnd_buffer中按照id做了排序，所以最后得到的结果集也是按照主键id递增顺序的，也就是与图1结果集中行的顺序相反。
@@ -101,7 +189,45 @@ select * from t1 where a>=1 and a<=100;
 
 我们再来看看上一篇文章中用到的NLJ算法的流程图：
 
-> **[图：图4 Index Nested-Loop Join流程图]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" style="max-width:600px;width:100%;height:auto;font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="a4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue-border)"/></marker>
+    <marker id="a4o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Driver table t1 -->
+  <rect x="20" y="30" width="120" height="90" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="80" y="22" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-blue-border)">驱动表 t1</text>
+  <text x="80" y="55" text-anchor="middle" font-size="10" fill="var(--d-text)">全表扫描</text>
+  <text x="80" y="73" text-anchor="middle" font-size="10" fill="var(--d-text)">取出一行 R</text>
+  <text x="80" y="91" text-anchor="middle" font-size="9" fill="var(--d-text)">取字段 a 的值</text>
+  <!-- Arrow to driven table -->
+  <line x1="140" y1="75" x2="220" y2="75" stroke="var(--d-blue-border)" stroke-width="1.5" marker-end="url(#a4)"/>
+  <text x="180" y="67" text-anchor="middle" font-size="9" fill="var(--d-blue-border)">a 的值</text>
+  <!-- Driven table t2 -->
+  <rect x="225" y="30" width="140" height="90" rx="6" fill="var(--d-bg)" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="295" y="22" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-orange)">被驱动表 t2</text>
+  <text x="295" y="52" text-anchor="middle" font-size="10" fill="var(--d-text)">索引 a 上查找</text>
+  <text x="295" y="70" text-anchor="middle" font-size="10" fill="var(--d-text)">匹配 t2.a = R.a</text>
+  <text x="295" y="88" text-anchor="middle" font-size="10" fill="var(--d-text)">回表取整行</text>
+  <text x="295" y="108" text-anchor="middle" font-size="9" fill="var(--d-green)">一行一行地查</text>
+  <!-- Arrow to result -->
+  <line x1="365" y1="75" x2="430" y2="75" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#a4)"/>
+  <!-- Result -->
+  <rect x="435" y="45" width="100" height="60" rx="6" fill="var(--d-bg)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="485" y="72" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-green)">结果集</text>
+  <text x="485" y="90" text-anchor="middle" font-size="9" fill="var(--d-text)">合并返回</text>
+  <!-- Loop arrow -->
+  <path d="M80,120 L80,155 L295,155 L295,120" fill="none" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4" marker-end="url(#a4o)"/>
+  <text x="187" y="150" text-anchor="middle" font-size="9" fill="var(--d-orange)">循环：t1 的每一行都去 t2 查一次</text>
+  <!-- Note box -->
+  <rect x="60" y="180" width="420" height="65" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4"/>
+  <text x="270" y="200" text-anchor="middle" font-size="10" fill="var(--d-text)">NLJ 流程：逐行从 t1 取值，到 t2 索引查找</text>
+  <text x="270" y="218" text-anchor="middle" font-size="10" fill="var(--d-text)">每次只传一个值给 t2，无法利用 MRR 顺序读优化</text>
+  <text x="270" y="236" text-anchor="middle" font-size="9" fill="var(--d-orange)">优化方向 → 批量传值 → BKA 算法</text>
+  <text x="280" y="280" text-anchor="middle" font-size="12" fill="var(--d-text)">图 4 Index Nested-Loop Join 流程图</text>
+</svg>
+</div>
 
 
 NLJ算法执行的逻辑是：从驱动表t1，一行行地取出a的值，再到被驱动表t2去做join。也就是说，对于表t2来说，每次都是匹配一个值。这时，MRR的优势就用不上了。
@@ -114,7 +240,54 @@ NLJ算法执行的逻辑是：从驱动表t1，一行行地取出a的值，再�
 
 如图5所示，是上面的NLJ算法优化后的BKA算法的流程。
 
-> **[图：图5 Batched Key Acess流程]**
+<div style="text-align:center;margin:1.5em 0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 270" style="max-width:620px;width:100%;height:auto;font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="a5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-blue-border)"/></marker>
+    <marker id="a5g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-green)"/></marker>
+    <marker id="a5o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="var(--d-orange)"/></marker>
+  </defs>
+  <!-- Step 1: Driver table t1 -->
+  <rect x="10" y="40" width="110" height="80" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="65" y="32" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-blue-border)">1. 驱动表 t1</text>
+  <text x="65" y="62" text-anchor="middle" font-size="10" fill="var(--d-text)">扫描多行</text>
+  <text x="65" y="80" text-anchor="middle" font-size="10" fill="var(--d-text)">取 P1~P100</text>
+  <text x="65" y="98" text-anchor="middle" font-size="9" fill="var(--d-text)">批量取出</text>
+  <!-- Arrow 1->2 -->
+  <line x1="120" y1="80" x2="155" y2="80" stroke="var(--d-blue-border)" stroke-width="1.5" marker-end="url(#a5)"/>
+  <!-- Step 2: join_buffer -->
+  <rect x="160" y="40" width="120" height="80" rx="6" fill="var(--d-orange)" fill-opacity="0.1" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="220" y="32" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-orange)">2. join_buffer</text>
+  <text x="220" y="62" text-anchor="middle" font-size="10" fill="var(--d-text)">暂存批量数据</text>
+  <text x="220" y="80" text-anchor="middle" font-size="10" fill="var(--d-text)">P1, P2 … P100</text>
+  <text x="220" y="98" text-anchor="middle" font-size="9" fill="var(--d-orange)">批量 key</text>
+  <!-- Arrow 2->3 -->
+  <line x1="280" y1="80" x2="315" y2="80" stroke="var(--d-orange)" stroke-width="1.5" marker-end="url(#a5o)"/>
+  <!-- Step 3: MRR sort -->
+  <rect x="320" y="40" width="100" height="80" rx="6" fill="var(--d-green)" fill-opacity="0.1" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="370" y="32" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-green)">3. MRR 排序</text>
+  <text x="370" y="62" text-anchor="middle" font-size="10" fill="var(--d-text)">对 key 排序</text>
+  <text x="370" y="80" text-anchor="middle" font-size="10" fill="var(--d-green)">顺序化</text>
+  <text x="370" y="98" text-anchor="middle" font-size="9" fill="var(--d-text)">减少随机 IO</text>
+  <!-- Arrow 3->4 -->
+  <line x1="420" y1="80" x2="450" y2="80" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#a5g)"/>
+  <!-- Step 4: Driven table t2 -->
+  <rect x="455" y="40" width="110" height="80" rx="6" fill="var(--d-bg)" stroke="var(--d-green)" stroke-width="1.5"/>
+  <text x="510" y="32" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-green)">4. 被驱动表 t2</text>
+  <text x="510" y="62" text-anchor="middle" font-size="10" fill="var(--d-text)">索引查找</text>
+  <text x="510" y="80" text-anchor="middle" font-size="10" fill="var(--d-green)">顺序回表</text>
+  <text x="510" y="98" text-anchor="middle" font-size="9" fill="var(--d-text)">返回匹配行</text>
+  <!-- Arrow to result -->
+  <path d="M510,120 L510,150 L300,150" fill="none" stroke="var(--d-green)" stroke-width="1.5" marker-end="url(#a5g)"/>
+  <rect x="210" y="140" width="85" height="30" rx="5" fill="var(--d-bg)" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="252" y="160" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--d-green)">结果集</text>
+  <!-- Comparison note -->
+  <rect x="50" y="190" width="480" height="40" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-orange)" stroke-width="1" stroke-dasharray="4"/>
+  <text x="290" y="207" text-anchor="middle" font-size="10" fill="var(--d-text)">BKA = NLJ + join_buffer(批量) + MRR(排序)</text>
+  <text x="290" y="223" text-anchor="middle" font-size="9" fill="var(--d-orange)">对比 NLJ：一次传多个值给被驱动表，利用 MRR 顺序读优化</text>
+  <text x="290" y="256" text-anchor="middle" font-size="12" fill="var(--d-text)">图 5 Batched Key Access 流程</text>
+</svg>
+</div>
 
 
 图中，我在join_buffer中放入的数据是P1~P100，表示的是只会取查询需要的字段。当然，如果join buffer放不下P1~P100的所有数据，就会把这100行数据分成多段执行上图的流程。
@@ -190,9 +363,54 @@ select * from t1 join t2 on (t1.b=t2.b) where t2.b>=1 and t2.b<=2000;
 
 我在上一篇文章中说过，对于表t2的每一行，判断join是否满足的时候，都需要遍历join_buffer中的所有行。因此判断等值条件的次数是1000*100万=10亿次，这个判断的工作量很大。
 
-> **[图：图6 explain结果]**
+<div style="text-align:center;margin:1.5em 0">
+<div style="display:inline-block;text-align:left;max-width:620px;width:100%;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:'Courier New',monospace">
+<caption style="font-size:12px;color:var(--d-text);margin-bottom:0.5em;font-family:system-ui,sans-serif">图 6 explain 结果 — BNL 算法</caption>
+<thead>
+<tr style="background:var(--d-th-bg);border:1px solid var(--d-th-border);color:var(--d-th-text)">
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">id</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">select_type</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">table</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">type</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">key</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">rows</th>
+<th style="padding:6px 10px;border:1px solid var(--d-th-border)">Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">1</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">SIMPLE</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">t1</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">ALL</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">NULL</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">1000</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">Using where</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">1</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">SIMPLE</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">t2</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">ALL</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">NULL</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border)">100000</td>
+<td style="padding:6px 10px;border:1px solid var(--d-th-border);color:var(--d-orange);font-weight:bold">Using where; Using join buffer (Block Nested Loop)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
-> **[图：图7 语句执行时间]**
+<div style="text-align:center;margin:1.5em 0">
+<div style="display:inline-block;max-width:480px;width:100%;background:var(--d-bg);border:1px solid var(--d-th-border);border-radius:6px;padding:16px 20px;text-align:left;font-family:'Courier New',monospace;font-size:13px">
+<div style="font-family:system-ui,sans-serif;font-size:12px;color:var(--d-text);margin-bottom:10px;font-weight:bold">图 7 语句执行时间</div>
+<div style="color:var(--d-text);margin-bottom:6px">mysql> select * from t1 join t2 on (t1.b=t2.b) where t2.b>=1 and t2.b<=2000;</div>
+<div style="color:var(--d-text);margin-bottom:6px">...</div>
+<div style="color:var(--d-text);margin-bottom:10px">1000 rows in set (<span style="color:var(--d-orange);font-weight:bold">1 min 11.87 sec</span>)</div>
+<div style="background:var(--d-warn-bg);border-radius:4px;padding:8px 12px;font-family:system-ui,sans-serif;font-size:11px;color:var(--d-orange)">BNL 算法：1000 x 100万 = 10 亿次判断，耗时超过 1 分钟</div>
+</div>
+</div>
 
 
 可以看到，explain结果里Extra字段显示使用了BNL算法。在我的测试环境里，这条语句需要执行1分11秒。
@@ -219,7 +437,27 @@ select * from t1 join temp_t on (t1.b=temp_t.b);
 
 图8就是这个语句序列的执行效果。
 
-> **[图：图8 使用临时表的执行效果]**
+<div style="text-align:center;margin:1.5em 0">
+<div style="display:inline-block;max-width:580px;width:100%;background:var(--d-bg);border:1px solid var(--d-th-border);border-radius:6px;padding:16px 20px;text-align:left;font-family:'Courier New',monospace;font-size:12px">
+<div style="font-family:system-ui,sans-serif;font-size:12px;color:var(--d-text);margin-bottom:12px;font-weight:bold">图 8 使用临时表的执行效果</div>
+<div style="color:var(--d-text);margin-bottom:4px">mysql> create temporary table temp_t(id int primary key, a int, b int, index(b)) engine=innodb;</div>
+<div style="color:var(--d-green);margin-bottom:8px">Query OK, 0 rows affected (<span style="font-weight:bold">0.00 sec</span>)</div>
+<div style="color:var(--d-text);margin-bottom:4px">mysql> insert into temp_t select * from t2 where b>=1 and b<=2000;</div>
+<div style="color:var(--d-green);margin-bottom:8px">Query OK, 2000 rows affected (<span style="font-weight:bold">0.05 sec</span>)</div>
+<div style="color:var(--d-text);margin-bottom:4px">mysql> select * from t1 join temp_t on (t1.b=temp_t.b);</div>
+<div style="color:var(--d-green);margin-bottom:10px">1000 rows in set (<span style="font-weight:bold">0.04 sec</span>)</div>
+<div style="display:flex;gap:12px;margin-top:8px">
+<div style="flex:1;background:var(--d-warn-bg);border-radius:4px;padding:8px 10px;font-family:system-ui,sans-serif;font-size:11px;text-align:center">
+<div style="color:var(--d-orange);font-weight:bold">优化前 (BNL)</div>
+<div style="color:var(--d-orange);font-size:16px;font-weight:bold;margin-top:4px">1 min 11 sec</div>
+</div>
+<div style="flex:1;background:var(--d-blue-bg);border-radius:4px;padding:8px 10px;font-family:system-ui,sans-serif;font-size:11px;text-align:center">
+<div style="color:var(--d-green);font-weight:bold">优化后 (临时表+BKA)</div>
+<div style="color:var(--d-green);font-size:16px;font-weight:bold;margin-top:4px">< 1 sec</div>
+</div>
+</div>
+</div>
+</div>
 
 
 可以看到，整个过程3个语句执行时间的总和还不到1秒，相比于前面的1分11秒，性能得到了大幅提升。接下来，我们一起看一下这个过程的消耗：
@@ -309,12 +547,10 @@ select * from t1 join t2 on(t1.a=t2.a) join t3 on (t2.b=t3.b) where t1.c>=X and 
 
 给这些同学点赞，非常好的思考和讨论。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：郭健]**
 
 
 [__ 2](<javascript:;>)
@@ -337,7 +573,6 @@ __ 作者回复
 
 2019-02-07
 
-> **[图：Geek_02538c]**
 
 
 [__ 1](<javascript:;>)
@@ -352,7 +587,6 @@ __ 作者回复
 
 2019-02-03
 
-> **[图：Ryoma]**
 
 
 [__ 1](<javascript:;>)
@@ -371,7 +605,6 @@ __ 作者回复
 
 2019-02-03
 
-> **[图：Mr.Strive.Z.H.L]**
 
 
 [__ 1](<javascript:;>)
@@ -404,7 +637,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：LY]**
 
 
 [__ 1](<javascript:;>)
@@ -423,7 +655,6 @@ __ 作者回复
 
 2019-02-01
 
-> **[图：郭健]**
 
 
 [__ 0](<javascript:;>)
@@ -432,7 +663,6 @@ __ 作者回复
 
 2019-02-09
 
-> **[图：磊]**
 
 
 [__ 0](<javascript:;>)
@@ -449,7 +679,6 @@ __ 作者回复
 
 2019-02-03
 
-> **[图：bluefantasy3]**
 
 
 [__ 0](<javascript:;>)
@@ -467,7 +696,6 @@ __ 作者回复
 
 2019-02-03
 
-> **[图：信信]**
 
 
 [__ 0](<javascript:;>)
@@ -488,7 +716,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：HuaMax]**
 
 
 [__ 0](<javascript:;>)
@@ -519,7 +746,6 @@ __ 作者回复
 
 2019-02-04
 
-> **[图：库淘淘]**
 
 
 [__ 0](<javascript:;>)
@@ -556,7 +782,6 @@ BKA是从Index Nexted-Loop join 优化而来的，并不是“t1和t2join得结�
 
 2019-02-02
 
-> **[图：LY]**
 
 
 [__ 0](<javascript:;>)
@@ -580,7 +805,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：dzkk]**
 
 
 [__ 0](<javascript:;>)
@@ -603,7 +827,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：老杨同志]**
 
 
 [__ 0](<javascript:;>)
@@ -627,7 +850,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：poppy]**
 
 
 [__ 0](<javascript:;>)
@@ -643,7 +865,6 @@ __ 作者回复
 
 2019-02-02
 
-> **[图：Destroy、]**
 
 
 [__ 0](<javascript:;>)
@@ -661,7 +882,6 @@ __ 作者回复
 
 2019-02-01
 
-> **[图：LY]**
 
 
 [__ 0](<javascript:;>)
@@ -682,7 +902,6 @@ sql语句，还有explain这个语句的结果😆，我们再来分析下哈
 
 2019-02-01
 
-> **[图：John]**
 
 
 [__ 0](<javascript:;>)
@@ -691,7 +910,6 @@ sql语句，还有explain这个语句的结果😆，我们再来分析下哈
 
 2019-02-01
 
-> **[图：永恒记忆]**
 
 
 [__ 0](<javascript:;>)
@@ -708,7 +926,6 @@ __ 作者回复
 
 2019-02-01
 
-> **[图：郭江伟]**
 
 
 [__ 0](<javascript:;>)

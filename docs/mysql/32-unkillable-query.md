@@ -19,7 +19,45 @@ description: "极客时间《MySQL 实战 45 讲》第 32 讲笔记整理"
 
 还有一种情况是，语句处于锁等待的时候，直接使用kill命令也是有效的。我们一起来看下这个例子：
 
-> **[图：图1 kill query 成功的例子]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<table style="width:100%;border-collapse:collapse;font-size:13px;text-align:center">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:8px;color:var(--d-th-text)"></th>
+<th style="padding:8px;color:var(--d-th-text)">Session A</th>
+<th style="padding:8px;color:var(--d-th-text)">Session B</th>
+<th style="padding:8px;color:var(--d-th-text)">Session C</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T1</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-text)">begin;<br/>update t set c=c+1<br/>where id=1;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T2</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace"><span style="color:var(--d-orange)">update t set c=c+1<br/>where id=1;</span><br/><span style="color:var(--d-orange)">(blocked)</span></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T3</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-green)">kill query &lt;B_thread_id&gt;;</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T4</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-green)">ERROR 1317<br/>Query execution was<br/>interrupted</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+</tr>
+</tbody>
+</table>
+<div style="color:var(--d-text-sub);font-size:0.9em;margin-top:0.5em">图 1 &nbsp;kill query 成功的例子 — 等行锁时可以被 kill</div>
+</div>
 
 
 可以看到，session C 执行kill query以后，session B几乎同时就提示了语句被中断。这，就是我们预期的结果。
@@ -60,7 +98,73 @@ description: "极客时间《MySQL 实战 45 讲》第 32 讲笔记整理"
 
 首先，执行set global `innodb_thread_concurrency`=2，将InnoDB的并发线程上限数设置为2；然后，执行下面的序列：
 
-> **[图：图2 kill query 无效的例子]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="text-align:center;max-width:640px;width:100%">
+<table style="width:100%;border-collapse:collapse;font-size:13px;text-align:center">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:8px;color:var(--d-th-text)"></th>
+<th style="padding:8px;color:var(--d-th-text)">Session A</th>
+<th style="padding:8px;color:var(--d-th-text)">Session B</th>
+<th style="padding:8px;color:var(--d-th-text)">Session C</th>
+<th style="padding:8px;color:var(--d-th-text)">Session D</th>
+<th style="padding:8px;color:var(--d-th-text)">Session E</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T1</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace;color:var(--d-text)">select sleep(100)<br/>from t where id=1;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T2</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace;color:var(--d-text)">select sleep(100)<br/>from t where id=2;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T3</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace"><span style="color:var(--d-orange)">select sleep(100)<br/>from t where id=3;</span><br/><span style="color:var(--d-orange)">(blocked - 等待进入<br/>InnoDB)</span></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T4</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace;color:var(--d-text)">kill query C;<br/><span style="color:var(--d-orange)">(无效 — C 仍在等待)</span></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T5</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace;color:var(--d-green)">kill connection C;</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);color:var(--d-text);font-weight:600">T6</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-size:12px;font-family:monospace;color:var(--d-orange)">Lost connection to<br/>MySQL server during<br/>query</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border)"></td>
+</tr>
+</tbody>
+</table>
+<div style="color:var(--d-text);font-size:0.9em;margin-top:0.5em">图 2 &nbsp;kill query 无效的例子 — innodb_thread_concurrency=2 时第三个线程被阻塞</div>
+</div>
+</div>
 
 
 可以看到：
@@ -73,7 +177,45 @@ description: "极客时间《MySQL 实战 45 讲》第 32 讲笔记整理"
 
   4. 但是这时候，如果在session E中执行show processlist，你就能看到下面这个图。
 
-> **[图：图3 kill connection之后的效果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="text-align:center;max-width:580px;width:100%">
+<table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:8px;color:var(--d-th-text)">Id</th>
+<th style="padding:8px;color:var(--d-th-text)">User</th>
+<th style="padding:8px;color:var(--d-th-text)">Command</th>
+<th style="padding:8px;color:var(--d-th-text)">State</th>
+<th style="padding:8px;color:var(--d-th-text)">Info</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">10</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">root</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">Query</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">User sleep</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">select sleep(100)...</td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">11</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">root</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">Query</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">User sleep</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-text)">select sleep(100)...</td>
+</tr>
+<tr style="background:var(--d-warn-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-orange);font-weight:600">12</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-orange)">root</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-orange);font-weight:600">Killed</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-orange)">Sending to client</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-th-border);font-family:monospace;font-size:12px;color:var(--d-orange)">select sleep(100)...</td>
+</tr>
+</tbody>
+</table>
+<div style="color:var(--d-text);font-size:0.9em;margin-top:0.5em">图 3 &nbsp;kill connection 之后 show processlist 的效果 — id=12 的 Command 列显示 Killed</div>
+</div>
+</div>
 
 
 这时候，id=12这个线程的Commnad列显示的是Killed。也就是说，客户端虽然断开了连接，但实际上服务端上这条语句还在执行过程中。
@@ -133,7 +275,31 @@ description: "极客时间《MySQL 实战 45 讲》第 32 讲笔记整理"
 
 有些线上的库，会包含很多表（我见过最多的一个库里有6万个表）。这时候，你就会发现，每次用客户端连接都会卡在下面这个界面上。
 
-> **[图：图4 连接等待]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<svg viewBox="0 0 520 200" style="max-width:520px;width:100%;font-family:system-ui,sans-serif">
+<rect x="0" y="0" width="520" height="200" rx="10" fill="var(--d-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+<!-- Terminal frame -->
+<rect x="30" y="20" width="460" height="150" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+<!-- Terminal title bar -->
+<rect x="30" y="20" width="460" height="28" rx="8" fill="var(--d-th-bg)"/>
+<rect x="30" y="40" width="460" height="8" fill="var(--d-th-bg)"/>
+<circle cx="50" cy="34" r="5" fill="var(--d-orange)"/>
+<circle cx="66" cy="34" r="5" fill="var(--d-green)"/>
+<circle cx="82" cy="34" r="5" fill="var(--d-blue-border)"/>
+<text x="260" y="38" text-anchor="middle" fill="var(--d-th-text)" font-size="12" font-weight="600">MySQL Client</text>
+<!-- Terminal content -->
+<text x="46" y="72" fill="var(--d-text)" font-size="13" font-family="monospace">$ mysql -h 127.0.0.1 -P 3306 -u root -p db1</text>
+<text x="46" y="96" fill="var(--d-text)" font-size="13" font-family="monospace">Reading table information for completion</text>
+<text x="46" y="116" fill="var(--d-text)" font-size="13" font-family="monospace">of table and column names</text>
+<text x="46" y="136" fill="var(--d-text)" font-size="13" font-family="monospace">You can turn off this feature to get a</text>
+<text x="46" y="156" fill="var(--d-text)" font-size="13" font-family="monospace">quicker startup with <tspan fill="var(--d-orange)" font-weight="600">-A</tspan></text>
+<!-- Blinking cursor -->
+<rect x="46" y="160" width="8" height="2" fill="var(--d-green)">
+<animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+</rect>
+</svg>
+<div style="color:var(--d-text);font-size:0.9em;margin-top:0.5em;text-align:center">图 4 &nbsp;连接等待 — 客户端在补全表名信息，使用 -A 参数可跳过</div>
+</div>
 
 
 而如果db1这个库里表很少的话，连接起来就会很快，可以很快进入输入命令的状态。因此，有同学会认为是表的数目影响了连接性能。
@@ -225,12 +391,10 @@ MySQL客户端默认采用第一种方式，而如果加上–quick参数，就�
 
 为了数据安全和服务稳定，多做点预防方案的设计讨论，总好过故障处理和事后复盘。方案设计讨论会和故障复盘会，这两种会议的会议室气氛完全不一样。经历过的同学一定懂的。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：Leon📷]**
 
 
 [__ 2](<javascript:;>)
@@ -249,7 +413,6 @@ __ 作者回复
 
 2019-01-30
 
-> **[图：Mr.sylar]**
 
 
 [__ 2](<javascript:;>)
@@ -278,7 +441,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：Ryoma]**
 
 
 [__ 1](<javascript:;>)
@@ -287,7 +449,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：斜面镜子 Bill]**
 
 
 [__ 0](<javascript:;>)
@@ -302,7 +463,6 @@ __ 作者回复
 
 2019-01-28
 
-> **[图：700]**
 
 
 [__ 0](<javascript:;>)
@@ -321,7 +481,6 @@ __ 作者回复
 
 2019-01-28
 
-> **[图：千年孤独]**
 
 
 [__ 0](<javascript:;>)
@@ -354,7 +513,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：路过]**
 
 
 [__ 0](<javascript:;>)
@@ -378,7 +536,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：HuaMax]**
 
 
 [__ 0](<javascript:;>)
@@ -418,7 +575,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：gaohueric]**
 
 
 [__ 0](<javascript:;>)
@@ -434,7 +590,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：700]**
 
 
 [__ 0](<javascript:;>)
@@ -457,7 +612,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：700]**
 
 
 [__ 0](<javascript:;>)
@@ -482,7 +636,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：Justin]**
 
 
 [__ 0](<javascript:;>)
@@ -497,7 +650,6 @@ __ 作者回复
 
 2019-01-26
 
-> **[图：往事随风，顺其自然]**
 
 
 [__ 0](<javascript:;>)
@@ -506,7 +658,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：发条橙子 ]**
 
 
 [__ 0](<javascript:;>)
@@ -532,7 +683,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：AI杜嘉嘉]**
 
 
 [__ 0](<javascript:;>)
@@ -547,7 +697,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：曾剑]**
 
 
 [__ 0](<javascript:;>)
@@ -556,7 +705,6 @@ __ 作者回复
 
 2019-01-25
 
-> **[图：Dkey]**
 
 
 [__ 0](<javascript:;>)

@@ -43,7 +43,59 @@ mysql> select count(*) from tradelog where month(t_modified)=7;
 
 下面是这个t_modified索引的示意图。方框上面的数字就是month()函数对应的值。
 
-> **[图：图1 t_modified索引示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:580px;width:100%;">
+<svg viewBox="0 0 580 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <text x="290" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图1 t_modified 索引示意图</text>
+  <defs>
+    <marker id="arrow18-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-text-sub)"/>
+    </marker>
+    <marker id="arrowGreen18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/>
+    </marker>
+  </defs>
+  <!-- month() values row -->
+  <text x="58" y="55" text-anchor="middle" font-size="11" fill="var(--d-text-muted)">month()</text>
+  <text x="120" y="55" text-anchor="middle" font-size="11" fill="var(--d-orange)">2</text>
+  <text x="200" y="55" text-anchor="middle" font-size="11" fill="var(--d-orange)">4</text>
+  <text x="290" y="55" text-anchor="middle" font-size="11" fill="var(--d-orange)">7</text>
+  <text x="380" y="55" text-anchor="middle" font-size="11" fill="var(--d-orange)">9</text>
+  <text x="460" y="55" text-anchor="middle" font-size="11" fill="var(--d-orange)">11</text>
+  <!-- Root node -->
+  <rect x="205" y="65" width="170" height="32" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="250" y="85" text-anchor="middle" font-size="12" fill="var(--d-text)">2016-04</text>
+  <text x="335" y="85" text-anchor="middle" font-size="12" fill="var(--d-text)">2017-09</text>
+  <line x1="220" y1="65" x2="220" y2="97" stroke="var(--d-border)" stroke-width="0.5"/>
+  <line x1="305" y1="65" x2="305" y2="97" stroke="var(--d-border)" stroke-width="0.5"/>
+  <!-- Level 2 nodes -->
+  <rect x="30" y="130" width="160" height="32" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="70" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2016-02</text>
+  <text x="145" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2016-04</text>
+  <line x1="110" y1="130" x2="110" y2="162" stroke="var(--d-border)" stroke-width="0.5"/>
+  <rect x="210" y="130" width="160" height="32" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="250" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2017-07</text>
+  <text x="330" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2017-09</text>
+  <line x1="290" y1="130" x2="290" y2="162" stroke="var(--d-border)" stroke-width="0.5"/>
+  <rect x="390" y="130" width="160" height="32" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="430" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2018-07</text>
+  <text x="510" y="150" text-anchor="middle" font-size="11" fill="var(--d-text)">2018-11</text>
+  <line x1="470" y1="130" x2="470" y2="162" stroke="var(--d-border)" stroke-width="0.5"/>
+  <!-- Arrows root → children -->
+  <line x1="240" y1="97" x2="130" y2="130" stroke="var(--d-text-sub)" stroke-width="1" marker-end="url(#arrow18-1)"/>
+  <line x1="290" y1="97" x2="290" y2="130" stroke="var(--d-text-sub)" stroke-width="1" marker-end="url(#arrow18-1)"/>
+  <line x1="340" y1="97" x2="450" y2="130" stroke="var(--d-text-sub)" stroke-width="1" marker-end="url(#arrow18-1)"/>
+  <!-- Green arrow: fast locate 2018-07-01 -->
+  <line x1="430" y1="162" x2="430" y2="190" stroke="var(--d-green)" stroke-width="2" marker-end="url(#arrowGreen18)"/>
+  <text x="430" y="207" text-anchor="middle" font-size="11" font-weight="bold" fill="var(--d-green)">t_modified='2018-7-1'</text>
+  <text x="430" y="222" text-anchor="middle" font-size="10" fill="var(--d-green)">快速定位 ✓</text>
+  <!-- Red X: month(t_modified)=7 cannot locate -->
+  <rect x="30" y="240" width="520" height="50" rx="6" fill="none" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="290" y="260" text-anchor="middle" font-size="12" fill="var(--d-orange)" font-weight="bold">month(t_modified) = 7</text>
+  <text x="290" y="278" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">month() 破坏有序性 → 无法定位，只能全索引扫描</text>
+</svg>
+</div>
+</div>
 
 
 如果你的SQL语句条件用的是where t_modified='2018-7-1’的话，引擎就会按照上面绿色箭头的路线，快速定位到 t_modified='2018-7-1’需要的结果。
@@ -60,7 +112,24 @@ mysql> select count(*) from tradelog where month(t_modified)=7;
 
 接下来，我们使用explain命令，查看一下这条SQL语句的执行结果。
 
-> **[图：图2 explain 结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图2 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select count(*) from tradelog
+       where month(t_modified)=7;
+
++----+-------------+----------+-------+---------------+------------+
+| id | select_type | table    | type  | possible_keys | key        |
++----+-------------+----------+-------+---------------+------------+
+|  1 | SIMPLE      | tradelog | <span style="color:var(--d-orange);">index</span> | NULL          | <span style="color:var(--d-green);">t_modified</span> |
++----+-------------+----------+-------+---------------+------------+
+| key_len |   rows | filtered | Extra                |
++---------+--------+----------+----------------------+
+| 5       | <span style="color:var(--d-orange);">100335</span> |   100.00 | <span style="color:var(--d-green);">Using where;</span>         |
+|         |        |          | <span style="color:var(--d-green);">Using index</span>          |
++---------+--------+----------+----------------------+</pre>
+</div>
+</div>
 
 
 key="t_modified"表示的是，使用了t_modified这个索引；我在测试表数据中插入了10万行数据，rows=100335，说明这条语句扫描了整个索引的所有值；Extra字段的Using index，表示的是使用了覆盖索引。
@@ -112,7 +181,27 @@ mysql> select * from tradelog where tradeid=110717;
 
 验证结果如图3所示。
 
-> **[图：图3 MySQL中字符串和数字转换的效果示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:580px;width:100%;">
+<svg viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <text x="290" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图3 MySQL 中字符串和数字转换的效果示意图</text>
+  <!-- Query box -->
+  <rect x="130" y="38" width="320" height="32" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="290" y="58" text-anchor="middle" font-size="13" font-family="'Courier New',monospace" fill="var(--d-text)">select "10" > 9  →  <tspan font-weight="bold" fill="var(--d-green)">1</tspan></text>
+  <!-- Result text -->
+  <text x="290" y="90" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">结论：MySQL 将字符串转换成数字进行比较</text>
+  <!-- Conversion examples -->
+  <rect x="40" y="108" width="230" height="75" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="155" y="128" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-green)">正常转换</text>
+  <text x="155" y="148" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">"10"  → 10</text>
+  <text x="155" y="168" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">"123" → 123</text>
+  <rect x="310" y="108" width="230" height="75" rx="6" fill="none" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="425" y="128" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-orange)">意外转换</text>
+  <text x="425" y="148" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">"abc" → 0</text>
+  <text x="425" y="168" text-anchor="middle" font-size="12" font-family="'Courier New',monospace" fill="var(--d-text)">"1a2" → 1</text>
+</svg>
+</div>
+</div>
 
 
 从图中可知，select “10” > 9返回的是1，所以你就能确认MySQL里的转换规则了：在MySQL中，字符串和数字做比较的话，是将字符串转换成数字。
@@ -182,7 +271,22 @@ insert into trade_detail values(11, 'aaaaaaac', 4, 'commit');
 mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2; /*语句Q1*/
 ```
 
-> **[图：图4 语句Q1的explain 结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图4 语句 Q1 的 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
+       trade_detail d
+       where d.tradeid=l.tradeid and l.id=2;
+
++----+-------+--------------+-------+---------+-------+------+-------+
+| id | table | type         | key   | key_len | ref   | rows | Extra |
++----+-------+--------------+-------+---------+-------+------+-------+
+|  1 | l     | const        | <span style="color:var(--d-green);">PRIMARY</span>| 4      | const |    <span style="color:var(--d-green);">1</span> |       |
+|  1 | d     | <span style="color:var(--d-orange);">ALL</span>          | <span style="color:var(--d-orange);">NULL</span>  | NULL    | NULL  |   <span style="color:var(--d-orange);">11</span> | Using |
+|    |       |              |       |         |       |      | where |
++----+-------+--------------+-------+---------+-------+------+-------+</pre>
+</div>
+</div>
 
 
 我们一起来看下这个结果：
@@ -196,7 +300,53 @@ mysql> select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and 
 
 接下来，我们看下这个explain结果表示的执行流程：
 
-> **[图：图5 语句Q1的执行过程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;max-width:580px;width:100%;">
+<svg viewBox="0 0 580 370" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+  <defs>
+    <marker id="arrow18-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-text-sub)"/>
+    </marker>
+    <marker id="arrow18-5r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+  <text x="290" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图5 语句 Q1 的执行过程</text>
+  <!-- tradelog table -->
+  <rect x="30" y="45" width="200" height="120" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="130" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">tradelog (utf8mb4)</text>
+  <line x1="30" y1="72" x2="230" y2="72" stroke="var(--d-blue-border)" stroke-width="1"/>
+  <text x="50" y="90" font-size="11" fill="var(--d-text-sub)">id=1  tradeid='aaaaaaaa'</text>
+  <rect x="35" y="98" width="190" height="22" rx="3" fill="var(--d-green)" fill-opacity="0.15" stroke="var(--d-green)" stroke-width="1"/>
+  <text x="50" y="114" font-size="11" font-weight="bold" fill="var(--d-text)">id=2  tradeid='aaaaaaab'</text>
+  <text x="50" y="138" font-size="11" fill="var(--d-text-sub)">id=3  tradeid='aaaaaaac'</text>
+  <!-- Step 1 -->
+  <text x="130" y="155" text-anchor="middle" font-size="10" fill="var(--d-green)">① 主键定位 id=2 → L2</text>
+  <!-- Arrow from tradelog to step2 -->
+  <line x1="230" y1="109" x2="270" y2="109" stroke="var(--d-text-sub)" stroke-width="1.5" marker-end="url(#arrow18-5)"/>
+  <text x="250" y="100" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">②</text>
+  <!-- Step 2 box -->
+  <rect x="270" y="90" width="120" height="38" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1"/>
+  <text x="330" y="108" text-anchor="middle" font-size="11" fill="var(--d-text)">取 tradeid</text>
+  <text x="330" y="122" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">'aaaaaaab'</text>
+  <!-- Arrow to trade_detail -->
+  <line x1="330" y1="128" x2="330" y2="172" stroke="var(--d-text-sub)" stroke-width="1.5" marker-end="url(#arrow18-5)"/>
+  <text x="342" y="155" font-size="10" fill="var(--d-text-sub)">③</text>
+  <!-- trade_detail table -->
+  <rect x="230" y="175" width="320" height="135" rx="6" fill="none" stroke="var(--d-orange)" stroke-width="1.5"/>
+  <text x="390" y="195" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">trade_detail (utf8)</text>
+  <line x1="230" y1="202" x2="550" y2="202" stroke="var(--d-orange)" stroke-width="1"/>
+  <text x="250" y="220" font-size="11" fill="var(--d-text-sub)">id=1  tradeid='aaaaaaaa'  →  CONVERT(utf8mb4)</text>
+  <text x="250" y="238" font-size="11" fill="var(--d-text-sub)">id=4  tradeid='aaaaaaab'  →  CONVERT(utf8mb4)</text>
+  <text x="250" y="256" font-size="11" fill="var(--d-text-sub)">id=8  tradeid='aaaaaaac'  →  CONVERT(utf8mb4)</text>
+  <text x="250" y="274" font-size="11" fill="var(--d-text-muted)">...逐行转换比较 (全表扫描)</text>
+  <!-- Warning box -->
+  <rect x="50" y="325" width="480" height="36" rx="6" fill="none" stroke="var(--d-orange)" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="290" y="340" text-anchor="middle" font-size="11" fill="var(--d-orange)" font-weight="bold">被驱动表 trade_detail 的 tradeid 被 CONVERT() 包裹 → 无法使用索引</text>
+  <text x="290" y="355" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">CONVERT(tradeid USING utf8mb4) = $L2.tradeid.value</text>
+</svg>
+</div>
+</div>
 
 
 图中：
@@ -246,7 +396,21 @@ CONVERT()函数，在这里的意思是把输入的字符串转成utf8mb4字符�
 mysql>select l.operator from tradelog l , trade_detail d where d.tradeid=l.tradeid and d.id=4;
 ```
 
-> **[图：图6 explain 结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图6 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select l.operator from tradelog l,
+       trade_detail d
+       where d.tradeid=l.tradeid and d.id=4;
+
++----+-------+--------------+---------+---------+-------+------+-------+
+| id | table | type         | key     | key_len | ref   | rows | Extra |
++----+-------+--------------+---------+---------+-------+------+-------+
+|  1 | d     | const        | <span style="color:var(--d-green);">PRIMARY</span> | 4       | const |    <span style="color:var(--d-green);">1</span> |       |
+|  1 | l     | ref          | <span style="color:var(--d-green);">tradeid</span> | 131     | const |    <span style="color:var(--d-green);">1</span> |       |
++----+-------+--------------+---------+---------+-------+------+-------+</pre>
+</div>
+</div>
 
 
 这个语句里trade_detail 表成了驱动表，但是explain结果的第二行显示，这次的查询操作用上了被驱动表tradelog里的索引(tradeid)，扫描行数是1。
@@ -291,7 +455,23 @@ alter table trade_detail modify tradeid varchar(32) CHARACTER SET utf8mb4 defaul
 mysql> select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid USING utf8) and l.id=2; 
 ```
 
-> **[图：图7 SQL语句优化后的explain结果]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:'Courier New',monospace;font-size:12px;background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:16px;max-width:580px;width:100%;overflow-x:auto;color:var(--d-text);">
+<div style="font-weight:bold;color:var(--d-blue);margin-bottom:8px;font-family:system-ui,sans-serif;">图7 SQL 语句优化后的 explain 结果</div>
+<pre style="margin:0;">mysql> <span style="color:var(--d-blue);">explain</span> select d.* from tradelog l,
+       trade_detail d
+       where d.tradeid=CONVERT(l.tradeid USING utf8)
+       and l.id=2;
+
++----+-------+--------------+---------+---------+-------+------+-------+
+| id | table | type         | key     | key_len | ref   | rows | Extra |
++----+-------+--------------+---------+---------+-------+------+-------+
+|  1 | l     | const        | <span style="color:var(--d-green);">PRIMARY</span> | 4       | const |    <span style="color:var(--d-green);">1</span> |       |
+|  1 | d     | ref          | <span style="color:var(--d-green);">tradeid</span> | 99      | const |    <span style="color:var(--d-green);">1</span> | Using |
+|    |       |              |         |         |       |      | where |
++----+-------+--------------+---------+---------+-------+------+-------+</pre>
+</div>
+</div>
 
 
 这里，我主动把 l.tradeid转成utf8，就避免了被驱动表上的字符编码转换，从explain结果可以看到，这次索引走对了。

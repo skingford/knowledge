@@ -31,7 +31,43 @@ CREATE TABLE `t` (
  insert into t values(1,1)
 ```
 
-> **[图：图1 查询blocked]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<table style="width:100%;border-collapse:collapse;font-size:13px;text-align:center">
+<thead>
+<tr style="background:var(--d-th-bg);border-bottom:2px solid var(--d-th-border)">
+<th style="padding:8px;color:var(--d-th-text)"></th>
+<th style="padding:8px;color:var(--d-th-text)">Session A</th>
+<th style="padding:8px;color:var(--d-th-text)">Session B</th>
+<th style="padding:8px;color:var(--d-th-text)">Session C</th>
+<th style="padding:8px;color:var(--d-th-text)">Session D</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T1</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-text)">select sleep(100)<br/>from t;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-text)">select sleep(100)<br/>from t;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace;color:var(--d-text)">select sleep(100)<br/>from t;</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-muted)"></td>
+</tr>
+<tr style="background:var(--d-stripe)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T2</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace"><span style="color:var(--d-green)">select 1;</span><br/><span style="color:var(--d-green)">(Query OK)</span></td>
+</tr>
+<tr style="background:var(--d-bg)">
+<td style="padding:6px;border-bottom:1px solid var(--d-border);color:var(--d-text-sub);font-weight:600">T3</td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border)"></td>
+<td style="padding:6px;border-bottom:1px solid var(--d-border);font-size:12px;font-family:monospace"><span style="color:var(--d-orange)">select * from t;</span><br/><span style="color:var(--d-orange)">(blocked)</span></td>
+</tr>
+</tbody>
+</table>
+<div style="color:var(--d-text-sub);font-size:0.9em;margin-top:0.5em">图 1 &nbsp;查询 blocked — select 1 成功但查表被阻塞</div>
+</div>
 
 
 我们设置innodb_thread_concurrency参数的目的是，控制InnoDB的并发线程上限。也就是说，一旦并发线程数达到这个值，InnoDB在接收到新请求的时候，就会进入等待状态，直到有线程退出。
@@ -67,7 +103,35 @@ MySQL这样设计是非常有意义的。因为，进入锁等待的线程已经
 
 下图2显示的就是这个状态。
 
-> **[图：图2 系统锁死状态（假设等行锁的语句占用并发计数）]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<svg viewBox="0 0 480 210" style="width:100%;font-family:system-ui,sans-serif">
+  <defs>
+    <marker id="hc2-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="var(--d-orange)"/>
+    </marker>
+  </defs>
+  <!-- Thread 1 -->
+  <rect x="20" y="15" width="180" height="44" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.5"/>
+  <text x="110" y="34" text-anchor="middle" fill="var(--d-blue)" font-size="12" font-weight="600">线程 1（持有行锁）</text>
+  <text x="110" y="50" text-anchor="middle" fill="var(--d-text-sub)" font-size="11">空闲，需要提交事务</text>
+  <!-- Threads 2-129 -->
+  <rect x="20" y="80" width="180" height="44" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.5"/>
+  <text x="110" y="99" text-anchor="middle" fill="var(--d-warn-text)" font-size="12" font-weight="600">线程 2 ~ 129</text>
+  <text x="110" y="115" text-anchor="middle" fill="var(--d-warn-text)" font-size="11">等行锁（128个）</text>
+  <!-- InnoDB concurrency -->
+  <rect x="270" y="40" width="190" height="70" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+  <text x="365" y="65" text-anchor="middle" fill="var(--d-text)" font-size="12" font-weight="600">InnoDB 并发计数</text>
+  <text x="365" y="85" text-anchor="middle" fill="var(--d-orange)" font-size="14" font-weight="700">128 / 128（满）</text>
+  <!-- arrows -->
+  <line x1="200" y1="37" x2="267" y2="55" stroke="var(--d-orange)" stroke-width="1.2" marker-end="url(#hc2-arrow)"/>
+  <line x1="200" y1="102" x2="267" y2="85" stroke="var(--d-orange)" stroke-width="1.2" marker-end="url(#hc2-arrow)"/>
+  <!-- Deadlock note -->
+  <rect x="80" y="150" width="320" height="40" rx="5" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.5"/>
+  <text x="240" y="166" text-anchor="middle" fill="var(--d-warn-text)" font-size="12">线程 1 无法进入引擎提交 → 行锁不释放</text>
+  <text x="240" y="182" text-anchor="middle" fill="var(--d-warn-text)" font-size="12">线程 2~129 永远等待 → <tspan font-weight="700">系统锁死</tspan></text>
+</svg>
+<div style="color:var(--d-text-sub);font-size:0.9em;margin-top:0.3em">图 2 &nbsp;系统锁死状态（假设等行锁的语句占用并发计数）</div>
+</div>
 
 
 这时候InnoDB不能响应任何请求，整个系统被锁死。而且，由于所有线程都处于等待状态，此时占用的CPU却是0，而这明显不合理。所以，我们说InnoDB在设计时，遇到进程进入锁等待的情况时，将并发线程的计数减1的设计，是合理而且是必要的。
@@ -156,7 +220,29 @@ insert into mysql.health_check(id, t_modified) values (@@server_id, now()) on du
 
 file_summary_by_event_name表里有很多行数据，我们先来看看event_name='wait/io/file/innodb/innodb_log_file’这一行。
 
-> **[图：图3 performance_schema.f]**
+<div style="text-align:center;margin:1.5em auto;max-width:580px">
+<div style="background:var(--d-bg-alt);border:1px solid var(--d-border);border-radius:6px;padding:1em;text-align:left;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.7;color:var(--d-text);overflow-x:auto">
+<div style="color:var(--d-text-muted);margin-bottom:0.5em">performance_schema.file_summary_by_event_name (redo log 行)</div>
+<table style="width:100%;border-collapse:collapse;font-size:11px">
+<tr style="border-bottom:1px solid var(--d-border)">
+<td style="padding:3px 6px;color:var(--d-text-sub)">EVENT_NAME</td>
+<td style="padding:3px 6px;color:var(--d-blue);font-weight:600">wait/io/file/innodb/innodb_log_file</td>
+</tr>
+<tr style="border-bottom:1px solid var(--d-border-dash)">
+<td colspan="2" style="padding:4px 6px;color:var(--d-text-muted);font-style:italic">-- 所有 IO 统计 --</td>
+</tr>
+<tr><td style="padding:2px 6px;color:var(--d-text-sub)">COUNT_STAR</td><td style="padding:2px 6px">854</td></tr>
+<tr><td style="padding:2px 6px;color:var(--d-text-sub)">SUM_TIMER_WAIT</td><td style="padding:2px 6px">2506706732000</td></tr>
+<tr><td style="padding:2px 6px;color:var(--d-text-sub)">MIN_TIMER_WAIT</td><td style="padding:2px 6px">22310000</td></tr>
+<tr><td style="padding:2px 6px;color:var(--d-text-sub)">AVG_TIMER_WAIT</td><td style="padding:2px 6px">2935250000</td></tr>
+<tr style="border-bottom:1px solid var(--d-border-dash)"><td style="padding:2px 6px;color:var(--d-orange);font-weight:600">MAX_TIMER_WAIT</td><td style="padding:2px 6px;color:var(--d-orange)">56688392000</td></tr>
+<tr style="border-bottom:1px solid var(--d-border-dash)">
+<td colspan="2" style="padding:4px 6px;color:var(--d-text-muted);font-style:italic">-- READ / WRITE / MISC 统计省略 --</td>
+</tr>
+</table>
+</div>
+<div style="color:var(--d-text-sub);font-size:0.9em;margin-top:0.5em">图 3 &nbsp;performance_schema.file_summary_by_event_name（redo log 行）</div>
+</div>
 
 
 图中这一行表示统计的是redo log的写入时间，第一列EVENT_NAME 表示统计的类型。
@@ -238,12 +324,10 @@ MHA中的另一个可选方法是只做连接，就是 “如果连接成功就�
 
 > @曾剑、@max 同学提到的备库先做，再切主库的方法也是可以的。
 
-> **[图：示意图]**
 
 
 ##  精选留言
 
-> **[图：某、人]**
 
 
 [__ 6](<javascript:;>)
@@ -263,7 +347,6 @@ __ 作者回复
 
 2019-01-21
 
-> **[图：IceGeek17]**
 
 
 [__ 1](<javascript:;>)
@@ -282,7 +365,6 @@ __ 作者回复
 
 2019-01-31
 
-> **[图：Mr.Strive.Z.H.L]**
 
 
 [__ 1](<javascript:;>)
@@ -307,8 +389,6 @@ insert into mysql.health_check(id, t_modified) values (1, now()) on duplicate ke
 
 2019-01-22
 
-- ![](http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLE4LYb3jrH63ZV98Zpc8DompwDgb1O3nffMoZCmiaibauRyEFv6NDNsST9RWxZExvMLMWb50zaanoQ/132)
-
 慧鑫coming
 
 [__ 1](<javascript:;>)
@@ -331,7 +411,6 @@ insert into mysql.health_check(id, t_modified) values (1, now()) on duplicate ke
 
 2019-01-22
 
-> **[图：heat nan]**
 
 
 [__ 1](<javascript:;>)
@@ -350,7 +429,6 @@ __ 作者回复
 
 2019-01-19
 
-> **[图：老杨同志]**
 
 
 [__ 1](<javascript:;>)
@@ -379,7 +457,6 @@ __ 作者回复
 
 2019-01-20
 
-> **[图：强哥]**
 
 
 [__ 1](<javascript:;>)
@@ -397,7 +474,6 @@ __ 作者回复
 
 2019-01-18
 
-> **[图：长杰]**
 
 
 [__ 1](<javascript:;>)
@@ -415,7 +491,6 @@ __ 作者回复
 
 2019-01-18
 
-> **[图：Mr.Strive.Z.H.L]**
 
 
 [__ 0](<javascript:;>)
@@ -441,7 +516,6 @@ __ 作者回复
 
 2019-01-23
 
-> **[图：一大只😴]**
 
 
 [__ 0](<javascript:;>)
@@ -457,7 +531,6 @@ Thread running 是包含“锁等待”状态的线程的，
 
 2019-01-22
 
-> **[图：小橙橙]**
 
 
 [__ 0](<javascript:;>)
@@ -474,8 +547,6 @@ __ 作者回复
 你把update改成select，先确定一下是不是能看到你要更新的数据（根据你这个描述，应该是没有）
 
 2019-01-18
-
-- ![](https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJJeibN69icI9iapx9h2MtUX3zb2iaggw32w4GAmbUDibPp3ia5MPSznxGZeiadXibBbx6Y13iacDbTDBwKyibA/132)
 
 悟空
 
@@ -504,7 +575,6 @@ __ 作者回复
 
 2019-01-18
 
-> **[图：One day]**
 
 
 [__ 0](<javascript:;>)
@@ -523,7 +593,6 @@ __ 作者回复
 
 2019-01-18
 
-> **[图：Ryoma]**
 
 
 [__ 0](<javascript:;>)
@@ -532,7 +601,6 @@ __ 作者回复
 
 2019-01-18
 
-> **[图：爸爸回来了]**
 
 
 [__ 0](<javascript:;>)
