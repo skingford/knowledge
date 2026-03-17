@@ -22,60 +22,60 @@ mysql> select * from T where ID=10;
 下面我给出的是 MySQL 的基本架构示意图，从中你可以清楚地看到 SQL 语句在 MySQL 的各个功能模块中的执行过程。
 
 <div style="display:flex;justify-content:center;padding:20px 0;">
-<div style="font-family:system-ui,sans-serif;font-size:14px;color:#333;max-width:460px;width:100%;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:460px;width:100%;">
   <!-- 客户端 -->
-  <div style="text-align:center;padding:10px 20px;background:#e3f2fd;border:2px solid #1565c0;border-radius:8px;color:#0d47a1;font-weight:bold;">客户端</div>
-  <div style="text-align:center;font-size:20px;color:#666;">↓</div>
+  <div style="text-align:center;padding:10px 20px;background:var(--d-client-bg);border:2px solid var(--d-client-border);border-radius:8px;color:var(--d-client-text);font-weight:bold;">客户端</div>
+  <div style="text-align:center;font-size:20px;color:var(--d-text-sub);">↓</div>
   <!-- Server 层 -->
-  <div style="border:2px solid #78909c;border-radius:10px;padding:16px;background:#fafafa;">
-    <div style="text-align:center;color:#546e7a;font-weight:bold;margin-bottom:12px;font-size:15px;">Server 层</div>
+  <div style="border:2px solid var(--d-layer-border);border-radius:10px;padding:16px;background:var(--d-bg);">
+    <div style="text-align:center;color:var(--d-layer-title);font-weight:bold;margin-bottom:12px;font-size:15px;">Server 层</div>
     <!-- 连接器 -->
-    <div style="text-align:center;padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+    <div style="text-align:center;padding:8px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;">
       <div style="font-weight:bold;">连接器</div>
-      <div style="font-size:12px;color:#666;">管理连接，权限验证</div>
+      <div style="font-size:12px;color:var(--d-text-sub);">管理连接，权限验证</div>
     </div>
-    <div style="text-align:center;font-size:18px;color:#666;">↓</div>
+    <div style="text-align:center;font-size:18px;color:var(--d-text-sub);">↓</div>
     <!-- 分析器 -->
-    <div style="text-align:center;padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+    <div style="text-align:center;padding:8px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;">
       <div style="font-weight:bold;">分析器</div>
-      <div style="font-size:12px;color:#666;">词法分析，语法分析</div>
+      <div style="font-size:12px;color:var(--d-text-sub);">词法分析，语法分析</div>
     </div>
-    <div style="text-align:center;font-size:18px;color:#666;">↓</div>
+    <div style="text-align:center;font-size:18px;color:var(--d-text-sub);">↓</div>
     <!-- 查询缓存（可选旁路） -->
     <div style="display:flex;gap:12px;align-items:stretch;margin-bottom:4px;">
       <!-- 左侧：查询缓存旁路 -->
-      <div style="flex:1;border:1px dashed #bdbdbd;border-radius:8px;padding:8px;background:#fafafa;text-align:center;">
-        <div style="font-size:11px;color:#999;margin-bottom:6px;">查询缓存（可选）</div>
-        <div style="padding:6px;background:#f5f5f5;border:1px solid #bdbdbd;border-radius:5px;margin-bottom:6px;">
-          <div style="font-weight:bold;font-size:13px;color:#666;">查询缓存</div>
-          <div style="font-size:11px;color:#999;">MySQL 8.0 已移除</div>
+      <div style="flex:1;border:1px dashed var(--d-border-dash);border-radius:8px;padding:8px;background:var(--d-bg);text-align:center;">
+        <div style="font-size:11px;color:var(--d-text-dim);margin-bottom:6px;">查询缓存（可选）</div>
+        <div style="padding:6px;background:var(--d-bg-alt);border:1px solid var(--d-border-dash);border-radius:5px;margin-bottom:6px;">
+          <div style="font-weight:bold;font-size:13px;color:var(--d-text-sub);">查询缓存</div>
+          <div style="font-size:11px;color:var(--d-text-dim);">MySQL 8.0 已移除</div>
         </div>
-        <div style="font-size:11px;color:#888;">↓ 命中</div>
-        <div style="padding:6px;background:#fff3cd;border:1px solid #ffc107;border-radius:5px;color:#856404;font-weight:bold;font-size:12px;margin-top:4px;">直接返回结果</div>
+        <div style="font-size:11px;color:var(--d-text-muted);">↓ 命中</div>
+        <div style="padding:6px;background:var(--d-warn-bg);border:1px solid var(--d-warn-border);border-radius:5px;color:var(--d-warn-text);font-weight:bold;font-size:12px;margin-top:4px;">直接返回结果</div>
       </div>
       <!-- 右侧：主流程继续 -->
       <div style="flex:1.6;text-align:center;">
-        <div style="font-size:11px;color:#999;margin-bottom:6px;">未命中 / 未开启缓存</div>
-        <div style="padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+        <div style="font-size:11px;color:var(--d-text-dim);margin-bottom:6px;">未命中 / 未开启缓存</div>
+        <div style="padding:8px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;">
           <div style="font-weight:bold;">优化器</div>
-          <div style="font-size:12px;color:#666;">执行计划生成，索引选择</div>
+          <div style="font-size:12px;color:var(--d-text-sub);">执行计划生成，索引选择</div>
         </div>
-        <div style="font-size:18px;color:#666;">↓</div>
-        <div style="padding:8px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;">
+        <div style="font-size:18px;color:var(--d-text-sub);">↓</div>
+        <div style="padding:8px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;">
           <div style="font-weight:bold;">执行器</div>
-          <div style="font-size:12px;color:#666;">操作引擎，返回结果</div>
+          <div style="font-size:12px;color:var(--d-text-sub);">操作引擎，返回结果</div>
         </div>
       </div>
     </div>
   </div>
-  <div style="text-align:center;font-size:20px;color:#666;">↓</div>
+  <div style="text-align:center;font-size:20px;color:var(--d-text-sub);">↓</div>
   <!-- 存储引擎层 -->
-  <div style="border:2px solid #78909c;border-radius:10px;padding:16px;background:#fafafa;">
-    <div style="text-align:center;color:#546e7a;font-weight:bold;margin-bottom:10px;font-size:15px;">存储引擎层 <span style="font-weight:normal;font-size:12px;color:#888;">— 存储数据，提供读写接口</span></div>
+  <div style="border:2px solid var(--d-layer-border);border-radius:10px;padding:16px;background:var(--d-bg);">
+    <div style="text-align:center;color:var(--d-layer-title);font-weight:bold;margin-bottom:10px;font-size:15px;">存储引擎层 <span style="font-weight:normal;font-size:12px;color:var(--d-text-muted);">— 存储数据，提供读写接口</span></div>
     <div style="display:flex;gap:10px;justify-content:center;">
-      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">InnoDB</div>
-      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">MyISAM</div>
-      <div style="padding:8px 16px;background:#e8eaf6;border:1px solid #7986cb;border-radius:6px;font-weight:bold;">Memory</div>
+      <div style="padding:8px 16px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;font-weight:bold;">InnoDB</div>
+      <div style="padding:8px 16px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;font-weight:bold;">MyISAM</div>
+      <div style="padding:8px 16px;background:var(--d-blue-bg);border:1px solid var(--d-blue-border);border-radius:6px;font-weight:bold;">Memory</div>
     </div>
   </div>
 </div>

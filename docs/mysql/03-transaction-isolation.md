@@ -36,7 +36,102 @@ mysql> create table T(c int) engine=InnoDB;
 insert into T(c) values(1);
 ```
 
-> **[图：我们来看看在不同的隔离级别下]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:13px;color:var(--d-text);max-width:560px;width:100%;overflow-x:auto;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:12px;font-size:15px;">事务 A 与事务 B 的执行时序</div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="background:var(--d-th-bg);">
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:20%;color:var(--d-th-text);">时刻</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:40%;color:var(--d-th-text);">事务 A</th>
+        <th style="padding:8px 10px;border:1px solid var(--d-th-border);width:40%;color:var(--d-th-text);">事务 B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T1</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">启动事务</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T2</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">启动事务</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T3</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">将 1 改成 2</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T4</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">查询得到值 <strong style="color:var(--d-orange);">V1</strong></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T5</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">提交事务 B</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T6</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">查询得到值 <strong style="color:var(--d-orange);">V2</strong></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T7</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">提交事务 A</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+      <tr style="background:var(--d-stripe);">
+        <td style="padding:6px 10px;border:1px solid var(--d-border);font-weight:bold;color:var(--d-blue);">T8</td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);">查询得到值 <strong style="color:var(--d-orange);">V3</strong></td>
+        <td style="padding:6px 10px;border:1px solid var(--d-border);color:var(--d-text-dim);">—</td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- 各隔离级别结果对比 -->
+  <div style="margin-top:12px;border:1px solid var(--d-border);border-radius:6px;overflow:hidden;">
+    <div style="background:var(--d-th-bg);padding:6px 12px;font-weight:bold;font-size:12px;color:var(--d-th-text);">各隔离级别下 V1、V2、V3 的值</div>
+    <table style="width:100%;border-collapse:collapse;text-align:center;font-size:12px;">
+      <thead>
+        <tr style="background:var(--d-bg-alt);">
+          <th style="padding:6px;border:1px solid var(--d-border);">隔离级别</th>
+          <th style="padding:6px;border:1px solid var(--d-border);">V1</th>
+          <th style="padding:6px;border:1px solid var(--d-border);">V2</th>
+          <th style="padding:6px;border:1px solid var(--d-border);">V3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:5px;border:1px solid var(--d-border);">读未提交</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+        </tr>
+        <tr style="background:var(--d-stripe);">
+          <td style="padding:5px;border:1px solid var(--d-border);">读提交</td>
+          <td style="padding:5px;border:1px solid var(--d-border);font-weight:bold;">1</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+        </tr>
+        <tr>
+          <td style="padding:5px;border:1px solid var(--d-border);">可重复读</td>
+          <td style="padding:5px;border:1px solid var(--d-border);font-weight:bold;">1</td>
+          <td style="padding:5px;border:1px solid var(--d-border);font-weight:bold;">1</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+        </tr>
+        <tr style="background:var(--d-stripe);">
+          <td style="padding:5px;border:1px solid var(--d-border);">串行化</td>
+          <td style="padding:5px;border:1px solid var(--d-border);font-weight:bold;">1</td>
+          <td style="padding:5px;border:1px solid var(--d-border);font-weight:bold;">1</td>
+          <td style="padding:5px;border:1px solid var(--d-border);color:var(--d-orange);font-weight:bold;">2</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
 
 
 - 若隔离级别是“读未提交”， 则V1的值就是2。这时候事务B虽然还没有提交，但是结果已经被A看到了。因此，V2、V3也都是2。
@@ -53,15 +148,10 @@ insert into T(c) values(1);
 
 ```sql
 mysql> show variables like 'transaction_isolation';
-
 +-----------------------+----------------+
-
-| Variable_name | Value |
-
+| Variable_name         | Value          |
 +-----------------------+----------------+
-
 | transaction_isolation | READ-COMMITTED |
-
 +-----------------------+----------------+
 ```
 
@@ -80,7 +170,69 @@ mysql> show variables like 'transaction_isolation';
 
 假设一个值从1被按顺序改成了2、3、4，在回滚日志里面就会有类似下面的记录。
 
-> **[图：相关示意图]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:520px;width:100%;">
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;">MVCC 回滚日志与 read-view 示意图</div>
+  <!-- 值变更链 -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:20px;">
+    <!-- 值 1 -->
+    <div style="text-align:center;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--d-blue-bg);border:2px solid var(--d-indigo);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:var(--d-deep-blue);">1</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;width:60px;">
+      <div style="font-size:11px;color:var(--d-text-muted);">set 2</div>
+      <div style="color:var(--d-text-dim);font-size:16px;">→</div>
+    </div>
+    <!-- 值 2 -->
+    <div style="text-align:center;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--d-blue-bg);border:2px solid var(--d-indigo);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:var(--d-deep-blue);">2</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;width:60px;">
+      <div style="font-size:11px;color:var(--d-text-muted);">set 3</div>
+      <div style="color:var(--d-text-dim);font-size:16px;">→</div>
+    </div>
+    <!-- 值 3 -->
+    <div style="text-align:center;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--d-blue-bg);border:2px solid var(--d-indigo);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:var(--d-deep-blue);">3</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;width:60px;">
+      <div style="font-size:11px;color:var(--d-text-muted);">set 4</div>
+      <div style="color:var(--d-text-dim);font-size:16px;">→</div>
+    </div>
+    <!-- 值 4 (当前值) -->
+    <div style="text-align:center;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--d-cur-bg);border:2px solid var(--d-cur-border);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;color:var(--d-cur-text);">4</div>
+      <div style="font-size:10px;color:var(--d-orange);margin-top:2px;">当前值</div>
+    </div>
+  </div>
+  <!-- 回滚操作链（反向） -->
+  <div style="text-align:center;font-size:12px;color:var(--d-text-muted);margin-bottom:12px;">
+    ← 回滚方向（将 4 改回 3、将 3 改回 2、将 2 改回 1）
+  </div>
+  <!-- read-view 指向 -->
+  <div style="display:flex;flex-direction:column;gap:8px;border:1px solid var(--d-border);border-radius:8px;padding:12px 16px;background:var(--d-bg);">
+    <div style="font-size:12px;font-weight:bold;color:var(--d-layer-title);margin-bottom:4px;">不同事务的 read-view 看到的值：</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:80px;padding:4px 8px;background:var(--d-rv-a-bg);border:1px solid var(--d-rv-a-border);border-radius:4px;text-align:center;font-weight:bold;font-size:12px;color:var(--d-rv-a-text);">read-view A</span>
+      <span style="color:var(--d-text-muted);font-size:12px;">→ 值 =</span>
+      <span style="font-weight:bold;color:var(--d-deep-blue);font-size:14px;">1</span>
+      <span style="color:var(--d-text-dim);font-size:11px;">（需回滚 3 次：4→3→2→1）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:80px;padding:4px 8px;background:var(--d-rv-b-bg);border:1px solid var(--d-rv-b-border);border-radius:4px;text-align:center;font-weight:bold;font-size:12px;color:var(--d-rv-b-text);">read-view B</span>
+      <span style="color:var(--d-text-muted);font-size:12px;">→ 值 =</span>
+      <span style="font-weight:bold;color:var(--d-deep-blue);font-size:14px;">2</span>
+      <span style="color:var(--d-text-dim);font-size:11px;">（需回滚 2 次：4→3→2）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:80px;padding:4px 8px;background:var(--d-rv-c-bg);border:1px solid var(--d-rv-c-border);border-radius:4px;text-align:center;font-weight:bold;font-size:12px;color:var(--d-rv-c-text);">read-view C</span>
+      <span style="color:var(--d-text-muted);font-size:12px;">→ 值 =</span>
+      <span style="font-weight:bold;color:var(--d-deep-blue);font-size:14px;">4</span>
+      <span style="color:var(--d-text-dim);font-size:11px;">（当前最新值，无需回滚）</span>
+    </div>
+  </div>
+</div>
+</div>
 
 当前值是4，但是在查询这条记录的时候，不同时刻启动的事务会有不同的read-view。如图中看到的，在视图A、B、C里面，这一个记录的值分别是1、2、4，同一条记录在系统中可以存在多个版本，就是数据库的多版本并发控制（`MVCC`）。对于read-view A，要得到1，就必须将当前值依次执行图中所有的回滚操作得到。
 

@@ -29,7 +29,7 @@ mysql> update T set c=c+1 where ID=2;
 
 前面我有跟你介绍过SQL语句基本的执行链路，这里我再把那张图拿过来，你也可以先简单看看这个图回顾下。首先，可以确定的说，查询语句的那一套流程，更新语句也是同样会走一遍。
 
-> **[图：MySQL的逻辑架构图]**
+> 参考 [01. 基础架构：一条 SQL 查询语句是如何执行的？](./01-sql-query-execution.md) 中的 MySQL 逻辑架构图。
 
 
 你执行语句前要先连接数据库，这是连接器的工作。
@@ -64,8 +64,66 @@ mysql> update T set c=c+1 where ID=2;
 
 与此类似，InnoDB的redo log是固定大小的，比如可以配置为一组4个文件，每个文件的大小是1GB，那么这块“粉板”总共就可以记录4GB的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。
 
-> **[图：相关示意图]**
-
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:400px;width:100%;">
+  <!-- redo log 循环写示意图 -->
+  <div style="position:relative;width:280px;height:280px;margin:0 auto;">
+    <!-- 圆环背景 -->
+    <svg viewBox="0 0 280 280" style="width:100%;height:100%;">
+      <!-- 四段弧线代表4个文件 -->
+      <circle cx="140" cy="140" r="110" fill="none" style="stroke:var(--d-svg-ring)" stroke-width="30"/>
+      <!-- file 0 (右上) -->
+      <path d="M 140 30 A 110 110 0 0 1 250 140" fill="none" style="stroke:var(--d-blue-bg)" stroke-width="28"/>
+      <!-- file 1 (右下) -->
+      <path d="M 250 140 A 110 110 0 0 1 140 250" fill="none" style="stroke:var(--d-blue-light)" stroke-width="28"/>
+      <!-- file 2 (左下) -->
+      <path d="M 140 250 A 110 110 0 0 1 30 140" fill="none" style="stroke:var(--d-blue-bg)" stroke-width="28"/>
+      <!-- file 3 (左上) -->
+      <path d="M 30 140 A 110 110 0 0 1 140 30" fill="none" style="stroke:var(--d-blue-light)" stroke-width="28"/>
+      <!-- 已写入区域 (write pos 到 checkpoint 之间，顺时针方向的已用空间) -->
+      <path d="M 250 140 A 110 110 0 0 1 80 60" fill="none" style="stroke:var(--d-svg-pending)" stroke-width="28" opacity="0.7"/>
+      <!-- 分隔线 -->
+      <line x1="140" y1="16" x2="140" y2="44" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="264" y1="140" x2="236" y2="140" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="140" y1="264" x2="140" y2="236" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <line x1="16" y1="140" x2="44" y2="140" style="stroke:var(--d-svg-line)" stroke-width="1.5"/>
+      <!-- write pos 箭头 (右下位置) -->
+      <circle cx="250" cy="140" r="6" style="fill:var(--d-orange)"/>
+      <!-- checkpoint 箭头 (左上位置) -->
+      <circle cx="80" cy="60" r="6" style="fill:var(--d-blue)"/>
+      <!-- 顺时针箭头 -->
+      <path d="M 200 50 L 210 35 L 215 55" fill="none" style="stroke:var(--d-arrow)" stroke-width="1.5"/>
+    </svg>
+    <!-- 文件标签 -->
+    <div style="position:absolute;top:55px;right:25px;font-size:11px;color:var(--d-indigo);">ib_logfile_0</div>
+    <div style="position:absolute;bottom:55px;right:25px;font-size:11px;color:var(--d-blue);">ib_logfile_1</div>
+    <div style="position:absolute;bottom:55px;left:25px;font-size:11px;color:var(--d-indigo);">ib_logfile_2</div>
+    <div style="position:absolute;top:55px;left:25px;font-size:11px;color:var(--d-blue);">ib_logfile_3</div>
+    <!-- 中心文字 -->
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+      <div style="font-weight:bold;font-size:13px;color:var(--d-text);">redo log</div>
+      <div style="font-size:11px;color:var(--d-text-muted);">循环写入</div>
+    </div>
+  </div>
+  <!-- 图例 -->
+  <div style="display:flex;justify-content:center;gap:16px;margin-top:12px;font-size:12px;">
+    <div style="display:flex;align-items:center;gap:4px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--d-orange);"></span>
+      <span style="color:var(--d-orange);font-weight:bold;">write pos</span>
+      <span style="color:var(--d-text-muted);">当前写入位置</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--d-blue);"></span>
+      <span style="color:var(--d-blue);font-weight:bold;">checkpoint</span>
+      <span style="color:var(--d-text-muted);">当前擦除位置</span>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--d-text-muted);">
+    <span style="display:inline-block;width:14px;height:8px;background:var(--d-warn-bg);border:1px solid var(--d-warn-border);border-radius:2px;vertical-align:middle;"></span>
+    write pos → checkpoint 之间：已写入待落盘 ｜ 其余部分：可写入空间
+  </div>
+</div>
+</div>
 
 write pos是当前记录的位置，一边写一边后移，写到第3号文件末尾后就回到0号文件开头。checkpoint是当前要擦除的位置，也是往后推移并且循环的，擦除记录前要把记录更新到数据文件。
 
@@ -107,7 +165,72 @@ write pos和checkpoint之间的是“粉板”上还空着的部分，可以用�
 
 这里我给出这个update语句的执行流程图，图中浅色框表示是在InnoDB内部执行的，深色框表示是在执行器中执行的。
 
-> **[图：update语句执行流程]**
+<div style="display:flex;justify-content:center;padding:20px 0;">
+<div style="font-family:system-ui,sans-serif;font-size:14px;color:var(--d-text);max-width:520px;width:100%;">
+  <!-- 标题 -->
+  <div style="text-align:center;font-weight:bold;margin-bottom:16px;font-size:15px;color:var(--d-text);">update 语句执行流程（两阶段提交）</div>
+  <!-- 流程步骤 -->
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <!-- 步骤1：取数据行 -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--d-exec-num);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;">1</div>
+      <div style="flex:1;padding:10px 14px;background:var(--d-exec-bg);border-radius:6px;color:#fff;">
+        <div style="font-weight:bold;">执行器：取数据行</div>
+        <div style="font-size:12px;opacity:0.9;">调用引擎接口，取 ID=2 这一行（内存中直接返回，否则从磁盘读入）</div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--d-text-dim);font-size:14px;">↓</div>
+    <!-- 步骤2：计算新值 -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--d-exec-num);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;">2</div>
+      <div style="flex:1;padding:10px 14px;background:var(--d-exec-bg);border-radius:6px;color:#fff;">
+        <div style="font-weight:bold;">执行器：计算新值</div>
+        <div style="font-size:12px;opacity:0.9;">将 c 的值加 1（N → N+1），调用引擎接口写入新数据</div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--d-text-dim);font-size:14px;">↓</div>
+    <!-- 步骤3：写 redo log (prepare) -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--d-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;">3</div>
+      <div style="flex:1;padding:10px 14px;background:var(--d-engine-bg);border:2px solid var(--d-engine-border);border-radius:6px;color:var(--d-engine-text);">
+        <div style="font-weight:bold;">InnoDB：写 redo log <span style="background:var(--d-orange);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:4px;">prepare</span></div>
+        <div style="font-size:12px;color:var(--d-engine-sub);">更新内存数据页，将更新操作写入 redo log，标记为 prepare 状态</div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--d-text-dim);font-size:14px;">↓</div>
+    <!-- 步骤4：写 binlog -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--d-exec-num);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;">4</div>
+      <div style="flex:1;padding:10px 14px;background:var(--d-exec-bg);border-radius:6px;color:#fff;">
+        <div style="font-weight:bold;">执行器：写 binlog</div>
+        <div style="font-size:12px;opacity:0.9;">生成这个操作的 binlog，并写入磁盘</div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--d-text-dim);font-size:14px;">↓</div>
+    <!-- 步骤5：提交事务 (commit) -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--d-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;flex-shrink:0;">5</div>
+      <div style="flex:1;padding:10px 14px;background:var(--d-engine-bg);border:2px solid var(--d-engine-border);border-radius:6px;color:var(--d-engine-text);">
+        <div style="font-weight:bold;">InnoDB：提交事务 <span style="background:var(--d-green);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:4px;">commit</span></div>
+        <div style="font-size:12px;color:var(--d-engine-sub);">将 redo log 状态从 prepare 改为 commit，事务提交完成</div>
+      </div>
+    </div>
+  </div>
+  <!-- 图例 -->
+  <div style="display:flex;justify-content:center;gap:20px;margin-top:16px;font-size:12px;">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="display:inline-block;width:14px;height:14px;background:var(--d-exec-bg);border-radius:3px;"></span>
+      <span style="color:var(--d-blue);font-weight:bold;">深色框</span>
+      <span style="color:var(--d-text-muted);">执行器（Server 层）</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="display:inline-block;width:14px;height:14px;background:var(--d-engine-bg);border:2px solid var(--d-engine-border);border-radius:3px;"></span>
+      <span style="color:var(--d-orange);font-weight:bold;">浅色框</span>
+      <span style="color:var(--d-text-muted);">InnoDB 引擎</span>
+    </div>
+  </div>
+</div>
+</div>
 
 
 你可能注意到了，最后三步看上去有点“绕”，将redo log的写入拆成了两个步骤：prepare和commit，这就是"两阶段提交"。

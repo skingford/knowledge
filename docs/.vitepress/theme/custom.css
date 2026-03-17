@@ -1,3 +1,23 @@
+/* ── Diagram theme variables ── */
+:root {
+  --d-text: #333; --d-text-sub: #666; --d-text-muted: #888; --d-text-dim: #999;
+  --d-bg: #fafafa; --d-bg-alt: #f5f5f5; --d-border: #e0e0e0; --d-border-dash: #bdbdbd;
+  --d-arrow: #666; --d-arrow-light: #999;
+  --d-blue-bg: #e8eaf6; --d-blue-border: #7986cb; --d-blue-light: #e3f2fd;
+  --d-layer-border: #78909c; --d-layer-title: #546e7a;
+  --d-client-bg: #e3f2fd; --d-client-border: #1565c0; --d-client-text: #0d47a1;
+  --d-exec-bg: #42a5f5; --d-exec-num: #1565c0;
+  --d-engine-bg: #ffe0b2; --d-engine-border: #e65100; --d-engine-text: #bf360c; --d-engine-sub: #795548;
+  --d-orange: #e65100; --d-blue: #1565c0; --d-indigo: #5c6bc0; --d-deep-blue: #283593; --d-green: #2e7d32;
+  --d-warn-bg: #fff3cd; --d-warn-border: #ffc107; --d-warn-text: #856404;
+  --d-th-bg: #e8eaf6; --d-th-border: #c5cae9; --d-th-text: #283593; --d-stripe: #fafafa;
+  --d-rv-a-bg: #c8e6c9; --d-rv-a-border: #43a047; --d-rv-a-text: #2e7d32;
+  --d-rv-b-bg: #bbdefb; --d-rv-b-border: #1e88e5; --d-rv-b-text: #1565c0;
+  --d-rv-c-bg: #ffe0b2; --d-rv-c-border: #e65100; --d-rv-c-text: #bf360c;
+  --d-cur-bg: #fff3e0; --d-cur-border: #e65100; --d-cur-text: #bf360c;
+  --d-svg-ring: #e0e0e0; --d-svg-pending: #fff3cd; --d-svg-line: #999;
+}
+
 :root {
   --vp-font-family-base: 'SF Pro Text', 'SF Pro SC', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', system-ui, sans-serif;
@@ -111,6 +131,24 @@
   --site-surface: linear-gradient(180deg, rgba(37, 31, 28, 0.88), rgba(28, 24, 21, 0.82));
   --site-panel-border: rgba(234, 219, 200, 0.12);
   --site-shadow: 0 30px 100px rgba(0, 0, 0, 0.34);
+
+  /* ── Diagram dark overrides ── */
+  --d-text: #e0d6cc; --d-text-sub: #c5b8a9; --d-text-muted: #998a7d; --d-text-dim: #7a6e63;
+  --d-bg: #201a16; --d-bg-alt: #26201d; --d-border: #3d342c; --d-border-dash: #4a3f36;
+  --d-arrow: #998a7d; --d-arrow-light: #7a6e63;
+  --d-blue-bg: #1a2040; --d-blue-border: #5c6bc0; --d-blue-light: #162040;
+  --d-layer-border: #5a4e46; --d-layer-title: #c5b8a9;
+  --d-client-bg: #162040; --d-client-border: #5c8bc0; --d-client-text: #90caf9;
+  --d-exec-bg: #1565c0; --d-exec-num: #5c8bc0;
+  --d-engine-bg: #3a2010; --d-engine-border: #e67e22; --d-engine-text: #ffcc80; --d-engine-sub: #c5a882;
+  --d-orange: #e67e22; --d-blue: #5c8bc0; --d-indigo: #7986cb; --d-deep-blue: #9fa8da; --d-green: #66bb6a;
+  --d-warn-bg: #3a3010; --d-warn-border: #f9a825; --d-warn-text: #ffe082;
+  --d-th-bg: #1a2040; --d-th-border: #3d4a6a; --d-th-text: #9fa8da; --d-stripe: #26201d;
+  --d-rv-a-bg: #1a3020; --d-rv-a-border: #43a047; --d-rv-a-text: #81c784;
+  --d-rv-b-bg: #162040; --d-rv-b-border: #1e88e5; --d-rv-b-text: #90caf9;
+  --d-rv-c-bg: #3a2010; --d-rv-c-border: #e67e22; --d-rv-c-text: #ffcc80;
+  --d-cur-bg: #3a2810; --d-cur-border: #e67e22; --d-cur-text: #ffcc80;
+  --d-svg-ring: #3d342c; --d-svg-pending: #3a3010; --d-svg-line: #7a6e63;
 }
 
 html,
