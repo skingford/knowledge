@@ -130,9 +130,10 @@ export default withMermaid(defineConfig({
       {
         text: '工具',
         items: [
-          { text: 'Claude Code 使用指南', link: '/tools/claude-code' },
-          { text: 'Codex 使用指南', link: '/tools/codex' },
+          { text: 'Cursor 使用指南', link: '/tools/cursor' },
           { text: 'Gemini CLI 使用指南', link: '/tools/gemini-cli' },
+          { text: 'Codex 使用指南', link: '/tools/codex' },
+          { text: 'Claude Code 使用指南', link: '/tools/claude-code' },
           { text: 'Vim 实用方案', link: '/tools/vim' },
           { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
           { text: 'Git 常用技巧', link: '/tools/git' },
