@@ -21,7 +21,35 @@ mysql> select * from T where ID=10;
 
 下面我给出的是 MySQL 的基本架构示意图，从中你可以清楚地看到 SQL 语句在 MySQL 的各个功能模块中的执行过程。
 
-> **[图：MySQL 逻辑架构图]** 自上而下分为 Server 层（连接器 → 查询缓存 → 分析器 → 优化器 → 执行器）和存储引擎层（InnoDB / MyISAM / Memory 等插件式引擎）。
+```mermaid
+flowchart TD
+    Client["客户端"]
+
+    subgraph Server["Server 层"]
+        Connector["连接器<br/>管理连接，权限验证"]
+        Cache["查询缓存<br/>命中则直接返回结果"]
+        Analyzer["分析器<br/>词法分析，语法分析"]
+        Optimizer["优化器<br/>执行计划生成，索引选择"]
+        Executor["执行器<br/>操作引擎，返回结果"]
+    end
+
+    subgraph StorageLayer["存储引擎层"]
+        direction LR
+        InnoDB["存储引擎<br/>(InnoDB)"]
+        MyISAM["存储引擎<br/>(MyISAM)"]
+        Memory["存储引擎<br/>(Memory)"]
+    end
+
+    Client -->|"连接"| Connector
+    Connector --> Cache
+    Cache -->|"未命中"| Analyzer
+    Cache -->|"命中则<br/>直接返回"| Client
+    Analyzer --> Optimizer
+    Optimizer --> Executor
+    Executor -->|"存储数据，提供读写接口"| StorageLayer
+```
+
+> MySQL 逻辑架构图：自上而下分为 Server 层（连接器 → 查询缓存 → 分析器 → 优化器 → 执行器）和存储引擎层（InnoDB / MyISAM / Memory 等插件式引擎）。
 
 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。
 

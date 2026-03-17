@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 37 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：今天是大年初二，在开始我们今天的学习之前，我要先和你道一声春节快乐！]**
-
-
 在[第16](<https://time.geekbang.org/column/article/73479>)和[第34](<https://time.geekbang.org/column/article/79700>)篇文章中，我分别和你介绍了sort buffer、内存临时表和join buffer。这三个数据结构都是用来存放语句执行过程中的中间数据，以辅助SQL语句的执行的。其中，我们在排序的时候用到了sort buffer，在使用join语句的时候用到了join buffer。
 
 然后，你可能会有这样的疑问，MySQL什么时候会使用内部临时表呢？
@@ -143,7 +140,7 @@ select id%10 as m, count(*) as c from t1 group by m order by null;
 
 这样就跳过了最后排序的阶段，直接从临时表中取数据返回。返回的结果如图8所示。
 
-> **[图：图8 group + order by null 的结果（内存临时表）]**
+> **[图：图8 group + order by nul]**
 
 
 由于表t1中的id值是从1开始的，因此返回的结果集中第一行是id=1；扫描到id=10的时候才插入m=0这一行，因此结果集里最后一行才是m=0。
@@ -162,7 +159,7 @@ select id%100 as m, count(*) as c from t1 group by m order by null limit 10;
 
 那么，这时候就会把内存临时表转成磁盘临时表，磁盘临时表默认使用的引擎是InnoDB。 这时，返回的结果如图9所示。
 
-> **[图：图9 group + order by null 的结果（磁盘临时表）]**
+> **[图：图9 group + order by nul]**
 
 
 如果这个表t1的数据量很大，很可能这个查询需要的磁盘临时表就会占用大量的磁盘空间。
@@ -251,7 +248,7 @@ select SQL_BIG_RESULT id%100 as m, count(*) as c from t1 group by m;
 
 > **[图：图12 使用 SQL_BIG_RESULT的执行流程图]**
 
-> **[图：图13 使用 SQL_BIG_RESULT的explain 结果]**
+> **[图：图13 使用 SQL_BIG_RESULT的ex]**
 
 
 从Extra字段可以看到，这个语句的执行没有再使用临时表，而是直接用了排序算法。

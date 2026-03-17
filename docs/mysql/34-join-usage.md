@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 34 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：在实际生产中，关于join语句使用的问题，一般会集中在以下两类：]**
-
-
   1. 我们DBA不让使用join，使用join有什么问题呢？
 
   2. 如果有两个大小不同的表做join，应该用哪个表做驱动表呢？
@@ -49,7 +46,7 @@ insert into t1 (select * from t2 where id<=100)
 
 可以看到，这两个表都有一个主键索引id和一个索引a，字段b上无索引。存储过程idata()往表t2里插入了1000行数据，在表t1里插入的是100行数据。
 
-## `Index Nested-Loop Join`
+## Index Nested-Loop Join
 
 我们来看一下这个语句：
 
@@ -80,7 +77,7 @@ select * from t1 straight_join t2 on (t1.a=t2.a);
 
 它对应的流程图如下所示：
 
-> **[图：图2 Index Nested-Loop Join算法的执行流程]**
+> **[图：图2 Index Nested-Loop Jo]**
 
 
 在这个流程里：
@@ -155,7 +152,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 当然，MySQL也没有使用这个Simple Nested-Loop Join算法，而是使用了另一个叫作“`Block Nested-Loop Join`”的算法，简称BNL。
 
-## `Block Nested-Loop Join`
+## Block Nested-Loop Join
 
 这时候，被驱动表上没有可用的索引，算法的流程是这样的：
 
@@ -166,7 +163,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 这个过程的流程图如下：
 
-> **[图：图3 `Block Nested-Loop Join` 算法的执行流程]**
+> **[图：图3 `Block Nested-Loop J]**
 
 
 对应地，这条SQL语句的explain结果如下所示：
@@ -211,7 +208,7 @@ select * from t1 straight_join t2 on (t1.a=t2.b);
 
 执行流程图也就变成这样：
 
-> **[图：图5 `Block Nested-Loop Join` -- 两段]**
+> **[图：图5 `Block Nested-Loop J]**
 
 
 图中的步骤4和5，表示清空join_buffer再复用。

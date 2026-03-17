@@ -174,9 +174,22 @@ def convert_indented_code_blocks(content):
     lines = content.split('\n')
     result = []
     i = 0
+    in_fenced_block = False
 
     while i < len(lines):
         line = lines[i]
+
+        # Track fenced code blocks to avoid processing their contents
+        if line.strip().startswith('```'):
+            in_fenced_block = not in_fenced_block
+            result.append(line)
+            i += 1
+            continue
+
+        if in_fenced_block:
+            result.append(line)
+            i += 1
+            continue
 
         # Check if this line is indented code (4+ spaces)
         if re.match(r'^    \S', line) or (re.match(r'^    $', line) and i + 1 < len(lines) and re.match(r'^    \S', lines[i + 1])):
@@ -414,6 +427,80 @@ def _add_backticks_to_line(line):
     return line
 
 
+def fix_existing_image_descriptions(content):
+    """Fix overly long image descriptions from previous processing.
+    Descriptions > 30 chars that look like paragraphs should be shortened."""
+    lines = content.split('\n')
+    result = []
+    for i, line in enumerate(lines):
+        m = re.match(r'^> \*\*\[图[：:](.*?)\]\*\*$', line)
+        if m:
+            desc = m.group(1)
+            # If description is too long or looks like a paragraph, shorten it
+            if len(desc) > 30 or any(desc.endswith(c) for c in ['。', '？', '！']):
+                # Try to extract a meaningful short description
+                # Common patterns: "图 N description" -> keep
+                fig_match = re.match(r'^(图\s*\d+\s*.{2,20}).*', desc)
+                if fig_match:
+                    desc = fig_match.group(1).rstrip('，。、')
+                else:
+                    # Check context from previous lines for a better description
+                    prev_text = ''
+                    for p in range(max(0, len(result) - 3), len(result)):
+                        if result[p].strip() and not result[p].startswith('>'):
+                            prev_text = result[p].strip()
+                    if '如下' in prev_text or '下面' in prev_text or '下图' in prev_text or '如图' in prev_text:
+                        desc = '相关示意图'
+                    elif '架构' in prev_text:
+                        desc = '架构示意图'
+                    elif '流程' in prev_text:
+                        desc = '执行流程图'
+                    elif '表' in prev_text and ('结果' in prev_text or '数据' in prev_text):
+                        desc = '数据表示意'
+                    else:
+                        # Truncate to first clause
+                        for sep in ['，', '、', '。', '；']:
+                            if sep in desc:
+                                desc = desc[:desc.index(sep)]
+                                break
+                        if len(desc) > 30:
+                            desc = desc[:25] + '...'
+                line = f'> **[图：{desc}]**'
+            result.append(line)
+        else:
+            result.append(line)
+    return '\n'.join(result)
+
+
+def remove_decorative_opening_image(content):
+    """Remove the decorative image placeholder that appears right after the intro quote.
+    These are typically GeekTime article header images with no useful content."""
+    # Pattern: after ">" quote line, blank, then <!-- image: --> or > **[图：...]**
+    content = re.sub(
+        r'(> 本文整理自极客时间.*?\n)\n+(?:<!-- image:\s*-->|> \*\*\[图[：:].*?\]\*\*)\s*\n+',
+        r'\1\n',
+        content
+    )
+    # Also remove trailing decorative image at end of file
+    content = re.sub(
+        r'\n+(?:<!-- image:\s*-->|> \*\*\[图[：:].*?\]\*\*)\s*$',
+        '\n',
+        content
+    )
+    return content
+
+
+def strip_backticks_from_headings(content):
+    """Remove backticks from heading text - technical terms in headings look cleaner without them."""
+    lines = content.split('\n')
+    result = []
+    for line in lines:
+        if re.match(r'^#{1,6} ', line):
+            line = re.sub(r'`([^`]+)`', r'\1', line)
+        result.append(line)
+    return '\n'.join(result)
+
+
 def clean_extra_blank_lines(content):
     """Remove excessive blank lines (max 2 consecutive)."""
     return re.sub(r'\n{4,}', '\n\n\n', content)
@@ -457,8 +544,10 @@ def optimize_file(filepath):
     content = convert_indented_code_blocks(content)
     content = remove_decorative_opening_image(content)
     content = fix_image_placeholders(content)
+    content = fix_existing_image_descriptions(content)
     content = fix_heading_hierarchy(content)
     content = add_inline_code(content)
+    content = strip_backticks_from_headings(content)
     content = clean_list_formatting(content)
     content = clean_extra_blank_lines(content)
 

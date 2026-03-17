@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 23 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：示意图]**
-
-
 今天这篇文章，我会继续和你介绍在业务高峰期临时提升性能的方法。从文章标题“MySQL是怎么保证数据不丢的？”，你就可以看出来，今天我和你介绍的方法，跟数据的可靠性有关。
 
 在专栏前面文章和答疑篇中，我都着重介绍了WAL机制（你可以再回顾下[第2篇](<https://time.geekbang.org/column/article/68633>)、[第9篇](<https://time.geekbang.org/column/article/70848>)、[第12篇](<https://time.geekbang.org/column/article/71806>)和[第15篇](<https://time.geekbang.org/column/article/73161>)文章中的相关内容），得到的结论是：只要redo log和binlog保证持久化到磁盘，就能确保MySQL异常重启后，数据可以恢复。

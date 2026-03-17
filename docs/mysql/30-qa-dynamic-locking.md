@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 30 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：示意图]**
-
-
 在第[20](<https://time.geekbang.org/column/article/75173>)和[21](<https://time.geekbang.org/column/article/75659>)篇文章中，我和你介绍了InnoDB的间隙锁、next-key lock，以及加锁规则。在这两篇文章的评论区，出现了很多高质量的留言。我觉得通过分析这些问题，可以帮助你加深对加锁规则的理解。
 
 所以，我就从中挑选了几个有代表性的问题，构成了今天这篇答疑文章的主题，即：用动态的观点看加锁。
@@ -234,7 +231,7 @@ select id from t where c in(5,20,10) order by c desc for update;
 
 按照我们上一节说的，索引c上(5,10)间隙是由这个间隙右边的记录，也就是c=10定义的。所以通过这个操作，session A的加锁范围变成了图7所示的样子：  
 
-> **[图：图 7 session B修改后， session A的加锁范围]**
+> **[图：图 7 session B修改后， sessio]**
 
 
 好，接下来session B要执行 update t set c = 5 where c = 1这个语句了，一样地可以拆成两步：

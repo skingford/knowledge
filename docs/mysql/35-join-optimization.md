@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 35 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：示意图]**
-
-
 在上一篇文章中，我和你介绍了join语句的两种算法，分别是Index Nested-Loop Join(NLJ)和Block Nested-Loop Join(BNL)。
 
 我们发现在使用NLJ算法的时候，其实效果还是不错的，比通过应用层拆分成多个语句然后再拼接查询结果更方便，而且性能也不会差。
@@ -98,7 +95,7 @@ select * from t1 where a>=1 and a<=100;
 
 **MRR能够提升性能的核心** 在于，这条查询语句在索引a上做的是一个范围查询（也就是说，这是一个多值查询），可以得到足够多的主键id。这样通过排序以后，再去主键索引查数据，才能体现出“顺序性”的优势。
 
-## `Batched Key Access`
+## Batched Key Access
 
 理解了MRR性能提升的原理，我们就能理解MySQL在5.6版本后开始引入的Batched Key Acess(BKA)算法了。这个BKA算法，其实就是对NLJ算法的优化。
 

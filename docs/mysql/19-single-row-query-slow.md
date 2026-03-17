@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 19 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：示意图]**
-
-
 一般情况下，如果我跟你说查询性能优化，你首先会想到一些复杂的语句，想到查询需要返回大量的数据。但有些情况下，“查一行”，也会执行得特别慢。今天，我就跟你聊聊这个有趣的话题，看看什么情况下，会出现这个现象。
 
 需要说明的是，如果MySQL数据库本身就有很大的压力，导致数据库服务器CPU占用率很高或ioutil（IO利用率）很高，这种情况下所有语句的执行都有可能变慢，不属于我们今天的讨论范围。
@@ -63,7 +60,7 @@ mysql> select * from t where id=1;
 
 如图2所示，就是使用show processlist命令查看Waiting for table metadata lock的示意图。
 
-> **[图：图2 Waiting for table metadata lock状态示意图]**
+> **[图：图2 Waiting for table me]**
 
 
 出现**这个状态表示的是，现在有一个线程正在表t上请求或者持有MDL写锁，把select语句堵住了。**
@@ -72,7 +69,7 @@ mysql> select * from t where id=1;
 
 不过，在MySQL 5.7版本下复现这个场景，也很容易。如图3所示，我给出了简单的复现步骤。  
 
-> **[图：图3 MySQL 5.7中Waiting for table metadata lock的复现步骤]**
+> **[图：图3 MySQL 5.7中Waiting fo]**
 
 
 session A 通过lock table命令持有表t的MDL写锁，而session B的查询需要获取MDL读锁。所以，session B进入等待状态。
@@ -101,7 +98,7 @@ mysql> select * from information_schema.processlist where id=1;
 
 你可以看一下图5。我查出来这个线程的状态是Waiting for table flush，你可以设想一下这是什么原因。  
 
-> **[图：图5 Waiting for table flush状态示意图]**
+> **[图：图5 Waiting for table fl]**
 
 
 这个状态表示的是，现在有一个线程正要对表t做flush操作。MySQL里面对表做flush操作的用法，一般有以下两个：
@@ -121,14 +118,14 @@ flush tables with read lock;
 
 现在，我们一起来复现一下这种情况，**复现步骤** 如图6所示：
 
-> **[图：图6 Waiting for table flush的复现步骤]**
+> **[图：图6 Waiting for table fl]**
 
 
 在session A中，我故意每行都调用一次sleep(1)，这样这个语句默认要执行10万秒，在这期间表t一直是被session A“打开”着。然后，session B的flush tables t命令再要去关闭表t，就需要等session A的查询结束。这样，session C要再次查询的话，就会被flush 命令堵住了。
 
 图7是这个复现步骤的show processlist结果。这个例子的排查也很简单，你看到这个show processlist的结果，肯定就知道应该怎么做了。
 
-> **[图：图 7 Waiting for table flush的show processlist 结果]**
+> **[图：图 7 Waiting for table fl]**
 
 
 ## 等行锁
@@ -161,7 +158,7 @@ mysql> select * from t where id=1 lock in share mode;
 mysql> select * from t sys.innodb_lock_waits where locked_table=`'test'.'t'`\G
 ```
 
-> **[图：图10 通过sys.innodb_lock_waits 查行锁]**
+> **[图：图10 通过sys.innodb_lock_wa]**
 
 
 可以看到，这个信息很全，4号线程是造成堵塞的罪魁祸首。而干掉这个罪魁祸首的方式，就是KILL QUERY 4或KILL 4。
@@ -210,7 +207,7 @@ mysql> select * from t where id=1；
 
 如果我把这个slow log的截图再往下拉一点，你可以看到下一个语句，select * from t where id=1 lock in share mode，执行时扫描行数也是1行，执行时间是0.2毫秒。
 
-> **[图：图 13 加上lock in share mode的slow log]**
+> **[图：图 13 加上lock in share mode]**
 
 
 看上去是不是更奇怪了？按理说lock in share mode还要加锁，时间应该更长才对啊。
@@ -312,5 +309,3 @@ mysql> select * from table_a where b='1234567890abcd';
 > @赖阿甘 提到了等号顺序问题，时间上MySQL优化器执行过程中，where 条件部分， a=b和 b=a的写法是一样的。  
 >  @沙漠里的骆驼 提到了一个常见的问题。相同的模板语句，但是匹配行数不同，语句执行时间相差很大。这种情况，在语句里面有order by这样的操作时会更明显。  
 >  @Justin 回答了我们正文中的问题，如果id 的类型是整数，传入的参数类型是字符串的时候，可以用上索引。
-
-> **[图：示意图]**

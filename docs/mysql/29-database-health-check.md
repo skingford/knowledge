@@ -7,9 +7,6 @@ description: "极客时间《MySQL 实战 45 讲》第 29 讲笔记整理"
 
 > 本文整理自极客时间《MySQL 实战 45 讲》（林晓斌/丁奇），仅用于个人学习笔记。
 
-> **[图：示意图]**
-
-
 我在第[25](<https://time.geekbang.org/column/article/76795>)和[27](<https://time.geekbang.org/column/article/77427>)篇文章中，和你介绍了主备切换流程。通过这些内容的讲解，你应该已经很清楚了：在一主一备的双M架构里，主备切换只需要把客户端流量切到备库；而在一主多从架构里，主备切换除了要把客户端流量切到备库外，还需要把从库接到新主库上。
 
 主备切换有两种场景，一种是主动切换，一种是被动切换。而其中被动切换，往往是因为主库出问题了，由HA系统发起的。
@@ -159,7 +156,7 @@ insert into mysql.health_check(id, t_modified) values (@@server_id, now()) on du
 
 file_summary_by_event_name表里有很多行数据，我们先来看看event_name='wait/io/file/innodb/innodb_log_file’这一行。
 
-> **[图：图3 performance_schema.file_summary_by_event_name的一行]**
+> **[图：图3 performance_schema.f]**
 
 
 图中这一行表示统计的是redo log的写入时间，第一列EVENT_NAME 表示统计的类型。
