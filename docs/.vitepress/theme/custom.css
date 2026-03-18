@@ -1772,3 +1772,109 @@ body:has(#VPNavScreen) {
     padding: 12px;
   }
 }
+
+/* docs/mysql/08-transaction-isolation-detail.md diagrams */
+
+svg.diagram-mysql-08-mvcc-chain .mv-title{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-mvcc-chain .mv-ver{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2;rx:8}
+svg.diagram-mysql-08-mvcc-chain .mv-cur{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-mvcc-chain .mv-txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-mvcc-chain .mv-id{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-08-mvcc-chain .mv-lbl{font-size:9px;fill:var(--d-text-muted);text-anchor:middle}
+svg.diagram-mysql-08-mvcc-chain .mv-arr{stroke:var(--d-border-dash);stroke-width:1.2;stroke-dasharray:5,3;fill:none;marker-end:url(#mv-ah)}
+svg.diagram-mysql-08-mvcc-chain .mv-undo{font-size:9px;fill:var(--d-orange);text-anchor:middle;font-weight:600}
+
+svg.diagram-mysql-08-visibility-rules .vr-title{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-visibility-rules .vr-txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-visibility-rules .vr-stxt{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-08-visibility-rules .vr-lbl{font-size:11px;font-weight:600;text-anchor:middle}
+
+svg.diagram-mysql-08-query-visibility .q-title{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-query-visibility .q-ver{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2;rx:8}
+svg.diagram-mysql-08-query-visibility .q-vis{fill:var(--d-rv-a-bg);stroke:var(--d-rv-a-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-query-visibility .q-invis{fill:var(--d-rv-c-bg);stroke:var(--d-rv-c-border);stroke-width:1.2;rx:8}
+svg.diagram-mysql-08-query-visibility .q-txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-query-visibility .q-id{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-08-query-visibility .q-arr{stroke:var(--d-border-dash);stroke-width:1.2;stroke-dasharray:5,3;fill:none;marker-end:url(#q-ah)}
+svg.diagram-mysql-08-query-visibility .q-note{font-size:9px;fill:var(--d-text-muted);text-anchor:middle}
+svg.diagram-mysql-08-query-visibility .q-tag{font-size:9px;font-weight:600;text-anchor:middle}
+
+svg.diagram-mysql-08-current-read .u-title{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-current-read .u-box{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2;rx:8}
+svg.diagram-mysql-08-current-read .u-cur{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-current-read .u-new{fill:var(--d-rv-a-bg);stroke:var(--d-rv-a-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-current-read .u-txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-current-read .u-id{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-08-current-read .u-note{font-size:10px;fill:var(--d-text-muted);text-anchor:middle}
+svg.diagram-mysql-08-current-read .u-arr{stroke:var(--d-text-muted);stroke-width:1.2;fill:none;marker-end:url(#u-ah)}
+svg.diagram-mysql-08-current-read .u-darr{stroke:var(--d-orange);stroke-width:1.5;fill:none;marker-end:url(#u-ah2)}
+
+svg.diagram-mysql-08-locking-update .u7-title{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-locking-update .u7-box{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2;rx:8}
+svg.diagram-mysql-08-locking-update .u7-lock{fill:var(--d-warn-bg);stroke:var(--d-warn-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-locking-update .u7-done{fill:var(--d-rv-a-bg);stroke:var(--d-rv-a-border);stroke-width:1.5;rx:8}
+svg.diagram-mysql-08-locking-update .u7-txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-08-locking-update .u7-id{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-08-locking-update .u7-arr{stroke:var(--d-text-muted);stroke-width:1.2;fill:none;marker-end:url(#u7-ah)}
+svg.diagram-mysql-08-locking-update .u7-larr{stroke:var(--d-orange);stroke-width:2;stroke-dasharray:6,3;fill:none}
+
+/* docs/mysql/09-normal-vs-unique-index.md diagrams */
+
+svg.diagram-mysql-09-index-structure .title{font-size:13px;font-weight:700;fill:var(--d-text)}
+svg.diagram-mysql-09-index-structure .node{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2}
+svg.diagram-mysql-09-index-structure .leaf{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2}
+svg.diagram-mysql-09-index-structure .cur{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1.5}
+svg.diagram-mysql-09-index-structure .txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-09-index-structure .stxt{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-09-index-structure .label{font-size:11px;fill:var(--d-text-sub);text-anchor:middle;font-weight:600}
+svg.diagram-mysql-09-index-structure .arrow{stroke:var(--d-text-muted);stroke-width:1;fill:none;marker-end:url(#ah)}
+
+svg.diagram-mysql-09-unique-check .t2{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-09-unique-check .lbl2{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
+svg.diagram-mysql-09-unique-check .box2{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
+svg.diagram-mysql-09-unique-check .inner2{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-unique-check .cb2{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-unique-check .disk2{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-unique-check .st2{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-09-unique-check .st2s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-09-unique-check .num{font-size:11px;font-weight:700;text-anchor:middle}
+svg.diagram-mysql-09-unique-check .arr2{stroke-width:1.5;fill:none;marker-end:url(#ah2)}
+svg.diagram-mysql-09-unique-check .dash2{stroke-dasharray:5,3;stroke-width:1.2;fill:none;marker-end:url(#ah2)}
+
+svg.diagram-mysql-09-change-buffer .t3{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-09-change-buffer .lbl3{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
+svg.diagram-mysql-09-change-buffer .box3{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
+svg.diagram-mysql-09-change-buffer .inner3{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-change-buffer .cb3{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-change-buffer .disk3{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
+svg.diagram-mysql-09-change-buffer .st3{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
+svg.diagram-mysql-09-change-buffer .st3s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
+svg.diagram-mysql-09-change-buffer .n3{font-size:11px;font-weight:700;text-anchor:middle}
+svg.diagram-mysql-09-change-buffer .a3{stroke-width:1.5;fill:none;marker-end:url(#ah3)}
+
+/* docs/mysql/23-data-durability.md diagrams */
+
+svg.diagram-mysql-23-binlog-cache .title{font-size:14px;font-weight:600;fill:var(--d-text)}
+svg.diagram-mysql-23-binlog-cache .label{font-size:11px;fill:var(--d-text)}
+svg.diagram-mysql-23-binlog-cache .sub{font-size:10px;fill:var(--d-text-muted)}
+svg.diagram-mysql-23-binlog-cache .arrow{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah1)}
+
+svg.diagram-mysql-23-redo-prepare .t2{font-size:14px;font-weight:600;fill:var(--d-text)}
+svg.diagram-mysql-23-redo-prepare .lb2{font-size:11px;fill:var(--d-text)}
+svg.diagram-mysql-23-redo-prepare .sb2{font-size:10px;fill:var(--d-text-muted)}
+svg.diagram-mysql-23-redo-prepare .ar2{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah2)}
+
+svg.diagram-mysql-23-binlog-write .t3{font-size:14px;font-weight:600;fill:var(--d-text)}
+svg.diagram-mysql-23-binlog-write .lb3{font-size:11px;fill:var(--d-text)}
+svg.diagram-mysql-23-binlog-write .sb3{font-size:10px;fill:var(--d-text-muted)}
+svg.diagram-mysql-23-binlog-write .ar3{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah3)}
+
+svg.diagram-mysql-23-redo-commit .t4{font-size:14px;font-weight:600;fill:var(--d-text)}
+svg.diagram-mysql-23-redo-commit .lb4{font-size:11px;fill:var(--d-text)}
+svg.diagram-mysql-23-redo-commit .sb4{font-size:10px;fill:var(--d-text-muted)}
+svg.diagram-mysql-23-redo-commit .ar4{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah4)}
+
+svg.diagram-mysql-23-crash-recovery .t5{font-size:14px;font-weight:600;fill:var(--d-text)}
+svg.diagram-mysql-23-crash-recovery .lb5{font-size:11px;fill:var(--d-text)}
+svg.diagram-mysql-23-crash-recovery .sb5{font-size:10px;fill:var(--d-text-muted)}
+svg.diagram-mysql-23-crash-recovery .ar5{stroke:var(--d-text-sub);stroke-width:1.5;marker-end:url(#ah5)}

@@ -33,17 +33,7 @@ select name from CUser where id_card = 'xxxxxxxyyyyyyzzzzz';
 简单起见，我们还是用第4篇文章[《深入浅出索引（上）》](<https://time.geekbang.org/column/article/69236>)中的例子来说明，假设字段 k 上的值都不重复。
 
 <div style="display:flex;justify-content:center;padding:20px 0;">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
-  <style>
-    .title{font-size:13px;font-weight:700;fill:var(--d-text)}
-    .node{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2}
-    .leaf{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1.2}
-    .cur{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1.5}
-    .txt{font-size:10px;fill:var(--d-text);text-anchor:middle}
-    .stxt{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
-    .label{font-size:11px;fill:var(--d-text-sub);text-anchor:middle;font-weight:600}
-    .arrow{stroke:var(--d-text-muted);stroke-width:1;fill:none;marker-end:url(#ah)}
-  </style>
+<svg class="diagram-mysql-09-index-structure" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
   <defs><marker id="ah" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
   <!-- Title -->
   <text x="280" y="18" class="title" text-anchor="middle">图1 InnoDB的索引组织结构</text>
@@ -233,20 +223,7 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 这里，我们假设当前k索引树的状态，查找到位置后，k1所在的数据页在内存(`InnoDB` `buffer pool`)中，k2所在的数据页不在内存中。如图2所示是带change buffer的更新状态图。
 
 <div style="display:flex;justify-content:center;padding:20px 0;">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 370" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
-  <style>
-    .t2{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
-    .lbl2{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
-    .box2{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
-    .inner2{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
-    .cb2{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
-    .disk2{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
-    .st2{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
-    .st2s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
-    .num{font-size:11px;font-weight:700;text-anchor:middle}
-    .arr2{stroke-width:1.5;fill:none;marker-end:url(#ah2)}
-    .dash2{stroke-dasharray:5,3;stroke-width:1.2;fill:none;marker-end:url(#ah2)}
-  </style>
+<svg class="diagram-mysql-09-unique-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 370" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
   <defs><marker id="ah2" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
   <text x="280" y="18" class="t2">图2 带change buffer的更新过程</text>
   <!-- Memory region -->
@@ -334,19 +311,7 @@ mysql> insert into t(id,k) values(id1,k1),(id2,k2);
 如果读语句发生在更新语句后不久，内存中的数据都还在，那么此时的这两个读操作就与系统表空间（ibdata1）和 `redo log`（ib_log_fileX）无关了。所以，我在图中就没画出这两部分。
 
 <div style="display:flex;justify-content:center;padding:20px 0;">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
-  <style>
-    .t3{font-size:13px;font-weight:700;fill:var(--d-text);text-anchor:middle}
-    .lbl3{font-size:11px;font-weight:600;fill:var(--d-layer-title)}
-    .box3{fill:var(--d-bg-alt);stroke:var(--d-border);stroke-width:1.2;rx:6}
-    .inner3{fill:var(--d-blue-bg);stroke:var(--d-blue-border);stroke-width:1;rx:4}
-    .cb3{fill:var(--d-cur-bg);stroke:var(--d-cur-border);stroke-width:1;rx:4}
-    .disk3{fill:var(--d-bg);stroke:var(--d-layer-border);stroke-width:1;rx:4}
-    .st3{font-size:9.5px;fill:var(--d-text);text-anchor:middle}
-    .st3s{font-size:9px;fill:var(--d-text-sub);text-anchor:middle}
-    .n3{font-size:11px;font-weight:700;text-anchor:middle}
-    .a3{stroke-width:1.5;fill:none;marker-end:url(#ah3)}
-  </style>
+<svg class="diagram-mysql-09-change-buffer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" style="max-width:560px;width:100%;font-family:system-ui,sans-serif;">
   <defs><marker id="ah3" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="var(--d-text-muted)"/></marker></defs>
   <text x="280" y="18" class="t3">图3 带change buffer的读过程</text>
   <!-- Memory -->
