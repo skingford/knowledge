@@ -758,15 +758,53 @@ export const sections: SectionConfig[] = [
     ],
   },
   {
+    key: 'git',
+    base: '/git/',
+    navText: 'Git',
+    overviewDescription:
+      '集中整理 Git 工作流、分支对比、PR 与 Code Review、GitHub Actions 排障、发布与回滚实践。',
+    landing: {
+      eyebrow: 'Git',
+      title: 'Git 主题',
+      intro: '把 Git 基础、GitHub 协作、Code Review、GitHub Actions 排障、发布与回滚拆成更清晰的主题入口，方便后续持续扩展。',
+      primary: { title: 'Git 常用技巧', href: '/git/common-tips', description: 'Git 与 GitHub 协作总手册，覆盖分支、对比、发布、回滚和团队规范。' },
+      secondary: { title: 'GitHub PR 与 Code Review', href: '/git/github-pr-review', description: '集中处理 PR 提交、审核、评论回复、合并策略与多人协作实践。' },
+      scope: [
+        'Git 日常工作流与常用命令',
+        '分支对比、cherry-pick 与恢复现场',
+        'PR 提交与 Code Review 协作',
+        'GitHub Actions CI/CD 与故障排查',
+        '发布分支、回滚与多人协作排障',
+      ],
+      docs: [
+        { title: 'Git 常用技巧', href: '/git/common-tips', description: 'Git 与 GitHub 协作总手册，覆盖分支、PR、Review、发布与回滚。' },
+        { title: 'GitHub PR 与 Code Review', href: '/git/github-pr-review', description: '集中处理 PR 提交、Code Review、评论回复、审核操作与协作规范。' },
+        { title: 'GitHub Actions 故障排查', href: '/git/github-actions-troubleshooting', description: '集中排查 workflow 不触发、权限不足、Secrets、缓存、Artifact 与 Environment 问题。' },
+      ],
+      order: ['Git 常用技巧', 'GitHub PR 与 Code Review', 'GitHub Actions 故障排查'],
+    },
+    sidebar: [
+      {
+        text: 'Git',
+        items: [
+          { text: '主题概览', link: '/git/' },
+          { text: 'Git 常用技巧', link: '/git/common-tips' },
+          { text: 'GitHub PR 与 Code Review', link: '/git/github-pr-review' },
+          { text: 'GitHub Actions 故障排查', link: '/git/github-actions-troubleshooting' },
+        ],
+      },
+    ],
+  },
+  {
     key: 'tools',
     base: '/tools/',
     navText: '工具',
     overviewDescription:
-      '收录 Vim、iTerm2、Git、Mac 等日常开发工具的实用配置和技巧。',
+      '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Mac 等日常开发工具的实用配置和技巧。',
     landing: {
       eyebrow: 'Tools',
       title: '工具方向',
-      intro: '收录 Vim、iTerm2、Git、Mac 等日常开发工具的实用配置和技巧，提升开发效率。',
+      intro: '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Mac 等日常开发工具的实用配置和技巧，提升开发效率。',
       primary: { title: 'Claude Code 使用指南', href: '/tools/claude-code', description: '整理安装、权限模式、CLAUDE.md、MCP、Hooks 与 VS Code 工作流。' },
       secondary: { title: 'Codex 使用指南', href: '/tools/codex', description: '整理 CLI、IDE、App、Cloud、AGENTS.md、MCP、skills 与自动化用法。' },
       scope: [
@@ -776,7 +814,6 @@ export const sections: SectionConfig[] = [
         'Cursor / Agent / Rules / MCP / Background Agents',
         'Vim 编辑器配置与技巧',
         'iTerm2 终端美化与效率',
-        'Git 工作流与常用命令',
         'Mac 开发环境与效率工具',
       ],
       docs: [
@@ -786,12 +823,9 @@ export const sections: SectionConfig[] = [
         { title: 'Cursor 使用指南', href: '/tools/cursor', description: '整理安装、Tab、Inline Edit、Agent、Rules、MCP、Background Agents、Bugbot 与 CLI 用法。' },
         { title: 'Vim 实用方案', href: '/tools/vim', description: 'Vim 编辑器的实用配置、快捷键和插件推荐。' },
         { title: 'iTerm2 配置指南', href: '/tools/iterm2', description: 'iTerm2 终端的美化配置、快捷操作和效率提升。' },
-        { title: 'Git 常用技巧', href: '/tools/git', description: 'Git 与 GitHub 协作实战手册，覆盖分支、PR、Review、发布与回滚。' },
-        { title: 'GitHub PR 与 Code Review', href: '/tools/github-pr-review', description: '集中处理 PR 提交、Code Review、评论回复、审核操作与协作规范。' },
-        { title: 'GitHub Actions 故障排查', href: '/tools/github-actions-troubleshooting', description: '集中排查 workflow 不触发、权限不足、Secrets、缓存、Artifact 与 Environment 问题。' },
         { title: 'Mac 效率工具', href: '/tools/mac', description: 'Mac 开发环境搭建和效率工具推荐。' },
       ],
-      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Git 常用技巧', 'GitHub PR 与 Code Review', 'GitHub Actions 故障排查', 'Mac 效率工具'],
+      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Mac 效率工具'],
     },
     sidebar: [
       {
@@ -804,9 +838,6 @@ export const sections: SectionConfig[] = [
           { text: 'Cursor 使用指南', link: '/tools/cursor' },
           { text: 'Vim 实用方案', link: '/tools/vim' },
           { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
-          { text: 'Git 常用技巧', link: '/tools/git' },
-          { text: 'GitHub PR 与 Code Review', link: '/tools/github-pr-review' },
-          { text: 'GitHub Actions 故障排查', link: '/tools/github-actions-troubleshooting' },
           { text: 'Mac 效率工具', link: '/tools/mac' },
         ],
       },

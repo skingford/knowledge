@@ -34,7 +34,7 @@ export default withMermaid(defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang、运维与工具的学习资料、路线图与专题索引',
+  description: '涵盖 AI / Agent、架构设计、Golang、Git、运维与工具的学习资料、路线图与专题索引',
 
   base: '/knowledge/',
   srcExclude: ['README.md', 'TEMPLATE.md'],
@@ -138,7 +138,6 @@ export default withMermaid(defineConfig({
           { text: 'Cursor 使用指南', link: '/tools/cursor' },
           { text: 'Vim 实用方案', link: '/tools/vim' },
           { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
-          { text: 'Git 常用技巧', link: '/tools/git' },
           { text: 'Mac 效率工具', link: '/tools/mac' },
         ]
       }
