@@ -174,11 +174,25 @@ const categories: Category[] = [
         url: "https://claude.ai/code",
       },
       {
-        name: "OpenAI Codex",
+        name: "Codex",
         desc: "OpenAI 云端软件工程 Agent，异步并行执行任务",
         domain: "openai.com",
         fallback: "🤖",
         url: "https://openai.com/codex",
+      },
+      {
+        name: "Gemini CLI",
+        desc: "Google 的终端 AI 编码助手，支持 MCP、skills、subagents 与自动化工作流",
+        domain: "geminicli.com",
+        fallback: "💎",
+        url: "https://geminicli.com/docs/",
+      },
+      {
+        name: "Cursor",
+        desc: "AI 原生代码编辑器，基于 VSCode 深度改造",
+        domain: "cursor.sh",
+        fallback: "🖱️",
+        url: "https://cursor.sh",
       },
       {
         name: "OpenCode",
@@ -193,13 +207,6 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "🐙",
         url: "https://github.com/features/copilot",
-      },
-      {
-        name: "Cursor",
-        desc: "AI 原生代码编辑器，基于 VSCode 深度改造",
-        domain: "cursor.sh",
-        fallback: "🖱️",
-        url: "https://cursor.sh",
       },
       {
         name: "Antigravity",
@@ -246,7 +253,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "AI Skill",
+    title: "AI Skill / GitHub",
     emoji: "🧩",
     sites: [
       {
@@ -256,18 +263,26 @@ const categories: Category[] = [
         fallback: "🧠",
         url: "https://skills.sh/",
       },
-    ],
-  },
-  {
-    title: "AI GitHub",
-    emoji: "🧰",
-    sites: [
       {
-        name: "Agency Agents",
-        desc: "面向多 Agent 工作流的开源项目集合，适合参考协作式 AI 自动化实践",
+        name: "BMAD-METHOD",
+        desc: "面向 AI 驱动敏捷开发的方法论仓库，提供 agents、workflows、templates 与团队协作流程",
         domain: "github.com",
-        fallback: "🤝",
-        url: "https://github.com/msitarzewski/agency-agents",
+        fallback: "🗂️",
+        url: "https://github.com/bmad-code-org/BMAD-METHOD",
+      },
+      {
+        name: "Superpowers",
+        desc: "面向编码 Agent 的 skills 框架与软件开发工作流，支持 Codex、Claude、Cursor 等使用方式",
+        domain: "github.com",
+        fallback: "🚀",
+        url: "https://github.com/obra/superpowers",
+      },
+      {
+        name: "OpenSpec",
+        desc: "围绕 AI 驱动规格定义与工程协作的开源工具项目",
+        domain: "github.com",
+        fallback: "📐",
+        url: "https://github.com/Fission-AI/OpenSpec",
       },
       {
         name: "Everything Claude Code",
@@ -277,11 +292,11 @@ const categories: Category[] = [
         url: "https://github.com/affaan-m/everything-claude-code",
       },
       {
-        name: "OpenSpec",
-        desc: "围绕 AI 驱动规格定义与工程协作的开源工具项目",
+        name: "Agency Agents",
+        desc: "面向多 Agent 工作流的开源项目集合，适合参考协作式 AI 自动化实践",
         domain: "github.com",
-        fallback: "📐",
-        url: "https://github.com/Fission-AI/OpenSpec",
+        fallback: "🤝",
+        url: "https://github.com/msitarzewski/agency-agents",
       },
     ],
   },
