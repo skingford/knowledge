@@ -786,10 +786,12 @@ export const sections: SectionConfig[] = [
         { title: 'Cursor 使用指南', href: '/tools/cursor', description: '整理安装、Tab、Inline Edit、Agent、Rules、MCP、Background Agents、Bugbot 与 CLI 用法。' },
         { title: 'Vim 实用方案', href: '/tools/vim', description: 'Vim 编辑器的实用配置、快捷键和插件推荐。' },
         { title: 'iTerm2 配置指南', href: '/tools/iterm2', description: 'iTerm2 终端的美化配置、快捷操作和效率提升。' },
-        { title: 'Git 常用技巧', href: '/tools/git', description: 'Git 日常工作流、分支管理和常用命令速查。' },
+        { title: 'Git 常用技巧', href: '/tools/git', description: 'Git 与 GitHub 协作实战手册，覆盖分支、PR、Review、发布与回滚。' },
+        { title: 'GitHub PR 与 Code Review', href: '/tools/github-pr-review', description: '集中处理 PR 提交、Code Review、评论回复、审核操作与协作规范。' },
+        { title: 'GitHub Actions 故障排查', href: '/tools/github-actions-troubleshooting', description: '集中排查 workflow 不触发、权限不足、Secrets、缓存、Artifact 与 Environment 问题。' },
         { title: 'Mac 效率工具', href: '/tools/mac', description: 'Mac 开发环境搭建和效率工具推荐。' },
       ],
-      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Git 常用技巧', 'Mac 效率工具'],
+      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Git 常用技巧', 'GitHub PR 与 Code Review', 'GitHub Actions 故障排查', 'Mac 效率工具'],
     },
     sidebar: [
       {
@@ -803,6 +805,8 @@ export const sections: SectionConfig[] = [
           { text: 'Vim 实用方案', link: '/tools/vim' },
           { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
           { text: 'Git 常用技巧', link: '/tools/git' },
+          { text: 'GitHub PR 与 Code Review', link: '/tools/github-pr-review' },
+          { text: 'GitHub Actions 故障排查', link: '/tools/github-actions-troubleshooting' },
           { text: 'Mac 效率工具', link: '/tools/mac' },
         ],
       },
