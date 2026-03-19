@@ -15,10 +15,16 @@ export interface SectionLandingContent {
   order: string[]
 }
 
+interface Items {
+  text: string; 
+  link: string;
+  items?: Items[];
+}
+
 export interface SidebarGroup {
   text: string
   collapsed?: boolean
-  items: Array<{ text: string; link: string }>
+  items: Items[]
 }
 
 export interface SectionConfig {
@@ -398,88 +404,79 @@ export const sections: SectionConfig[] = [
         text: '学习大纲详解',
         collapsed: true,
         items: [
-          { text: '一、语言基础深化', link: '/golang/guide/01-language-fundamentals' },
-          { text: '二、底层原理', link: '/golang/guide/02-underlying-principles' },
-          { text: '三、并发编程', link: '/golang/guide/03-concurrency' },
-          { text: '四、网络编程与标准库', link: '/golang/guide/04-network-stdlib' },
-          { text: '五、工程实践', link: '/golang/guide/05-engineering-practices' },
-          { text: '六、数据库与缓存', link: '/golang/guide/06-database-cache' },
+          {
+            text: '一、语言基础深化',
+            link: '/golang/guide/01-language-fundamentals',
+            items: [
+              { text: 'Slice 的坑与三指切片', link: '/golang/guide/01-slice-append-pitfalls' },
+              { text: 'String 与 []byte 最佳实践', link: '/golang/guide/01-string-byte-best-practices' },
+            ],
+          },
+          {
+            text: '二、底层原理',
+            link: '/golang/guide/02-underlying-principles',
+            items: [
+              { text: '逃逸分析、栈与堆', link: '/golang/guide/02-escape-analysis' },
+              { text: '切片并发陷阱与工程化取舍', link: '/golang/guide/02-concurrent-slice-patterns' },
+            ],
+          },
+          {
+            text: '三、并发编程',
+            link: '/golang/guide/03-concurrency',
+            items: [
+              { text: 'Goroutine 与 GMP 调度模型', link: '/golang/guide/03-goroutine-and-scheduler' },
+              { text: 'Channel、select 与 Context', link: '/golang/guide/03-channel-select-context' },
+              { text: 'sync 同步原语与 Atomic', link: '/golang/guide/03-sync-primitives' },
+              { text: 'Goroutine 泄漏与并发安全', link: '/golang/guide/03-goroutine-leak-and-data-race' },
+              { text: '高级并发模式', link: '/golang/guide/03-advanced-concurrency-patterns' },
+            ],
+          },
+          {
+            text: '四、网络编程与标准库',
+            link: '/golang/guide/04-network-stdlib',
+            items: [
+              { text: 'HTTP 服务端、客户端与 TCP/UDP', link: '/golang/guide/04-http-server-client-tcp-udp' },
+              { text: '连接池、超时、重试与限流', link: '/golang/guide/04-connection-timeout-retry-rate-limit' },
+              { text: '中间件、JSON 编解码与文件 IO', link: '/golang/guide/04-middleware-json-io' },
+            ],
+          },
+          {
+            text: '五、工程实践',
+            link: '/golang/guide/05-engineering-practices',
+            items: [
+              { text: '项目结构、依赖管理、日志与配置', link: '/golang/guide/05-project-layout-deps-logging-config' },
+              { text: '错误码、中间件与代码规范', link: '/golang/guide/05-error-middleware-code-style' },
+              { text: '测试、Benchmark 与 CI/CD', link: '/golang/guide/05-testing-benchmark-cicd' },
+            ],
+          },
+          {
+            text: '六、数据库与缓存',
+            link: '/golang/guide/06-database-cache',
+            items: [
+              { text: 'database/sql 与连接池', link: '/golang/guide/06-database-sql-and-connection' },
+            ],
+          },
           { text: '七、性能优化与排障', link: '/golang/guide/07-performance-troubleshooting' },
-          { text: '八、微服务与分布式', link: '/golang/guide/08-microservices-distributed' },
+          {
+            text: '八、微服务与分布式',
+            link: '/golang/guide/08-microservices-distributed',
+            items: [
+              { text: 'RPC、注册发现与配置', link: '/golang/guide/08-rpc-discovery-config' },
+              { text: '追踪、容错与重试', link: '/golang/guide/08-observability-resilience' },
+              { text: 'MQ、事务、治理与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
+            ],
+          },
           { text: '九、源码阅读主线', link: '/golang/guide/source-reading/learning-path' },
-          { text: '十、进阶专题', link: '/golang/guide/10-advanced-topics' },
-        ],
-      },
-      {
-        text: '并发编程拆分专题',
-        collapsed: true,
-        items: [
-          { text: 'Goroutine 与 GMP 调度模型', link: '/golang/guide/03-goroutine-and-scheduler' },
-          { text: 'Channel、select 与 Context', link: '/golang/guide/03-channel-select-context' },
-          { text: 'sync 同步原语与 Atomic', link: '/golang/guide/03-sync-primitives' },
-          { text: 'Goroutine 泄漏与并发安全', link: '/golang/guide/03-goroutine-leak-and-data-race' },
-          { text: '高级并发模式', link: '/golang/guide/03-advanced-concurrency-patterns' },
-        ],
-      },
-      {
-        text: '语言基础拆分专题',
-        collapsed: true,
-        items: [
-          { text: 'Slice 的坑与三指切片', link: '/golang/guide/01-slice-append-pitfalls' },
-          { text: 'String 与 []byte 最佳实践', link: '/golang/guide/01-string-byte-best-practices' },
-        ],
-      },
-      {
-        text: '底层原理拆分专题',
-        collapsed: true,
-        items: [
-          { text: '逃逸分析、栈与堆', link: '/golang/guide/02-escape-analysis' },
-          { text: '切片并发陷阱与工程化取舍', link: '/golang/guide/02-concurrent-slice-patterns' },
-        ],
-      },
-      {
-        text: '网络编程与标准库拆分专题',
-        collapsed: true,
-        items: [
-          { text: 'HTTP 服务端、客户端与 TCP/UDP', link: '/golang/guide/04-http-server-client-tcp-udp' },
-          { text: '连接池、超时、重试与限流', link: '/golang/guide/04-connection-timeout-retry-rate-limit' },
-          { text: '中间件、JSON 编解码与文件 IO', link: '/golang/guide/04-middleware-json-io' },
-        ],
-      },
-      {
-        text: '工程实践拆分专题',
-        collapsed: true,
-        items: [
-          { text: '项目结构、依赖管理、日志与配置', link: '/golang/guide/05-project-layout-deps-logging-config' },
-          { text: '错误码、中间件与代码规范', link: '/golang/guide/05-error-middleware-code-style' },
-          { text: '测试、Benchmark 与 CI/CD', link: '/golang/guide/05-testing-benchmark-cicd' },
-        ],
-      },
-      {
-        text: '数据库与缓存拆分专题',
-        collapsed: true,
-        items: [
-          { text: 'database/sql 与连接池', link: '/golang/guide/06-database-sql-and-connection' },
-        ],
-      },
-      {
-        text: '进阶专题',
-        collapsed: true,
-        items: [
-          { text: '进阶专题总览', link: '/golang/guide/10-advanced-topics' },
-          { text: '设计模式与惯用法', link: '/golang/guide/10-design-patterns-idioms' },
-          { text: '安全编程实践', link: '/golang/guide/10-security-practices' },
-          { text: '容器化与云原生', link: '/golang/guide/10-containerization-cloud-native' },
-          { text: '代码生成与元编程', link: '/golang/guide/10-codegen-metaprogramming' },
-        ],
-      },
-      {
-        text: '微服务与分布式拆分专题',
-        collapsed: true,
-        items: [
-          { text: 'RPC、注册发现与配置', link: '/golang/guide/08-rpc-discovery-config' },
-          { text: '追踪、容错与重试', link: '/golang/guide/08-observability-resilience' },
-          { text: 'MQ、事务、治理与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
+          {
+            text: '十、进阶专题',
+            link: '/golang/guide/10-advanced-topics',
+            items: [
+              { text: '设计模式与惯用法', link: '/golang/guide/10-design-patterns-idioms' },
+              { text: '安全编程实践', link: '/golang/guide/10-security-practices' },
+              { text: '容器化与云原生', link: '/golang/guide/10-containerization-cloud-native' },
+              { text: '代码生成与元编程', link: '/golang/guide/10-codegen-metaprogramming' },
+            ],
+          },
         ],
       },
       ...golangSourceReadingSidebar,
