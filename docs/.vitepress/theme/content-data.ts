@@ -408,6 +408,10 @@ export const sections: SectionConfig[] = [
             text: '一、语言基础深化',
             link: '/golang/guide/01-language-fundamentals',
             items: [
+              { text: '变量、类型与值语义', link: '/golang/guide/01-variables-types-and-semantics' },
+              { text: 'defer、panic/recover 与函数闭包', link: '/golang/guide/01-defer-panic-and-closures' },
+              { text: 'Interface、反射与泛型', link: '/golang/guide/01-interface-reflect-generics' },
+              { text: '错误处理设计', link: '/golang/guide/01-error-handling-design' },
               { text: 'Slice 的坑与三指切片', link: '/golang/guide/01-slice-append-pitfalls' },
               { text: 'String 与 []byte 最佳实践', link: '/golang/guide/01-string-byte-best-practices' },
             ],
@@ -416,6 +420,9 @@ export const sections: SectionConfig[] = [
             text: '二、底层原理',
             link: '/golang/guide/02-underlying-principles',
             items: [
+              { text: 'Slice、Map、Channel 底层实现', link: '/golang/guide/02-slice-map-channel-internals' },
+              { text: 'Interface itab、逃逸分析与栈堆分配', link: '/golang/guide/02-interface-escape-and-stack' },
+              { text: 'GC、内存分配器与 Memory Model', link: '/golang/guide/02-gc-allocator-and-memory-model' },
               { text: '逃逸分析、栈与堆', link: '/golang/guide/02-escape-analysis' },
               { text: '切片并发陷阱与工程化取舍', link: '/golang/guide/02-concurrent-slice-patterns' },
             ],
@@ -453,10 +460,21 @@ export const sections: SectionConfig[] = [
             text: '六、数据库与缓存',
             link: '/golang/guide/06-database-cache',
             items: [
+              { text: 'Redis 实践与缓存穿透/击穿/雪崩', link: '/golang/guide/06-redis-and-cache-patterns' },
+              { text: '缓存一致性与分库分表', link: '/golang/guide/06-cache-consistency-and-sharding' },
               { text: 'database/sql 与连接池', link: '/golang/guide/06-database-sql-and-connection' },
             ],
           },
-          { text: '七、性能优化与排障', link: '/golang/guide/07-performance-troubleshooting' },
+          {
+            text: '七、性能优化与排障',
+            link: '/golang/guide/07-performance-troubleshooting',
+            items: [
+              { text: 'Pprof、Trace 与 Benchmark', link: '/golang/guide/07-pprof-trace-and-benchmark' },
+              { text: 'GC 调优与内存优化', link: '/golang/guide/07-gc-tuning-and-memory-optimization' },
+              { text: '锁竞争分析与慢请求排查', link: '/golang/guide/07-lock-contention-and-slow-requests' },
+              { text: 'Goroutine 泄漏与线上问题定位', link: '/golang/guide/07-goroutine-leak-and-production-debugging' },
+            ],
+          },
           {
             text: '八、微服务与分布式',
             link: '/golang/guide/08-microservices-distributed',
