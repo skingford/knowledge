@@ -414,6 +414,10 @@ export const sections: SectionConfig[] = [
         text: '并发编程拆分专题',
         collapsed: true,
         items: [
+          { text: 'Goroutine 与 GMP 调度模型', link: '/golang/guide/03-goroutine-and-scheduler' },
+          { text: 'Channel、select 与 Context', link: '/golang/guide/03-channel-select-context' },
+          { text: 'sync 同步原语与 Atomic', link: '/golang/guide/03-sync-primitives' },
+          { text: 'Goroutine 泄漏与并发安全', link: '/golang/guide/03-goroutine-leak-and-data-race' },
           { text: '高级并发模式', link: '/golang/guide/03-advanced-concurrency-patterns' },
         ],
       },

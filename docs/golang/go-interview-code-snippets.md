@@ -26,10 +26,10 @@ search: false
 | Slice 与底层数组 | Slice 扩容与共享 | `go-top-30-interview-questions` 基础与底层 |
 | Interface | Nil Interface | `go-top-30-interview-questions` 基础与底层 |
 | Defer | 参数求值 | `go-top-30-interview-questions` 基础与底层 |
-| Channel | 无缓冲同步 | `guide/03-concurrency` |
-| Context | 取消传播 | `context-usage-boundaries` + `guide/03-concurrency` |
-| WaitGroup | 正确等待方式 | `guide/03-concurrency` |
-| Mutex | 共享状态保护 | `guide/03-concurrency` |
+| Channel | 无缓冲同步 | `guide/03-channel-select-context` |
+| Context | 取消传播 | `context-usage-boundaries` + `guide/03-channel-select-context` |
+| WaitGroup | 正确等待方式 | `guide/03-sync-primitives` |
+| Mutex | 共享状态保护 | `guide/03-sync-primitives` |
 | 逃逸分析 | `-gcflags=-m` | `guide/02-escape-analysis` |
 | `sync.Pool` | 对象复用 | `guide/07-performance-troubleshooting` |
 | Pprof | HTTP 接入 | `pprof-troubleshooting-guide` |
