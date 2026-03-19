@@ -407,6 +407,13 @@ const categories: Category[] = [
     emoji: "📈",
     sites: [
       {
+        name: "OpenRouter Rankings",
+        desc: "OpenRouter 模型排行榜，适合查看模型热度、调用趋势与综合表现",
+        domain: "openrouter.ai",
+        fallback: "🏅",
+        url: "https://openrouter.ai/rankings",
+      },
+      {
         name: "GitHub Trending",
         desc: "GitHub 热门仓库趋势榜，适合发现近期活跃项目",
         domain: "github.com",
