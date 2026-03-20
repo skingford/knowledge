@@ -7,6 +7,8 @@ type DiagramKind =
   | 'http-server-flow'
   | 'graceful-shutdown'
   | 'http-client-pool'
+  | 'netpoller-flow'
+  | 'tcp-dial-flow'
   | 'tcp-vs-udp'
   | 'connection-pool'
   | 'timeout-layers'
@@ -27,6 +29,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'http-server-flow': '760px',
   'graceful-shutdown': '760px',
   'http-client-pool': '760px',
+  'netpoller-flow': '760px',
+  'tcp-dial-flow': '760px',
   'tcp-vs-udp': '760px',
   'connection-pool': '760px',
   'timeout-layers': '760px',
@@ -189,6 +193,75 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="614" y="202" width="122" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
       <text x="675" y="222" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">错误</text>
       <text x="675" y="238" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">不关 Body -> 连接泄漏</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'netpoller-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="netpoller 异步 IO 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">netpoller 的关键是“fd 非阻塞 + goroutine 挂起”，真正等 IO 的不是系统线程，而是运行时里的等待队列</text>
+
+      <rect x="28" y="90" width="118" height="50" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="111" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">goroutine</text>
+      <text x="87" y="127" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">conn.Read()</text>
+
+      <line x1="146" y1="115" x2="236" y2="115" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="236" y="70" width="160" height="90" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="316" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">poll.FD.Read</text>
+      <text x="316" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">syscall.Read -> EAGAIN</text>
+      <text x="316" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">waitRead / gopark</text>
+      <text x="316" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">当前 G 挂起，不占住 M</text>
+
+      <line x1="396" y1="115" x2="502" y2="115" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="502" y="58" width="132" height="114" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="568" y="80" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">runtime netpoll</text>
+      <text x="568" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">epoll_wait / kqueue</text>
+      <text x="568" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">fd 就绪事件</text>
+      <text x="568" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">unblock 对应 goroutine</text>
+      <text x="568" y="152" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">放回 runnable 队列</text>
+
+      <rect x="278" y="194" width="204" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="215" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">IO 未就绪时，M 还能继续跑别的 goroutine</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'tcp-dial-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="TCP 建连流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">DialContext 的主线是：解析地址，尝试建连，把 fd 设为非阻塞，然后等“可写”事件确认连接真正完成</text>
+
+      <rect x="22" y="98" width="108" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="76" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">DialContext</text>
+      <text x="76" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">tcp host:port</text>
+
+      <line x1="130" y1="120" x2="214" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="214" y="76" width="132" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="280" y="98" text-anchor="middle" font-size="11" fill="var(--d-text)">resolver</text>
+      <text x="280" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">DNS 解析</text>
+      <text x="280" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">A / AAAA</text>
+      <text x="280" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Happy Eyeballs</text>
+
+      <line x1="346" y1="120" x2="432" y2="120" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="432" y="66" width="148" height="108" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="506" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">socket + connect</text>
+      <text x="506" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">setNonblock(fd)</text>
+      <text x="506" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">connect 立即返回</text>
+      <text x="506" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">注册到 netpoller</text>
+      <text x="506" y="160" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">waitWrite 等完成</text>
+
+      <line x1="580" y1="120" x2="654" y2="120" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="654" y="98" width="84" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="696" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">TCPConn</text>
+      <text x="696" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">返回上层</text>
+
+      <rect x="248" y="194" width="264" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="215" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">Go 里“连接建立中”也是走非阻塞 fd + 就绪事件，不会把整个线程卡死在 connect 上</text>
     </svg>
 
     <svg

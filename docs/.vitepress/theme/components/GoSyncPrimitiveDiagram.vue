@@ -6,6 +6,7 @@ type DiagramKind =
   | 'mutex-vs-rwmutex'
   | 'atomic-cas'
   | 'coordination-primitives'
+  | 'cond-wait-signal'
   | 'sync-map-read-dirty'
   | 'primitive-decision-tree'
 
@@ -17,6 +18,7 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'mutex-vs-rwmutex': '600px',
   'atomic-cas': '660px',
   'coordination-primitives': '700px',
+  'cond-wait-signal': '700px',
   'sync-map-read-dirty': '680px',
   'primitive-decision-tree': '560px',
 }
@@ -118,6 +120,43 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="78" y="156" width="544" height="70" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2"/>
       <text x="350" y="182" text-anchor="middle" font-size="10" fill="var(--d-text)">四者分别解决：等待结束、只初始化一次、条件等待、对象复用</text>
       <text x="350" y="200" text-anchor="middle" font-size="10" fill="var(--d-text)">真正要选型时，先问自己是“协调 goroutine 生命周期”，还是“保护共享状态”</text>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'cond-wait-signal'" viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">sync.Cond：Wait 会先释放锁再睡眠，被唤醒后重新拿锁，所以条件判断必须放在 for 里</text>
+      <rect x="20" y="34" width="660" height="186" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+
+      <rect x="48" y="74" width="156" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="126" y="94" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">goroutine A</text>
+      <text x="126" y="110" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">mu.Lock() -> for !ready</text>
+
+      <line x1="204" y1="96" x2="286" y2="96" stroke="var(--d-rv-c-border)" stroke-width="1.4"/>
+      <rect x="286" y="62" width="144" height="68" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="358" y="84" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">cond.Wait()</text>
+      <text x="358" y="102" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">释放 mu</text>
+      <text x="358" y="118" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">加入等待队列并挂起</text>
+
+      <rect x="48" y="156" width="156" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="126" y="176" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">goroutine B</text>
+      <text x="126" y="192" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">mu.Lock() -> 修改条件</text>
+
+      <line x1="204" y1="178" x2="286" y2="178" stroke="var(--d-rv-a-border)" stroke-width="1.4"/>
+      <rect x="286" y="144" width="144" height="68" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+      <text x="358" y="166" text-anchor="middle" font-size="10" fill="var(--d-text)">Signal / Broadcast</text>
+      <text x="358" y="184" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">唤醒一个或全部等待者</text>
+      <text x="358" y="200" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">但不会替你保证条件仍成立</text>
+
+      <line x1="430" y1="178" x2="516" y2="178" stroke="var(--d-blue-border)" stroke-width="1.4"/>
+      <line x1="430" y1="96" x2="516" y2="96" stroke="var(--d-orange)" stroke-width="1.4"/>
+      <rect x="516" y="74" width="136" height="44" rx="8" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1.2"/>
+      <text x="584" y="94" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">被唤醒的 A</text>
+      <text x="584" y="110" text-anchor="middle" font-size="9" fill="var(--d-cur-text)">重新获取 mu</text>
+
+      <rect x="516" y="144" width="136" height="56" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="584" y="166" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">再次检查条件</text>
+      <text x="584" y="182" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">成立 -> 继续</text>
+      <text x="584" y="196" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">不成立 -> 再 Wait</text>
     </svg>
 
     <svg

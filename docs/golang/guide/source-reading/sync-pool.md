@@ -6,6 +6,8 @@ description: 精读 sync.Pool 的对象复用机制，理解 per-P 本地池、v
 # sync.Pool：对象池源码精读
 
 > 核心源码：`src/sync/pool.go`、`src/sync/poolqueue.go`
+>
+> 图例参考：复用 [性能优化与排障](../07-performance-troubleshooting.md) 和前面的 [内存分配器源码精读](./runtime-memory.md) 里的 `sync.Pool` 生命周期图，先看 `Get/Put/victim` 的流转，再对照 `poolLocal` 与 GC 清理逻辑。
 
 这篇聚焦对象复用与 GC 交互，不再承担 `sync` 总览页的职责。
 
@@ -20,6 +22,8 @@ description: 精读 sync.Pool 的对象复用机制，理解 per-P 本地池、v
 - 为什么它和 per-P、本地性、性能热点密切相关
 
 ## 包结构图
+
+<GoPerformanceDiagram kind="sync-pool-lifecycle" />
 
 ```
 sync.Pool 内部结构（Go 1.13+ victim cache 设计）

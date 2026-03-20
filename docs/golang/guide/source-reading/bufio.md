@@ -6,8 +6,12 @@ description: 精读 bufio.Reader/Writer/Scanner 的缓冲策略与 SplitFunc 机
 # bufio：缓冲 I/O 源码精读
 
 > 核心源码：`src/bufio/bufio.go`、`src/bufio/scan.go`
+>
+> 图例参考：复用 IO 组合图例，把 `Reader` / `Writer` / `bufio` 放到同一条链上看，先理解“缓冲层插在 Reader/Writer 中间”这件事，再回头读 `r/w` 指针和 `Flush` 约束。
 
 ## 包结构图
+
+<GoNetworkDiagram kind="io-primitives" />
 
 ```
 bufio 包全景

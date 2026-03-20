@@ -6,8 +6,12 @@ description: 精读 time.Timer/Ticker 与 runtime 定时器堆实现，理解定
 # time.Timer/Ticker：定时器源码精读
 
 > 核心源码：`src/time/sleep.go`、`src/runtime/time.go`
+>
+> 图例参考：补了 runtime 定时器堆图，把 `time.Timer`、`Ticker`、`AfterFunc` 和 per-P timer heap 放到同一条链上看，再回头理解 Stop/Reset 与 netpoll 的关系。
 
 ## 定时器架构图
+
+<GoRuntimeDiagram kind="timer-heap" />
 
 ```
 定时器体系全景

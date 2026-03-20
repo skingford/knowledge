@@ -6,6 +6,8 @@ description: 精读 database/sql 的高级用法，掌握 Savepoint 嵌套事务
 # database/sql 高级事务：源码精读
 
 > 核心源码：`src/database/sql/sql.go`、`src/database/sql/convert.go`
+>
+> 图例参考：继续复用 [数据库与缓存](../06-database-cache.md) 的预编译语句和连接池指标图例，先抓“批量执行 / 连接轮换 / 池内排队”这条主线，再看 Savepoint 和事务封装细节。
 
 这篇是 `database/sql` 的进阶补充页，不再重复连接池和基础扫描模型。
 
@@ -21,6 +23,8 @@ description: 精读 database/sql 的高级用法，掌握 Savepoint 嵌套事务
 - 基础总览：[database/sql 源码精读](./database-sql.md)
 
 ## 包结构图
+
+<GoDataCacheDiagram kind="prepared-statement" />
 
 ```
 database/sql 高级体系
@@ -427,6 +431,8 @@ func getUser(ctx context.Context, cache *StmtCache, id int64) (*User, error) {
 ```
 
 ### 连接池调优与监控
+
+<GoDataCacheDiagram kind="sql-pool-stats" />
 
 ```go
 func configurePool(db *sql.DB) {

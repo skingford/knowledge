@@ -6,6 +6,8 @@ description: 精读 sync.Cond 的条件变量实现，掌握 Wait/Signal/Broadca
 # sync.Cond：条件变量源码精读
 
 > 核心源码：`src/sync/cond.go`
+>
+> 图例参考：复用同步原语图例，并补了 `Cond Wait/Signal/Broadcast` 的专用流程图，先看“释放锁 -> 睡眠 -> 重新拿锁”的顺序，再回头理解为什么条件判断必须写在 `for` 里。
 
 这篇只聚焦条件变量语义：`Wait`、`Signal`、`Broadcast` 以及为什么必须用 `for` 循环守护条件。
 
@@ -16,6 +18,8 @@ description: 精读 sync.Cond 的条件变量实现，掌握 Wait/Signal/Broadca
 `sync.Cond` 适合解决“等待某个条件成立”的问题，不适合拿来替代所有 channel 或 mutex 场景。
 
 ## 包结构图
+
+<GoSyncPrimitiveDiagram kind="cond-wait-signal" />
 
 ```
 sync.Cond 内部结构

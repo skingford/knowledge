@@ -9,6 +9,7 @@ type DiagramKind =
   | 'escape-scenarios'
   | 'gc-tricolor'
   | 'allocator-hierarchy'
+  | 'timer-heap'
   | 'happens-before'
   | 'concurrent-append'
   | 'slice-safe-patterns'
@@ -25,6 +26,7 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'escape-scenarios': '760px',
   'gc-tricolor': '760px',
   'allocator-hierarchy': '760px',
+  'timer-heap': '760px',
   'happens-before': '760px',
   'concurrent-append': '760px',
   'slice-safe-patterns': '760px',
@@ -269,6 +271,50 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="544" y="196" width="150" height="52" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
       <text x="619" y="218" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">大对象（&gt; 32KB）</text>
       <text x="619" y="234" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">更接近直接走 mheap</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'timer-heap'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="runtime timer heap 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">定时器的主线是：time 包创建 timer，挂到某个 P 的最小堆里，再由调度器或 netpoll 按最近到期时间触发</text>
+
+      <rect x="28" y="92" width="138" height="68" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="97" y="114" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">time.NewTimer</text>
+      <text x="97" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Ticker / After / Sleep</text>
+      <text x="97" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">构造 runtime.timer</text>
+
+      <line x1="166" y1="126" x2="256" y2="126" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+
+      <rect x="256" y="70" width="176" height="112" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="344" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">per-P timers heap</text>
+      <text x="344" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">按 when 排序的最小堆</text>
+      <text x="344" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">堆顶就是最近到期的 timer</text>
+      <text x="344" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">addtimer / deltimer / runtimer</text>
+      <text x="344" y="164" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Stop 通常是惰性删除标记</text>
+
+      <line x1="432" y1="126" x2="532" y2="126" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="532" y="62" width="120" height="128" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="592" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">触发者</text>
+      <text x="592" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">schedule()</text>
+      <text x="592" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">netpoll timeout</text>
+      <text x="592" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">sysmon 托底</text>
+      <text x="592" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">now >= when 时执行</text>
+      <text x="592" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Ticker 还会重排下次 when</text>
+
+      <line x1="652" y1="126" x2="732" y2="96" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="652" y1="126" x2="732" y2="156" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+
+      <rect x="620" y="74" width="116" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="678" y="95" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">向 C 发送时间值</text>
+      <rect x="620" y="144" width="116" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="678" y="165" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">执行 AfterFunc 回调</text>
+
+      <text x="380" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">Timer 是“一次性”；Ticker 是“触发后按 period 重新入堆”。理解这一点，Stop / Reset / 泄漏问题就容易串起来</text>
     </svg>
 
     <svg

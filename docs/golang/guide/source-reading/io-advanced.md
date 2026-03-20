@@ -6,8 +6,12 @@ description: 精读 io 包的高级 Reader/Writer 组合工具，掌握 TeeReade
 # io 高级组合模式：源码精读
 
 > 核心源码：`src/io/io.go`、`src/io/pipe.go`、`src/io/multi.go`
+>
+> 图例参考：复用 [中间件、JSON 与 IO](../04-middleware-json-io.md) 的 IO 组合和 `io.Pipe` 图例，先看组合关系和同步管道，再回到 `io.Copy` 优化路径与各类 wrapper。
 
 ## 包结构图
+
+<GoNetworkDiagram kind="io-primitives" />
 
 ```
 io 包组合工具全览
@@ -221,6 +225,8 @@ func compressWithChecksum(dst *os.File, src io.Reader) (checksum []byte, err err
 ```
 
 ### io.Pipe：连接不兼容接口
+
+<GoNetworkDiagram kind="io-pipe-stream" />
 
 ```go
 // 场景：将 json.Encoder（需要 io.Writer）接到 http.Request（需要 io.Reader）

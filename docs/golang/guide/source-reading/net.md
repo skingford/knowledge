@@ -6,6 +6,8 @@ description: 精读 net.Conn/Listener 接口设计、TCP 拨号流程与 netpoll
 # net：网络层源码精读
 
 > 核心源码：`src/net/net.go`、`src/net/dial.go`、`src/net/tcpsock.go`、`src/internal/poll/`
+>
+> 图例参考：复用网络专题里的 TCP/UDP 图例，并补了 `netpoller` 与 `DialContext` 两个流程图，先看“fd 与 goroutine 如何配合”，再回头读 `internal/poll` 和 `runtime.netpoll`。
 
 ## 包结构图
 
@@ -67,6 +69,8 @@ type Addr interface {
 
 ## 二、netpoller：异步 I/O 核心
 
+<GoNetworkDiagram kind="netpoller-flow" />
+
 ```
 Go 网络 I/O 事件驱动模型
 ══════════════════════════════════════════════════════════════════
@@ -101,6 +105,8 @@ Go 网络 I/O 事件驱动模型
 ---
 
 ## 三、TCP 连接建立流程
+
+<GoNetworkDiagram kind="tcp-dial-flow" />
 
 ```
 net.DialContext("tcp", "host:port") 完整流程
@@ -259,6 +265,8 @@ func dialWithRetry(ctx context.Context, addr string, maxRetries int) (net.Conn, 
 ```
 
 ### UDP 收发
+
+<GoNetworkDiagram kind="tcp-vs-udp" />
 
 ```go
 // UDP 服务端
