@@ -20,6 +20,12 @@ search: false
 - 掌握 sync 包各同步原语的适用场景与注意事项
 - 能够排查 Goroutine 泄漏和并发安全问题
 
+## 图例速览
+
+并发主线里最容易先卡住的是 “G、M、P 到底怎么配合”。下面这张 SVG 图例复用了 [Goroutine 与 GMP 调度模型](./03-goroutine-and-scheduler.md) 一文的组件，建议先看角色分工，再进入具体章节。
+
+<GoSchedulerDiagram kind="roles" />
+
 ## 快速导航
 
 | 专题 | 内容 |

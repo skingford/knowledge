@@ -13,6 +13,8 @@ head:
 
 Go 使用**并发三色标记清除**（Concurrent Tri-color Mark and Sweep）算法，核心目标是在保证正确性的同时，最小化 STW（Stop The World）时间。
 
+<GoRuntimeDiagram kind="gc-tricolor" />
+
 ### 三色标记
 
 - **白色**：未被访问的对象，GC 结束后会被回收
@@ -110,6 +112,8 @@ gc 1 @0.012s 2%: 0.011+1.2+0.003 ms clock, 0.089+0.3/1.0/0+0.024 ms cpu, 4->4->0
 
 Go 的内存分配器基于 TCMalloc 设计思想，采用多级缓存架构减少锁竞争：
 
+<GoRuntimeDiagram kind="allocator-hierarchy" />
+
 ### 三级结构
 
 - **mcache**：每个 P（处理器）持有一个本地缓存，分配时无需加锁。包含各种 size class 的 `mspan` 链表
@@ -189,6 +193,8 @@ func main() {
 
 Go Memory Model 定义了在多 goroutine 环境下，一个 goroutine 的写操作何时对另一个 goroutine 的读操作可见。核心概念是 **happens-before** 关系。
 
+<GoRuntimeDiagram kind="happens-before" />
+
 ### Happens-Before 规则
 
 如果事件 A happens-before 事件 B，那么 A 的内存写入对 B 可见。以下是 Go 保证的 happens-before 关系：
@@ -206,6 +212,8 @@ Go Memory Model 定义了在多 goroutine 环境下，一个 goroutine 的写操
 ### Data Race
 
 当两个 goroutine 并发访问同一个变量，且至少一个是写操作，并且没有 happens-before 关系保证顺序时，就构成 Data Race。Data Race 是未定义行为（undefined behavior），可能导致任意结果。
+
+<GoLeakRaceDiagram kind="data-race" />
 
 ```go
 package main

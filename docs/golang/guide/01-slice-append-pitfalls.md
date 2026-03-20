@@ -20,6 +20,8 @@ search: false
 
 切片最容易踩坑的点，不是读写共享本身，而是很多人以为 `append` 一定会返回一块新的内存。这个理解是错的。`append` 只有在容量不够时才会扩容；只要当前 `cap` 还够，它就会直接复用当前底层数组。
 
+<GoLanguageDiagram kind="slice-append-trap" />
+
 ### 不指定 `max` 时，`append` 可能覆盖后续元素
 
 当你写：

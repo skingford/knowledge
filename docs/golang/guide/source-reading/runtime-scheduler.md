@@ -18,8 +18,12 @@ vocabulary:
 # GMP 调度器：runtime 源码精读
 
 > 核心源码：`src/runtime/proc.go`、`src/runtime/runtime2.go`
+>
+> 图例参考：复用 [Goroutine 与 GMP 调度模型](../03-goroutine-and-scheduler.md) 中的 SVG 图例，把角色关系、调度路径和 work stealing 先看成图，再对照本文的 runtime 细节。
 
 ## GMP 全景图
+
+<GoSchedulerDiagram kind="roles" />
 
 ```
 GMP 调度模型
@@ -87,6 +91,10 @@ type p struct {
 
 ## 二、调度循环
 
+<GoSchedulerDiagram kind="schedule-flow" />
+
+<GoSchedulerDiagram kind="run-queue" />
+
 ```
 schedule() 主循环
 ══════════════════════════════════════════════════════
@@ -126,6 +134,8 @@ schedule() 主循环
 
 ## 三、findRunnable 查找顺序与 Work Stealing
 
+<GoSchedulerDiagram kind="findrunnable" />
+
 从源码角度看，`schedule()` 真正的核心不是“执行”，而是 `findRunnable()` 如何尽量低成本地把下一个 G 找出来。它大致遵循这样的优先级：
 
 1. **`runnext`**：优先执行被标记为“下一次就跑”的 G，减少唤醒后的额外排队。
@@ -137,6 +147,8 @@ schedule() 主循环
 这个顺序体现了 runtime 的设计取舍：先走局部性最好、代价最低的路径，再逐步扩大搜索范围，最后才进入跨 P 的负载均衡。
 
 ### Work Stealing 为什么有效
+
+<GoSchedulerDiagram kind="work-stealing" />
 
 `runqsteal` 的核心思想并不复杂：如果某个 P 很忙、另一个 P 很闲，就把忙者本地队列的一部分任务转移给闲者。
 
@@ -161,6 +173,8 @@ schedule() 主循环
 
 ### 自旋线程（Spinning Threads）
 
+<GoSchedulerDiagram kind="spinning" />
+
 当一个 M 没找到任务时，并不会总是立刻睡眠。原因很现实：线程休眠/唤醒涉及内核切换，代价并不小。如果系统此刻正有新任务即将出现，立刻休眠反而会增加调度延迟。
 
 因此 runtime 会让一部分 M 进入 **spinning** 状态：
@@ -174,6 +188,8 @@ schedule() 主循环
 ---
 
 ## 四、抢占机制
+
+<GoSchedulerDiagram kind="preemption" />
 
 ```
 Go 抢占演进
@@ -202,6 +218,8 @@ Go 抢占演进
 ---
 
 ## 五、系统调用时的 P 交接
+
+<GoSchedulerDiagram kind="handoff" />
 
 ```
 M 进入系统调用

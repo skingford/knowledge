@@ -13,6 +13,8 @@ head:
 
 Go 用返回值而非异常处理错误，核心原则是：错误是值，可以被编程处理。Go 1.13 引入 `errors.Is`（判断错误链中是否包含特定错误）和 `errors.As`（从错误链中提取特定类型错误）以及 `fmt.Errorf` 的 `%w` 动词用于错误包装。良好的错误处理设计应该分层：底层返回 sentinel error 或自定义错误类型，中间层用 `%w` 包装添加上下文，上层用 `errors.Is/As` 做决策。避免对所有错误都 `log.Fatal` 或简单打印。
 
+<GoLanguageDiagram kind="error-chain" />
+
 ```go
 package main
 

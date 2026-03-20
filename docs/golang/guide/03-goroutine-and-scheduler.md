@@ -155,7 +155,25 @@ func main() {
 - **抢占式调度**：Go 1.14 起引入基于信号的抢占，即使 Goroutine 没有函数调用也能被抢占，避免单个 G 长期霸占 M。
 - **本地队列 vs 全局队列**：新创建的 G 优先放入当前 P 的本地队列；本地队列满（256 个）时，一半会被转移到全局队列。调度器每隔一段时间也会检查全局队列，防止 G 饿死。
 
+### `runnext`、本地队列与全局队列
+
+<GoSchedulerDiagram kind="run-queue" />
+
+学习这部分时，最容易混淆的是“新建的 G 到底先进哪里”。实践上可以先记住一条主线：**优先放当前 P 的近处，放不下再向全局扩散**。这样既能减少加锁，也更容易命中 CPU cache。
+
 <GoSchedulerDiagram kind="work-stealing" />
+
+### Hand-off：阻塞 syscall 时为什么还能继续跑别的 G
+
+<GoSchedulerDiagram kind="handoff" />
+
+这张图建议和 `entersyscall / exitsyscall` 一起看。核心不是“阻塞 syscall 消失了”，而是 **阻塞的是 M，不应该顺带把 P 也困住**，所以 runtime 会把 P 交给其他 M。
+
+### 抢占式调度：为什么死循环不再长期霸占 CPU
+
+<GoSchedulerDiagram kind="preemption" />
+
+这里要把“协作式抢占”和“异步抢占”区分开。前者更依赖函数调用边界，后者则由 `sysmon` 观察长时间运行的 G，并通过信号让它在安全点让出执行权。
 
 ### Work Stealing 的查找顺序与触发逻辑
 
@@ -176,6 +194,8 @@ func main() {
 <GoSchedulerDiagram kind="findrunnable" />
 
 ### 自旋线程（Spinning）为什么存在
+
+<GoSchedulerDiagram kind="spinning" />
 
 如果一个 M/P 组合没找到任务就立刻休眠，会频繁进入内核态睡眠与唤醒，代价并不低。Go runtime 因此引入了自旋线程：
 

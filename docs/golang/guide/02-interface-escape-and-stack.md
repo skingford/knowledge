@@ -13,6 +13,8 @@ head:
 
 Go 的接口在运行时有两种表示：
 
+<GoRuntimeDiagram kind="interface-itab" />
+
 - **eface**（empty interface `interface{}`）：只有两个字段 `_type` 和 `data`
 - **iface**（非空接口）：有 `tab`（指向 itab）和 `data` 两个字段
 
@@ -92,6 +94,8 @@ func main() {
 
 Go 编译器在编译期通过逃逸分析（Escape Analysis）决定变量分配在栈上还是堆上。栈分配成本极低，堆分配需要 GC 参与回收，所以减少逃逸 = 减少 GC 压力 = 提升性能。
 
+<GoRuntimeDiagram kind="escape-scenarios" />
+
 典型逃逸场景包括：
 
 - 返回局部变量指针
@@ -168,6 +172,10 @@ go build -gcflags="-m -m" main.go
 ## 6. 栈与堆
 
 Go 的 goroutine 使用独立的栈，栈的特点：
+
+<GoRuntimeDiagram kind="stack-vs-heap" />
+
+<GoSchedulerDiagram kind="stack-growth" />
 
 - **初始大小**：Go 1.4+ 起初始栈大小为 **2KB**（之前是 8KB）
 - **动态增长**：函数调用时如果栈空间不够，运行时会分配一个 2 倍大小的新栈，把旧栈内容拷贝过去（连续栈，copystack）

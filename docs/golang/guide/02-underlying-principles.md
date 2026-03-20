@@ -21,6 +21,12 @@ search: false
 - 理解 Go 内存分配器的多级缓存架构
 - 掌握 Go Memory Model 的 happens-before 规则
 
+## 图例速览
+
+底层原理里最容易断开的，是“数据结构、分配位置、GC、并发可见性”这四条线。先看这张总览图，再按顺序拆进每篇文章会更稳。
+
+<GoRuntimeDiagram kind="overview" />
+
 ## 快速导航
 
 | 专题 | 内容 |

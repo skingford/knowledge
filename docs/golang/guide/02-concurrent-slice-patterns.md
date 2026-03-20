@@ -24,6 +24,8 @@ search: false
 
 切片在运行时可以理解为这样一个结构：
 
+<GoRuntimeDiagram kind="concurrent-append" />
+
 ```go
 type slice struct {
 	array unsafe.Pointer
@@ -101,6 +103,8 @@ for i := 0; i < 100; i++ {
 ---
 
 ## 3. 更稳妥的收集结果模式
+
+<GoRuntimeDiagram kind="slice-safe-patterns" />
 
 ### 预分配结果切片，按索引写入
 
@@ -211,6 +215,8 @@ func main() {
 ## 5. Monitor Goroutine：Channel 串行化方案
 
 Go 并发编程里有一句经典的话：
+
+<GoRuntimeDiagram kind="channel-manager" />
 
 > Don't communicate by sharing memory; share memory by communicating.
 

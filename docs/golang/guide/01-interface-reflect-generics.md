@@ -13,6 +13,8 @@ head:
 
 Go 的接口在运行时有两种底层结构：`eface`（空接口 `interface{}`/`any`）只包含类型指针和数据指针；`iface`（非空接口）还额外包含方法表（`itab`）。接口变量是否为 nil 取决于其类型指针和数据指针**是否都为零**——一个常见陷阱是将具体类型的 nil 指针赋值给接口变量，此时接口的类型信息非空，导致 `interface != nil`。理解这个原理可以避免大量"明明是 nil 但判断不为 nil"的 bug。
 
+<GoLanguageDiagram kind="interface-nil" />
+
 ```go
 package main
 
@@ -114,6 +116,8 @@ func main() {
 
 Go 的 `reflect` 包提供运行时类型检查和值操作能力。`reflect.TypeOf` 返回类型信息，`reflect.ValueOf` 返回值的反射对象。反射的三大法则：反射可以从接口值获取反射对象；反射对象可以还原为接口值；要修改反射对象，其值必须可设置（settable，即通过指针传入）。反射常用于序列化框架、ORM、配置解析等场景，但性能开销大，生产代码应尽量避免在热路径使用。
 
+<GoLanguageDiagram kind="reflect-settable" />
+
 ```go
 package main
 
@@ -213,6 +217,8 @@ func main() {
 ## 9. 泛型 generics
 
 Go 1.18 引入泛型，通过类型参数（type parameters）和类型约束（constraints）实现类型安全的通用代码。约束用接口定义，可以包含类型集合（`~int | ~float64`）和方法集合。泛型最适合用于容器类型（如通用 slice 操作）、算法函数（如排序、查找）和减少类型断言的场景。避免过度使用泛型——如果 `interface{}` 或具体类型就能清晰表达，就不需要泛型。
+
+<GoLanguageDiagram kind="generics-constraint" />
 
 ```go
 package main

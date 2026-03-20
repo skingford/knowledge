@@ -13,6 +13,8 @@ head:
 
 `defer` 将函数调用压入栈，在当前函数返回前按 LIFO（后进先出）顺序执行。defer 的参数在 `defer` 语句执行时就已经求值（而非延迟到调用时）。`panic` 触发运行时恐慌，沿调用栈向上传播；`recover` 只能在 `defer` 函数中调用，用于捕获 panic 并恢复正常执行。这三者组合构成了 Go 的异常处理机制，常用于资源清理、锁释放和顶层错误兜底。
 
+<GoLanguageDiagram kind="defer-panic" />
+
 ```go
 package main
 
@@ -85,6 +87,8 @@ func main() {
 ## 6. 函数闭包
 
 闭包是引用了外部变量的函数，Go 中闭包捕获的是变量的**引用**而非值的拷贝。这意味着闭包执行时会读取变量的最新值，而不是定义闭包时的值。最经典的陷阱是在 for 循环中创建 goroutine 或 defer 闭包引用循环变量——所有闭包最终都会看到循环变量的最后一个值。Go 1.22 修复了 `for` 循环变量的语义（每次迭代创建新变量），但理解底层原理仍然重要。
+
+<GoLanguageDiagram kind="closure-capture" />
 
 ```go
 package main

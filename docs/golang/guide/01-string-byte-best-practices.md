@@ -46,6 +46,8 @@ search: false
 - `[]byte`：可变的字节切片，适合网络包、文件内容、编码结果这类“按字节处理”的数据。
 - `[]rune`：可变的 Unicode 码点切片，适合“按字符处理”的文本修改场景。
 
+<GoLanguageDiagram kind="string-byte-rune" />
+
 最容易混淆的是“字节”和“字符”不是一回事。以中文 `"你"` 为例：
 
 - `len("你") == 3`，因为 UTF-8 下它占 3 个字节
@@ -424,6 +426,8 @@ fmt.Println(string(runes[:3])) // Go语
 ## 9. `strings.Builder` 的零拷贝设计
 
 前面推荐 `strings.Builder`，并提到它在生成最终 `string` 时通常可以避免额外拷贝。很多人第一反应是：不是说 `string` 和 `[]byte` 之间的转换通常会拷贝吗，为什么标准库这里敢这么做？
+
+<GoLanguageDiagram kind="builder-flow" />
 
 把 `Builder` 的核心思想简化一下，大致可以理解成下面这样：
 

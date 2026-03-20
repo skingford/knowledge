@@ -7,6 +7,8 @@ import ClaudeHome from './components/ClaudeHome.vue'
 import SectionLanding from './components/SectionLanding.vue'
 import OverviewLanding from './components/OverviewLanding.vue'
 import GoSchedulerDiagram from './components/GoSchedulerDiagram.vue'
+import GoLanguageDiagram from './components/GoLanguageDiagram.vue'
+import GoRuntimeDiagram from './components/GoRuntimeDiagram.vue'
 import GoLeakRaceDiagram from './components/GoLeakRaceDiagram.vue'
 import GoChannelDiagram from './components/GoChannelDiagram.vue'
 import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
@@ -43,6 +45,8 @@ export default {
     app.component('SectionLanding', SectionLanding)
     app.component('OverviewLanding', OverviewLanding)
     app.component('GoSchedulerDiagram', GoSchedulerDiagram)
+    app.component('GoLanguageDiagram', GoLanguageDiagram)
+    app.component('GoRuntimeDiagram', GoRuntimeDiagram)
     app.component('GoLeakRaceDiagram', GoLeakRaceDiagram)
     app.component('GoChannelDiagram', GoChannelDiagram)
     app.component('GoInternalsDiagram', GoInternalsDiagram)
