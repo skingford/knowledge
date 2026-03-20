@@ -6,8 +6,12 @@ description: 精读 Go GC 三色标记算法、写屏障与 STW 实现，理解 
 # Go GC：垃圾回收源码精读
 
 > 核心源码：`src/runtime/mgc.go`、`src/runtime/mgcmark.go`、`src/runtime/mgcsweep.go`
+>
+> 图例参考：复用 [底层原理](../02-underlying-principles.md) 和 [性能排障](../07-performance-troubleshooting.md) 里的三色标记、GC 调优图例，先把颜色流转和触发控制看清，再读 `mgc*.go`。
 
 ## GC 全景图
+
+<GoRuntimeDiagram kind="gc-tricolor" />
 
 ```
 Go GC 三色标记-清扫（Tri-color Mark-Sweep）
@@ -136,6 +140,8 @@ GC 触发时机
 ---
 
 ## 四、GC 调优参数
+
+<GoPerformanceDiagram kind="gc-control" />
 
 ```
 关键参数一览

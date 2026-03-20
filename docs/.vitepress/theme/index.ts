@@ -23,6 +23,7 @@ import GoCodegenDiagram from './components/GoCodegenDiagram.vue'
 import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
 import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
 import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
+import GoSourceReadingDiagram from './components/GoSourceReadingDiagram.vue'
 import MySQLDurabilityDiagram from './components/MySQLDurabilityDiagram.vue'
 import MySQLTransactionIsolationDiagram from './components/MySQLTransactionIsolationDiagram.vue'
 import MySQLHighAvailabilityDiagram from './components/MySQLHighAvailabilityDiagram.vue'
@@ -70,6 +71,7 @@ export default {
     app.component('GoInternalsDiagram', GoInternalsDiagram)
     app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
     app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)
+    app.component('GoSourceReadingDiagram', GoSourceReadingDiagram)
     app.component('MySQLDurabilityDiagram', MySQLDurabilityDiagram)
     app.component('MySQLTransactionIsolationDiagram', MySQLTransactionIsolationDiagram)
     app.component('MySQLHighAvailabilityDiagram', MySQLHighAvailabilityDiagram)

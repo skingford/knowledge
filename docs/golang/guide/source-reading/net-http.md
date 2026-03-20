@@ -6,6 +6,8 @@ description: 精读 net/http Server、Transport、ServeMux 实现，理解 HTTP 
 # net/http 包：HTTP 实现源码精读
 
 > 核心源码：`src/net/http/server.go`、`src/net/http/transport.go`
+>
+> 图例参考：复用 [网络编程与标准库](../04-network-stdlib.md) 和 [HTTP 服务端、客户端、TCP/UDP](../04-http-server-client-tcp-udp.md) 里的服务端、连接池、中间件图例，先看请求和连接的流向，再回到 `server.go` / `transport.go`。
 
 这篇是 `net/http` 的总览页，负责把服务端、客户端、路由和连接池放到一个整体视角里讲清楚。
 
@@ -21,6 +23,8 @@ description: 精读 net/http Server、Transport、ServeMux 实现，理解 HTTP 
 - **只想深入客户端传输层**：看 `net-http-transport`
 
 ## 包结构图
+
+<GoNetworkDiagram kind="http-server-flow" />
 
 ```
 net/http 包结构
@@ -127,6 +131,8 @@ ServeMux 匹配规则
 
 ## 三、Transport：客户端连接池
 
+<GoNetworkDiagram kind="http-client-pool" />
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                     http.Transport                           │
@@ -229,6 +235,8 @@ func fetch(ctx context.Context, url string) ([]byte, error) {
 ```
 
 ### 中间件链
+
+<GoNetworkDiagram kind="middleware-chain" />
 
 ```go
 type Middleware func(http.Handler) http.Handler

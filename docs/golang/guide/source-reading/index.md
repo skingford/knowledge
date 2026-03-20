@@ -15,6 +15,12 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 - **想按主题查包**：看“按主题分组索引”
 - **想知道单篇文章的定位**：再看后面的“精读索引”
 
+## 图例速览
+
+<GoSourceReadingDiagram kind="entry-map" />
+
+<GoSourceReadingDiagram kind="runtime-route" />
+
 ## 推荐阅读路线
 
 ### 路线一：先补 runtime 主线

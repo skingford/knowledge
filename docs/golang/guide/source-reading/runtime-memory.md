@@ -6,8 +6,12 @@ description: 精读 Go 内存分配器 tcmalloc 变体，理解 mcache/mcentral/
 # Go 内存分配：runtime 源码精读
 
 > 核心源码：`src/runtime/malloc.go`、`src/runtime/mheap.go`、`src/runtime/mcache.go`
+>
+> 图例参考：复用 [底层原理](../02-underlying-principles.md) 和 [性能排障](../07-performance-troubleshooting.md) 里的分配器、栈堆、`sync.Pool` 图例，先抓主路径，再回来看 `malloc.go` 的 size class 和 span 细节。
 
 ## 内存分配器全景图
+
+<GoRuntimeDiagram kind="allocator-hierarchy" />
 
 ```
 Go 内存分配器（tcmalloc 变体）
@@ -103,6 +107,8 @@ newobject(size) 分配流程
 
 ## 三、sync.Pool 与内存复用
 
+<GoPerformanceDiagram kind="sync-pool-lifecycle" />
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                      sync.Pool                               │
@@ -153,6 +159,8 @@ func encode(v any) ([]byte, error) {
 ```
 
 ### 减少逃逸（栈分配）
+
+<GoRuntimeDiagram kind="stack-vs-heap" />
 
 ```go
 // 逃逸到堆（慢）

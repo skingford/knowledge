@@ -6,8 +6,12 @@ description: 精读 Go 性能剖析工具链，掌握 CPU/内存/goroutine Profi
 # runtime/pprof + net/http/pprof：性能剖析源码精读
 
 > 核心源码：`src/runtime/pprof/pprof.go`、`src/net/http/pprof/pprof.go`
+>
+> 图例参考：复用 [Pprof、Trace 与 Benchmark](../07-pprof-trace-and-benchmark.md) 中的 CPU / Heap 图例，先把采样链路和读图顺序看直观，再回头对照 `runtime/pprof` 的采集实现。
 
 ## 包结构图
+
+<GoPerformanceDiagram kind="cpu-pprof" />
 
 ```
 Go 性能剖析工具链
@@ -142,6 +146,8 @@ func profileCPU(duration time.Duration, fn func()) error {
 ```
 
 ### 堆内存与 Allocs Profile
+
+<GoPerformanceDiagram kind="heap-profile" />
 
 ```go
 func captureHeapProfile(path string) error {

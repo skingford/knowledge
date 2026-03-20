@@ -6,6 +6,8 @@ description: 精读 net/http Server 的连接生命周期、middleware 链设计
 # net/http 服务端高级模式：源码精读
 
 > 核心源码：`src/net/http/server.go`
+>
+> 图例参考：复用 [HTTP 服务端、客户端、TCP/UDP](../04-http-server-client-tcp-udp.md) 和 [连接池、超时、重试与限流](../04-connection-timeout-retry-rate-limit.md) 里的服务端流程、优雅关闭、中间件链图例，先把连接生命周期和关闭顺序看清，再读 `conn.serve`。
 
 这篇是 `net/http` 服务端方向的深挖页，重点是连接生命周期、middleware、graceful shutdown、SSE 和连接劫持。
 
@@ -18,6 +20,8 @@ description: 精读 net/http Server 的连接生命周期、middleware 链设计
 - Transport：[net/http Transport 深度解析](./net-http-transport.md)
 
 ## 包结构图
+
+<GoNetworkDiagram kind="http-server-flow" />
 
 ```
 net/http Server 体系
@@ -94,6 +98,8 @@ func (c *conn) serve(ctx context.Context) {
 
 ### 生产级 Server 配置
 
+<GoNetworkDiagram kind="graceful-shutdown" />
+
 ```go
 import (
     "context"
@@ -146,6 +152,8 @@ func startServer(handler http.Handler) error {
 ```
 
 ### Middleware 链：洋葱模型
+
+<GoNetworkDiagram kind="middleware-chain" />
 
 ```go
 // Middleware 类型定义：接收 Handler 返回 Handler

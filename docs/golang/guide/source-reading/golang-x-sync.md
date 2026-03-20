@@ -6,8 +6,12 @@ description: 精读 Go 准标准库 x/sync 的 errgroup、singleflight、semapho
 # golang.org/x/sync：并发工具包源码精读
 
 > 核心源码：`golang.org/x/sync/errgroup`、`singleflight`、`semaphore`
+>
+> 图例参考：复用 [高级并发模式](../03-advanced-concurrency-patterns.md) 里的 `errgroup`、`singleflight`、`semaphore`、有界并发图例，把工具职责先拆清，再回来看各自的实现取舍。
 
 ## 包结构图
+
+<GoAdvancedConcurrencyDiagram kind="errgroup" />
 
 ```
 golang.org/x/sync 体系
@@ -168,6 +172,8 @@ func fetchPageData(ctx context.Context, userID int) (*PageData, error) {
 
 ### errgroup + SetLimit：限制并发下载
 
+<GoAdvancedConcurrencyDiagram kind="bounded-concurrency" />
+
 ```go
 // 批量下载文件，最多同时 5 个并发（Go 1.21+）
 func downloadFiles(ctx context.Context, urls []string, dir string) error {
@@ -198,6 +204,8 @@ func downloadFilesV2(ctx context.Context, urls []string, dir string) error {
 ```
 
 ### singleflight：防缓存击穿
+
+<GoAdvancedConcurrencyDiagram kind="singleflight" />
 
 ```go
 import "golang.org/x/sync/singleflight"
@@ -250,6 +258,8 @@ func (s *UserService) UpdateUser(ctx context.Context, user *User) error {
 ```
 
 ### semaphore：限制 CPU 密集任务并发
+
+<GoAdvancedConcurrencyDiagram kind="semaphore" />
 
 ```go
 import "golang.org/x/sync/semaphore"

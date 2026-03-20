@@ -17,6 +17,12 @@ search: false
 - **想按包查文章**：跳到 [Go 源码精读总览](./index.md)
 - **想准备 runtime / 调度 / GC 面试**：优先读 runtime 主线，再回题库和排障页
 
+## 图例速览
+
+<GoSourceReadingDiagram kind="reading-method" />
+
+<GoSourceReadingDiagram kind="runtime-route" />
+
 ## 开始之前：怎么读 Go 源码
 
 在深入 runtime 之前，先把版本、目录和入口找法对齐，不然后面容易迷路。

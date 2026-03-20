@@ -6,8 +6,12 @@ description: 精读 context.Context 接口与四种实现（emptyCtx、cancelCtx
 # context 包：上下文传播源码精读
 
 > 源码路径：`src/context/context.go`（约 600 行）
+>
+> 图例参考：复用 [Channel、Select 与 Context](../03-channel-select-context.md) 里的取消树图例，先看 `cancelCtx` 的父子传播关系，再回头理解 `propagateCancel` 和 `Done()`。
 
 ## 包结构图
+
+<GoChannelDiagram kind="context-tree" />
 
 ```
 context 包结构

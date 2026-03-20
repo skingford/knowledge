@@ -8,6 +8,8 @@ search: false
 
 这个入口原来承担“runtime 导读 + 源码阅读方法 + 文章索引”的混合职责。为了避免 `docs/golang` 下继续维护两套并行入口，相关内容已经统一收口到 `guide/source-reading/`。
 
+<GoSourceReadingDiagram kind="archive-redirect" />
+
 ## 当前应该去哪里
 
 - 源码阅读主入口：[Go 源码阅读学习主线](/golang/guide/source-reading/learning-path)
