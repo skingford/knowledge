@@ -22,6 +22,7 @@ import MySQLInternalTempTableDiagram from './components/MySQLInternalTempTableDi
 import MySQLJoinUsageDiagram from './components/MySQLJoinUsageDiagram.vue'
 import MySQLJoinOptimizationDiagram from './components/MySQLJoinOptimizationDiagram.vue'
 import MySQLInnoDBVsMemoryDiagram from './components/MySQLInnoDBVsMemoryDiagram.vue'
+import MySQLAutoIncrementGapsDiagram from './components/MySQLAutoIncrementGapsDiagram.vue'
 import WechatQrNotice from './components/WechatQrNotice.vue'
 import DocAfterSlot from './components/DocAfterSlot.vue'
 
@@ -57,5 +58,6 @@ export default {
     app.component('MySQLJoinUsageDiagram', MySQLJoinUsageDiagram)
     app.component('MySQLJoinOptimizationDiagram', MySQLJoinOptimizationDiagram)
     app.component('MySQLInnoDBVsMemoryDiagram', MySQLInnoDBVsMemoryDiagram)
+    app.component('MySQLAutoIncrementGapsDiagram', MySQLAutoIncrementGapsDiagram)
   },
 }
