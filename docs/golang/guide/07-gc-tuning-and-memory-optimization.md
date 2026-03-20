@@ -86,6 +86,8 @@ func main() {
 # 8 P        : 使用的 P（processor）数量
 ```
 
+<GoPerformanceDiagram kind="gc-control" />
+
 ### 讲解重点
 
 - **GOGC vs GOMEMLIMIT**：`GOGC` 按比例控制，适合通用场景；`GOMEMLIMIT` 按绝对值控制，适合容器环境（已知内存上限）。两者组合使用效果最佳：`GOGC=off` + `GOMEMLIMIT=容器内存的70-80%`。
@@ -260,6 +262,8 @@ func main() {
 }
 ```
 
+<GoPerformanceDiagram kind="allocation-optimization" />
+
 ### 讲解重点
 
 - **逃逸 = 堆分配 = GC 压力**：Go 编译器通过逃逸分析决定变量分配在栈还是堆上。栈分配几乎零成本（函数返回自动回收），堆分配需要 GC 参与。用 `-gcflags="-m"` 检查关键路径上的逃逸。
@@ -357,6 +361,8 @@ func BenchmarkWithPool(b *testing.B) {
 	}
 }
 ```
+
+<GoPerformanceDiagram kind="sync-pool-lifecycle" />
 
 ### 讲解重点
 

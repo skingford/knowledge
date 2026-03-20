@@ -28,3 +28,5 @@ search: false
 | [GC 调优与内存优化](./07-gc-tuning-and-memory-optimization.md) | GOGC/GOMEMLIMIT、逃逸分析、预分配、strings.Builder、sync.Pool |
 | [锁竞争分析与慢请求排查](./07-lock-contention-and-slow-requests.md) | mutex profile、分片 Map、请求链路追踪、分段计时 |
 | [Goroutine 泄漏与线上问题定位](./07-goroutine-leak-and-production-debugging.md) | 泄漏模式与修复、四步排障法、运行时自检、指标/日志/Trace 三件套 |
+
+<GoPerformanceDiagram kind="overview" />

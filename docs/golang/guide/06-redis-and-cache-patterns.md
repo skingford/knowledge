@@ -90,6 +90,8 @@ func main() {
 }
 ```
 
+<GoDataCacheDiagram kind="redis-client-types" />
+
 ### Pipeline 批量操作
 
 ```go
@@ -124,6 +126,8 @@ func getUsersBatch(ctx context.Context, rdb *redis.Client, userIDs []int64) (map
 }
 ```
 
+<GoDataCacheDiagram kind="redis-pipeline" />
+
 ### Pub/Sub 发布订阅
 
 ```go
@@ -146,6 +150,8 @@ func publishMessage(ctx context.Context, rdb *redis.Client) error {
 	return rdb.Publish(ctx, "notifications", "new order created").Err()
 }
 ```
+
+<GoDataCacheDiagram kind="redis-pubsub" />
 
 **讲解重点：**
 
@@ -226,6 +232,8 @@ func getUserWithBloom(ctx context.Context, rdb *redis.Client, db *sql.DB, userID
 }
 ```
 
+<GoDataCacheDiagram kind="cache-penetration" />
+
 ### 缓存击穿
 
 **定义**：某个热点 key 过期的瞬间，大量并发请求同时打到数据库。
@@ -274,6 +282,8 @@ func getHotProduct(ctx context.Context, rdb *redis.Client, db *sql.DB, productID
 	return product, nil
 }
 ```
+
+<GoDataCacheDiagram kind="cache-breakdown" />
 
 ### 缓存雪崩
 
@@ -331,6 +341,8 @@ func (cm *CacheManager) Get(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 ```
+
+<GoDataCacheDiagram kind="cache-avalanche" />
 
 **讲解重点：**
 

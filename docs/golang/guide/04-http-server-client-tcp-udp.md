@@ -65,6 +65,8 @@ func main() {
 }
 ```
 
+<GoNetworkDiagram kind="http-server-flow" />
+
 ### Graceful Shutdown
 
 ```go
@@ -120,6 +122,8 @@ func main() {
 	fmt.Println("Server exited")
 }
 ```
+
+<GoNetworkDiagram kind="graceful-shutdown" />
 
 **讲解重点：**
 
@@ -237,6 +241,8 @@ func main() {
 	correctRequest(client, "https://httpbin.org/get")
 }
 ```
+
+<GoNetworkDiagram kind="http-client-pool" />
 
 **讲解重点：**
 
@@ -419,6 +425,8 @@ func main() {
 	}
 }
 ```
+
+<GoNetworkDiagram kind="tcp-vs-udp" />
 
 **讲解重点：**
 

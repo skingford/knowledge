@@ -20,6 +20,8 @@ search: false
 - 形成可维护的错误码体系、中间件模式和团队代码规范
 - 系统掌握单测、Mock、集成测试、基准测试和自动化交付流程
 
+<GoEngineeringDiagram kind="overview" />
+
 ## 拆分说明
 
 - 原第 1-4 节 -> [项目结构、依赖管理、日志与配置](./05-project-layout-deps-logging-config)

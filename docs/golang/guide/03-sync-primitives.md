@@ -225,6 +225,8 @@ func main() {
 }
 ```
 
+<GoSyncPrimitiveDiagram kind="atomic-cas" />
+
 ### 讲解重点
 
 - **适用场景**：计数器、标志位、配置热加载等简单共享状态。复杂逻辑（多个字段需一致性更新）仍应使用 Mutex。
@@ -380,6 +382,8 @@ func main() {
 }
 ```
 
+<GoSyncPrimitiveDiagram kind="coordination-primitives" />
+
 ### 讲解重点
 
 - **WaitGroup.Add 的时机**：`Add` 必须在启动 Goroutine 之前调用，否则 `Wait` 可能在 `Add` 之前返回。不要在 Goroutine 内部调用 `Add`。
@@ -501,6 +505,8 @@ func main() {
 }
 ```
 
+<GoSyncPrimitiveDiagram kind="sync-map-read-dirty" />
+
 ### 讲解重点
 
 - **适用场景**：key 稳定（写少读多）或各 Goroutine 操作不同 key 集合。这两种场景下 `sync.Map` 内部的 read-only 快路径能避免加锁。
@@ -513,4 +519,3 @@ func main() {
 回顾 Section 6-9 的各种同步原语，可以按以下决策树选择：
 
 <GoSyncPrimitiveDiagram kind="primitive-decision-tree" />
-

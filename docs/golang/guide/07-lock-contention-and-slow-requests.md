@@ -68,6 +68,8 @@ go tool pprof http://localhost:6060/debug/pprof/mutex
 # (pprof) list funcName
 ```
 
+<GoPerformanceDiagram kind="mutex-profile" />
+
 ### 分片降低锁粒度
 
 ```go
@@ -133,6 +135,8 @@ func main() {
 	wg.Wait()
 }
 ```
+
+<GoPerformanceDiagram kind="sharded-map" />
 
 ### 讲解重点
 
@@ -270,6 +274,8 @@ func main() {
 	t.Report()
 }
 ```
+
+<GoPerformanceDiagram kind="slow-request-breakdown" />
 
 ### 讲解重点
 

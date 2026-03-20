@@ -20,6 +20,8 @@ search: false
 - 掌握 TCP / UDP 基础、连接池、超时与重试这些生产环境常见模式
 - 熟悉中间件组织方式、JSON 编解码细节，以及文件与 IO 相关标准库
 
+<GoNetworkDiagram kind="overview" />
+
 ## 拆分说明
 
 - 原第 1-3 节 -> [HTTP 服务端、客户端与 TCP/UDP](./04-http-server-client-tcp-udp)

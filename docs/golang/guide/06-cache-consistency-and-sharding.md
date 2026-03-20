@@ -67,6 +67,8 @@ func updateUser(ctx context.Context, rdb *redis.Client, db *sql.DB, user *User) 
 }
 ```
 
+<GoDataCacheDiagram kind="cache-aside" />
+
 ### 延迟双删：进一步降低不一致窗口
 
 ```go
@@ -98,6 +100,8 @@ func updateUserWithDoubleDelete(ctx context.Context, rdb *redis.Client, db *sql.
 	return nil
 }
 ```
+
+<GoDataCacheDiagram kind="double-delete" />
 
 ### 基于消息队列的最终一致性
 
@@ -141,6 +145,8 @@ type DBChangeEvent struct {
 	Data       map[string]interface{}
 }
 ```
+
+<GoDataCacheDiagram kind="mq-invalidation" />
 
 **讲解重点：**
 
@@ -214,6 +220,8 @@ func (sr *ShardRouter) ConsistentHashRoute(key string) (db *sql.DB, tableName st
 }
 ```
 
+<GoDataCacheDiagram kind="sharding-route" />
+
 ### 分布式 ID 生成
 
 ```go
@@ -279,6 +287,8 @@ func (s *Snowflake) ParseTime(id int64) time.Time {
 	return time.UnixMilli(ms)
 }
 ```
+
+<GoDataCacheDiagram kind="snowflake-id" />
 
 ### 跨分片查询
 
@@ -381,6 +391,8 @@ func (sr *ShardRouter) QueryByUserID(ctx context.Context, userID int64) ([]Order
 	return orders, rows.Err()
 }
 ```
+
+<GoDataCacheDiagram kind="cross-shard-query" />
 
 **讲解重点：**
 

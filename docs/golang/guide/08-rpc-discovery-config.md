@@ -251,6 +251,8 @@ func newGRPCServer() *grpc.Server {
 }
 ```
 
+<GoMicroserviceDiagram kind="grpc-request-lifecycle" />
+
 ### 讲解重点
 
 - **gRPC 四种模式**：一元（Unary）、服务端流（Server Streaming）、客户端流（Client Streaming）、双向流（Bidirectional Streaming），按业务需要选择。
@@ -397,6 +399,8 @@ func main() {
 }
 ```
 
+<GoMicroserviceDiagram kind="protobuf-codegen" />
+
 ### 讲解重点
 
 - **字段编号不可更改**：Protobuf 的字段编号一旦分配就不能修改或复用，删除字段应用 `reserved` 标记。这是向后兼容的核心机制。
@@ -515,6 +519,8 @@ func (r *ServiceRegistry) Deregister(ctx context.Context, serviceName, addr stri
 }
 ```
 
+<GoMicroserviceDiagram kind="service-registry" />
+
 ### 3.3 服务发现与 Watch
 
 ```go
@@ -586,6 +592,8 @@ func (d *ServiceDiscovery) Watch(ctx context.Context, serviceName string) {
     }
 }
 ```
+
+<GoMicroserviceDiagram kind="service-discovery-watch" />
 
 ### 讲解重点
 
@@ -757,6 +765,8 @@ func main() {
     select {}
 }
 ```
+
+<GoMicroserviceDiagram kind="config-hot-reload" />
 
 ### 讲解重点
 

@@ -169,6 +169,8 @@ go tool cover -html=coverage.out -o coverage.html
 go tool cover -func=coverage.out
 ```
 
+<GoEngineeringDiagram kind="unit-test-patterns" />
+
 ::: tip 讲解重点
 1. **表驱动测试是 Go 的核心测试模式**：所有用例集中在一个 slice 中，新增用例只需加一行，减少了重复代码。
 2. **`t.Helper()` 让错误定位更准确**：在辅助函数中调用它，出错时报告的是调用方的行号而非辅助函数内部。
@@ -411,6 +413,8 @@ func TestGetUser_WithGoMock(t *testing.T) {
 }
 ```
 
+<GoEngineeringDiagram kind="mock-boundary" />
+
 ::: tip 讲解重点
 1. **Mock 的前提是面向接口编程**：只有业务层依赖接口而非具体实现，才能在测试中注入 Mock 对象。
 2. **手写 Mock 适合简单场景**，使用函数字段的方式灵活且无第三方依赖；`testify/mock` 和 `gomock` 适合接口方法多、需要验证调用次数/顺序的场景。
@@ -637,6 +641,8 @@ go test -short ./...
 go test -tags=integration ./...
 ```
 
+<GoEngineeringDiagram kind="integration-lifecycle" />
+
 ::: tip 讲解重点
 1. **`TestMain` 是包级别的测试生命周期钩子**：适合数据库连接、容器启动等重量级 Setup/Teardown，每个包只能有一个。
 2. **Testcontainers 自动管理容器生命周期**：无需手动启停 Docker，测试结束自动清理，适合 CI 环境。
@@ -812,6 +818,8 @@ benchstat old.txt new.txt
 #                        │       └── 循环次数（b.N）
 #                        └── GOMAXPROCS
 ```
+
+<GoEngineeringDiagram kind="benchmark-reading" />
 
 ::: tip 讲解重点
 1. **`b.ResetTimer()` 排除初始化开销**：如果 benchmark 前有数据准备工作，必须在循环前重置计时器。
@@ -1080,6 +1088,8 @@ COPY --from=builder /api-server /api-server
 EXPOSE 8080
 ENTRYPOINT ["/api-server"]
 ```
+
+<GoEngineeringDiagram kind="ci-pipeline" />
 
 ::: tip 讲解重点
 1. **CI 流水线分阶段执行**：Lint -> Test -> Build，前一阶段失败就跳过后续步骤，节省资源并快速反馈。

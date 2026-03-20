@@ -69,6 +69,8 @@ func main() {
 }
 ```
 
+<GoChannelDiagram kind="channel-close" />
+
 ### Pipeline 模式
 
 ```go
@@ -235,6 +237,8 @@ func main() {
 	}
 }
 ```
+
+<GoChannelDiagram kind="select-flow" />
 
 ### 超时控制
 
@@ -479,4 +483,3 @@ func main() {
 - **Context 树形传播**：父 Context 取消时，所有子 Context 自动取消；子 Context 取消不影响父 Context。
 - **WithValue 的限制**：只适合传递请求级元数据（trace ID、auth token），不要传业务对象。key 应使用未导出的自定义类型，避免包间碰撞。
 - **作为函数第一个参数**：按 Go 惯例，`ctx context.Context` 放在函数参数列表的第一位，不要放在 struct 里。
-

@@ -180,6 +180,8 @@ func newTracedGRPCConn(addr string) (*grpc.ClientConn, error) {
 }
 ```
 
+<GoMicroserviceDiagram kind="otel-trace" />
+
 ### 讲解重点
 
 - **Context 传播是核心**：Trace 信息通过 `context.Context` 在进程内传递，通过 HTTP Header / gRPC Metadata 跨进程传递。丢失 context 就断链。
@@ -291,6 +293,8 @@ func (cb *CircuitBreaker) State() State {
 }
 ```
 
+<GoMicroserviceDiagram kind="circuit-breaker" />
+
 ### 6.2 限流器（Rate Limiter）
 
 ```go
@@ -363,6 +367,8 @@ func (pcl *PerClientLimiter) Allow(clientID string) bool {
 }
 ```
 
+<GoMicroserviceDiagram kind="rate-limiter" />
+
 ### 6.3 降级策略
 
 ```go
@@ -412,6 +418,8 @@ type Product struct {
     Price float64
 }
 ```
+
+<GoMicroserviceDiagram kind="degradation-fallback" />
 
 ### 讲解重点
 
@@ -621,6 +629,8 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
     return nil
 }
 ```
+
+<GoMicroserviceDiagram kind="idempotency-key" />
 
 ### 讲解重点
 
@@ -835,6 +845,8 @@ func main() {
     }
 }
 ```
+
+<GoMicroserviceDiagram kind="retry-budget" />
 
 ### 讲解重点
 

@@ -151,6 +151,8 @@ func writeJSON(w http.ResponseWriter, status int, v interface{}) {
 }
 ```
 
+<GoEngineeringDiagram kind="error-code-system" />
+
 ::: tip 讲解重点
 1. **错误码按模块分段**：使用 5 位数字编码，万位代表模块，便于快速定位错误来源。
 2. **错误码注册表防止重复**：通过 `init()` 注册 + `panic` 检测重复，在编译/启动阶段就能发现冲突。
@@ -358,6 +360,8 @@ func main() {
 }
 ```
 
+<GoEngineeringDiagram kind="middleware-stack" />
+
 ::: tip 讲解重点
 1. **中间件执行顺序很重要**：Recovery 应放在最外层确保 panic 被捕获，RequestID 在 Logger 之前确保日志能记录请求 ID。
 2. **包装 `http.ResponseWriter`** 来捕获状态码是常见技巧，因为标准库的 ResponseWriter 写入后无法再读取状态码。
@@ -506,6 +510,8 @@ golangci-lint run ./...
 # 只检查改动的文件（适合 CI）
 golangci-lint run --new-from-rev=HEAD~1 ./...
 ```
+
+<GoEngineeringDiagram kind="code-style-principles" />
 
 ::: tip 讲解重点
 1. **Go 的命名哲学是简短且有上下文**：在 `user` 包中用 `Service` 而非 `UserService`，因为调用方写的是 `user.Service`。

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import DiagramFrame from './DiagramFrame.vue'
 
-type DiagramKind = 'leak-scenarios' | 'data-race'
+type DiagramKind = 'leak-scenarios' | 'data-race' | 'map-concurrent-write'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -11,6 +11,7 @@ const props = defineProps<{
 const maxWidthByKind: Record<DiagramKind, string> = {
   'leak-scenarios': '620px',
   'data-race': '520px',
+  'map-concurrent-write': '620px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -64,7 +65,7 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
-      v-else
+      v-else-if="kind === 'data-race'"
       viewBox="0 0 520 220"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="Data Race 两个 Goroutine 竞争 counter 图"
@@ -99,6 +100,27 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <defs>
         <marker id="aDR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-text-muted)" /></marker>
       </defs>
+    </svg>
+
+    <svg
+      v-else
+      viewBox="0 0 620 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="并发 map 写入 panic 图"
+      role="img"
+    >
+      <text x="310" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">普通 map 并发写不是“结果不对”，而是 runtime 可能直接 panic</text>
+      <rect x="20" y="34" width="580" height="166" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <rect x="256" y="60" width="108" height="42" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="310" y="85" text-anchor="middle" font-size="10" fill="var(--d-text)">map[int]int</text>
+      <rect x="70" y="124" width="130" height="40" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="135" y="148" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">G1: m[1] = 1</text>
+      <rect x="420" y="124" width="130" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="485" y="148" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">G2: m[2] = 2</text>
+      <line x1="200" y1="144" x2="256" y2="102" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="420" y1="144" x2="364" y2="102" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="220" y="176" width="180" height="20" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1" />
+      <text x="310" y="190" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">fatal error: concurrent map writes</text>
     </svg>
   </DiagramFrame>
 </template>

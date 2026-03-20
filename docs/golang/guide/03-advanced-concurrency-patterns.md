@@ -149,6 +149,8 @@ func main() {
 }
 ```
 
+<GoAdvancedConcurrencyDiagram kind="errgroup" />
+
 ### 讲解重点
 
 - **适用场景**：并发执行一组独立任务，需要收集第一个错误并取消其余任务。典型用于并发请求多个微服务、并发加载页面多个模块。
@@ -250,6 +252,8 @@ func main() {
 	}
 }
 ```
+
+<GoAdvancedConcurrencyDiagram kind="singleflight" />
 
 ### 讲解重点
 
@@ -382,6 +386,8 @@ func main() {
 	}
 }
 ```
+
+<GoAdvancedConcurrencyDiagram kind="semaphore" />
 
 ### 讲解重点
 
@@ -645,6 +651,8 @@ func main() {
 	fmt.Println("所有文件下载完成")
 }
 ```
+
+<GoAdvancedConcurrencyDiagram kind="bounded-concurrency" />
 
 ### 讲解重点
 
@@ -1052,6 +1060,8 @@ func main() {
 }
 ```
 
+<GoAdvancedConcurrencyDiagram kind="rate-limiter" />
+
 ### 讲解重点
 
 - **适用场景**：API 网关限流、防爬虫、第三方 API 调用频率控制、数据库写入速率控制。
@@ -1199,6 +1209,8 @@ func main() {
 	fmt.Println("所有 context 已取消")
 }
 ```
+
+<GoChannelDiagram kind="context-tree" />
 
 ### 常见陷阱演示
 

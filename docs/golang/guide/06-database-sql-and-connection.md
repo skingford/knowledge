@@ -89,6 +89,8 @@ func main() {
 }
 ```
 
+<GoDataCacheDiagram kind="dbsql-lifecycle" />
+
 ## 2. Prepared Statements
 
 ```go
@@ -109,6 +111,8 @@ func batchInsertUsers(db *sql.DB, names []string) error {
 	return nil
 }
 ```
+
+<GoDataCacheDiagram kind="prepared-statement" />
 
 **讲解重点：**
 
@@ -216,6 +220,8 @@ func dbStatsHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 ```
+
+<GoDataCacheDiagram kind="sql-pool-stats" />
 
 **讲解重点：**
 

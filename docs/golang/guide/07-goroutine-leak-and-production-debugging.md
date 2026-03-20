@@ -76,6 +76,8 @@ func main() {
 }
 ```
 
+<GoPerformanceDiagram kind="goroutine-leak-patterns" />
+
 ### 修复方式：使用 context 控制退出
 
 ```go
@@ -122,6 +124,8 @@ func main() {
 	fmt.Println("goroutines after:", runtime.NumGoroutine())
 }
 ```
+
+<GoPerformanceDiagram kind="goroutine-context-exit" />
 
 ### 线上检测 Goroutine 泄漏
 
@@ -175,6 +179,8 @@ go tool pprof http://localhost:6060/debug/pprof/goroutine
     ▼
 修复 → 验证 → 复盘
 ```
+
+<GoPerformanceDiagram kind="incident-workflow" />
 
 ### 运行时自检工具
 
@@ -261,6 +267,8 @@ func main() {
 }
 ```
 
+<GoPerformanceDiagram kind="runtime-selfcheck" />
+
 ### 指标/日志/Trace 三件套
 
 ```go
@@ -339,6 +347,8 @@ func main() {
 	fmt.Println("done")
 }
 ```
+
+<GoPerformanceDiagram kind="telemetry-triad" />
 
 ### 讲解重点
 

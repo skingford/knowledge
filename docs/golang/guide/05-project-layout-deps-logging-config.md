@@ -134,6 +134,8 @@ func main() {
 }
 ```
 
+<GoEngineeringDiagram kind="project-layout" />
+
 ::: tip 讲解重点
 1. **`internal/` 是 Go 编译器强制的访问控制**：任何 `internal/` 下的包只能被其父目录的代码导入，这比注释约定更可靠。
 2. **`cmd/` 下每个子目录对应一个可执行文件**，`main.go` 应保持精简，只做依赖组装和启动，业务逻辑放在 `internal/`。
@@ -225,6 +227,8 @@ git config --global url."git@github.com:yourcompany/".insteadOf "https://github.
 // 只升级补丁版本
 // go get -u=patch ./...
 ```
+
+<GoEngineeringDiagram kind="go-mod-lifecycle" />
 
 ::: tip 讲解重点
 1. **始终提交 `go.sum`**：它保证了依赖的完整性校验，团队成员拉取代码后能获得完全一致的依赖版本。
@@ -369,6 +373,8 @@ func logWithGroup() {
 	)
 }
 ```
+
+<GoEngineeringDiagram kind="slog-pipeline" />
 
 ::: tip 讲解重点
 1. **生产环境使用 JSON 格式**：便于 ELK/Loki 等日志系统采集和检索，文本格式仅用于本地开发。
@@ -541,6 +547,8 @@ log:
   level: "info"
   format: "json"
 ```
+
+<GoEngineeringDiagram kind="config-priority" />
 
 ::: tip 讲解重点
 1. **环境变量优先级最高**：Viper 支持 配置文件 < 环境变量 < 命令行参数 的优先级链，生产环境敏感信息（密码、密钥）必须走环境变量或 Secrets Manager。

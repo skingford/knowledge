@@ -238,6 +238,8 @@ func main() {
 
 ### 循环中闭包捕获变量
 
+<GoLanguageDiagram kind="closure-capture" />
+
 ```go
 package main
 
@@ -292,6 +294,8 @@ func main() {
 ```
 
 ### Map 并发读写 panic
+
+<GoLeakRaceDiagram kind="map-concurrent-write" />
 
 ```go
 package main

@@ -198,6 +198,8 @@ func main() {
 }
 ```
 
+<GoNetworkDiagram kind="middleware-chain" />
+
 **讲解重点：**
 
 1. **中间件本质是函数装饰器**：接收 `http.Handler` 返回 `http.Handler`，在调用 `next.ServeHTTP` 前后注入逻辑。不调用 `next` 就终止了请求链路（如认证失败）。
@@ -284,6 +286,8 @@ func main() {
 	// 注意：unknown_field 被静默忽略了
 }
 ```
+
+<GoNetworkDiagram kind="json-struct-tags" />
 
 ### 自定义 Marshaler / Unmarshaler
 
@@ -453,6 +457,8 @@ func main() {
 }
 ```
 
+<GoNetworkDiagram kind="json-stream-decoder" />
+
 **讲解重点：**
 
 1. **`omitempty` 对不同类型的行为不同**：数值零值（0）、空字符串、nil 指针、空 slice/map 都被视为"空"而被忽略。但 `false` 对 bool 来说是零值，如果你的业务需要区分"未设置"和"false"，用 `*bool` 指针。
@@ -536,6 +542,8 @@ func main() {
 	io.Copy(os.Stdout, pr)
 }
 ```
+
+<GoNetworkDiagram kind="io-primitives" />
 
 ### bufio 缓冲 IO
 
@@ -750,6 +758,8 @@ func main() {
 	}
 }
 ```
+
+<GoNetworkDiagram kind="io-pipe-stream" />
 
 **讲解重点：**
 

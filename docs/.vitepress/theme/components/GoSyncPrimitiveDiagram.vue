@@ -2,7 +2,12 @@
 import { computed } from 'vue'
 import DiagramFrame from './DiagramFrame.vue'
 
-type DiagramKind = 'mutex-vs-rwmutex' | 'primitive-decision-tree'
+type DiagramKind =
+  | 'mutex-vs-rwmutex'
+  | 'atomic-cas'
+  | 'coordination-primitives'
+  | 'sync-map-read-dirty'
+  | 'primitive-decision-tree'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -10,6 +15,9 @@ const props = defineProps<{
 
 const maxWidthByKind: Record<DiagramKind, string> = {
   'mutex-vs-rwmutex': '600px',
+  'atomic-cas': '660px',
+  'coordination-primitives': '700px',
+  'sync-map-read-dirty': '680px',
   'primitive-decision-tree': '560px',
 }
 
@@ -64,6 +72,74 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <defs>
         <marker id="aSYN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-text-muted)"/></marker>
       </defs>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'atomic-cas'" viewBox="0 0 660 220" xmlns="http://www.w3.org/2000/svg">
+      <text x="330" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">Atomic / CAS：在不加锁的前提下做单变量原子更新</text>
+      <rect x="20" y="34" width="620" height="166" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <rect x="42" y="76" width="110" height="40" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
+      <text x="97" y="100" text-anchor="middle" font-size="10" fill="var(--d-text)">Load old</text>
+      <text x="170" y="100" font-size="14" fill="var(--d-text-sub)">→</text>
+      <rect x="206" y="76" width="120" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="266" y="100" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">计算 new</text>
+      <text x="344" y="100" font-size="14" fill="var(--d-text-sub)">→</text>
+      <rect x="380" y="76" width="150" height="40" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="455" y="100" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">CompareAndSwap(old, new)</text>
+      <line x1="530" y1="96" x2="610" y2="96" stroke="var(--d-green)" stroke-width="1.4"/>
+      <text x="568" y="88" text-anchor="middle" font-size="9" fill="var(--d-green)">success</text>
+      <rect x="548" y="56" width="74" height="32" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="585" y="76" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">提交成功</text>
+      <line x1="455" y1="116" x2="455" y2="152" stroke="var(--d-orange)" stroke-width="1.4"/>
+      <line x1="455" y1="152" x2="266" y2="152" stroke="var(--d-orange)" stroke-width="1.4"/>
+      <text x="356" y="146" text-anchor="middle" font-size="9" fill="var(--d-orange)">failed → 其他 goroutine 抢先更新，重试</text>
+      <text x="330" y="182" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">适合计数器、标志位、配置指针切换；复杂多字段一致性更新仍应使用 Mutex</text>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'coordination-primitives'" viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">WaitGroup / Once / Cond / Pool：关注点不是“共享状态”，而是“协作方式”</text>
+      <rect x="20" y="34" width="150" height="90" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="95" y="58" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">WaitGroup</text>
+      <text x="95" y="76" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Add → goroutine → Done</text>
+      <text x="95" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Wait 阻塞到计数归零</text>
+      <rect x="190" y="34" width="150" height="90" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="265" y="58" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Once</text>
+      <text x="265" y="76" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">多个调用者竞争</text>
+      <text x="265" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">只有第一次真正执行</text>
+      <rect x="360" y="34" width="150" height="90" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="435" y="58" text-anchor="middle" font-size="11" fill="var(--d-warn-text)">Cond</text>
+      <text x="435" y="76" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">Wait 时释放锁</text>
+      <text x="435" y="92" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">Signal / Broadcast 唤醒</text>
+      <rect x="530" y="34" width="150" height="90" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="605" y="58" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">Pool</text>
+      <text x="605" y="76" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Get → 使用 → Reset → Put</text>
+      <text x="605" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">降低临时对象分配</text>
+      <rect x="78" y="156" width="544" height="70" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2"/>
+      <text x="350" y="182" text-anchor="middle" font-size="10" fill="var(--d-text)">四者分别解决：等待结束、只初始化一次、条件等待、对象复用</text>
+      <text x="350" y="200" text-anchor="middle" font-size="10" fill="var(--d-text)">真正要选型时，先问自己是“协调 goroutine 生命周期”，还是“保护共享状态”</text>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'sync-map-read-dirty'" viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg">
+      <text x="340" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">sync.Map 的优势来自 read-only 快路径，而不是“天然比 map+锁更高级”</text>
+      <rect x="20" y="34" width="640" height="176" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <rect x="52" y="70" width="206" height="104" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="155" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">read map</text>
+      <text x="155" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">只读快路径</text>
+      <text x="155" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Load 常常无需加锁</text>
+      <text x="155" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">适合稳定 key、读多写少</text>
+      <text x="280" y="122" font-size="14" fill="var(--d-text-sub)">↔</text>
+      <rect x="330" y="70" width="206" height="104" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="433" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">dirty map</text>
+      <text x="433" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">写入 / 新 key 更常走这里</text>
+      <text x="433" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">miss 多了会提升到 read</text>
+      <text x="433" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">写频繁时维护成本上升</text>
+      <rect x="560" y="82" width="74" height="80" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="597" y="104" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">不擅长</text>
+      <text x="597" y="122" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">高写比例</text>
+      <text x="597" y="138" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">频繁增删</text>
+      <text x="340" y="198" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">如果你需要强类型、频繁统计长度、写入比例高，通常 `RWMutex + map` 更直接</text>
     </svg>
 
     <svg

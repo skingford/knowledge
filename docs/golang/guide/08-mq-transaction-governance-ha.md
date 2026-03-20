@@ -92,6 +92,8 @@ func (p *KafkaProducer) Close() error {
 }
 ```
 
+<GoMicroserviceDiagram kind="kafka-producer" />
+
 ### 9.2 Kafka 消费者模式
 
 ```go
@@ -166,6 +168,8 @@ func (c *KafkaConsumer) Close() error {
     return c.reader.Close()
 }
 ```
+
+<GoMicroserviceDiagram kind="kafka-consumer" />
 
 ### 9.3 使用示例
 
@@ -348,6 +352,8 @@ func CreateOrderSaga(ctx context.Context, order Order) error {
 }
 ```
 
+<GoMicroserviceDiagram kind="saga-compensation" />
+
 ### 10.3 基于消息的最终一致性
 
 ```go
@@ -472,6 +478,8 @@ type MessagePublisher interface {
 }
 ```
 
+<GoMicroserviceDiagram kind="outbox-pattern" />
+
 ### 讲解重点
 
 - **Saga 的两种编排方式**：编排式（Orchestration，有中央协调者）和协作式（Choreography，事件驱动无中心）。上面实现的是编排式，适合流程清晰的场景。
@@ -562,6 +570,8 @@ func (r *RandomBalancer) Pick(endpoints []string) string {
     return endpoints[rand.Intn(len(endpoints))]
 }
 ```
+
+<GoMicroserviceDiagram kind="load-balancing" />
 
 ### 11.2 健康检查
 
@@ -669,6 +679,8 @@ func (c *RedisChecker) Check(ctx context.Context) error {
 }
 ```
 
+<GoMicroserviceDiagram kind="health-check" />
+
 ### 11.3 优雅启停
 
 ```go
@@ -774,6 +786,8 @@ func (app *Application) Run() error {
     return nil
 }
 ```
+
+<GoMicroserviceDiagram kind="graceful-shutdown" />
 
 ### 讲解重点
 
@@ -948,6 +962,8 @@ func (b *ZoneAwareBalancer) Pick(endpoints []Endpoint) *Endpoint {
 }
 ```
 
+<GoMicroserviceDiagram kind="zone-failover" />
+
 ### 12.3 高可用设计清单
 
 ```go
@@ -1051,6 +1067,8 @@ func main() {
     }
 }
 ```
+
+<GoMicroserviceDiagram kind="bulkhead-isolation" />
 
 ### 讲解重点
 

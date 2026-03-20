@@ -11,6 +11,11 @@ import GoLanguageDiagram from './components/GoLanguageDiagram.vue'
 import GoRuntimeDiagram from './components/GoRuntimeDiagram.vue'
 import GoLeakRaceDiagram from './components/GoLeakRaceDiagram.vue'
 import GoChannelDiagram from './components/GoChannelDiagram.vue'
+import GoNetworkDiagram from './components/GoNetworkDiagram.vue'
+import GoEngineeringDiagram from './components/GoEngineeringDiagram.vue'
+import GoDataCacheDiagram from './components/GoDataCacheDiagram.vue'
+import GoPerformanceDiagram from './components/GoPerformanceDiagram.vue'
+import GoMicroserviceDiagram from './components/GoMicroserviceDiagram.vue'
 import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
 import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
 import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
@@ -49,6 +54,11 @@ export default {
     app.component('GoRuntimeDiagram', GoRuntimeDiagram)
     app.component('GoLeakRaceDiagram', GoLeakRaceDiagram)
     app.component('GoChannelDiagram', GoChannelDiagram)
+    app.component('GoNetworkDiagram', GoNetworkDiagram)
+    app.component('GoEngineeringDiagram', GoEngineeringDiagram)
+    app.component('GoDataCacheDiagram', GoDataCacheDiagram)
+    app.component('GoPerformanceDiagram', GoPerformanceDiagram)
+    app.component('GoMicroserviceDiagram', GoMicroserviceDiagram)
     app.component('GoInternalsDiagram', GoInternalsDiagram)
     app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
     app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)

@@ -81,6 +81,8 @@ go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
 go tool pprof -http=:8080 cpu.prof
 ```
 
+<GoPerformanceDiagram kind="cpu-pprof" />
+
 ### 讲解重点
 
 - **采样原理**：Go 的 CPU Profile 默认每秒采样 100 次（每 10ms 一次），记录当时所有 goroutine 的调用栈。采样率可通过 `runtime.SetCPUProfileRate` 调整，但通常默认值即可。
@@ -143,6 +145,8 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 # 对比两个时间点的 heap，找增长点
 go tool pprof -base heap1.prof heap2.prof
 ```
+
+<GoPerformanceDiagram kind="heap-profile" />
 
 ### 讲解重点
 
@@ -215,6 +219,8 @@ curl -o trace.out http://localhost:6060/debug/pprof/trace?seconds=5
 # 用浏览器打开 trace 可视化
 go tool trace trace.out
 ```
+
+<GoPerformanceDiagram kind="trace-timeline" />
 
 ### 讲解重点
 
@@ -306,6 +312,8 @@ go test -bench=. -count=5 . > new.txt
 # 用 benchstat 对比（需安装：go install golang.org/x/perf/cmd/benchstat@latest）
 benchstat old.txt new.txt
 ```
+
+<GoPerformanceDiagram kind="benchmark-benchstat" />
 
 ### 讲解重点
 

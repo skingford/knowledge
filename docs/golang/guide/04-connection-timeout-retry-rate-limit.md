@@ -207,6 +207,8 @@ func main() {
 }
 ```
 
+<GoNetworkDiagram kind="connection-pool" />
+
 **讲解重点：**
 
 1. **`database/sql` 自带连接池**：`sql.Open` 并不会立即建连，只有实际查询时才从池中取连接。必须合理配置 `MaxOpenConns` 和 `MaxIdleConns`，否则可能出现连接耗尽或频繁建连。
@@ -372,6 +374,8 @@ func main() {
 }
 ```
 
+<GoNetworkDiagram kind="timeout-layers" />
+
 **讲解重点：**
 
 1. **超时是分层的**：`Dialer.Timeout`（建连）< `ResponseHeaderTimeout`（等响应头）< `Client.Timeout`（整个请求）。每层超时针对不同阶段，需要合理搭配。
@@ -499,6 +503,8 @@ func main() {
 	fmt.Println("Final status:", resp.StatusCode)
 }
 ```
+
+<GoNetworkDiagram kind="retry-backoff" />
 
 **讲解重点：**
 
@@ -642,6 +648,8 @@ func main() {
 	wg.Wait()
 }
 ```
+
+<GoNetworkDiagram kind="rate-limit-modes" />
 
 **讲解重点：**
 

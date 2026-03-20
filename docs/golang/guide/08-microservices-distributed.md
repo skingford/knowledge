@@ -27,6 +27,8 @@ search: false
 2. [追踪、容错与重试](./08-observability-resilience)
 3. [消息队列、事务、治理与高可用](./08-mq-transaction-governance-ha)
 
+<GoMicroserviceDiagram kind="overview" />
+
 ## 主题拆分
 
 ### 1. RPC、注册发现与配置
