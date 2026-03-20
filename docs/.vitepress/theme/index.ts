@@ -6,6 +6,22 @@ import QuickNav from './components/QuickNav.vue'
 import ClaudeHome from './components/ClaudeHome.vue'
 import SectionLanding from './components/SectionLanding.vue'
 import OverviewLanding from './components/OverviewLanding.vue'
+import GoSchedulerDiagram from './components/GoSchedulerDiagram.vue'
+import GoLeakRaceDiagram from './components/GoLeakRaceDiagram.vue'
+import GoChannelDiagram from './components/GoChannelDiagram.vue'
+import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
+import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
+import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
+import MySQLDurabilityDiagram from './components/MySQLDurabilityDiagram.vue'
+import MySQLTransactionIsolationDiagram from './components/MySQLTransactionIsolationDiagram.vue'
+import MySQLHighAvailabilityDiagram from './components/MySQLHighAvailabilityDiagram.vue'
+import MySQLReplicaDelayDiagram from './components/MySQLReplicaDelayDiagram.vue'
+import MySQLLargeQueryMemoryDiagram from './components/MySQLLargeQueryMemoryDiagram.vue'
+import MySQLInsertLocksDiagram from './components/MySQLInsertLocksDiagram.vue'
+import MySQLInternalTempTableDiagram from './components/MySQLInternalTempTableDiagram.vue'
+import MySQLJoinUsageDiagram from './components/MySQLJoinUsageDiagram.vue'
+import MySQLJoinOptimizationDiagram from './components/MySQLJoinOptimizationDiagram.vue'
+import MySQLInnoDBVsMemoryDiagram from './components/MySQLInnoDBVsMemoryDiagram.vue'
 import WechatQrNotice from './components/WechatQrNotice.vue'
 import DocAfterSlot from './components/DocAfterSlot.vue'
 
@@ -25,5 +41,21 @@ export default {
     app.component('ClaudeHome', ClaudeHome)
     app.component('SectionLanding', SectionLanding)
     app.component('OverviewLanding', OverviewLanding)
+    app.component('GoSchedulerDiagram', GoSchedulerDiagram)
+    app.component('GoLeakRaceDiagram', GoLeakRaceDiagram)
+    app.component('GoChannelDiagram', GoChannelDiagram)
+    app.component('GoInternalsDiagram', GoInternalsDiagram)
+    app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
+    app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)
+    app.component('MySQLDurabilityDiagram', MySQLDurabilityDiagram)
+    app.component('MySQLTransactionIsolationDiagram', MySQLTransactionIsolationDiagram)
+    app.component('MySQLHighAvailabilityDiagram', MySQLHighAvailabilityDiagram)
+    app.component('MySQLReplicaDelayDiagram', MySQLReplicaDelayDiagram)
+    app.component('MySQLLargeQueryMemoryDiagram', MySQLLargeQueryMemoryDiagram)
+    app.component('MySQLInsertLocksDiagram', MySQLInsertLocksDiagram)
+    app.component('MySQLInternalTempTableDiagram', MySQLInternalTempTableDiagram)
+    app.component('MySQLJoinUsageDiagram', MySQLJoinUsageDiagram)
+    app.component('MySQLJoinOptimizationDiagram', MySQLJoinOptimizationDiagram)
+    app.component('MySQLInnoDBVsMemoryDiagram', MySQLInnoDBVsMemoryDiagram)
   },
 }

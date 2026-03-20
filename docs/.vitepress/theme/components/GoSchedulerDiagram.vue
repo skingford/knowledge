@@ -1,0 +1,40 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { Component } from 'vue'
+import DiagramFrame from './DiagramFrame.vue'
+import ThreadVsGoroutineDiagram from './go-scheduler/ThreadVsGoroutineDiagram.vue'
+import LifecycleDiagram from './go-scheduler/LifecycleDiagram.vue'
+import RolesDiagram from './go-scheduler/RolesDiagram.vue'
+import ScheduleFlowDiagram from './go-scheduler/ScheduleFlowDiagram.vue'
+import WorkStealingDiagram from './go-scheduler/WorkStealingDiagram.vue'
+import FindRunnableDiagram from './go-scheduler/FindRunnableDiagram.vue'
+
+type DiagramKind =
+  | 'thread-vs-goroutine'
+  | 'lifecycle'
+  | 'roles'
+  | 'schedule-flow'
+  | 'work-stealing'
+  | 'findrunnable'
+
+const props = defineProps<{
+  kind: DiagramKind
+}>()
+
+const diagramByKind: Record<DiagramKind, { component: Component; maxWidth: string }> = {
+  'thread-vs-goroutine': { component: ThreadVsGoroutineDiagram, maxWidth: '680px' },
+  lifecycle: { component: LifecycleDiagram, maxWidth: '520px' },
+  roles: { component: RolesDiagram, maxWidth: '560px' },
+  'schedule-flow': { component: ScheduleFlowDiagram, maxWidth: '520px' },
+  'work-stealing': { component: WorkStealingDiagram, maxWidth: '680px' },
+  findrunnable: { component: FindRunnableDiagram, maxWidth: '520px' },
+}
+
+const currentDiagram = computed(() => diagramByKind[props.kind])
+</script>
+
+<template>
+  <DiagramFrame :max-width="currentDiagram.maxWidth">
+    <component :is="currentDiagram.component" />
+  </DiagramFrame>
+</template>
