@@ -36,6 +36,8 @@ search: false
 
 ## 1. 多阶段 Docker 构建
 
+<GoCloudNativeDiagram kind="multistage-docker" />
+
 Go 的静态编译特性天然适合容器化——编译产物是一个无依赖的二进制文件，可以运行在极小的基础镜像上。多阶段构建将"编译环境"和"运行环境"分离，编译阶段使用完整的 golang 镜像，运行阶段使用 scratch / distroless / alpine，最终镜像体积可从数百 MB 缩减到 10~20 MB。
 
 ### 完整的多阶段 Dockerfile
@@ -125,6 +127,8 @@ ENTRYPOINT ["/app"]
 ---
 
 ## 2. 优雅关闭（Graceful Shutdown）
+
+<GoMicroserviceDiagram kind="graceful-shutdown" />
 
 在 Kubernetes 环境中，Pod 在滚动更新、缩容或节点驱逐时会收到 SIGTERM 信号。如果服务收到信号后立即退出，正在处理中的请求会被中断，导致客户端收到连接重置错误。优雅关闭的核心思路是：停止接收新请求 → 等待进行中的请求完成 → 关闭数据库连接等资源 → 退出。
 
@@ -255,6 +259,8 @@ func (a *App) handleHealth(w http.ResponseWriter, r *http.Request) {
 ---
 
 ## 3. 信号处理
+
+<GoCloudNativeDiagram kind="signal-lifecycle" />
 
 Unix 信号是操作系统与进程通信的基础机制。在容器环境中，PID 1 进程会直接收到容器运行时发出的信号。Go 的 `os/signal` 包提供了类型安全的信号处理能力，Go 1.16+ 新增的 `signal.NotifyContext` 进一步简化了信号与 context 的集成。
 
@@ -437,6 +443,8 @@ func main() {
 ---
 
 ## 4. 健康检查端点
+
+<GoMicroserviceDiagram kind="health-check" />
 
 健康检查是 Kubernetes 管理 Pod 生命周期的核心机制。Liveness 探针判断进程是否存活（失败则重启），Readiness 探针判断服务是否准备好接收流量（失败则从 Service 摘除）。两者的检查逻辑不同：liveness 只需确认进程没有死锁，readiness 需要确认所有依赖（数据库、缓存等）都已就绪。
 
@@ -625,6 +633,8 @@ func main() {
 
 ## 5. Kubernetes 部署配置
 
+<GoCloudNativeDiagram kind="kubernetes-workload" />
+
 将 Go 服务部署到 Kubernetes 需要正确配置 Deployment、Service、探针、资源限制和优雅关闭期。以下是一个生产级的 K8s 配置示例，涵盖了健康检查、资源管理和滚动更新策略。
 
 ### 完整的 Deployment + Service YAML
@@ -802,6 +812,8 @@ data:
 
 ## 6. 12-Factor App 在 Go 中的落地
 
+<GoCloudNativeDiagram kind="twelve-factor" />
+
 12-Factor App 是 Heroku 联合创始人 Adam Wiggins 提出的云原生应用方法论，定义了适合在现代云平台上运行的应用应遵循的 12 条原则。Go 语言的设计哲学与 12-Factor 高度契合——静态编译、显式依赖、简洁的标准库都使得这些原则在 Go 中的落地格外自然。
 
 ### 12 要素逐条实践
@@ -958,6 +970,8 @@ func main() {
 
 ## 7. 容器内调试与诊断
 
+<GoCloudNativeDiagram kind="container-debugging" />
+
 在生产环境中，容器内的 Go 服务出现性能问题时，pprof 是最重要的诊断工具。通过在独立端口暴露 pprof 端点，可以在不影响正常服务的情况下进行 CPU profiling、内存分析和 goroutine 泄漏检测。
 
 ### 通过独立端口暴露 pprof
@@ -1092,6 +1106,8 @@ go tool trace trace.out
 ---
 
 ## 8. 配置管理实践
+
+<GoCloudNativeDiagram kind="config-sources" />
 
 云原生应用的配置来源通常有多个层次：环境变量（最高优先级）→ 配置文件 → K8s ConfigMap/Secret → 默认值。使用 viper 库可以统一管理这些配置源，并支持配置文件热更新。
 
@@ -1291,6 +1307,8 @@ log:
 
 ## 9. Docker Compose 开发环境
 
+<GoCloudNativeDiagram kind="compose-dev" />
+
 Docker Compose 是搭建本地开发环境的利器，让开发者一条命令就能启动 Go 服务及其所有依赖（数据库、缓存、消息队列等）。配合 `air` 热重载工具，可以实现修改代码后自动重新编译运行，接近解释型语言的开发体验。
 
 ### 完整的 docker-compose.yml
@@ -1454,6 +1472,8 @@ tmp_dir = "tmp"
 ---
 
 ## 10. CI/CD Pipeline 集成
+
+<GoCloudNativeDiagram kind="cloud-ci-cd" />
 
 一个完善的 CI/CD 流水线是 Go 项目工程化的最后一环。GitHub Actions 是目前最流行的 CI/CD 平台之一，以下是一个涵盖代码检查、测试、构建和发布的完整工作流。
 

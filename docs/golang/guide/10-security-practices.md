@@ -37,6 +37,8 @@ search: false
 
 ## 1. 密码哈希与验证
 
+<GoSecurityDiagram kind="password-storage" />
+
 密码存储是 Web 应用最基础的安全需求。将密码以明文或简单哈希（MD5/SHA256）存储是极其危险的做法——一旦数据库泄露，攻击者可以通过彩虹表在数秒内还原明文密码。正确的做法是使用专为密码设计的自适应哈希算法（bcrypt、argon2），它们内置盐值和可调节的计算成本，能有效抵御暴力破解。
 
 ### bcrypt 哈希与验证
@@ -189,6 +191,8 @@ func main() {
 ---
 
 ## 2. JWT 签发与验证
+
+<GoSecurityDiagram kind="jwt-lifecycle" />
 
 JSON Web Token（JWT）是无状态认证的主流方案，适用于微服务架构中的身份传递。服务端签发包含用户信息的 token，客户端在后续请求中携带该 token，服务端通过验证签名来确认身份，无需查询 session 存储。
 
@@ -412,6 +416,8 @@ func main() {
 
 ## 3. TLS/HTTPS 配置
 
+<GoSecurityDiagram kind="tls-mtls" />
+
 所有生产环境的 HTTP 服务都必须启用 TLS 加密。Go 标准库内置了完整的 TLS 支持，无需依赖 Nginx 等反向代理即可直接提供 HTTPS 服务。正确的 TLS 配置需要禁用过时的协议版本和弱密码套件，防止降级攻击。
 
 ### HTTPS 服务器配置
@@ -537,6 +543,8 @@ func main() {
 ---
 
 ## 4. SQL 注入防护
+
+<GoSecurityDiagram kind="sql-injection" />
 
 SQL 注入是 Web 应用最经典的安全漏洞之一。攻击者通过在用户输入中嵌入 SQL 语句片段，篡改查询逻辑，可以窃取数据、删除表甚至获取系统权限。Go 中防护 SQL 注入的核心原则是：永远使用参数化查询，绝不拼接 SQL 字符串。
 
@@ -666,6 +674,8 @@ func main() {
 ---
 
 ## 5. XSS 防护
+
+<GoSecurityDiagram kind="xss-csp" />
 
 跨站脚本攻击（XSS）是指攻击者将恶意脚本注入到 Web 页面中，当其他用户浏览该页面时，脚本会在其浏览器中执行，从而窃取 Cookie、会话信息或执行恶意操作。Go 的 `html/template` 内置了自动转义机制，是防护 XSS 的第一道防线。
 
@@ -797,6 +807,8 @@ func main() {
 ---
 
 ## 6. CSRF 防护
+
+<GoSecurityDiagram kind="csrf-protection" />
 
 跨站请求伪造（CSRF）是指攻击者诱导已登录用户的浏览器向目标网站发送伪造请求，利用用户的身份执行非授权操作（如转账、修改密码）。防护的核心是在表单中嵌入服务端生成的随机 token，并在提交时验证该 token。
 
@@ -978,6 +990,8 @@ func main() {
 
 ## 7. 输入验证与 Sanitization
 
+<GoSecurityDiagram kind="input-validation" />
+
 永远不要信任来自客户端的任何输入。输入验证是安全的第一道防线，需要在服务端对所有用户输入进行格式、长度、范围和业务规则的校验。Go 社区广泛使用 `go-playground/validator` 库，支持声明式的结构体标签验证。
 
 ### 完整的用户注册验证
@@ -1137,6 +1151,8 @@ func main() {
 
 ## 8. 安全的 HTTP Header 配置
 
+<GoSecurityDiagram kind="security-headers" />
+
 HTTP 安全头是 Web 安全的重要防线，通过指示浏览器启用或禁用特定行为，可以有效防护 XSS、点击劫持、MIME 嗅探等攻击。建议在中间件中统一设置，确保所有响应都包含安全头。
 
 ### 安全头中间件
@@ -1240,6 +1256,8 @@ func main() {
 ---
 
 ## 9. Secret 管理
+
+<GoSecurityDiagram kind="secret-lifecycle" />
 
 Secret（密钥、数据库密码、API Key 等）的管理是应用安全的基础。硬编码的 secret 一旦提交到 Git 仓库，几乎无法彻底清除——即使删除文件，历史提交中仍然存在。正确的做法是将 secret 与代码分离，通过环境变量或专用的 Secret Manager 注入。
 
@@ -1419,6 +1437,8 @@ func main() {
 ---
 
 ## 10. gosec 静态安全扫描
+
+<GoSecurityDiagram kind="gosec-pipeline" />
 
 gosec 是 Go 社区最主流的静态安全分析工具，能够在编译前发现代码中的安全隐患，包括硬编码凭据、SQL 注入风险、弱加密算法、不安全的文件权限等。将 gosec 集成到 CI/CD 流水线中，可以在代码合并前自动拦截安全问题。
 
@@ -1613,6 +1633,8 @@ func main() {
 ---
 
 ## 11. 速率限制与防暴力破解
+
+<GoSecurityDiagram kind="brute-force-protection" />
 
 速率限制是保护 API 端点免受滥用的关键机制。没有速率限制的登录接口可以被暴力破解工具在数分钟内尝试数百万个密码组合。Go 标准扩展库 `golang.org/x/time/rate` 提供了基于令牌桶算法的速率限制器，适用于大多数场景。
 

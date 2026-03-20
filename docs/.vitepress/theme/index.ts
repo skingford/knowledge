@@ -16,6 +16,10 @@ import GoEngineeringDiagram from './components/GoEngineeringDiagram.vue'
 import GoDataCacheDiagram from './components/GoDataCacheDiagram.vue'
 import GoPerformanceDiagram from './components/GoPerformanceDiagram.vue'
 import GoMicroserviceDiagram from './components/GoMicroserviceDiagram.vue'
+import GoAdvancedTopicDiagram from './components/GoAdvancedTopicDiagram.vue'
+import GoSecurityDiagram from './components/GoSecurityDiagram.vue'
+import GoCloudNativeDiagram from './components/GoCloudNativeDiagram.vue'
+import GoCodegenDiagram from './components/GoCodegenDiagram.vue'
 import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
 import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
 import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
@@ -59,6 +63,10 @@ export default {
     app.component('GoDataCacheDiagram', GoDataCacheDiagram)
     app.component('GoPerformanceDiagram', GoPerformanceDiagram)
     app.component('GoMicroserviceDiagram', GoMicroserviceDiagram)
+    app.component('GoAdvancedTopicDiagram', GoAdvancedTopicDiagram)
+    app.component('GoSecurityDiagram', GoSecurityDiagram)
+    app.component('GoCloudNativeDiagram', GoCloudNativeDiagram)
+    app.component('GoCodegenDiagram', GoCodegenDiagram)
     app.component('GoInternalsDiagram', GoInternalsDiagram)
     app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
     app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)

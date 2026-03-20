@@ -41,6 +41,8 @@ search: false
 
 ## 1. go generate 基础
 
+<GoCodegenDiagram kind="go-generate" />
+
 `go generate` 是 Go 工具链内置的代码生成入口。它扫描源文件中的 `//go:generate` 注释指令，按顺序执行指定的命令。关键要理解：**`go generate` 在开发时手动运行，而非编译时自动触发**——它只是一个便捷的命令执行器，让代码生成步骤可以被记录在源码中、被版本控制追踪。
 
 ```go
@@ -104,6 +106,8 @@ func main() {
 ---
 
 ## 2. stringer 工具
+
+<GoCodegenDiagram kind="stringer-flow" />
 
 `stringer` 是 Go 官方提供的代码生成工具，为整型常量枚举自动生成 `String()` 方法。在没有 stringer 之前，每新增一个枚举值都需要手动更新 `String()` 方法，极易遗漏；stringer 彻底消除了这类人为错误。
 
@@ -228,6 +232,8 @@ func main() {
 ---
 
 ## 3. mockgen / mockery
+
+<GoCodegenDiagram kind="mockgen-modes" />
 
 接口 mock 是 Go 单元测试的核心技能。`mockgen`（Go 官方维护）和 `mockery`（社区维护）是两个主流工具，它们为接口自动生成 mock 实现，避免手写大量样板代码。
 
@@ -427,6 +433,8 @@ func main() {
 ---
 
 ## 4. wire 依赖注入
+
+<GoCodegenDiagram kind="wire-di" />
 
 Google Wire 是编译时依赖注入框架，通过代码生成（而非运行时反射）完成依赖注入。开发者定义 Provider 函数和 Injector 函数签名，Wire 自动分析依赖关系并生成完整的构造代码。
 
@@ -658,6 +666,8 @@ func main() {
 ---
 
 ## 5. go/ast 与 go/parser
+
+<GoCodegenDiagram kind="ast-pipeline" />
 
 `go/ast` 和 `go/parser` 是 Go 标准库提供的 AST（抽象语法树）解析工具。它们让你能以编程方式分析和操作 Go 源代码——这是构建自定义代码生成器、linter、重构工具的基础。
 
@@ -891,6 +901,8 @@ func formatFieldList(fl *ast.FieldList) string {
 ---
 
 ## 6. 基于模板的代码生成
+
+<GoCodegenDiagram kind="template-codegen" />
 
 `text/template` 是 Go 代码生成最常用的方式之一。通过定义模板和数据模型，可以批量生成结构化的 Go 源代码——从简单的 CRUD 到复杂的 ORM 代码都能胜任。
 
@@ -1157,6 +1169,8 @@ func main() {
 
 ## 7. go:embed 静态资源嵌入
 
+<GoCodegenDiagram kind="go-embed" />
+
 `//go:embed` 是 Go 1.16 引入的指令，可以在编译时将文件和目录嵌入到 Go 二进制文件中。这让部署变得极其简单——一个二进制文件包含所有需要的资源，无需额外的文件分发。
 
 ```go
@@ -1344,6 +1358,8 @@ func main() {
 ---
 
 ## 8. 代码生成 vs 反射 vs 泛型
+
+<GoCodegenDiagram kind="meta-choice" />
 
 Go 提供了三种"元编程"方式：代码生成（编译前）、反射（运行时）、泛型（编译时）。理解它们各自的优势和限制，是做出正确技术选型的关键。
 
@@ -1548,6 +1564,8 @@ func main() {
 
 ## 9. 自定义 linter / 分析器
 
+<GoCodegenDiagram kind="analyzer-pipeline" />
+
 `golang.org/x/tools/go/analysis` 框架让你能编写自定义的静态分析器，集成到 `go vet` 或 `golangci-lint` 中。这是保障团队代码规范的强大工具——比代码审查更可靠、比文档约定更强制。
 
 ```go
@@ -1740,6 +1758,8 @@ func main() {
 ---
 
 ## 10. 构建标签与条件编译
+
+<GoCodegenDiagram kind="build-tags" />
 
 构建标签（Build Tags）让你能根据操作系统、CPU 架构或自定义条件选择性编译代码。这是 Go 实现跨平台支持的核心机制——标准库中大量使用了此技术。
 

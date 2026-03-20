@@ -26,6 +26,8 @@ search: false
 3. [容器化与云原生实践](./10-containerization-cloud-native)
 4. [代码生成与元编程](./10-codegen-metaprogramming)
 
+<GoAdvancedTopicDiagram kind="overview" />
+
 ## 主题拆分
 
 ### 1. 设计模式与惯用法
