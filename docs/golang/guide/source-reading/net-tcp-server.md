@@ -6,6 +6,9 @@ description: 精读 net 包的 TCP 服务器实现，掌握二进制帧协议设
 # 自定义 TCP 协议服务器：源码精读
 
 > 核心源码：`src/net/net.go`、`src/net/tcpsock.go`、`src/net/server.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`tcp-frame-lifecycle`
 
 ## 包结构图
 
@@ -42,6 +45,8 @@ net TCP 服务器体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="tcp-frame-lifecycle" />
 
 ---
 

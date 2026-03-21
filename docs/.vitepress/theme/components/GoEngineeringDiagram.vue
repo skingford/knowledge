@@ -30,6 +30,8 @@ type DiagramKind =
   | 'benchmark-reading'
   | 'fuzz-lifecycle'
   | 'ci-pipeline'
+  | 'prometheus-scrape-flow'
+  | 'zapcore-pipeline'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -63,6 +65,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'benchmark-reading': '760px',
   'fuzz-lifecycle': '760px',
   'ci-pipeline': '760px',
+  'prometheus-scrape-flow': '760px',
+  'zapcore-pipeline': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -1045,6 +1049,78 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
 
       <rect x="224" y="196" width="312" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
       <text x="380" y="216" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">前一阶段失败就停止后续阶段。越早拦截，越省 CI 时间，也越快给开发者反馈</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'prometheus-scrape-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Prometheus 抓取流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Prometheus Go 客户端的关键不是“把值存起来”，而是把指标注册到 registry，再在抓取瞬间统一编码成 exposition 格式给 Prometheus 拉走</text>
+
+      <rect x="28" y="84" width="164" height="92" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="110" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">应用代码</text>
+      <text x="110" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Counter.Inc / Gauge.Set</text>
+      <text x="110" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Histogram.Observe</text>
+      <text x="110" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Collector.Collect()</text>
+
+      <line x1="192" y1="130" x2="300" y2="130" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="300" y="62" width="174" height="136" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="387" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">Registry + promhttp.Handler</text>
+      <text x="387" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">注册 Desc / Metric</text>
+      <text x="387" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">抓取时 Gather()</text>
+      <text x="387" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">编码为 /metrics 文本格式</text>
+      <text x="387" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">标签决定时序数量</text>
+      <text x="387" y="168" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">高基数标签会直接把成本拉爆</text>
+
+      <line x1="474" y1="130" x2="582" y2="130" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="582" y="84" width="150" height="92" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="657" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Prometheus server</text>
+      <text x="657" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">定时 GET /metrics</text>
+      <text x="657" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">写入 TSDB</text>
+      <text x="657" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">后续再做查询和告警</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">因此 Counter / Gauge / Histogram 的差异体现在导出形态和查询方式上，而不是“采集入口不同”；真正先炸掉系统的往往是标签设计而不是指标类型</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'zapcore-pipeline'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="zapcore 日志流水线图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`zap` 的核心不是 Logger 壳子，而是 `zapcore.Core` 把级别判断、编码和输出目标拼成一条高性能流水线</text>
+
+      <rect x="28" y="96" width="128" height="60" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="92" y="118" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Logger / Sugar</text>
+      <text x="92" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Info(...fields)</text>
+
+      <line x1="156" y1="126" x2="258" y2="126" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="258" y="64" width="178" height="124" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="347" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">zapcore.Core</text>
+      <text x="347" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Check(level) 先判是否值得记</text>
+      <text x="347" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">With(...) 预挂固定字段</text>
+      <text x="347" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Write(entry, fields) 才真正落日志</text>
+      <text x="347" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">NewTee 可把多条 Core 合成一条</text>
+      <text x="347" y="168" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">AtomicLevel 运行时可调级别</text>
+
+      <line x1="436" y1="126" x2="546" y2="88" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="436" y1="126" x2="546" y2="126" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="436" y1="126" x2="546" y2="164" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="546" y="68" width="186" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="639" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Encoder：JSON / Console，把 Entry + Fields 编成字节</text>
+
+      <rect x="546" y="110" width="186" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="639" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">WriteSyncer：stdout / stderr / 文件 / lumberjack</text>
+
+      <rect x="546" y="152" width="186" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="639" y="176" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">Error+ 走堆栈、Fatal/Panic 写完后再分叉退出</text>
+
+      <text x="380" y="236" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">性能差异主要来自字段构造和编码路径：`Logger` 更偏零分配字段流，`SugaredLogger` 则拿易用性换少量额外开销</text>
     </svg>
   </DiagramFrame>
 </template>

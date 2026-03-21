@@ -12,6 +12,8 @@ vocabulary:
 
 # Kafka 深入追问与词汇
 
+<KafkaDiagram kind="interview-questions" />
+
 > 以下为高频追问的精简口径和代码示例。每个知识点的完整展开见 [核心概念](./core-concepts.md) 和 [支付实战](./payment-practice.md)。
 
 ## 消息如何做到尽量不丢

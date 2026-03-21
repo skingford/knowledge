@@ -7,6 +7,8 @@ type DiagramKind =
   | 'value-semantics'
   | 'slice-append-trap'
   | 'string-byte-rune'
+  | 'xtext-transform'
+  | 'tabwriter-layout'
   | 'defer-panic'
   | 'closure-capture'
   | 'interface-nil'
@@ -30,6 +32,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'value-semantics': '760px',
   'slice-append-trap': '760px',
   'string-byte-rune': '760px',
+  'xtext-transform': '760px',
+  'tabwriter-layout': '760px',
   'defer-panic': '760px',
   'closure-capture': '760px',
   'interface-nil': '760px',
@@ -213,6 +217,90 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="627" y="152" text-anchor="middle" font-size="11" fill="var(--d-text)">[]rune("你") => ['你']</text>
       <text x="627" y="170" text-anchor="middle" font-size="11" fill="var(--d-text)">长度是 1 个 rune</text>
       <text x="627" y="220" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`for range string` 也是按 rune 解码，但 index 是字节偏移</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'xtext-transform'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="golang.org/x/text 文本变换流水线图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`x/text` 不是零散工具箱，而是一条“解码 -> 规范化 -> 语言协商/排序”的文本处理流水线</text>
+
+      <rect x="24" y="84" width="150" height="104" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="99" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">输入源</text>
+      <text x="99" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">GBK / Big5 字节流</text>
+      <text x="99" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">含组合字符的 Unicode</text>
+      <text x="99" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Accept-Language 头</text>
+      <text x="99" y="172" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">待排序文本列表</text>
+
+      <line x1="174" y1="136" x2="280" y2="136" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="280" y="62" width="190" height="148" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="375" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">transform / norm / language</text>
+      <text x="375" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">NewReader / NewWriter / Bytes / String</text>
+      <text x="375" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Decoder / Encoder 先把字符集转成 UTF-8</text>
+      <text x="375" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">NFC / NFKC 统一“视觉相同、编码不同”的文本</text>
+      <text x="375" y="150" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">language.Matcher 负责语言协商</text>
+      <text x="375" y="166" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">collate 按目标语言给出排序规则</text>
+      <text x="375" y="182" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">核心抽象始终是 Transformer 链</text>
+
+      <line x1="470" y1="136" x2="578" y2="96" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="470" y1="136" x2="578" y2="136" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="470" y1="136" x2="578" y2="176" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="578" y="74" width="154" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="655" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">规范 UTF-8 文本：可比较、可落库、可搜索</text>
+
+      <rect x="578" y="116" width="154" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="655" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">协商语言标签：zh-Hans / en / ja ...</text>
+
+      <rect x="578" y="158" width="154" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="655" y="182" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">语言感知排序：拼音、字典序、区域规则</text>
+
+      <text x="380" y="236" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">工程上常见顺序是先解码、再规范化、最后再比较或排序；否则“看起来一样”的文本可能根本比不相等</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'tabwriter-layout'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="text/tabwriter 列对齐流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`tabwriter` 的关键不是“见到 tab 就补空格”，而是先缓存整批 cell，再按每列最大宽度统一回填</text>
+
+      <rect x="28" y="72" width="148" height="120" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="102" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">输入文本</text>
+      <text x="102" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">NAME\tAGE\tCITY</text>
+      <text x="102" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Alice\t30\tNew York</text>
+      <text x="102" y="146" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Bob\t25\tLA</text>
+      <text x="102" y="170" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">`\t` 切 cell</text>
+      <text x="102" y="186" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">`\n` 结束一行</text>
+
+      <line x1="176" y1="132" x2="284" y2="132" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="284" y="52" width="192" height="160" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="74" text-anchor="middle" font-size="11" fill="var(--d-text)">tabwriter.Writer</text>
+      <text x="380" y="92" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">buf 暂存原始内容</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">lines[][]cell 记录每行每列</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">cell.width 统计显示宽度</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Flush() 时计算 widths[col] = max(cell.width)</text>
+      <text x="380" y="156" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">再按 padding / padchar / flags 输出</text>
+      <text x="380" y="172" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">AlignRight 会改变填充方向</text>
+      <text x="380" y="188" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Debug 会把列边界打印成 |</text>
+
+      <line x1="476" y1="132" x2="584" y2="96" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="476" y1="132" x2="584" y2="168" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="584" y="76" width="148" height="56" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="658" y="98" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">对齐输出</text>
+      <text x="658" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">NAME   AGE  CITY</text>
+
+      <rect x="584" y="150" width="148" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="658" y="172" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">必须 Flush()</text>
+      <text x="658" y="190" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">否则缓冲区不会真正写出</text>
+
+      <text x="380" y="232" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">它适合 CLI、报表和调试输出；如果要渲染真正表格组件，就别把终端对齐算法硬搬进 UI 层</text>
     </svg>
 
     <svg

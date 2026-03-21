@@ -6,6 +6,10 @@ description: 精读 Go net/http RESTful API 服务端设计，掌握路由模式
 # net/http RESTful API 设计模式
 
 > 核心：`net/http`（Go 1.22+ 路由增强）、中间件架构、统一响应规范
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`middleware-chain`
+> - `GoNetworkDiagram`：`json-stream-decoder`
 
 ## 包结构图
 
@@ -38,6 +42,8 @@ Go RESTful API 体系（Go 1.22+）
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="middleware-chain" />
 
 ---
 
@@ -169,6 +175,8 @@ func Handle(h HandlerFunc) http.HandlerFunc {
 ```
 
 ### 请求解析与验证
+
+<GoNetworkDiagram kind="json-stream-decoder" />
 
 ```go
 // 通用 JSON 解析 + 验证

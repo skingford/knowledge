@@ -6,8 +6,12 @@ description: 精读 Google wire 的编译期依赖注入实现，掌握 Provider
 # wire：编译期依赖注入源码精读
 
 > 核心包：`github.com/google/wire`（代码生成工具）
+>
+> 图例参考：这里复用 `wire-di` 图，先把 `ProviderSet -> injector -> wire_gen.go` 的生成链路看成普通构造代码生成，再回头理解 `wire.Build` 和 build tag 的分工。
 
 ## 包结构图
+
+<GoCodegenDiagram kind="wire-di" />
 
 ```
 wire 体系

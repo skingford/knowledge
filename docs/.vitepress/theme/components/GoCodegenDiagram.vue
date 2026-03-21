@@ -11,6 +11,7 @@ type DiagramKind =
   | 'analysis-pass-flow'
   | 'types-checker-flow'
   | 'format-roundtrip'
+  | 'template-exec-flow'
   | 'template-codegen'
   | 'go-embed'
   | 'meta-choice'
@@ -30,6 +31,7 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'analysis-pass-flow': '760px',
   'types-checker-flow': '760px',
   'format-roundtrip': '760px',
+  'template-exec-flow': '760px',
   'template-codegen': '760px',
   'go-embed': '760px',
   'meta-choice': '760px',
@@ -248,6 +250,35 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="638" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">注释尽量保住原语义位置</text>
       <text x="638" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">生成代码也能马上过 CI</text>
       <text x="380" y="192" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">这也是为什么语法错误时 `format.Source` 会直接失败：前半段根本过不了 parser，就无从谈起“格式化”</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'template-exec-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="text/template 执行流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`text/template` 的主线是：先把模板 parse 成语法树，再在执行期拿着 dot、变量栈和 FuncMap 递归遍历节点，把结果一段段写到输出里</text>
+      <rect x="24" y="92" width="122" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="85" y="117" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">template text</text>
+      <line x1="146" y1="114" x2="252" y2="114" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="252" y="66" width="176" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="340" y="88" text-anchor="middle" font-size="11" fill="var(--d-text)">Parse -&gt; Tree</text>
+      <text x="340" y="106" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">TextNode / ActionNode / RangeNode</text>
+      <text x="340" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">define / block / template</text>
+      <text x="340" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">关联模板共享 common</text>
+      <line x1="428" y1="114" x2="536" y2="114" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="536" y="58" width="190" height="112" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="631" y="82" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Execute(w, data)</text>
+      <text x="631" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">state.walk(dot, node)</text>
+      <text x="631" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">pipeline 求值</text>
+      <text x="631" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">变量栈 + reflect 调 FuncMap</text>
+      <text x="631" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">逐段写到 io.Writer</text>
+      <rect x="154" y="184" width="170" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="239" y="206" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">dot 会在 `range` / `with` / `template` 中切换</text>
+      <rect x="362" y="184" width="244" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="484" y="206" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">它不做 HTML 安全转义；面向 Web 时应切到 `html/template`</text>
     </svg>
 
     <svg

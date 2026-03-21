@@ -6,6 +6,9 @@ description: 精读 mime/multipart 的多部分报文实现，掌握文件上传
 # mime/multipart：多部分报文源码精读
 
 > 核心源码：`src/mime/multipart/multipart.go`、`src/mime/multipart/formdata.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`multipart-boundary-flow`
 
 ## 包结构图
 
@@ -52,6 +55,8 @@ mime/multipart 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="multipart-boundary-flow" />
 
 ---
 

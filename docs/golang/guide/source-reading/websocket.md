@@ -6,6 +6,9 @@ description: 精读 net/http WebSocket 升级机制，掌握帧协议解析、go
 # WebSocket：源码精读
 
 > 核心包：`net/http`（协议升级）、`github.com/gorilla/websocket`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`websocket-hub-flow`
 
 ## 包结构图
 
@@ -44,6 +47,8 @@ WebSocket 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="websocket-hub-flow" />
 
 ---
 

@@ -7,6 +7,7 @@ type DiagramKind =
   | 'dbsql-lifecycle'
   | 'prepared-statement'
   | 'sql-pool-stats'
+  | 'pgx-driver-flow'
   | 'redis-client-types'
   | 'redis-pipeline'
   | 'redis-distributed-lock'
@@ -31,6 +32,7 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'dbsql-lifecycle': '760px',
   'prepared-statement': '760px',
   'sql-pool-stats': '760px',
+  'pgx-driver-flow': '760px',
   'redis-client-types': '760px',
   'redis-pipeline': '760px',
   'redis-distributed-lock': '760px',
@@ -187,6 +189,44 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="650" y="182" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">说明慢查询或连接没释放</text>
 
       <text x="380" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`ConnMaxLifetime` 不设通常迟早踩到数据库端断开老连接的问题；设得过短又会造成频繁重建，需结合服务端超时一起看</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'pgx-driver-flow'"
+      viewBox="0 0 760 270"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="pgx 驱动与连接池能力图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`pgx` 的优势不是“又一个 SQL 客户端”，而是在 PostgreSQL 原生协议上把连接池、批量写入、COPY 和通知机制直接暴露出来</text>
+
+      <rect x="26" y="94" width="126" height="60" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="89" y="116" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">业务代码</text>
+      <text x="89" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Query / Exec / Tx</text>
+
+      <line x1="152" y1="124" x2="266" y2="124" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="266" y="58" width="186" height="132" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="359" y="80" text-anchor="middle" font-size="11" fill="var(--d-text)">pgxpool / pgx.Conn</text>
+      <text x="359" y="98" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Acquire -> 查询/事务 -> Release</text>
+      <text x="359" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">AfterConnect 初始化 session</text>
+      <text x="359" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">HealthCheck / Lifetime / IdleTime 管池</text>
+      <text x="359" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">类型系统直接贴近 PostgreSQL</text>
+      <text x="359" y="162" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">不是经 `database/sql` 再包一层</text>
+
+      <line x1="452" y1="124" x2="560" y2="84" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="452" y1="124" x2="560" y2="124" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="452" y1="124" x2="560" y2="164" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="560" y="64" width="172" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="646" y="88" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Batch：多条语句排队，1 次网络往返</text>
+
+      <rect x="560" y="106" width="172" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="646" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">CopyFrom：走 COPY 协议，批量导入比循环 INSERT 更快</text>
+
+      <rect x="560" y="148" width="172" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="646" y="172" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">LISTEN / NOTIFY：要专用连接，别混进通用连接池</text>
+
+      <text x="380" y="236" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以读 `pgx` 时先把“池、批量、COPY、通知”当成四条主能力线；它们都建立在同一套 PostgreSQL 原生连接语义上</text>
     </svg>
 
     <svg

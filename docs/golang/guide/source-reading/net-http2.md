@@ -6,6 +6,9 @@ description: 精读 Go HTTP/2 实现，掌握多路复用、Server Push、流量
 # golang.org/x/net/http2：HTTP/2 协议深度解析
 
 > 核心源码：`golang.org/x/net/http2`（已集成进 `net/http` 标准库）
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`http2-multiplex`
 
 ## 包结构图
 
@@ -42,6 +45,8 @@ HTTP/2 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="http2-multiplex" />
 
 ---
 

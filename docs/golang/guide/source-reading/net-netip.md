@@ -6,6 +6,9 @@ description: 精读 net/netip 的现代 IP 地址实现，掌握 Addr/AddrPort/P
 # net/netip：现代 IP 地址处理源码精读
 
 > 核心源码：`src/net/netip/netip.go`（Go 1.18 引入）
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`netip-value-layout`
 
 ## 包结构图
 
@@ -47,6 +50,8 @@ net/netip 体系（Go 1.18+）
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="netip-value-layout" />
 
 ---
 

@@ -41,8 +41,10 @@ search: false
 - Protobuf 语法和代码生成
 - 基于 etcd 的服务注册与发现
 - 配置中心和热更新边界
+- etcd 的 Lease / Watch / Revision 基本认知
 
 入口：[开始阅读](./08-rpc-discovery-config)
+延伸阅读：[etcd 专题](/etcd/)
 
 ### 2. 追踪、容错与重试
 

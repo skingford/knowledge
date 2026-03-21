@@ -18,6 +18,10 @@ type DiagramKind =
   | 'cipher-interface-stack'
   | 'secure-random-source'
   | 'hash-hmac-flow'
+  | 'hybrid-encryption'
+  | 'public-key-sign-verify'
+  | 'certificate-chain-verify'
+  | 'oauth2-code-flow'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -39,6 +43,10 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'cipher-interface-stack': '760px',
   'secure-random-source': '760px',
   'hash-hmac-flow': '760px',
+  'hybrid-encryption': '760px',
+  'public-key-sign-verify': '760px',
+  'certificate-chain-verify': '760px',
+  'oauth2-code-flow': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -496,6 +504,147 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="642" y="102" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">攻击者能重算摘要时，它就不是签名</text>
 
       <text x="380" y="232" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">密码存储别用 SHA/HMAC；那是认证和完整性工具，不是慢哈希</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'hybrid-encryption'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="混合加密图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">RSA 真正常见的现代用法不是“直接加密大消息”，而是只保护一个随机对称密钥，再交给 AEAD 处理真正的数据</text>
+
+      <rect x="24" y="78" width="172" height="110" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="110" y="100" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">发送前</text>
+      <text x="110" y="120" text-anchor="middle" font-size="9" fill="var(--d-text)">1. 生成随机 AES key</text>
+      <text x="110" y="136" text-anchor="middle" font-size="9" fill="var(--d-text)">2. 准备 plaintext</text>
+      <text x="110" y="152" text-anchor="middle" font-size="9" fill="var(--d-text)">3. 选择接收方公钥</text>
+      <text x="110" y="168" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">对称快，非对称慢</text>
+
+      <line x1="196" y1="133" x2="306" y2="98" stroke="var(--d-border)" stroke-width="1.4" />
+      <line x1="196" y1="133" x2="306" y2="168" stroke="var(--d-border)" stroke-width="1.4" />
+
+      <rect x="306" y="68" width="148" height="58" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="90" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">RSA-OAEP</text>
+      <text x="380" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">只加密 AES key</text>
+
+      <rect x="306" y="138" width="148" height="58" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="160" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">AES-GCM / ChaCha20-Poly1305</text>
+      <text x="380" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">加密真正的业务数据</text>
+
+      <line x1="454" y1="97" x2="564" y2="97" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="454" y1="167" x2="564" y2="167" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+
+      <rect x="564" y="60" width="172" height="70" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="650" y="82" text-anchor="middle" font-size="11" fill="var(--d-text)">输出 1</text>
+      <text x="650" y="100" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">encryptedKey</text>
+      <text x="650" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">长度受 RSA 密钥位数限制</text>
+
+      <rect x="564" y="144" width="172" height="70" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="650" y="166" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">输出 2</text>
+      <text x="650" y="184" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">nonce || ciphertext || tag</text>
+      <text x="650" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">可安全承载大消息</text>
+
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">接收方流程正好反过来：私钥解出 AES key，再用 AEAD `Open` 拿回明文</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'public-key-sign-verify'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="公私钥签名验证图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">公钥签名体系的外部形状都一样：私钥只负责签名，公钥只负责验证；差异在于内部数学和随机性要求</text>
+
+      <rect x="26" y="84" width="146" height="56" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="99" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">message</text>
+      <text x="99" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">通常先做 SHA-256 / SHA-512</text>
+
+      <line x1="172" y1="112" x2="280" y2="112" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="280" y="62" width="164" height="100" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="362" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">私钥签名</text>
+      <text x="362" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">RSA-PSS / PKCS1v15</text>
+      <text x="362" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">ECDSA（依赖随机 k）</text>
+      <text x="362" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Ed25519（确定性签名）</text>
+
+      <line x1="444" y1="112" x2="552" y2="112" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="552" y="84" width="182" height="56" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="643" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">signature</text>
+      <text x="643" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">和 message 一起传给对端</text>
+
+      <line x1="643" y1="140" x2="643" y2="176" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="520" y="176" width="214" height="44" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="627" y="194" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">公钥验证</text>
+      <text x="627" y="210" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">通过才说明“这份内容确实来自持有私钥的一方”</text>
+
+      <text x="248" y="206" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">别把“签名验证通过”和“证书链可信”混为一谈；前者只是数学正确，后者还需要 PKI 信任链</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'certificate-chain-verify'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="证书链验证图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">x509.Verify 做的不只是“看一下证书是不是过期”，而是沿着整条链逐层确认签发关系、用途和主机名都成立</text>
+
+      <rect x="32" y="88" width="146" height="70" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="105" y="110" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Leaf cert</text>
+      <text x="105" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">api.example.com</text>
+      <text x="105" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">ServerAuth / ClientAuth</text>
+
+      <line x1="178" y1="123" x2="286" y2="123" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="286" y="88" width="146" height="70" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="359" y="110" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Intermediate CA</text>
+      <text x="359" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">负责给叶证书签名</text>
+      <text x="359" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">自身也必须被上级签过</text>
+
+      <line x1="432" y1="123" x2="540" y2="123" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="540" y="88" width="146" height="70" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="613" y="110" text-anchor="middle" font-size="11" fill="var(--d-text)">Root CA</text>
+      <text x="613" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">必须已在 CertPool 中信任</text>
+      <text x="613" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">SystemCertPool 或自定义 Roots</text>
+
+      <rect x="84" y="184" width="592" height="40" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="201" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">每一层都要过：签名匹配、有效期、KeyUsage/ExtKeyUsage、SAN/DNSName；任何一步失败，整条链都不可信</text>
+      <text x="380" y="216" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">所以 `InsecureSkipVerify` 真正绕过的不只是主机名，而是整套身份验证链路</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'oauth2-code-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="OAuth2 授权码与刷新流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">OAuth2 客户端真正关键的不是“拿到 token”，而是把 state、授权码交换和 refresh token 刷新这三段链路都做对</text>
+
+      <rect x="26" y="86" width="128" height="74" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="90" y="108" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">browser / app</text>
+      <text x="90" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">带 state 跳转授权页</text>
+      <text x="90" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">回调携带 code</text>
+
+      <line x1="154" y1="123" x2="266" y2="123" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="266" y="60" width="188" height="126" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="360" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">oauth2.Config</text>
+      <text x="360" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">AuthCodeURL(state, PKCE...)</text>
+      <text x="360" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">回调先校验 state 防 CSRF</text>
+      <text x="360" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Exchange(code[, verifier])</text>
+      <text x="360" y="150" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">拿到 access + refresh token</text>
+      <text x="360" y="166" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ReuseTokenSource 负责到期刷新</text>
+
+      <line x1="454" y1="123" x2="566" y2="123" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="566" y="72" width="168" height="100" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="650" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">OAuth provider</text>
+      <text x="650" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">授权页 + token endpoint</text>
+      <text x="650" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">code 只能换一次</text>
+      <text x="650" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">refresh token 换新 access token</text>
+
+      <rect x="224" y="206" width="312" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="224" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">公开客户端再加 PKCE：code_challenge / code_verifier 绑定同一次授权，防止授权码被中途截走后重放</text>
     </svg>
   </DiagramFrame>
 </template>

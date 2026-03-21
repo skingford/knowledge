@@ -6,6 +6,9 @@ description: 精读 net/http/httptest 的测试服务器与响应记录器，掌
 # net/http/httptest：HTTP 测试工具源码精读
 
 > 核心源码：`src/net/http/httptest/recorder.go`、`src/net/http/httptest/server.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`httptest-modes`
 
 ## 包结构图
 
@@ -41,6 +44,8 @@ net/http/httptest 两大工具
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="httptest-modes" />
 
 ---
 

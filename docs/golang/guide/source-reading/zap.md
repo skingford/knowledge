@@ -6,8 +6,12 @@ description: 精读 Uber zap 的高性能结构化日志实现，掌握 zapcore 
 # zap：高性能结构化日志源码精读
 
 > 核心包：`go.uber.org/zap`、`go.uber.org/zap/zapcore`
+>
+> 图例参考：这里补了 `zapcore` 流水线图，把 `Logger`、`Core`、`Encoder`、`WriteSyncer` 和 `AtomicLevel` 放在一张图里，先抓住性能关键路径，再看具体 API。
 
 ## 包结构图
+
+<GoEngineeringDiagram kind="zapcore-pipeline" />
 
 ```
 zap 体系

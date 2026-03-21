@@ -6,8 +6,12 @@ description: 精读 text/tabwriter 的列对齐实现，掌握弹性制表符算
 # text/tabwriter：列对齐输出源码精读
 
 > 核心源码：`src/text/tabwriter/tabwriter.go`
+>
+> 图例参考：这里补了 `tabwriter` 的列对齐流程图，先把“按 `\t` 分 cell、缓存整批内容、Flush 时统一算列宽”这条主线看清，再读 `tabwriter.go` 的 `cell` 和 `widths` 逻辑。
 
 ## 包结构图
+
+<GoLanguageDiagram kind="tabwriter-layout" />
 
 ```
 text/tabwriter 体系

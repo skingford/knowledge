@@ -6,6 +6,9 @@ description: 精读 OpenTelemetry Go SDK 的实现，掌握 Trace/Span 创建、
 # OpenTelemetry Go：源码精读
 
 > 核心包：`go.opentelemetry.io/otel`、`go.opentelemetry.io/otel/trace`
+>
+> 图例参考：
+> - `GoMicroserviceDiagram`：`otel-trace`
 
 ## 包结构图
 
@@ -40,6 +43,8 @@ OpenTelemetry Go 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoMicroserviceDiagram kind="otel-trace" />
 
 ---
 

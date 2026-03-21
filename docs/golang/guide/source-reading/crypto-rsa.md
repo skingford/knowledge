@@ -6,6 +6,10 @@ description: 精读 crypto/rsa 的 RSA 算法实现，掌握密钥生成、PKCS1
 # crypto/rsa：RSA 非对称加密源码精读
 
 > 核心源码：`src/crypto/rsa/rsa.go`、`src/crypto/rsa/pkcs1v15.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`hybrid-encryption`
+> - `GoSecurityDiagram`：`public-key-sign-verify`
 
 ## 包结构图
 
@@ -41,6 +45,8 @@ crypto/rsa 体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoSecurityDiagram kind="hybrid-encryption" />
+
 ---
 
 ## 一、核心实现
@@ -62,6 +68,8 @@ func decrypt(priv *PrivateKey, c *big.Int) (*big.Int, error) {
 // OAEP 加密：添加随机 padding 防止确定性攻击
 // 同一明文每次加密结果不同（随机 seed）
 ```
+
+<GoSecurityDiagram kind="public-key-sign-verify" />
 
 ---
 

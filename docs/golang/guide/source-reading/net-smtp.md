@@ -6,6 +6,9 @@ description: 精读 net/smtp 的邮件发送实现，掌握 SMTP 握手流程、
 # net/smtp：邮件发送源码精读
 
 > 核心源码：`src/net/smtp/smtp.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`smtp-session-flow`
 
 ## 包结构图
 
@@ -46,6 +49,8 @@ net/smtp 协议层次
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="smtp-session-flow" />
 
 ---
 

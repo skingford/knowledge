@@ -16,6 +16,7 @@ import GoEngineeringDiagram from './components/GoEngineeringDiagram.vue'
 import GoDataCacheDiagram from './components/GoDataCacheDiagram.vue'
 import GoPerformanceDiagram from './components/GoPerformanceDiagram.vue'
 import GoMicroserviceDiagram from './components/GoMicroserviceDiagram.vue'
+import GoHighConcurrencySystemDesignDiagram from './components/GoHighConcurrencySystemDesignDiagram.vue'
 import GoAdvancedTopicDiagram from './components/GoAdvancedTopicDiagram.vue'
 import GoSecurityDiagram from './components/GoSecurityDiagram.vue'
 import GoCloudNativeDiagram from './components/GoCloudNativeDiagram.vue'
@@ -24,6 +25,7 @@ import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
 import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
 import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
 import GoSourceReadingDiagram from './components/GoSourceReadingDiagram.vue'
+import KafkaDiagram from './components/KafkaDiagram.vue'
 import MySQLDurabilityDiagram from './components/MySQLDurabilityDiagram.vue'
 import MySQLTransactionIsolationDiagram from './components/MySQLTransactionIsolationDiagram.vue'
 import MySQLHighAvailabilityDiagram from './components/MySQLHighAvailabilityDiagram.vue'
@@ -65,6 +67,7 @@ export default {
     app.component('GoDataCacheDiagram', GoDataCacheDiagram)
     app.component('GoPerformanceDiagram', GoPerformanceDiagram)
     app.component('GoMicroserviceDiagram', GoMicroserviceDiagram)
+    app.component('GoHighConcurrencySystemDesignDiagram', GoHighConcurrencySystemDesignDiagram)
     app.component('GoAdvancedTopicDiagram', GoAdvancedTopicDiagram)
     app.component('GoSecurityDiagram', GoSecurityDiagram)
     app.component('GoCloudNativeDiagram', GoCloudNativeDiagram)
@@ -73,6 +76,7 @@ export default {
     app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
     app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)
     app.component('GoSourceReadingDiagram', GoSourceReadingDiagram)
+    app.component('KafkaDiagram', KafkaDiagram)
     app.component('MySQLDurabilityDiagram', MySQLDurabilityDiagram)
     app.component('MySQLTransactionIsolationDiagram', MySQLTransactionIsolationDiagram)
     app.component('MySQLHighAvailabilityDiagram', MySQLHighAvailabilityDiagram)

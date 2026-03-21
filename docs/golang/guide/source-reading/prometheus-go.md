@@ -6,6 +6,9 @@ description: 精读 prometheus/client_golang 的指标实现，掌握 Counter/Ga
 # Prometheus Go 客户端：源码精读
 
 > 核心包：`github.com/prometheus/client_golang/prometheus`
+>
+> 图例参考：
+> - `GoEngineeringDiagram`：`prometheus-scrape-flow`
 
 ## 包结构图
 
@@ -37,6 +40,8 @@ prometheus/client_golang 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoEngineeringDiagram kind="prometheus-scrape-flow" />
 
 ---
 

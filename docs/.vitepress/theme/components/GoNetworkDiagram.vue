@@ -7,6 +7,19 @@ type DiagramKind =
   | 'http-server-flow'
   | 'graceful-shutdown'
   | 'http-client-pool'
+  | 'url-components'
+  | 'cookiejar-flow'
+  | 'circuit-breaker-states'
+  | 'httptest-modes'
+  | 'httptrace-events'
+  | 'http2-multiplex'
+  | 'reverse-proxy-flow'
+  | 'netip-value-layout'
+  | 'rpc-call-flow'
+  | 'smtp-session-flow'
+  | 'tcp-frame-lifecycle'
+  | 'multipart-boundary-flow'
+  | 'websocket-hub-flow'
   | 'netpoller-flow'
   | 'tcp-dial-flow'
   | 'tcp-vs-udp'
@@ -49,6 +62,19 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'http-server-flow': '760px',
   'graceful-shutdown': '760px',
   'http-client-pool': '760px',
+  'url-components': '760px',
+  'cookiejar-flow': '760px',
+  'circuit-breaker-states': '760px',
+  'httptest-modes': '760px',
+  'httptrace-events': '760px',
+  'http2-multiplex': '760px',
+  'reverse-proxy-flow': '760px',
+  'netip-value-layout': '760px',
+  'rpc-call-flow': '760px',
+  'smtp-session-flow': '760px',
+  'tcp-frame-lifecycle': '760px',
+  'multipart-boundary-flow': '760px',
+  'websocket-hub-flow': '760px',
   'netpoller-flow': '760px',
   'tcp-dial-flow': '760px',
   'tcp-vs-udp': '760px',
@@ -233,6 +259,407 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="614" y="202" width="122" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
       <text x="675" y="222" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">错误</text>
       <text x="675" y="238" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">不关 Body -> 连接泄漏</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'url-components'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="net/url 组件与编码流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`net/url` 真正关键的是先把 URL 拆成结构化字段，再分别按 path 和 query 的规则编码，而不是拿整串字符串硬拼</text>
+      <rect x="24" y="66" width="712" height="54" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="90" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">https://alice:secret@example.com:8443/search?q=go+lang#frag</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">scheme://userinfo@host/path?query#fragment</text>
+      <line x1="380" y1="120" x2="380" y2="150" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="26" y="150" width="132" height="70" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="92" y="172" text-anchor="middle" font-size="11" fill="var(--d-text)">URL struct</text>
+      <text x="92" y="190" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Scheme / Host</text>
+      <text x="92" y="206" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Path / RawQuery</text>
+      <rect x="172" y="150" width="132" height="70" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="238" y="172" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Userinfo</text>
+      <text x="238" y="190" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Username()</text>
+      <text x="238" y="206" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Password()</text>
+      <rect x="318" y="150" width="132" height="70" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="384" y="172" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">Values</text>
+      <text x="384" y="190" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Query() -&gt; map[string][]string</text>
+      <text x="384" y="206" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Encode() 稳定排序输出</text>
+      <rect x="464" y="150" width="132" height="70" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="530" y="172" text-anchor="middle" font-size="11" fill="var(--d-text)">QueryEscape</text>
+      <text x="530" y="190" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">空格 -&gt; +</text>
+      <text x="530" y="206" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">适合表单 query</text>
+      <rect x="610" y="150" width="126" height="70" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="673" y="172" text-anchor="middle" font-size="11" fill="var(--d-text)">PathEscape</text>
+      <text x="673" y="190" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">空格 -&gt; %20</text>
+      <text x="673" y="206" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">适合路径段</text>
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`ResolveReference`、`String()`、`Encode()` 都建立在结构化字段之上；先 parse 成 `URL` 再改字段，通常比手工拼接稳得多</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cookiejar-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="CookieJar 存取流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`cookiejar` 的核心是把响应里的 `Set-Cookie` 先按域名、路径、Secure 和 PSL 规则过滤入库，再在后续请求里按目标 URL 精确挑回去</text>
+      <rect x="28" y="92" width="122" height="52" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="89" y="113" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">响应头</text>
+      <text x="89" y="131" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Set-Cookie: session=...</text>
+      <line x1="150" y1="118" x2="248" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="248" y="64" width="202" height="108" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="349" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">Jar.SetCookies(url, cookies)</text>
+      <text x="349" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">校验 Domain / Path</text>
+      <text x="349" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Public Suffix List 防 `.com` 级别滥设</text>
+      <text x="349" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">按 eTLD+1 -&gt; id 存到 entries</text>
+      <text x="349" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">持久 Cookie 额外记录 Expires / MaxAge</text>
+      <line x1="450" y1="118" x2="548" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="548" y="74" width="184" height="88" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="640" y="96" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Jar.Cookies(requestURL)</text>
+      <text x="640" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">域名匹配 / 路径前缀 / Secure</text>
+      <text x="640" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">过滤过期项并按路径长度排序</text>
+      <text x="640" y="146" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">生成请求 Cookie 头</text>
+      <rect x="236" y="194" width="288" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="216" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">所以 Jar 不是“无脑缓存 Cookie”，而是一个按 URL 规则动态裁剪的会话存储器</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'circuit-breaker-states'"
+      viewBox="0 0 760 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="断路器状态机图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">断路器的核心不是“失败就拒绝”，而是让系统在连续失败时快速止损，并只用少量探测请求判断是否恢复</text>
+      <rect x="42" y="84" width="170" height="64" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="127" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">Closed</text>
+      <text x="127" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">正常放行</text>
+      <text x="127" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">累计失败计数</text>
+      <line x1="212" y1="116" x2="328" y2="116" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="270" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">连续失败超阈值</text>
+      <rect x="328" y="72" width="118" height="88" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="387" y="96" text-anchor="middle" font-size="11" fill="var(--d-warn-text)">Open</text>
+      <text x="387" y="114" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">快速失败</text>
+      <text x="387" y="130" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">保护下游</text>
+      <text x="387" y="146" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">等待 resetTimeout</text>
+      <line x1="446" y1="116" x2="560" y2="116" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="503" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">超时后放少量探测流量</text>
+      <rect x="560" y="72" width="160" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="640" y="96" text-anchor="middle" font-size="11" fill="var(--d-text)">HalfOpen</text>
+      <text x="640" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">只允许少量请求</text>
+      <text x="640" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">成功则恢复</text>
+      <text x="640" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">失败则重新断开</text>
+      <path d="M640 160 C640 196 160 196 160 148" fill="none" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="208" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">关键参数不是越敏感越好；阈值、恢复窗口和 half-open 探测并发都决定了它是在止损，还是在抖动中来回拍门</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'httptest-modes'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="httptest 两种测试模式图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`httptest` 的价值在于把 HTTP 测试拆成两档：一档直接测 handler 行为，一档起真实测试服务器把网络和 TLS 也带上</text>
+      <rect x="26" y="68" width="334" height="136" rx="12" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="193" y="92" text-anchor="middle" font-size="12" fill="var(--d-text)">ResponseRecorder</text>
+      <rect x="46" y="112" width="104" height="40" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="98" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">NewRequest</text>
+      <line x1="150" y1="132" x2="228" y2="132" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="228" y="96" width="106" height="72" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="281" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">handler.ServeHTTP</text>
+      <text x="281" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">recorder 记 Code/Header/Body</text>
+      <text x="281" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Result() 断言结果</text>
+      <text x="193" y="188" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">单元测试首选，快且定位准</text>
+      <rect x="400" y="68" width="334" height="136" rx="12" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="567" y="92" text-anchor="middle" font-size="12" fill="var(--d-rv-b-text)">Test Server</text>
+      <rect x="420" y="112" width="106" height="40" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="473" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">NewServer / TLSServer</text>
+      <line x1="526" y1="132" x2="606" y2="132" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="606" y="96" width="104" height="72" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="658" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Client().Do()</text>
+      <text x="658" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">真实端口 / TLS / 重定向</text>
+      <text x="658" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">更接近集成测试</text>
+      <text x="567" y="188" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">适合测 Transport、中间件、连接复用</text>
+      <text x="380" y="226" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">判断标准很简单：如果只关心 handler 输出，用 recorder；如果想把真正的 HTTP 栈也带进来，用 test server</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'httptrace-events'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="httptrace 事件流图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`httptrace` 的核心不是“打印更多日志”，而是把一次请求在拿连接、建连、写请求、收首字节这些关键节点上都挂成可编程钩子</text>
+      <rect x="26" y="96" width="92" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="72" y="121" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">GetConn</text>
+      <line x1="118" y1="118" x2="208" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="208" y="74" width="140" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="278" y="96" text-anchor="middle" font-size="11" fill="var(--d-text)">连接阶段</text>
+      <text x="278" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">DNSStart / DNSDone</text>
+      <text x="278" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ConnectStart / Done</text>
+      <text x="278" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">TLSHandshakeStart / Done</text>
+      <line x1="348" y1="118" x2="442" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="442" y="86" width="118" height="64" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="501" y="108" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">GotConn</text>
+      <text x="501" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Reused / IdleTime</text>
+      <line x1="560" y1="118" x2="650" y2="118" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="650" y="74" width="84" height="88" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="692" y="96" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">写请求</text>
+      <text x="692" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">WroteHeaderField</text>
+      <text x="692" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">WroteHeaders</text>
+      <text x="692" y="146" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">WroteRequest</text>
+      <path d="M501 150 L501 196 L692 196 L692 162" fill="none" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <rect x="262" y="184" width="238" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="381" y="204" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">GotFirstResponseByte</text>
+      <text x="381" y="220" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">TTFB 的观测锚点，后面才是读完整个响应体</text>
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">如果请求直接命中连接池，DNS / TCP / TLS 钩子可能完全不会触发，这正是它诊断“为什么没复用上连接”的价值所在</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'http2-multiplex'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="HTTP/2 多路复用图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">HTTP/2 的关键不是“更快的 HTTP”，而是把很多请求拆成独立 stream，在同一条 TCP 连接上用帧交错发送</text>
+
+      <rect x="26" y="82" width="118" height="86" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="85" y="104" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">client</text>
+      <text x="85" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">stream 1: /users</text>
+      <text x="85" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">stream 3: /orders</text>
+      <text x="85" y="154" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">stream 5: /events</text>
+
+      <line x1="144" y1="125" x2="254" y2="125" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="254" y="58" width="252" height="134" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="82" text-anchor="middle" font-size="11" fill="var(--d-text)">一条 TCP + TLS 连接</text>
+      <rect x="280" y="102" width="56" height="24" rx="6" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1" />
+      <text x="308" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">H1 S1</text>
+      <rect x="344" y="102" width="56" height="24" rx="6" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1" />
+      <text x="372" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">D1 S1</text>
+      <rect x="408" y="102" width="56" height="24" rx="6" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1" />
+      <text x="436" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">H1 S3</text>
+      <rect x="472" y="102" width="56" height="24" rx="6" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1" />
+      <text x="500" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">D1 S5</text>
+      <text x="380" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">HEADERS / DATA / WINDOW_UPDATE / SETTINGS 按帧交错</text>
+      <text x="380" y="162" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">头部还会走 HPACK 压缩，避免重复发送大 header</text>
+
+      <line x1="506" y1="125" x2="616" y2="125" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="616" y="82" width="118" height="86" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="675" y="104" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">server</text>
+      <text x="675" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">同连接并发处理多流</text>
+      <text x="675" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">优雅关闭用 GOAWAY</text>
+      <text x="675" y="154" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">不是每请求一连接</text>
+
+      <text x="380" y="230" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">它消除了应用层的请求队头阻塞，但底层仍只有一条 TCP；一旦这条连接丢包，传输层的阻塞仍会影响其上的所有 stream</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'reverse-proxy-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="ReverseProxy 转发流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`ReverseProxy` 的核心不是简单转发，而是把“改请求、发后端、改响应、流式回写”这条链固定成一个可插拔流水线</text>
+
+      <rect x="28" y="92" width="92" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="74" y="117" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">client</text>
+
+      <line x1="120" y1="114" x2="220" y2="114" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="220" y="60" width="188" height="108" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="314" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">ReverseProxy</text>
+      <text x="314" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Director 改 URL / Host / Header</text>
+      <text x="314" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">移除逐跳头 + 加 X-Forwarded-For</text>
+      <text x="314" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Transport.RoundTrip 发后端</text>
+      <text x="314" y="150" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ModifyResponse / ErrorHandler</text>
+
+      <line x1="408" y1="114" x2="512" y2="114" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="512" y="92" width="100" height="44" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="562" y="117" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">backend</text>
+
+      <path d="M562 136 L562 186 L314 186 L314 168" fill="none" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <rect x="214" y="196" width="200" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="314" y="214" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">copyResponse 流式写回客户端，SSE/大响应都能边读边回</text>
+
+      <text x="380" y="232" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">真正容易踩坑的是 Host、逐跳头和错误处理；代理不是“再发一次请求”这么简单，而是处在两个 HTTP 语义之间做桥接</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'netip-value-layout'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="netip 值类型布局图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`netip` 真正解决的是旧 `net.IP` 的引用语义问题：地址、端口、前缀都变成可比较的值类型，适合做 map key 和热路径数据结构</text>
+
+      <rect x="26" y="70" width="220" height="122" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="136" y="94" text-anchor="middle" font-size="12" fill="var(--d-text)">net.IP（旧）</text>
+      <text x="136" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">[]byte，引用类型</text>
+      <text x="136" y="132" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">不能直接 `==`，也不能当 map key</text>
+      <text x="136" y="148" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">nil / 16字节 / 4字节 语义容易混</text>
+      <text x="136" y="164" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">热路径里常有额外分配和拷贝</text>
+
+      <rect x="278" y="54" width="206" height="154" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="381" y="78" text-anchor="middle" font-size="12" fill="var(--d-rv-b-text)">netip（新）</text>
+      <text x="381" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Addr = 128bit address + zone</text>
+      <text x="381" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">AddrPort = Addr + uint16 port</text>
+      <text x="381" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Prefix = Addr + prefix bits</text>
+      <text x="381" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">值类型、可比较、零值可用</text>
+      <text x="381" y="164" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">IPv4 / IPv6 / mapped IPv4 统一处理</text>
+
+      <rect x="516" y="70" width="218" height="122" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="625" y="94" text-anchor="middle" font-size="12" fill="var(--d-rv-a-text)">直接收益</text>
+      <text x="625" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">路由表：map[Prefix]Policy</text>
+      <text x="625" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">去重：map[Addr]struct{}</text>
+      <text x="625" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">解析后长期保留更省分配</text>
+      <text x="625" y="164" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Contains / Unmap / Next 语义更清晰</text>
+
+      <text x="380" y="220" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 `netip` 不是语法糖，而是把“地址”从字节切片提升成真正的值对象；这对高频网络路径和路由类代码非常重要</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'rpc-call-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="net/rpc 调用流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`net/rpc` 的主线是：客户端给每次调用分配序列号挂进 pending，服务端按 `Service.Method` 反射分发，最后再靠同一个序列号把响应对回原调用</text>
+
+      <rect x="24" y="74" width="176" height="112" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="112" y="98" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Client</text>
+      <text x="112" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Call / Go</text>
+      <text x="112" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">seq++</text>
+      <text x="112" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">pending[seq] = *Call</text>
+      <text x="112" y="164" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">codec 写 Request + Args</text>
+
+      <line x1="200" y1="130" x2="296" y2="130" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="296" y="96" width="168" height="68" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="118" text-anchor="middle" font-size="11" fill="var(--d-text)">连接 + codec</text>
+      <text x="380" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">gob / jsonrpc / 自定义</text>
+      <text x="380" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Request{ServiceMethod, Seq}</text>
+
+      <line x1="464" y1="130" x2="560" y2="130" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="560" y="74" width="176" height="112" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="648" y="98" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Server</text>
+      <text x="648" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">serviceMap 找到 Service</text>
+      <text x="648" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">method 表找 Method</text>
+      <text x="648" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">反射调用 args, reply</text>
+      <text x="648" y="164" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">回 Response{Seq, Error} + Reply</text>
+
+      <path d="M648 186 L648 214 L112 214 L112 186" fill="none" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">因此它天然支持一条连接上并发多个调用，但代价是所有方法签名都要服从固定反射约束；这也是它后来被更强类型的 gRPC 取代的原因之一</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'smtp-session-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="SMTP 会话流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">SMTP 发送不是一次 HTTP 式请求，而是一段长会话：先协商能力和安全，再声明发件人/收件人，最后才进入 DATA 阶段上传邮件正文</text>
+
+      <rect x="44" y="64" width="136" height="132" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="112" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Client</text>
+      <text x="112" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">EHLO</text>
+      <text x="112" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">STARTTLS</text>
+      <text x="112" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">AUTH</text>
+      <text x="112" y="160" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">MAIL / RCPT / DATA</text>
+
+      <line x1="180" y1="130" x2="306" y2="130" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="306" y="52" width="148" height="156" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="76" text-anchor="middle" font-size="11" fill="var(--d-text)">smtp.Client</text>
+      <text x="380" y="96" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Hello / Extension</text>
+      <text x="380" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">StartTLS 升级连接</text>
+      <text x="380" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Auth 认证</text>
+      <text x="380" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Mail / Rcpt</text>
+      <text x="380" y="160" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Data() 返回 writer 写正文</text>
+      <text x="380" y="176" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Close data writer 发送终止点 `.`</text>
+
+      <line x1="454" y1="130" x2="580" y2="130" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="580" y="64" width="136" height="132" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="648" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">SMTP server</text>
+      <text x="648" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">220 / 250 capability</text>
+      <text x="648" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">250-STARTTLS</text>
+      <text x="648" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">收 envelope</text>
+      <text x="648" y="160" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">DATA 后收完整 MIME</text>
+
+      <text x="380" y="234" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以发信时最常见的问题不是“请求失败”，而是协商能力、TLS、AUTH、单个 RCPT 或 DATA 阶段中的某一步被服务器拒绝</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'tcp-frame-lifecycle'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="TCP 帧协议服务器流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">自定义 TCP 服务器真正要解决的是“字节流没有消息边界”，所以核心不是 `Read` 本身，而是先定帧协议，再围绕连接生命周期和超时来处理它</text>
+
+      <rect x="24" y="92" width="110" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="79" y="112" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">listener.Accept</text>
+      <text x="79" y="128" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">新连接</text>
+
+      <line x1="134" y1="116" x2="232" y2="116" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="232" y="60" width="170" height="112" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="317" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">conn goroutine</text>
+      <text x="317" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">SetReadDeadline / idle timeout</text>
+      <text x="317" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">先读 Header：Magic / Type / Len</text>
+      <text x="317" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">再按 Len 读 Payload</text>
+      <text x="317" y="150" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">心跳 / 请求 / 错误分支</text>
+
+      <line x1="402" y1="116" x2="500" y2="116" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="500" y="74" width="122" height="84" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="561" y="96" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">handler</text>
+      <text x="561" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">按 Type/子命令分发</text>
+      <text x="561" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">返回响应 payload</text>
+
+      <line x1="622" y1="116" x2="720" y2="116" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="618" y="184" width="118" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="677" y="206" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">encodeFrame + Write</text>
+
+      <line x1="677" y1="158" x2="677" y2="184" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <rect x="172" y="184" width="264" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="304" y="206" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">优雅关闭时先停 Accept，再等连接 goroutine 收尾；否则半包、超时和写回中断都会变成线上噪音</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'multipart-boundary-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="multipart boundary 解析图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`multipart` 的关键不是“有很多字段”，而是每个 part 都靠 boundary 切开；Reader/Writer 只是把这个切分协议做成了可流式读写的抽象</text>
+
+      <rect x="24" y="66" width="712" height="68" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="90" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">--boundary | headers | body | --boundary | headers | body | --boundary--</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">结束边界多两个 `--`，因此 Reader 才知道整份报文真的结束了</text>
+
+      <line x1="380" y1="134" x2="380" y2="162" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+
+      <rect x="42" y="162" width="186" height="62" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="135" y="184" text-anchor="middle" font-size="11" fill="var(--d-text)">multipart.Reader</text>
+      <text x="135" y="202" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">NextPart() 扫下一个 boundary</text>
+      <text x="135" y="218" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Part.Read() 流式读内容</text>
+
+      <rect x="288" y="162" width="186" height="62" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="381" y="184" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">ParseMultipartForm</text>
+      <text x="381" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">小字段进内存</text>
+      <text x="381" y="218" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">大文件可落临时文件</text>
+
+      <rect x="534" y="162" width="186" height="62" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="627" y="184" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">multipart.Writer</text>
+      <text x="627" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">CreatePart / CreateFormFile</text>
+      <text x="627" y="218" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Close() 写结束 boundary</text>
+
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以它特别适合文件上传和 MIME 组合体，但前提是别忘了 boundary 和 Close；缺任何一个，接收端都看不到一份完整报文</text>
     </svg>
 
     <svg
@@ -1272,6 +1699,41 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
 
       <rect x="170" y="184" width="420" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
       <text x="380" y="202" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">当输入不是 UTF-8 时，要先给 `CharsetReader`；否则 Token 流还没开始，解码就会在字符集阶段失败</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'websocket-hub-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="WebSocket Hub 并发模型图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">WebSocket 线上实现最关键的不是握手本身，而是读写并发模型：每个连接一读一写，广播统一交给 Hub，避免多人同时写同一条连接</text>
+
+      <rect x="24" y="82" width="156" height="104" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="102" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">Upgrader.Upgrade</text>
+      <text x="102" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">HTTP 101 握手成功</text>
+      <text x="102" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">得到 *websocket.Conn</text>
+      <text x="102" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">register client 到 Hub</text>
+
+      <line x1="180" y1="134" x2="286" y2="134" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="286" y="60" width="188" height="148" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">Hub</text>
+      <text x="380" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">register / unregister / broadcast</text>
+      <text x="380" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">单 goroutine 管 clients map</text>
+      <text x="380" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">慢客户端 send 满了就踢掉</text>
+      <text x="380" y="150" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">避免锁着一堆 conn 并发写</text>
+
+      <line x1="474" y1="134" x2="580" y2="98" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="474" y1="134" x2="580" y2="170" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="580" y="74" width="156" height="56" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="658" y="96" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">readPump</text>
+      <text x="658" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">ReadMessage -> broadcast</text>
+      <rect x="580" y="146" width="156" height="56" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="658" y="168" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">writePump</text>
+      <text x="658" y="186" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">send chan 串行写 + ping/pong 保活</text>
+
+      <text x="380" y="236" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">gorilla/websocket 明确要求同一连接写操作串行，所以“每 client 一个 writePump”不是风格选择，而是正确性前提</text>
     </svg>
   </DiagramFrame>
 </template>

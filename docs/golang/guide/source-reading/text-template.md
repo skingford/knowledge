@@ -6,6 +6,9 @@ description: 精读 text/template 的模板解析与执行机制，理解 Action
 # text/template：模板引擎源码精读
 
 > 核心源码：`src/text/template/parse/`、`src/text/template/exec.go`、`src/text/template/funcs.go`
+>
+> 图例参考：
+> - `GoCodegenDiagram`：`template-exec-flow`
 
 ## 包结构图
 
@@ -45,6 +48,8 @@ text/template 与 html/template 关系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoCodegenDiagram kind="template-exec-flow" />
 
 ---
 

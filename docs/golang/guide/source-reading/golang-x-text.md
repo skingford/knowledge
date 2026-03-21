@@ -6,8 +6,12 @@ description: 精读 Go x/text Unicode 文本处理库，掌握字符规范化、
 # golang.org/x/text：Unicode 文本处理源码精读
 
 > 核心源码：`golang.org/x/text/unicode/norm`、`transform`、`encoding`、`language`
+>
+> 图例参考：这里补了 `x/text` 的文本变换流水线图，先把“解码 -> 规范化 -> 语言协商/排序”看成一条链，再回头读 `transform`、`norm` 和 `language` 各自负责哪一段。
 
 ## 包结构图
+
+<GoLanguageDiagram kind="xtext-transform" />
 
 ```
 golang.org/x/text 体系

@@ -17,6 +17,8 @@ vocabulary:
 
 # Kafka 核心概念
 
+<KafkaDiagram kind="core-concepts" />
+
 ## Producer / Consumer / Broker
 
 - **Producer**：生产者，负责把业务事件写入 Kafka

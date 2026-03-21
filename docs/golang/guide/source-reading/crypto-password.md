@@ -6,6 +6,9 @@ description: 精读 Go x/crypto 密码散列实现，掌握 bcrypt/Argon2id/scry
 # 密码散列：bcrypt / Argon2id / scrypt 源码精读
 
 > 核心源码：`golang.org/x/crypto/bcrypt`、`golang.org/x/crypto/argon2`、`golang.org/x/crypto/scrypt`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`password-storage`
 
 ## 包结构图
 
@@ -41,6 +44,8 @@ description: 精读 Go x/crypto 密码散列实现，掌握 bcrypt/Argon2id/scry
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="password-storage" />
 
 ---
 

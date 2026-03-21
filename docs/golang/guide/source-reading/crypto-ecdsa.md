@@ -6,6 +6,9 @@ description: 精读 Go crypto/ecdsa 椭圆曲线数字签名实现，掌握 P-25
 # crypto/ecdsa：椭圆曲线数字签名源码精读
 
 > 核心源码：`src/crypto/ecdsa/ecdsa.go`、`src/crypto/elliptic/elliptic.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`public-key-sign-verify`
 
 ## 包结构图
 
@@ -45,6 +48,8 @@ crypto/ecdsa 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="public-key-sign-verify" />
 
 ---
 

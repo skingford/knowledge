@@ -6,6 +6,10 @@ description: 精读 crypto/tls 的握手流程、证书验证、客户端/服务
 # crypto/tls：TLS 实现源码精读
 
 > 核心源码：`src/crypto/tls/conn.go`、`src/crypto/tls/handshake_client.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`tls-mtls`
+> - `GoSecurityDiagram`：`certificate-chain-verify`
 
 ## 包结构图
 
@@ -50,6 +54,8 @@ crypto/tls 体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoSecurityDiagram kind="tls-mtls" />
+
 ---
 
 ## 一、核心实现
@@ -85,6 +91,8 @@ func (c *Conn) Read(b []byte) (int, error) {
 // 3. 检查 ServerName（SNI）与证书 CN/SAN 匹配
 // 4. 检查证书有效期和吊销状态（OCSP）
 ```
+
+<GoSecurityDiagram kind="certificate-chain-verify" />
 
 ---
 

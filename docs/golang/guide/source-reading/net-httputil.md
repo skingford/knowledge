@@ -6,6 +6,9 @@ description: 精读 net/http/httputil 的反向代理实现，掌握 ReverseProx
 # net/http/httputil：反向代理源码精读
 
 > 核心源码：`src/net/http/httputil/reverseproxy.go`、`src/net/http/httputil/dump.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`reverse-proxy-flow`
 
 ## 包结构图
 
@@ -43,6 +46,8 @@ net/http/httputil 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoNetworkDiagram kind="reverse-proxy-flow" />
 
 ---
 

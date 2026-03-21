@@ -10,6 +10,8 @@ search: false
 
 原来分散在 `learning-path`、`guide/09-runtime-source`、`golang-advanced-learning-guide`、`golang-recommended-resources` 里的源码阅读路线、runtime 导读和资料清单，统一收口到这里维护。`docs/golang` 根目录继续保留通用专题导航，但源码阅读相关内容以后以本页和 [Go 源码精读总览](./index.md) 为准。
 
+> 图例参考：这页继续复用 `GoSourceReadingDiagram` 的 `reading-method` 和 `runtime-route`，先掌握读法，再按主线进具体源码页。
+
 ## 怎么使用这页
 
 - **想先抓主线**：直接看“推荐阅读路线”

@@ -9,6 +9,8 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 
 这页现在承担 `guide/source-reading/` 的统一索引职责。源码阅读的路线、方法、runtime 导读和资料清单已经统一收口到 [Go 源码阅读学习主线](./learning-path.md)，这页只负责按主题组织文章，避免路线页和索引页继续重复。
 
+> 图例参考：入口页复用 `GoSourceReadingDiagram` 的 `entry-map` 和 `runtime-route`，先抓源码地图，再顺着 runtime 主线往具体包展开。
+
 ## 怎么使用这页
 
 - **想先抓主线**：先看 [Go 源码阅读学习主线](./learning-path.md)

@@ -6,8 +6,12 @@ description: 精读 Go 运行时内存管理机制，掌握 GOMEMLIMIT 软内存
 # Go 内存管理调优：源码精读
 
 > 核心源码：`src/runtime/mgc.go`、`src/runtime/mem.go`、`src/runtime/debug/`
+>
+> 图例参考：复用 GC 控制旋钮图，先把 `GOGC`、`GOMEMLIMIT`、`gc pacer` 和 `runtime/debug` 的调参入口放进一条线里，再回头读 `mgc.go` 的 heap goal 与 memory limit 提交逻辑。
 
 ## 包结构图
+
+<GoRuntimeDiagram kind="gc-control-knobs" />
 
 ```
 Go 内存管理调优体系

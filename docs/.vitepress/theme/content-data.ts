@@ -733,6 +733,48 @@ export const sections: SectionConfig[] = [
     ],
   },
   {
+    key: 'etcd',
+    base: '/etcd/',
+    navText: 'etcd',
+    overviewDescription:
+      '系统整理 etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch、Txn/CAS、读一致性与生产运维边界。',
+    landing: {
+      eyebrow: 'etcd',
+      title: 'etcd 专题',
+      intro:
+        '把 etcd 从“知道能做注册中心”提升到“理解一致性存储系统”的层面，先抓必须掌握的知识点，再延伸到服务发现、配置中心和高可用场景。',
+      primary: { title: '专题总览', href: '/etcd/', description: '从总览页开始，先建立统一框架。' },
+      secondary: { title: 'RPC、注册发现与配置', href: '/golang/guide/08-rpc-discovery-config', description: '看 Go 场景中的 etcd 落地。' },
+      scope: [
+        'Raft 与多数派',
+        'MVCC 与 revision',
+        'Lease / TTL / KeepAlive',
+        'Watch 与 compaction',
+        'Txn / CAS / 分布式锁',
+        '线性一致性读写',
+        '备份恢复与运维边界',
+      ],
+      docs: [
+        { title: '专题总览', href: '/etcd/', description: '先建立 etcd 的定位、核心机制和必须掌握知识点。' },
+        { title: 'RPC、注册发现与配置', href: '/golang/guide/08-rpc-discovery-config', description: '看 etcd 在服务注册发现和配置中心里的 Go 实战。' },
+        { title: 'PostgreSQL 高可用集群整理', href: '/postgresql/ha-cluster', description: '看 etcd 在 Patroni + HAProxy 方案中的角色。' },
+      ],
+      order: [
+        '专题总览',
+        'RPC、注册发现与配置',
+        'PostgreSQL 高可用集群整理',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'etcd 专题',
+        items: [
+          { text: '专题总览', link: '/etcd/' },
+        ],
+      },
+    ],
+  },
+  {
     key: 'postgresql',
     base: '/postgresql/',
     navText: 'PostgreSQL',
@@ -934,8 +976,10 @@ export const homeTracks = sections
             ? '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。'
             : section.key === 'mysql'
               ? '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。'
-              : section.key === 'kafka'
+            : section.key === 'kafka'
                 ? '系统整理 Kafka 核心知识，涵盖消息可靠性、顺序性、积压治理与支付场景实战。'
+                : section.key === 'etcd'
+                  ? '系统整理 etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch 与运维边界。'
                 : section.key === 'postgresql'
                   ? '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。'
                   : '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',

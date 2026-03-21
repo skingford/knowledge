@@ -11,6 +11,8 @@ vocabulary:
 
 # Kafka 支付实战
 
+<KafkaDiagram kind="payment-practice" />
+
 ## TCC 为什么要配合 Kafka
 
 标准 TCC 的 Confirm / Cancel 失败需要持续重试。高并发场景下同步重试会长时间占住线程、连接和下游资源。

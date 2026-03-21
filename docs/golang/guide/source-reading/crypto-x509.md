@@ -6,6 +6,9 @@ description: 精读 crypto/x509 的证书解析与验证实现，掌握证书链
 # crypto/x509：证书与 PKI 源码精读
 
 > 核心源码：`src/crypto/x509/x509.go`、`src/crypto/x509/verify.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`certificate-chain-verify`
 
 ## 包结构图
 
@@ -42,6 +45,8 @@ crypto/x509 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="certificate-chain-verify" />
 
 ---
 
