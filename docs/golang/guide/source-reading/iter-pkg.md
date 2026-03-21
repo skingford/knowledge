@@ -6,6 +6,9 @@ description: 精读 Go 1.23 iter 包与 range over func 语言特性，掌握 pu
 # iter（Go 1.23+）：迭代器协议源码精读
 
 > 核心源码：`src/iter/iter.go`（Go 1.23+）
+>
+> 图例参考：
+> - `GoAdvancedTopicDiagram`：`iterator-range-func`
 
 ## 包结构图
 
@@ -45,6 +48,8 @@ Go 1.23 迭代器体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoAdvancedTopicDiagram kind="iterator-range-func" />
+
 ---
 
 ## 一、核心实现
@@ -75,6 +80,8 @@ func Pull[V any](seq Seq[V]) (next func() (V, bool), stop func()) {
 ## 二、代码示例
 
 ### range over func 基础用法
+
+<GoAdvancedTopicDiagram kind="iterator-range-func" />
 
 ```go
 import (

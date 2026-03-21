@@ -6,6 +6,9 @@ description: 精读 go generate 机制，掌握 stringer/mockgen/protoc/sqlc 集
 # go:generate：代码生成工具链精读
 
 > 核心文档：`cmd/go/internal/generate`，工具链：`stringer`、`mockgen`、`protoc-gen-go`、`sqlc`
+>
+> 图例参考：
+> - `GoEngineeringDiagram`：`go-generate-pipeline`
 
 ## 包结构图
 
@@ -43,6 +46,8 @@ go generate 工具链体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoEngineeringDiagram kind="go-generate-pipeline" />
 
 ---
 
@@ -82,6 +87,8 @@ const (
 ## 二、代码示例
 
 ### stringer：枚举自动生成 String()
+
+<GoEngineeringDiagram kind="go-generate-pipeline" />
 
 ```go
 // 文件：color.go
@@ -279,6 +286,8 @@ func CreateUser(ctx context.Context, q *db.Queries, name, email string) error {
 ```
 
 ### 自定义代码生成器（text/template）
+
+<GoEngineeringDiagram kind="go-generate-pipeline" />
 
 ```go
 // 工具文件：tools/gen-crud/main.go

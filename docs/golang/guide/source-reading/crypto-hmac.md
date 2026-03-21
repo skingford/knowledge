@@ -6,6 +6,9 @@ description: 精读 crypto/hmac 与 hash 生态系统，理解 HMAC 认证、SHA
 # crypto/hmac：哈希与消息认证源码精读
 
 > 核心源码：`src/crypto/hmac/hmac.go`、`src/crypto/sha256/sha256.go`、`src/hash/hash.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`hash-hmac-flow`
 
 ## 包结构图
 
@@ -40,6 +43,8 @@ Go 哈希与 MAC 生态
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="hash-hmac-flow" />
 
 ---
 

@@ -7,6 +7,8 @@ description: 精读 Go map 实现（Go 1.24+ Swiss Table），理解哈希表结
 
 > Go 1.24+ 核心源码：`src/internal/runtime/maps/`（Swiss Table 实现）
 > 旧版（≤1.23）源码：`src/runtime/map.go`（基于拉链法的 hmap）
+>
+> 图例参考：这里补了 Go 1.24+ Swiss Table 结构图，并复用旧版 `hmap`、渐进式扩容和并发写 panic 图，先把版本差异、查找路径和并发限制看清，再回头读 `internal/runtime/maps`。
 
 ## 版本演进
 
@@ -29,6 +31,8 @@ Go map 实现版本演进
 ---
 
 ## 一、Swiss Table 结构（Go 1.24+）
+
+<GoInternalsDiagram kind="map-swiss" />
 
 ```
 map 数据结构（Swiss Table）
@@ -105,6 +109,8 @@ m[key]  查找流程（mapaccess）
 
 ## 三、旧版 hmap 结构（≤Go 1.23，面试仍常考）
 
+<GoInternalsDiagram kind="map-hmap" />
+
 ```
 hmap（Go 1.23 及以前）
 ══════════════════════════════════════════════════════════════════
@@ -139,6 +145,8 @@ hmap（Go 1.23 及以前）
 ---
 
 ## 四、扩容机制
+
+<GoInternalsDiagram kind="map-grow" />
 
 ```
 扩容策略
@@ -182,6 +190,8 @@ for k, v := range m {
 ```
 
 ### map 并发安全
+
+<GoLeakRaceDiagram kind="map-concurrent-write" />
 
 ```go
 // ❌ 错误：并发读写未加锁 → data race

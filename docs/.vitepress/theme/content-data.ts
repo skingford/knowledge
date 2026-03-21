@@ -324,7 +324,6 @@ export const sections: SectionConfig[] = [
           { text: '架构能力自检准备清单', link: '/architecture/architect-interview-prep-checklist' },
           { text: '高并发系统设计清单', link: '/architecture/high-concurrency-system-checklist' },
           { text: '分布式事务方案对比', link: '/architecture/distributed-transaction-comparison' },
-          { text: 'PostgreSQL 高可用集群整理', link: '/postgresql/ha-cluster' },
           { text: '待补主题清单', link: '/architecture/todo-topics' },
         ],
       },
@@ -333,12 +332,7 @@ export const sections: SectionConfig[] = [
         items: [
           { text: '案例概览', link: '/architecture/case-studies/' },
           { text: '组织架构与业务系统设计方案', link: '/architecture/case-studies/organization-structure-and-business-system-design' },
-          { text: 'PostgreSQL 高可用集群整理', link: '/postgresql/ha-cluster' },
           { text: '高并发支付系统专题整理', link: '/architecture/case-studies/high-concurrency-payment-system-practice-notes' },
-          { text: '高并发支付系统：MySQL 篇', link: '/mysql/' },
-          { text: '高并发支付系统：PostgreSQL 篇', link: '/postgresql/' },
-          { text: '高并发支付系统：Redis 篇', link: '/architecture/case-studies/high-concurrency-payment-redis' },
-          { text: '高并发支付系统：Kafka 篇', link: '/kafka/' },
           { text: '运动 APP 出海架构与管理完全指南', link: '/architecture/case-studies/global-fitness-app-architecture-and-management-guide' },
         ],
       },
@@ -460,7 +454,7 @@ export const sections: SectionConfig[] = [
             text: '六、数据与缓存',
             link: '/golang/guide/06-database-cache',
             items: [
-              { text: 'Redis 缓存', link: '/golang/guide/06-redis-and-cache-patterns' },
+              { text: 'Redis 缓存', link: '/redis/redis-and-cache-patterns' },
               { text: '一致性分表', link: '/golang/guide/06-cache-consistency-and-sharding' },
               { text: 'SQL 连接池', link: '/golang/guide/06-database-sql-and-connection' },
             ],
@@ -481,6 +475,7 @@ export const sections: SectionConfig[] = [
             items: [
               { text: 'RPC 与发现', link: '/golang/guide/08-rpc-discovery-config' },
               { text: '容错与追踪', link: '/golang/guide/08-observability-resilience' },
+              { text: '高并发系统设计', link: '/golang/guide/08-go-high-concurrency-system-design' },
               { text: 'MQ 与高可用', link: '/golang/guide/08-mq-transaction-governance-ha' },
             ],
           },
@@ -641,6 +636,54 @@ export const sections: SectionConfig[] = [
           { text: '44 问题答疑', link: '/mysql/44-qa-good-questions' },
           { text: '45 自增溢出', link: '/mysql/45-auto-increment-overflow' },
           { text: '46 收官总结', link: '/mysql/46-conclusion' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'redis',
+    base: '/redis/',
+    navText: 'Redis',
+    overviewDescription:
+      '系统整理 Redis 核心知识，涵盖缓存治理、go-redis 客户端实践、分布式锁、Lua 原子性、滑动窗口与支付系统高并发场景。',
+    landing: {
+      eyebrow: 'Redis',
+      title: 'Redis 专题',
+      intro:
+        '把散落在 Go 实践、源码精读和支付系统案例中的 Redis 相关内容统一收敛，方便按主题查阅和持续更新。',
+      primary: { title: '专题总览', href: '/redis/', description: '从总览页开始，按主题查阅。' },
+      secondary: { title: '高并发治理', href: '/redis/high-concurrency-cluster-locks', description: '继续补集群、锁和 Lua。' },
+      scope: [
+        'go-redis 客户端实践',
+        '缓存穿透/击穿/雪崩',
+        '高并发治理与集群部署',
+        'Pipeline 与 Pub/Sub',
+        '分布式锁与 Lua',
+        '滑动窗口与限流',
+        '支付系统幂等与高并发治理',
+      ],
+      docs: [
+        { title: 'Redis 实践与缓存穿透/击穿/雪崩', href: '/redis/redis-and-cache-patterns', description: 'go-redis 基础用法、Pipeline、Pub/Sub、singleflight、布隆过滤器与多级缓存。' },
+        { title: 'Redis 高并发、集群部署与分布式锁', href: '/redis/high-concurrency-cluster-locks', description: '热点 Key / 大 Key 治理、Sentinel / Cluster 选型、hash tag、分布式锁与 Lua 原子脚本。' },
+        { title: 'go-redis 客户端源码精读', href: '/golang/guide/source-reading/go-redis', description: '连接池、Pipeline/TxPipeline、分布式锁、Watch 与客户端设计细节。' },
+        { title: '支付系统 Redis 实战', href: '/redis/payment-practice', description: '缓存治理、分布式锁、Lua、滑动窗口、请求级幂等与支付场景答题模板。' },
+      ],
+      order: [
+        'Redis 实践与缓存穿透/击穿/雪崩',
+        'Redis 高并发、集群部署与分布式锁',
+        'go-redis 客户端源码精读',
+        '支付系统 Redis 实战',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'Redis 专题',
+        items: [
+          { text: '专题总览', link: '/redis/' },
+          { text: 'Redis 实践与缓存穿透/击穿/雪崩', link: '/redis/redis-and-cache-patterns' },
+          { text: 'Redis 高并发、集群部署与分布式锁', link: '/redis/high-concurrency-cluster-locks' },
+          { text: 'go-redis 客户端源码精读', link: '/golang/guide/source-reading/go-redis' },
+          { text: '支付系统 Redis 实战', link: '/redis/payment-practice' },
         ],
       },
     ],

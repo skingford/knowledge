@@ -6,6 +6,9 @@ description: 精读 crypto/rand 的密码学安全随机数实现，掌握 Token
 # crypto/rand：密码学随机数源码精读
 
 > 核心源码：`src/crypto/rand/rand.go`、`src/crypto/rand/rand_unix.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`secure-random-source`
 
 ## 包结构图
 
@@ -39,6 +42,8 @@ description: 精读 crypto/rand 的密码学安全随机数实现，掌握 Token
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="secure-random-source" />
 
 ---
 

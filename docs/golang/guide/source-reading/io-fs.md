@@ -6,8 +6,12 @@ description: 精读 io/fs 的文件系统抽象接口，理解 FS/ReadDirFS/Stat
 # io/fs：文件系统抽象源码精读
 
 > 核心源码：`src/io/fs/fs.go`、`src/io/fs/readdir.go`、`src/io/fs/walk.go`（Go 1.16+）
+>
+> 图例参考：这里补了 `FS` 抽象图和 `WalkDir` 递归图，先把“最小接口 + 可选扩展接口 + 统一辅助函数”这套模型看清，再回头读 `fs.go` / `walk.go`。
 
 ## 包结构图
+
+<GoNetworkDiagram kind="fs-abstraction" />
 
 ```
 io/fs 接口体系
@@ -81,6 +85,8 @@ type DirEntry interface {
 ---
 
 ## 二、WalkDir 实现
+
+<GoNetworkDiagram kind="walkdir-flow" />
 
 ```go
 // src/io/fs/walk.go

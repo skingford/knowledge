@@ -129,5 +129,5 @@ description: 系统整理 MySQL 核心知识，聚焦事务、查询优化、GOR
 - [database/sql：连接池与事务（源码精读）](/golang/guide/source-reading/database-sql)
 - [database/sql：高级事务与批量插入（源码精读）](/golang/guide/source-reading/database-sql-advanced)
 - [高并发支付系统专题整理](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
-- [高并发支付系统：Redis 篇](/architecture/case-studies/high-concurrency-payment-redis)
+- [Redis 专题](/redis/)
 - [Kafka 专题](/kafka/)

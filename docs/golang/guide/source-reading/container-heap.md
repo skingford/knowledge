@@ -6,6 +6,9 @@ description: 精读 container/heap 的接口驱动堆实现，理解优先队列
 # container/heap：堆与优先队列源码精读
 
 > 核心源码：`src/container/heap/heap.go`（仅约 100 行）
+>
+> 图例参考：
+> - `GoInternalsDiagram`：`heap-array-tree`
 
 ## 包结构图
 
@@ -40,6 +43,8 @@ container 包全景
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoInternalsDiagram kind="heap-array-tree" />
 
 ---
 

@@ -6,8 +6,12 @@ description: 精读 Go regexp 包的 NFA 引擎设计、编译流程与性能特
 # regexp：正则引擎源码精读
 
 > 核心源码：`src/regexp/regexp.go`、`src/regexp/syntax/`、`src/regexp/exec.go`
+>
+> 图例参考：这里补了正则编译与执行链图，先看 `Parse -> Prog -> engine choice` 这条主线，再回头理解为什么 Go 正则保证线性时间。
 
 ## 包结构图
+
+<GoLanguageDiagram kind="regexp-engine" />
 
 ```
 regexp 包架构
@@ -67,6 +71,8 @@ Go regexp vs PCRE 的根本区别
 ---
 
 ## 二、编译流程
+
+<GoLanguageDiagram kind="regexp-engine" />
 
 ```
 regexp.Compile("a(b|c)+d") 编译流程

@@ -6,6 +6,9 @@ description: 精读 Go hash 接口体系与 SHA-256/SHA-512 实现，掌握 Merk
 # crypto/sha256 & hash 接口：源码精读
 
 > 核心源码：`src/crypto/sha256/sha256.go`、`src/hash/hash.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`hash-hmac-flow`
 
 ## 包结构图
 
@@ -47,6 +50,8 @@ Go hash 体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="hash-hmac-flow" />
 
 ---
 

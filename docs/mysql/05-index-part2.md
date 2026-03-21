@@ -535,172 +535,26 @@ InnoDB 的二级索引叶子节点会自动带上主键值。这里主键是 `(a
 
 为了把这个差异看得更直观，我们用一组具体数据看一下这三个索引叶子项的实际排列顺序：
 
-<div style="display:flex;justify-content:center;padding:16px 0 22px;">
-<svg viewBox="0 0 820 540" style="max-width:820px;width:100%;font-family:system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
-  <text x="410" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--d-text)">图5 联合主键下 c / ca / cb 索引组织对比</text>
+<MySQLIndexRedundancyDiagram />
 
-  <!-- Source data -->
-  <rect x="20" y="40" width="240" height="204" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
-  <rect x="20" y="40" width="240" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
-  <text x="140" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-blue)">示例数据（按主键 a,b 排序）</text>
+#### 为什么 `KEY cb(c, b)` 最终是 `(c, b, a)`，而不是 `(c, b, a, b)`
 
-  <line x1="20" y1="94" x2="260" y2="94" stroke="var(--d-border)" stroke-width="1"/>
-  <text x="70" y="84" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">a</text>
-  <text x="140" y="84" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">b</text>
-  <text x="210" y="84" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">c</text>
-  <line x1="95" y1="68" x2="95" y2="244" stroke="var(--d-border)" stroke-width="0.8"/>
-  <line x1="165" y1="68" x2="165" y2="244" stroke="var(--d-border)" stroke-width="0.8"/>
+这里还有一个很容易被忽略的细节：InnoDB 在处理二级索引时，并不是把“二级索引列 + 完整主键列”机械地直接拼起来，而是会避免重复存储已经出现过的主键列。
 
-  <text x="70" y="114" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="140" y="114" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="210" y="114" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
+你可以把它近似理解成这样两条规则：
 
-  <text x="70" y="138" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="140" y="138" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="210" y="138" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
+- 二级索引叶子节点里，必须带上足够的聚簇索引键，才能定位到完整数据行；
+- 如果二级索引定义里已经包含了某些主键列，这些列就不会再被重复追加一次。
 
-  <text x="70" y="162" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="140" y="162" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-  <text x="210" y="162" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
+所以，对于这个表：
 
-  <text x="70" y="186" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="140" y="186" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="210" y="186" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
+- 主键是 `(a, b)`；
+- 索引 `KEY cb(c, b)` 里，用户显式定义的列是 `(c, b)`；
+- 这时候 InnoDB 只需要再把“还没出现的主键列”补上，也就是 `a`。
 
-  <text x="70" y="210" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="140" y="210" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="210" y="210" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
+因此最终顺序是 `(c, b, a)`，而不是 `(c, b, a, b)`。
 
-  <text x="70" y="234" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="140" y="234" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="210" y="234" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-
-  <!-- Explanation -->
-  <rect x="280" y="40" width="520" height="92" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2"/>
-  <text x="300" y="64" font-size="10" font-weight="600" fill="var(--d-text)">主键是 (a, b)，二级索引叶子项会补上“还没出现的主键列”</text>
-  <text x="300" y="88" font-size="10" fill="var(--d-blue)">KEY c：显式 c，隐含 a,b，最终顺序是 (c, a, b)</text>
-  <text x="300" y="108" font-size="10" fill="var(--d-orange)">KEY ca：显式 c,a，隐含 b，最终顺序仍然是 (c, a, b)</text>
-  <text x="300" y="128" font-size="10" fill="var(--d-green)">KEY cb：显式 c,b，隐含 a，最终顺序才会变成 (c, b, a)</text>
-
-  <text x="275" y="260" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-orange)">KEY c 与 KEY ca 的叶子项完全相同</text>
-
-  <!-- KEY c -->
-  <rect x="20" y="280" width="240" height="204" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
-  <rect x="20" y="280" width="240" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2"/>
-  <text x="140" y="298" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-blue)">KEY c</text>
-  <text x="140" y="322" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">显式 c，隐含 a,b，最终是 (c,a,b)</text>
-  <text x="70" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">c</text>
-  <text x="140" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">a</text>
-  <text x="210" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">b</text>
-  <line x1="20" y1="350" x2="260" y2="350" stroke="var(--d-border)" stroke-width="1"/>
-  <line x1="95" y1="330" x2="95" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-  <line x1="165" y1="330" x2="165" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-
-  <text x="70" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="140" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="210" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-
-  <text x="70" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="140" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="210" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="70" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="140" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="210" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="70" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="140" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="210" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-
-  <text x="70" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="140" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="210" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-
-  <text x="70" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-  <text x="140" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="210" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-
-  <!-- KEY ca -->
-  <rect x="290" y="280" width="240" height="204" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-orange)" stroke-width="1.2"/>
-  <rect x="290" y="280" width="240" height="28" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-orange)" stroke-width="1.2"/>
-  <rect x="462" y="286" width="54" height="16" rx="8" fill="var(--d-orange)"/>
-  <text x="489" y="297" text-anchor="middle" font-size="8" font-weight="600" fill="white">冗余</text>
-  <text x="410" y="298" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-orange)">KEY ca</text>
-  <text x="410" y="322" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">显式 c,a，隐含 b，最终仍是 (c,a,b)</text>
-  <text x="340" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">c</text>
-  <text x="410" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">a</text>
-  <text x="480" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">b</text>
-  <line x1="290" y1="350" x2="530" y2="350" stroke="var(--d-border)" stroke-width="1"/>
-  <line x1="365" y1="330" x2="365" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-  <line x1="435" y1="330" x2="435" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-
-  <text x="340" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="410" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="480" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-
-  <text x="340" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="410" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="480" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="340" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="410" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="480" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="340" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="410" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="480" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-
-  <text x="340" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="410" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="480" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-
-  <text x="340" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-  <text x="410" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="480" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-
-  <!-- KEY cb -->
-  <rect x="560" y="280" width="240" height="204" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.2"/>
-  <rect x="560" y="280" width="240" height="28" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-green)" stroke-width="1.2"/>
-  <rect x="724" y="286" width="62" height="16" rx="8" fill="var(--d-green)"/>
-  <text x="755" y="297" text-anchor="middle" font-size="8" font-weight="600" fill="white">顺序不同</text>
-  <text x="680" y="298" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-green)">KEY cb</text>
-  <text x="680" y="322" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">显式 c,b，隐含 a，最终变成 (c,b,a)</text>
-  <text x="610" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">c</text>
-  <text x="680" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">b</text>
-  <text x="750" y="342" text-anchor="middle" font-size="9" font-weight="600" fill="var(--d-text)">a</text>
-  <line x1="560" y1="350" x2="800" y2="350" stroke="var(--d-border)" stroke-width="1"/>
-  <line x1="635" y1="330" x2="635" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-  <line x1="705" y1="330" x2="705" y2="484" stroke="var(--d-border)" stroke-width="0.8"/>
-
-  <text x="610" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="680" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="750" y="370" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="610" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="680" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="750" y="392" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-
-  <text x="610" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="680" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-  <text x="750" y="414" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <text x="610" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="680" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-  <text x="750" y="436" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-
-  <text x="610" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="680" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-  <text x="750" y="458" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
-
-  <text x="610" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
-  <text x="680" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
-  <text x="750" y="480" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
-
-  <!-- Summary -->
-  <rect x="20" y="500" width="780" height="24" rx="6" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2"/>
-  <text x="410" y="516" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">结论：KEY c 足以支持 where c = ? order by a；只有 where c = ? order by b 才需要额外考虑 KEY cb</text>
-</svg>
-</div>
+如果真的按 `(c, b, a, b)` 存，最后那个 `b` 就完全是冗余的。因为对 InnoDB 来说，前面的 `(c, b, a)` 已经足以唯一确定这一条记录，再多存一个 `b` 既不能提升排序能力，也不能提升查找能力，反而只会浪费索引空间和 Buffer Pool。
 
 也就是说，`KEY ca (c, a)` 基本是多此一举的。因为 `KEY c (c)` 实际上已经按 `(c, a, b)` 排序了，它天然就能支持下面这类语句：
 

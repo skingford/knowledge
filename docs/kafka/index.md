@@ -37,6 +37,6 @@ description: 系统整理 Kafka 核心知识，涵盖消息模型、可靠性机
 
 - [Go 代码实现：消息队列、事务、治理与高可用](/golang/guide/08-mq-transaction-governance-ha)
 - [高并发支付系统专题整理](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
-- [高并发支付系统：Redis 篇](/architecture/case-studies/high-concurrency-payment-redis)
+- [Redis 专题](/redis/)
 - [MySQL 专题](/mysql/)
 - [PostgreSQL 专题](/postgresql/)

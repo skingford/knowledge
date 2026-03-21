@@ -19,6 +19,26 @@ type DiagramKind =
   | 'json-stream-decoder'
   | 'io-primitives'
   | 'io-pipe-stream'
+  | 'fs-abstraction'
+  | 'walkdir-flow'
+  | 'tar-archive-layout'
+  | 'zip-central-directory'
+  | 'gzip-stream'
+  | 'gzip-writer-pool'
+  | 'embed-build-flow'
+  | 'path-filepath-compare'
+  | 'filepath-symlink'
+  | 'base64-encoding-flow'
+  | 'base64-streaming'
+  | 'binary-byte-order'
+  | 'binary-varint'
+  | 'csv-reader-writer'
+  | 'csv-streaming'
+  | 'gob-type-stream'
+  | 'gob-register'
+  | 'hex-encode-dump'
+  | 'xml-tag-mapping'
+  | 'xml-token-stream'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -41,6 +61,26 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'json-stream-decoder': '760px',
   'io-primitives': '760px',
   'io-pipe-stream': '760px',
+  'fs-abstraction': '760px',
+  'walkdir-flow': '760px',
+  'tar-archive-layout': '760px',
+  'zip-central-directory': '760px',
+  'gzip-stream': '760px',
+  'gzip-writer-pool': '760px',
+  'embed-build-flow': '760px',
+  'path-filepath-compare': '760px',
+  'filepath-symlink': '760px',
+  'base64-encoding-flow': '760px',
+  'base64-streaming': '760px',
+  'binary-byte-order': '760px',
+  'binary-varint': '760px',
+  'csv-reader-writer': '760px',
+  'csv-streaming': '760px',
+  'gob-type-stream': '760px',
+  'gob-register': '760px',
+  'hex-encode-dump': '760px',
+  'xml-tag-mapping': '760px',
+  'xml-token-stream': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -592,6 +632,646 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="641" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">逐条 Decode + 输出</text>
 
       <text x="380" y="194" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">常见用法：流式 JSON、multipart 上传、边压缩边上传。它很像内存里的同步管道，而不是可积压数据的缓冲队列</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'fs-abstraction'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="io/fs 文件系统抽象图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`io/fs` 的关键抽象是：只要实现 `Open`，真实磁盘、嵌入资源、测试内存文件系统都能被同一套工具函数消费</text>
+
+      <rect x="24" y="58" width="164" height="146" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="106" y="82" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">实现侧</text>
+      <text x="106" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">embed.FS</text>
+      <text x="106" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">os.DirFS(".")</text>
+      <text x="106" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">fstest.MapFS</text>
+      <text x="106" y="168" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">生产 / 嵌入 / 测试</text>
+      <text x="106" y="184" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">只换实现，不换调用者</text>
+
+      <line x1="188" y1="132" x2="286" y2="132" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="286" y="48" width="188" height="168" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="72" text-anchor="middle" font-size="11" fill="var(--d-text)">fs.FS</text>
+      <text x="380" y="92" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">最小接口：Open(name)</text>
+      <text x="380" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">按需扩展：</text>
+      <text x="380" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ReadDirFS / ReadFileFS</text>
+      <text x="380" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">StatFS / GlobFS / SubFS</text>
+      <text x="380" y="178" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">路径统一用 `/`，根目录是 `.`</text>
+      <text x="380" y="194" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">调用方不用关心底层来源</text>
+
+      <line x1="474" y1="132" x2="572" y2="132" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="572" y="58" width="164" height="146" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="654" y="82" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">消费侧</text>
+      <text x="654" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">fs.ReadFile</text>
+      <text x="654" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">fs.ReadDir / fs.Stat</text>
+      <text x="654" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">fs.WalkDir / fs.Sub</text>
+      <text x="654" y="168" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">loadConfig(fsys)</text>
+      <text x="654" y="184" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">http.FileServer(http.FS(...))</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'walkdir-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="fs.WalkDir 递归流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`WalkDir` 的主线是：先 `Stat(root)`，再回调当前节点；若是目录则读取子项继续递归，回调返回值控制是否跳过</text>
+
+      <rect x="28" y="94" width="124" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="90" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">fs.WalkDir</text>
+      <text x="90" y="130" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">(fsys, root, fn)</text>
+
+      <line x1="152" y1="118" x2="250" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="250" y="78" width="148" height="80" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="324" y="100" text-anchor="middle" font-size="11" fill="var(--d-text)">Stat(root)</text>
+      <text x="324" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">失败也会回调 fn(path,nil,err)</text>
+      <text x="324" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">成功后包装成 DirEntry</text>
+
+      <line x1="398" y1="118" x2="494" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="494" y="66" width="156" height="104" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="572" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">fn(path, d, err)</text>
+      <text x="572" y="108" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">文件：处理完返回</text>
+      <text x="572" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">目录：决定是否继续向下</text>
+      <text x="572" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">SkipDir / SkipAll 控制遍历</text>
+
+      <line x1="572" y1="170" x2="572" y2="214" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="454" y="214" width="236" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="572" y="232" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">如果是目录，就 ReadDir 后对子节点重复同样流程</text>
+
+      <rect x="88" y="190" width="246" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="211" y="212" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">隐藏目录过滤、错误短路、跳过分支，本质都靠回调返回值表达</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'tar-archive-layout'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="archive/tar 顺序归档图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">TAR 是严格顺序格式：`Header(512B) + Data` 一条一条排，Reader 只能从前往后扫，Writer 也必须按顺序写完</text>
+
+      <rect x="24" y="70" width="120" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="84" y="90" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Header #1</text>
+      <text x="84" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">name / mode / size</text>
+      <rect x="144" y="70" width="98" height="48" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="193" y="90" text-anchor="middle" font-size="10" fill="var(--d-text)">Data #1</text>
+      <text x="193" y="106" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">补齐到 512B</text>
+      <rect x="260" y="70" width="120" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="320" y="90" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Header #2</text>
+      <text x="320" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">目录 / 链接 / 文件</text>
+      <rect x="380" y="70" width="98" height="48" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="429" y="90" text-anchor="middle" font-size="10" fill="var(--d-text)">Data #2</text>
+      <text x="429" y="106" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">顺序写入</text>
+      <rect x="496" y="70" width="152" height="48" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="572" y="90" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">两个全零 512B block</text>
+      <text x="572" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">归档结束标记</text>
+
+      <rect x="42" y="156" width="168" height="60" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="126" y="178" text-anchor="middle" font-size="10" fill="var(--d-text)">tar.Writer</text>
+      <text x="126" y="196" text-anchor="middle" font-size="9" fill="var(--d-text)">WriteHeader -> Write(data)</text>
+
+      <line x1="210" y1="186" x2="316" y2="186" stroke="var(--d-border)" stroke-width="1.4" />
+      <rect x="316" y="156" width="128" height="60" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="178" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">gzip.Writer</text>
+      <text x="380" y="196" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">tar.gz 时包在外层</text>
+
+      <line x1="444" y1="186" x2="552" y2="186" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <rect x="552" y="156" width="166" height="60" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="635" y="178" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">tar.Reader</text>
+      <text x="635" y="196" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Next() -> 读当前文件内容</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'zip-central-directory'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="ZIP 中央目录图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">ZIP 和 TAR 最大的差别在末尾的中央目录：Reader 先从文件尾部定位目录，再反查每个文件的数据偏移</text>
+
+      <rect x="24" y="78" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="83" y="98" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Local Header #1</text>
+      <text x="83" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">+ Data #1</text>
+      <rect x="152" y="78" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="211" y="98" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Local Header #2</text>
+      <text x="211" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">+ Data #2</text>
+      <rect x="290" y="68" width="204" height="68" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="392" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">Central Directory</text>
+      <text x="392" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">文件名 / 方法 / CRC / 偏移量</text>
+      <text x="392" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">汇总所有条目的元数据</text>
+      <rect x="516" y="78" width="190" height="48" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="611" y="98" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">EOCD</text>
+      <text x="611" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">记录中央目录位置和长度</text>
+
+      <rect x="44" y="168" width="172" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="130" y="190" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">zip.NewReader</text>
+      <text x="130" y="208" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">需要 ReaderAt + size</text>
+
+      <line x1="216" y1="196" x2="344" y2="196" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <rect x="344" y="160" width="188" height="72" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="438" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">先从文件尾向前找 EOCD</text>
+      <text x="438" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">再读中央目录，拿到每个文件偏移</text>
+      <text x="438" y="216" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">最后 File.Open() 随机跳过去读</text>
+
+      <text x="654" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 ZIP 支持随机访问，TAR 不行</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'gzip-stream'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="gzip 流式压缩图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">gzip 的主线是：写入时边做 DEFLATE 边累计 CRC32，最后 `Close` 把 trailer 写出来；读时先解头，再流式解压</text>
+
+      <rect x="24" y="82" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="83" y="102" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">src bytes</text>
+      <text x="83" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">file / HTTP body</text>
+
+      <line x1="142" y1="106" x2="246" y2="106" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="246" y="58" width="188" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="340" y="82" text-anchor="middle" font-size="11" fill="var(--d-text)">gzip.Writer</text>
+      <text x="340" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">写 header</text>
+      <text x="340" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Write -> flate.Writer 压缩</text>
+      <text x="340" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">同时累计 CRC32 和原始大小</text>
+
+      <line x1="434" y1="106" x2="534" y2="106" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="534" y="66" width="186" height="80" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="627" y="88" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">gzip stream</text>
+      <text x="627" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">header + deflate blocks</text>
+      <text x="627" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Close 时再补 trailer</text>
+      <text x="627" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">CRC32 + size</text>
+
+      <rect x="160" y="180" width="440" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="201" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`Flush` 只把当前压缩块往下游推，不结束流；`Close` 才真正把 trailer 写完整</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'gzip-writer-pool'"
+      viewBox="0 0 760 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="gzip Writer 池化复用图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">高并发下复用 `gzip.Writer` 的重点不是省几行代码，而是避免每个请求都重新分配压缩器内部状态</text>
+
+      <rect x="34" y="86" width="110" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="89" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">request</text>
+      <text x="89" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">need gzip</text>
+
+      <line x1="144" y1="110" x2="238" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="238" y="70" width="140" height="80" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="308" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">sync.Pool</text>
+      <text x="308" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Get() 取已有 Writer</text>
+      <text x="308" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">空时才 NewWriterLevel</text>
+
+      <line x1="378" y1="110" x2="486" y2="110" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="486" y="60" width="142" height="100" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="557" y="82" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">gz.Reset(w)</text>
+      <text x="557" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">绑定新目标</text>
+      <text x="557" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Write / Close</text>
+      <text x="557" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">完成一次压缩</text>
+
+      <line x1="628" y1="110" x2="720" y2="110" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="600" y="176" width="132" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="666" y="194" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Reset(io.Discard) 后 Put()</text>
+
+      <rect x="84" y="176" width="392" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="280" y="194" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">没 `Close` 就回池会丢 trailer；没 `Reset(io.Discard)` 就可能把旧目标留在内部状态里</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'embed-build-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="embed 编译时打包流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`embed` 的关键不是运行时读文件，而是编译时把匹配资源打进二进制的只读段，运行时只是在读内存</text>
+
+      <rect x="26" y="88" width="142" height="62" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="97" y="110" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">//go:embed</text>
+      <text x="97" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">static / templates/*.html</text>
+
+      <line x1="168" y1="119" x2="266" y2="119" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="266" y="74" width="170" height="92" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="351" y="98" text-anchor="middle" font-size="11" fill="var(--d-text)">编译器阶段</text>
+      <text x="351" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">扫描注释并匹配文件</text>
+      <text x="351" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">读取内容并生成初始化数据</text>
+      <text x="351" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">写入可执行文件 `.rodata`</text>
+
+      <line x1="436" y1="119" x2="540" y2="119" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="540" y="72" width="194" height="96" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="637" y="96" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">运行时变量</text>
+      <text x="637" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">embed.FS / []byte / string</text>
+      <text x="637" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">直接指向只读数据</text>
+      <text x="637" y="152" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">不需要额外磁盘 I/O</text>
+
+      <rect x="176" y="196" width="408" height="32" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="216" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">所以部署时常见用法是：单二进制 + 内嵌静态资源，再通过 `http.FS` / `template.ParseFS` / `fs.Sub` 统一消费</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'path-filepath-compare'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="path 与 filepath 对比图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`path` 是纯斜杠字符串处理，`filepath` 才是操作系统感知路径处理；把两者混用，最容易踩在 Windows 和虚拟文件系统边界上</text>
+
+      <rect x="26" y="56" width="210" height="150" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="131" y="80" text-anchor="middle" font-size="12" fill="var(--d-rv-c-text)">path</text>
+      <text x="131" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">始终用 `/`</text>
+      <text x="131" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">适合 URL、路由、embed.FS</text>
+      <text x="131" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">不访问文件系统</text>
+      <text x="131" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">path.Join("a", "b")</text>
+      <text x="131" y="182" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">=> a/b</text>
+
+      <rect x="274" y="56" width="212" height="150" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="80" text-anchor="middle" font-size="12" fill="var(--d-text)">filepath</text>
+      <text x="380" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">感知 `Separator` / `ListSeparator`</text>
+      <text x="380" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Join / Abs / Rel / EvalSymlinks</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">既做字符串规整，也会与 OS 语义互动</text>
+      <text x="380" y="166" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">filepath.Join("a", "b")</text>
+      <text x="380" y="182" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">=> Unix `a/b`，Windows `a\\b`</text>
+
+      <rect x="524" y="56" width="210" height="150" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="629" y="80" text-anchor="middle" font-size="12" fill="var(--d-rv-a-text)">经验法则</text>
+      <text x="629" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">虚拟路径：`path`</text>
+      <text x="629" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">真实磁盘路径：`filepath`</text>
+      <text x="629" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">`embed.FS` + URL 路径别用 `filepath`</text>
+      <text x="629" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">跨平台工具链优先 `filepath`</text>
+      <text x="629" y="182" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">规范化不等于安全校验</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'filepath-symlink'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="filepath 与符号链接图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`filepath.WalkDir` 默认不跟随目录符号链接，这不是缺陷，而是为了避免递归环和意外把遍历范围扩大</text>
+
+      <rect x="38" y="84" width="138" height="56" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="107" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">root/link-to-data</text>
+      <text x="107" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">目录符号链接</text>
+
+      <line x1="176" y1="112" x2="282" y2="112" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="282" y="68" width="170" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="367" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">filepath.WalkDir</text>
+      <text x="367" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">底层先 `os.Lstat`</text>
+      <text x="367" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">拿到“链接自身”而不是目标目录</text>
+      <text x="367" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">因此不会自动深入该链接</text>
+
+      <line x1="452" y1="112" x2="552" y2="112" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="552" y="76" width="174" height="72" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="639" y="98" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">如果业务必须跟随链接</text>
+      <text x="639" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">手动 `EvalSymlinks(path)`</text>
+      <text x="639" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">并自行做去重 / 防环处理</text>
+
+      <rect x="154" y="182" width="452" height="30" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="201" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`Clean` 只做字符串规整；真正涉及链接解析、目录越权和循环引用时，必须进入 `Lstat / EvalSymlinks / Abs` 这一层</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'base64-encoding-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Base64 3字节转4字符图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Base64 的核心动作只有一件事：把 24 bit 拆成 4 个 6 bit 索引，再按字母表换成可打印字符</text>
+
+      <rect x="30" y="84" width="138" height="54" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="99" y="104" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">3 bytes</text>
+      <text x="99" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">24 bits 原始数据</text>
+
+      <line x1="168" y1="111" x2="278" y2="111" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="278" y="68" width="204" height="86" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">切成 4 组 6 bits</text>
+      <text x="380" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">c0 c1 c2 c3</text>
+      <text x="380" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">每组范围 0~63</text>
+      <text x="380" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">再用 `Encoding.encode[64]` 查表</text>
+
+      <line x1="482" y1="111" x2="586" y2="111" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="586" y="56" width="144" height="110" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="658" y="80" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">字母表差异</text>
+      <text x="658" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Std: `+/` + `=`</text>
+      <text x="658" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">URL: `-_` + `=`</text>
+      <text x="658" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Raw: 无 padding</text>
+      <text x="658" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">JWT 常用 RawURL</text>
+
+      <rect x="170" y="186" width="420" height="30" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="205" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">尾部不足 3 字节时才需要 padding；Raw 编码只是把 `=` 去掉，字母表和 6 bit 拆分逻辑本身不变</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'base64-streaming'"
+      viewBox="0 0 760 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Base64 流式编码图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">大文件场景里，Base64 最合适的用法不是 `EncodeToString`，而是把 `NewEncoder / NewDecoder` 当 IO wrapper 夹进拷贝链路里</text>
+
+      <rect x="34" y="86" width="112" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="90" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">src Reader</text>
+      <text x="90" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">file / body</text>
+
+      <line x1="146" y1="110" x2="248" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="248" y="68" width="182" height="84" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="339" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">io.Copy(encoder, src)</text>
+      <text x="339" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">encoder := base64.NewEncoder(...)</text>
+      <text x="339" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">内部缓存尾部 1~2 字节</text>
+      <text x="339" y="142" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">凑满 3 字节再输出 4 字符</text>
+
+      <line x1="430" y1="110" x2="534" y2="110" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="534" y="86" width="194" height="48" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="631" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">dst Writer / Reader</text>
+      <text x="631" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">socket / file / HTTP response</text>
+
+      <rect x="190" y="176" width="380" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="194" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`NewEncoder` 必须 `Close`，否则最后那点没凑满 3 字节的尾巴不会刷出 padding；`NewDecoder` 则作为 Reader 直接消费即可</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'binary-byte-order'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="encoding/binary 字节序图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`encoding/binary` 真正解决的是“整数如何拆成字节序列”，而不是帮你猜协议格式；协议先定好大小端，代码才能正确读写</text>
+
+      <rect x="40" y="62" width="300" height="128" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="190" y="86" text-anchor="middle" font-size="12" fill="var(--d-rv-c-text)">BigEndian / Network Order</text>
+      <text x="190" y="112" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">uint32(0x01020304)</text>
+      <text x="190" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">[01] [02] [03] [04]</text>
+      <text x="190" y="158" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">网络协议、文件头常见</text>
+      <text x="190" y="174" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">高位字节先写</text>
+
+      <rect x="420" y="62" width="300" height="128" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="570" y="86" text-anchor="middle" font-size="12" fill="var(--d-text)">LittleEndian</text>
+      <text x="570" y="112" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">uint32(0x01020304)</text>
+      <text x="570" y="132" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">[04] [03] [02] [01]</text>
+      <text x="570" y="158" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">CPU 内存布局常见</text>
+      <text x="570" y="174" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">低位字节先写</text>
+
+      <rect x="172" y="202" width="416" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="220" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">高性能场景优先 `PutUint32/Uint32` 直接处理字节；`binary.Read/Write` 更像反射版便利层，适合结构体原型，不适合热路径</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'binary-varint'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Varint 变长整数图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Varint 的核心是“每字节只拿 7 bit 存数据，最高位做 continuation 标记”，值越小，占字节越少</text>
+
+      <rect x="42" y="86" width="122" height="50" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="103" y="107" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">uint64 value</text>
+      <text x="103" y="123" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">按 7 bit 切块</text>
+
+      <line x1="164" y1="111" x2="276" y2="111" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="276" y="66" width="208" height="90" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="90" text-anchor="middle" font-size="11" fill="var(--d-text)">b0 b1 b2 ...</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">低 7 位存 payload</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">最高位 1 = 后面还有字节</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">最高位 0 = 结束</text>
+
+      <line x1="484" y1="111" x2="588" y2="92" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="484" y1="111" x2="588" y2="130" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="588" y="74" width="138" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="657" y="96" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">小数值：1 byte 就够</text>
+      <rect x="588" y="118" width="138" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="657" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">大数值：多 byte 继续拼</text>
+
+      <rect x="148" y="180" width="464" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="198" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`PutUvarint/Uvarint` 处理无符号；`PutVarint/Varint` 会对有符号值做额外编码以避免负数把长度拖到很大</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'csv-reader-writer'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="CSV Reader Writer 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`encoding/csv` 的核心不是一次性读成二维数组，而是围绕 `Reader.Read` / `Writer.Write` 做逐行流式处理</text>
+
+      <rect x="24" y="74" width="150" height="118" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="99" y="98" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">csv.Reader</text>
+      <text x="99" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Read() -> []string</text>
+      <text x="99" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Comma / Comment</text>
+      <text x="99" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">FieldsPerRecord</text>
+      <text x="99" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">LazyQuotes / TrimLeadingSpace</text>
+
+      <line x1="174" y1="133" x2="292" y2="133" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="292" y="62" width="176" height="142" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">CSV 规则层</text>
+      <text x="380" y="106" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">包含逗号 / 引号 / 换行时要加双引号</text>
+      <text x="380" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">字段内 `\"` 要写成 `\"\"`</text>
+      <text x="380" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Reader 逐字段切，Writer 负责转义</text>
+      <text x="380" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">本质还是文本流，不是数据库表</text>
+
+      <line x1="468" y1="133" x2="586" y2="133" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="586" y="74" width="150" height="118" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="661" y="98" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">csv.Writer</text>
+      <text x="661" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Write(record)</text>
+      <text x="661" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">WriteAll(records)</text>
+      <text x="661" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Flush() + Error()</text>
+      <text x="661" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">可改 `Comma` 生成 TSV</text>
+
+      <text x="380" y="226" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`ReadAll` / `WriteAll` 只是便利接口。数据量一大，真正安全的心智模型还是“逐行读，逐行处理，逐行写”</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'csv-streaming'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="CSV 大文件流式处理图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">CSV 大文件场景里最容易忽略的细节是 `ReuseRecord` 和 `Flush`：一个影响内存复用，一个决定写出的数据什么时候真正落到下游</text>
+
+      <rect x="34" y="76" width="190" height="108" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="129" y="100" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">读取链路</text>
+      <text x="129" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">bufio.Reader -> csv.Reader</text>
+      <text x="129" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">ReuseRecord = true</text>
+      <text x="129" y="152" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">同一个 `[]string` 反复复用</text>
+      <text x="129" y="168" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">要持久保存必须自己 copy</text>
+
+      <rect x="286" y="76" width="188" height="108" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="100" text-anchor="middle" font-size="11" fill="var(--d-text)">处理层</text>
+      <text x="380" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">逐行转换 / 校验 / 聚合</text>
+      <text x="380" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">错误行决定跳过还是中断</text>
+      <text x="380" y="152" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">避免 `ReadAll` 吃满内存</text>
+
+      <rect x="536" y="76" width="190" height="108" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="631" y="100" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">输出链路</text>
+      <text x="631" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">csv.Writer -> HTTP / file</text>
+      <text x="631" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">逐行 Write</text>
+      <text x="631" y="152" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">最后 Flush() + Error()</text>
+      <text x="631" y="168" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">否则尾部可能还在缓冲里</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'gob-type-stream'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="gob 自描述流图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">gob 的关键特征是“自描述流”：首次发某种类型时，会先发类型描述，再发值；后续同类型值就只发数据本体</text>
+
+      <rect x="34" y="88" width="130" height="48" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="99" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Encoder.Encode(v)</text>
+      <text x="99" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">第一次见到类型</text>
+
+      <line x1="164" y1="112" x2="280" y2="112" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="280" y="64" width="200" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="88" text-anchor="middle" font-size="11" fill="var(--d-text)">gob stream</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">typeId -> wireType 描述</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">再跟 value payload</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">后续相同类型复用已有 typeId</text>
+
+      <line x1="480" y1="112" x2="588" y2="112" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="588" y="74" width="138" height="76" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="657" y="96" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Decoder</text>
+      <text x="657" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">缓存 typeId -> 本地类型</text>
+      <text x="657" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">按字段名匹配解码</text>
+
+      <rect x="174" y="188" width="412" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="206" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">这也是 gob 适合 Go 内部 RPC / IPC 的原因：不用单独 schema 文件，但也因此不适合跨语言协议边界</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'gob-register'"
+      viewBox="0 0 760 220"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="gob Register 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">接口值通过 gob 传输时，真正关键的是先 `Register` 具体实现类型，否则 Decoder 根本不知道该落到哪个 concrete type</text>
+
+      <rect x="36" y="86" width="166" height="62" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="119" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Canvas{ Shapes []Shape }</text>
+      <text x="119" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">里面放 Rect / Tri</text>
+
+      <line x1="202" y1="117" x2="314" y2="117" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="314" y="68" width="132" height="98" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="90" text-anchor="middle" font-size="11" fill="var(--d-text)">gob.Register</text>
+      <text x="380" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Rect{}</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Tri{}</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">建立名字 -> 类型映射</text>
+
+      <line x1="446" y1="117" x2="558" y2="117" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="558" y="86" width="168" height="62" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="642" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">解码时恢复具体类型</text>
+      <text x="642" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">再塞回接口字段</text>
+
+      <rect x="178" y="184" width="404" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="202" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">没注册时，普通结构体字段仍能解，但接口字段常会直接失败，这也是 gob 在复杂接口模型里最容易被忘的前置条件</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'hex-encode-dump'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="hex 编码与 dump 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">十六进制编码的核心比 Base64 更直接：每个字节拆成高 4 位和低 4 位，各自查一次 16 进制字符表</text>
+
+      <rect x="38" y="82" width="118" height="52" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="97" y="103" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">byte 0xAB</text>
+      <text x="97" y="121" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">高4位 A / 低4位 B</text>
+
+      <line x1="156" y1="108" x2="270" y2="108" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="270" y="68" width="192" height="80" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="366" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">hextable</text>
+      <text x="366" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">0123456789abcdef</text>
+      <text x="366" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">1 byte -> 2 chars</text>
+
+      <line x1="462" y1="108" x2="576" y2="108" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="576" y="60" width="150" height="96" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="651" y="84" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">输出形态</text>
+      <text x="651" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">`deadbeef`</text>
+      <text x="651" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">`hex.Dump(data)`</text>
+      <text x="651" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">地址 + hex + ASCII 预览</text>
+
+      <rect x="160" y="182" width="440" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="200" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">解码时最常见的两个错误也最朴素：奇数长度和非 `[0-9a-fA-F]` 字符；`DecodeString` 在入口就会把它们拦下来</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'xml-tag-mapping'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="XML 标签映射图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">XML 标签映射比 JSON 更复杂，因为它不仅有“字段名”，还有属性、文本节点、嵌套路径和命名空间</text>
+
+      <rect x="28" y="62" width="250" height="150" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="153" y="86" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">struct tags</text>
+      <text x="153" y="110" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">xml:"person"</text>
+      <text x="153" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">xml:"id,attr"</text>
+      <text x="153" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">xml:",chardata"</text>
+      <text x="153" y="158" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">xml:"contact>email"</text>
+      <text x="153" y="174" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">xml:"ns name"</text>
+
+      <line x1="278" y1="137" x2="384" y2="137" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="384" y="62" width="348" height="150" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="558" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">XML 结果形态</text>
+      <text x="558" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">&lt;person id="1"&gt;</text>
+      <text x="558" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">&lt;name&gt;Alice&lt;/name&gt;</text>
+      <text x="558" y="142" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">&lt;contact&gt;&lt;email&gt;...&lt;/email&gt;&lt;/contact&gt;</text>
+      <text x="558" y="158" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">属性、文本节点、子元素可以同时出现</text>
+      <text x="558" y="174" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">命名空间通过 `xml.Name{Space, Local}` 体现</text>
+
+      <text x="380" y="234" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">这也是 XML 比 JSON 更适合文档和协议封装的原因，但反过来，标签语义也更容易复杂到需要直接下到 `Token()` 级别处理</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'xml-token-stream'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="XML Token 流图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">大 XML 文件场景里，真正可控的主线是 `Decoder.Token()`：边读边产出 token，命中目标元素后再选择手工处理或 `DecodeElement`</text>
+
+      <rect x="30" y="86" width="126" height="48" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="93" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">io.Reader</text>
+      <text x="93" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">XML stream</text>
+
+      <line x1="156" y1="110" x2="266" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="266" y="64" width="202" height="92" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="367" y="88" text-anchor="middle" font-size="11" fill="var(--d-text)">xml.Decoder.Token()</text>
+      <text x="367" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">StartElement / EndElement</text>
+      <text x="367" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">CharData / Comment / ProcInst</text>
+      <text x="367" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">逐 token 前进，不必整文档入内存</text>
+
+      <line x1="468" y1="110" x2="580" y2="92" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="468" y1="110" x2="580" y2="128" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="580" y="74" width="148" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="654" y="95" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">手工 switch token 处理</text>
+      <rect x="580" y="118" width="148" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="654" y="139" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">命中 StartElement 后 DecodeElement</text>
+
+      <rect x="170" y="184" width="420" height="28" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="202" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">当输入不是 UTF-8 时，要先给 `CharsetReader`；否则 Token 流还没开始，解码就会在字符集阶段失败</text>
     </svg>
   </DiagramFrame>
 </template>

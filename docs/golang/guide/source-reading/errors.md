@@ -6,6 +6,8 @@ description: 精读 errors.New/Is/As/Unwrap/Join 实现，理解 Go 错误链设
 # errors 包：错误处理源码精读
 
 > 核心源码：`src/errors/errors.go`、`src/errors/wrap.go`（共约 200 行）
+>
+> 图例参考：复用 [错误处理设计](../01-error-handling-design.md) 里的错误链图，先把 sentinel error、包装链、`Is/As` 的分层处理关系看清，再回头读 `wrap.go`。
 
 ## 包结构图
 
@@ -73,6 +75,8 @@ func New(text string) error {
 ---
 
 ## 二、错误包装链
+
+<GoLanguageDiagram kind="error-chain" />
 
 ```
 错误树结构

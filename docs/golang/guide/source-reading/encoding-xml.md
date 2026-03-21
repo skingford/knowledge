@@ -6,8 +6,12 @@ description: 精读 encoding/xml 的标签驱动编解码机制，理解 XML 与
 # encoding/xml：XML 编解码源码精读
 
 > 核心源码：`src/encoding/xml/xml.go`、`src/encoding/xml/marshal.go`
+>
+> 图例参考：这里补了 XML 标签映射图和 Token 流图，先分清元素、属性、文本节点、命名空间和 `Token()/DecodeElement` 的层次，再回头读 `xml.go` / `marshal.go`。
 
 ## 包结构图
+
+<GoNetworkDiagram kind="xml-tag-mapping" />
 
 ```
 encoding/xml 核心组件
@@ -129,6 +133,8 @@ type Config struct {
 ```
 
 ### 流式解析大 XML 文件（Token 流）
+
+<GoNetworkDiagram kind="xml-token-stream" />
 
 ```go
 // 不需要将整个 XML 加载到内存

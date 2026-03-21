@@ -6,6 +6,10 @@ description: 精读 Go crypto/cipher 分组密码接口体系，掌握 AEAD/AES-
 # crypto/cipher：分组密码接口源码精读
 
 > 核心源码：`src/crypto/cipher/gcm.go`、`src/crypto/cipher/ctr.go`、`src/crypto/aes/aes.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`cipher-interface-stack`
+> - `GoSecurityDiagram`：`aead-seal-open`
 
 ## 包结构图
 
@@ -51,6 +55,8 @@ crypto/cipher 体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoSecurityDiagram kind="cipher-interface-stack" />
+
 ---
 
 ## 一、核心实现
@@ -93,6 +99,8 @@ func (g *gcm) Open(dst, nonce, ciphertext, data []byte) ([]byte, error) {
     return ret, nil
 }
 ```
+
+<GoSecurityDiagram kind="aead-seal-open" />
 
 ---
 

@@ -6,15 +6,29 @@ type DiagramKind =
   | 'overview'
   | 'project-layout'
   | 'go-mod-lifecycle'
+  | 'flag-parse-flow'
+  | 'expvar-http-flow'
+  | 'buildinfo-read-flow'
+  | 'fstest-mapfs'
+  | 'os-user-backends'
+  | 'cgo-call-bridge'
+  | 'cobra-viper-flow'
+  | 'go-generate-pipeline'
   | 'slog-pipeline'
+  | 'os-file-open'
+  | 'exec-cmd-lifecycle'
+  | 'signal-notify-flow'
+  | 'log-output-flow'
   | 'config-priority'
   | 'error-code-system'
   | 'middleware-stack'
   | 'code-style-principles'
   | 'unit-test-patterns'
+  | 'testing-run-flow'
   | 'mock-boundary'
   | 'integration-lifecycle'
   | 'benchmark-reading'
+  | 'fuzz-lifecycle'
   | 'ci-pipeline'
 
 const props = defineProps<{
@@ -25,15 +39,29 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   overview: '760px',
   'project-layout': '760px',
   'go-mod-lifecycle': '760px',
+  'flag-parse-flow': '760px',
+  'expvar-http-flow': '760px',
+  'buildinfo-read-flow': '760px',
+  'fstest-mapfs': '760px',
+  'os-user-backends': '760px',
+  'cgo-call-bridge': '760px',
+  'cobra-viper-flow': '760px',
+  'go-generate-pipeline': '760px',
   'slog-pipeline': '760px',
+  'os-file-open': '760px',
+  'exec-cmd-lifecycle': '760px',
+  'signal-notify-flow': '760px',
+  'log-output-flow': '760px',
   'config-priority': '760px',
   'error-code-system': '760px',
   'middleware-stack': '760px',
   'code-style-principles': '760px',
   'unit-test-patterns': '760px',
+  'testing-run-flow': '760px',
   'mock-boundary': '760px',
   'integration-lifecycle': '760px',
   'benchmark-reading': '760px',
+  'fuzz-lifecycle': '760px',
   'ci-pipeline': '760px',
 }
 
@@ -149,6 +177,321 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
+      v-else-if="kind === 'flag-parse-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="flag 解析流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">flag 的主线是：先把所有定义注册进 formal，再按顺序扫描参数，把出现过的项记进 actual，剩下的留给位置参数或子命令</text>
+
+      <rect x="24" y="94" width="124" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="86" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">os.Args[1:]</text>
+      <text x="86" y="130" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">-v -port=8080 file</text>
+
+      <line x1="148" y1="118" x2="242" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="242" y="74" width="156" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="320" y="96" text-anchor="middle" font-size="11" fill="var(--d-text)">FlagSet</text>
+      <text x="320" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">formal: 所有已定义 flag</text>
+      <text x="320" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">parseOne() 逐个消费参数</text>
+      <text x="320" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">bool flag 可直接设 true</text>
+
+      <line x1="398" y1="118" x2="494" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="494" y="62" width="136" height="112" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="562" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Value.Set(string)</text>
+      <text x="562" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">String / Int / Bool</text>
+      <text x="562" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Duration / TextVar</text>
+      <text x="562" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">自定义 Value</text>
+      <text x="562" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">类型转换失败则报错</text>
+
+      <line x1="630" y1="118" x2="726" y2="86" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="630" y1="118" x2="726" y2="150" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="614" y="64" width="122" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="675" y="84" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">actual</text>
+      <text x="675" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">本次命令里出现过的 flag</text>
+      <rect x="614" y="132" width="122" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="675" y="152" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">args</text>
+      <text x="675" y="168" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">非 flag 参数或 `--` 之后的部分</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">子命令模式本质上只是为每个命令各自建一个 FlagSet，再把分发后的参数切片交给它继续解析</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'expvar-http-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="expvar HTTP 暴露流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">expvar 的关键是把进程内变量挂进全局注册表，再通过 `/debug/vars` 按 JSON 一次性导出来</text>
+
+      <rect x="24" y="92" width="138" height="56" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="93" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">业务代码</text>
+      <text x="93" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">NewInt / NewMap / Publish(Func)</text>
+
+      <line x1="162" y1="120" x2="258" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="258" y="72" width="154" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="335" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)">expvar registry</text>
+      <text x="335" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">vars sync.Map</text>
+      <text x="335" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">varKeys 保持稳定输出顺序</text>
+      <text x="335" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">内置 cmdline / memstats</text>
+
+      <line x1="412" y1="120" x2="510" y2="120" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="510" y="72" width="136" height="96" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="578" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">/debug/vars</text>
+      <text x="578" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">import _ &quot;expvar&quot;</text>
+      <text x="578" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">handler 遍历 Do()</text>
+      <text x="578" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">每个 Var.String() 输出 JSON</text>
+
+      <line x1="646" y1="120" x2="736" y2="88" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="646" y1="120" x2="736" y2="152" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="618" y="66" width="118" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="677" y="86" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">curl / 调试脚本</text>
+      <text x="677" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">直接看进程内部状态</text>
+      <rect x="618" y="134" width="118" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="677" y="154" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">轻量观测</text>
+      <text x="677" y="170" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">不是替代 Prometheus 的多维指标系统</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">Int/Float 适合主动累计，Func 适合请求时再现算；两者都只是 `/debug/vars` 输出源，不带拉取频率和告警语义</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'buildinfo-read-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="debug/buildinfo 读取流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">buildinfo 的主线是：链接器把版本和 VCS 信息写进二进制，运行时或离线工具再把它读出来做版本暴露和制品审计</text>
+
+      <rect x="28" y="88" width="132" height="56" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="94" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">go build</text>
+      <text x="94" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">module + deps + vcs.*</text>
+
+      <line x1="160" y1="116" x2="260" y2="116" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="260" y="68" width="170" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="345" y="90" text-anchor="middle" font-size="11" fill="var(--d-text)">binary + .go_buildinfo</text>
+      <text x="345" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">GoVersion / Main / Deps</text>
+      <text x="345" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">vcs.revision / vcs.time</text>
+      <text x="345" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">vcs.modified / GOOS / GOARCH</text>
+
+      <line x1="430" y1="116" x2="520" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="430" y1="116" x2="520" y2="150" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="520" y="62" width="108" height="48" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="574" y="82" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">runtime/debug</text>
+      <text x="574" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">ReadBuildInfo()</text>
+
+      <rect x="520" y="126" width="108" height="48" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="574" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">debug/buildinfo</text>
+      <text x="574" y="162" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">ReadFile(path)</text>
+
+      <line x1="628" y1="86" x2="730" y2="86" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="628" y1="150" x2="730" y2="150" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="610" y="62" width="126" height="48" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="673" y="82" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">版本端点</text>
+      <text x="673" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">/version / healthz header</text>
+      <rect x="610" y="126" width="126" height="48" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="673" y="146" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">制品审计</text>
+      <text x="673" y="162" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">漏洞依赖扫描 / 集群排查</text>
+
+      <text x="380" y="220" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 buildinfo 解决的是“制品自己说明自己是谁”，而不是靠 CI 额外塞一组 ldflags 字符串去赌构建流程没漏掉</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'fstest-mapfs'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="testing/fstest MapFS 测试图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">MapFS 的价值是把“文件系统依赖”换成内存实现，让模板、配置、静态资源逻辑在测试里不碰磁盘也能完整验证</text>
+
+      <rect x="24" y="86" width="150" height="78" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="99" y="108" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">fstest.MapFS</text>
+      <text x="99" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">map[path]*MapFile</text>
+      <text x="99" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Data / Mode / ModTime</text>
+      <text x="99" y="158" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">目录可自动推断</text>
+
+      <line x1="174" y1="125" x2="274" y2="125" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="274" y="74" width="178" height="102" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="363" y="96" text-anchor="middle" font-size="11" fill="var(--d-text)">被测代码只依赖 fs.FS</text>
+      <text x="363" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">fs.ReadFile / fs.Sub / template.ParseFS</text>
+      <text x="363" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">生产可换 embed.FS / os.DirFS</text>
+      <text x="363" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">测试直接注入 MapFS</text>
+      <text x="363" y="162" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">逻辑完全不改</text>
+
+      <line x1="452" y1="125" x2="550" y2="125" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="550" y="86" width="92" height="78" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="596" y="108" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">fstest.TestFS</text>
+      <text x="596" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">规范校验</text>
+      <text x="596" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Open / Stat / ReadDir</text>
+      <text x="596" y="158" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">路径和排序</text>
+
+      <line x1="642" y1="125" x2="732" y2="125" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="622" y="194" width="114" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="679" y="215" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">零磁盘 I/O、易并行、跨平台稳定</text>
+
+      <rect x="118" y="194" width="360" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="298" y="215" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">MapFS 适合验证“文件内容和路径语义”；要测真实权限、符号链接、大小写差异，还得回到 `t.TempDir()` + OS 文件系统</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'os-user-backends'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="os/user 后端选择图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">os/user 的关键不是 API 本身，而是查询到底走 libc/NSS 还是纯 Go 解析本地文件，这决定了它能不能看到 LDAP、NIS 或容器里的动态用户</text>
+
+      <rect x="28" y="96" width="112" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="84" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">user.Current /</text>
+      <text x="84" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Lookup / GroupIds</text>
+
+      <line x1="140" y1="120" x2="244" y2="88" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="140" y1="120" x2="244" y2="152" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+
+      <rect x="244" y="62" width="172" height="58" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="330" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">CGO backend</text>
+      <text x="330" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">getpwnam / getpwuid / NSS</text>
+      <text x="330" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">可见 LDAP / NIS / 企业目录</text>
+
+      <rect x="244" y="136" width="172" height="58" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="330" y="158" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">pure Go backend</text>
+      <text x="330" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">解析 /etc/passwd / /etc/group</text>
+      <text x="330" y="192" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">CGO_ENABLED=0 或 -tags osusergo</text>
+
+      <line x1="416" y1="91" x2="520" y2="91" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="416" y1="165" x2="520" y2="165" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="520" y="62" width="118" height="58" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="579" y="84" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">User / Group</text>
+      <text x="579" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Uid / Gid / HomeDir</text>
+      <text x="579" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">可能来自远程目录服务</text>
+
+      <rect x="520" y="136" width="118" height="58" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="579" y="158" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">User / Group</text>
+      <text x="579" y="174" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">只能看本地条目</text>
+      <text x="579" y="190" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">容器缺失条目时会失败</text>
+
+      <rect x="646" y="96" width="90" height="48" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="691" y="116" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">实战建议</text>
+      <text x="691" y="132" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">只是判断 root 时直接用 os.Getuid()</text>
+
+      <text x="380" y="226" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 `os/user` 更适合做“展示和查询用户元信息”，不适合在启动主路径里当成一定可靠的权限判断基础设施</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cgo-call-bridge'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="CGO 调用桥接图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">CGO 的核心代价不只是语法，而是每次都要跨 Go/C 边界：运行时让出调度、桥接参数、进入 C 世界，再安全地回到 Go</text>
+
+      <rect x="22" y="96" width="118" height="50" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="81" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Go caller</text>
+      <text x="81" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">C.add / C.sqlite3_*</text>
+
+      <line x1="140" y1="121" x2="236" y2="121" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="236" y="74" width="154" height="94" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="313" y="96" text-anchor="middle" font-size="11" fill="var(--d-text)">cgo generated wrapper</text>
+      <text x="313" y="114" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">类型转换</text>
+      <text x="313" y="130" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">unsafe.Pointer / C.int / *C.char</text>
+      <text x="313" y="146" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">调用 runtime.cgocall</text>
+
+      <line x1="390" y1="121" x2="488" y2="121" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="488" y="66" width="136" height="110" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="556" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">runtime bridge</text>
+      <text x="556" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">entersyscall / cgocall</text>
+      <text x="556" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">让当前 G 脱离普通调度</text>
+      <text x="556" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">防止把 M 长时间绑死</text>
+      <text x="556" y="154" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">返回后 exitsyscall</text>
+
+      <line x1="624" y1="121" x2="720" y2="121" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="622" y="96" width="114" height="50" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="679" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">C function</text>
+      <text x="679" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">malloc / free / callback</text>
+
+      <rect x="122" y="198" width="516" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="219" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">边界规则：C 内存要手动释放；C 不能长期持有 Go 指针；频繁小调用要尽量批量化，否则调度与边界开销会盖过业务逻辑</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cobra-viper-flow'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="cobra 与 viper 流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">cobra 负责“命令树和执行顺序”，viper 负责“把 flag、环境变量、配置文件合并成最终配置”</text>
+
+      <rect x="24" y="96" width="116" height="50" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="82" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">rootCmd.Execute()</text>
+      <text x="82" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">os.Args</text>
+
+      <line x1="140" y1="121" x2="234" y2="121" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="234" y="66" width="166" height="110" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="317" y="88" text-anchor="middle" font-size="11" fill="var(--d-text)">cobra command tree</text>
+      <text x="317" y="106" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">匹配 root / serve / migrate ...</text>
+      <text x="317" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">PersistentPreRunE</text>
+      <text x="317" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">PreRunE -> RunE -> PostRunE</text>
+      <text x="317" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">PersistentPostRunE</text>
+
+      <line x1="400" y1="121" x2="496" y2="121" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="496" y="66" width="150" height="110" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="571" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">viper bindings</text>
+      <text x="571" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">BindPFlag</text>
+      <text x="571" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">AutomaticEnv + key replacer</text>
+      <text x="571" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">ReadInConfig + SetDefault</text>
+      <text x="571" y="154" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Unmarshal 到结构体</text>
+
+      <line x1="646" y1="121" x2="736" y2="121" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="618" y="198" width="118" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="677" y="219" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">typed Config + business run</text>
+
+      <rect x="120" y="198" width="420" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="330" y="219" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">command tree 和配置优先级要分开理解：cobra 决定“执行谁”，viper 决定“值从哪来”，混在一起最容易让 CLI 变成隐式状态机</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'go-generate-pipeline'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="go generate 流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">go generate 本质上是“扫描注释并调用外部工具”，它不参与编译依赖分析，也不替你保证生成结果最新</text>
+
+      <rect x="26" y="94" width="124" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="88" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">go generate ./...</text>
+      <text x="88" y="130" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">遍历包</text>
+
+      <line x1="150" y1="118" x2="246" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="246" y="72" width="166" height="92" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="329" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)">扫描 .go 文件</text>
+      <text x="329" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">找 `//go:generate ...`</text>
+      <text x="329" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">注入 GOFILE / GOPACKAGE 等环境变量</text>
+      <text x="329" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">在包目录执行</text>
+
+      <line x1="412" y1="118" x2="508" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="508" y="62" width="132" height="112" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="574" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">os/exec tools</text>
+      <text x="574" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">stringer</text>
+      <text x="574" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">mockgen / protoc / sqlc</text>
+      <text x="574" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">自定义生成器</text>
+      <text x="574" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">输出 .go / 资源文件</text>
+
+      <line x1="640" y1="118" x2="734" y2="118" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="612" y="198" width="122" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="673" y="219" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">生成文件进仓库 + CI 检查 diff</text>
+
+      <rect x="124" y="198" width="380" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="314" y="219" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">它不是 shell，也不是自动增量构建系统；忘了跑 generate，编译照样可能成功，但生成代码会悄悄过期</text>
+    </svg>
+
+    <svg
       v-else-if="kind === 'slog-pipeline'"
       viewBox="0 0 760 250"
       xmlns="http://www.w3.org/2000/svg"
@@ -180,6 +523,163 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="706" y="84" text-anchor="end" font-size="9" fill="var(--d-rv-a-text)">stdout / file / collector</text>
 
       <text x="380" y="208" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">本地开发常看文本，生产常落 JSON。真正的价值是字段化检索、上下文关联和动态调试，而不是把日志拼成一整句字符串</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'os-file-open'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="os.File 打开流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">os.Open 的主线是：系统调用拿到 fd，再包成 poll.FD 和 *os.File，Close 才是常规释放路径，finalizer 只是兜底</text>
+
+      <rect x="24" y="94" width="124" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="86" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">os.Open /</text>
+      <text x="86" y="130" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">os.OpenFile</text>
+
+      <line x1="148" y1="118" x2="242" y2="118" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="242" y="84" width="160" height="68" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="322" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">syscall.Open</text>
+      <text x="322" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">flag | O_CLOEXEC</text>
+      <text x="322" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">返回真实 fd</text>
+
+      <line x1="402" y1="118" x2="496" y2="118" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="496" y="72" width="148" height="92" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="570" y="94" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">newFile + poll.FD.Init</text>
+      <text x="570" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">记录 name / mode</text>
+      <text x="570" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">初始化 pollDesc</text>
+      <text x="570" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">让阻塞 I/O 可挂起 G</text>
+
+      <line x1="644" y1="118" x2="736" y2="118" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="612" y="186" width="124" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="674" y="206" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">*os.File</text>
+      <text x="674" y="222" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Read / Write / Close</text>
+
+      <line x1="674" y1="164" x2="674" y2="186" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+
+      <rect x="110" y="186" width="230" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="225" y="206" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">正常释放：defer f.Close()</text>
+      <text x="225" y="222" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">finalizer 触发时机不确定，不能拿来代替 Close</text>
+
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">看到 fd 泄漏时，首先查遗漏的 Close，不要指望 GC 替你回收文件描述符</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'exec-cmd-lifecycle'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="os/exec Cmd 生命周期图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">exec.Cmd 的关键是把“进程生命周期”和“管道复制 goroutine”绑在一起：Start 负责启动，Wait 负责收尾</text>
+
+      <rect x="24" y="96" width="118" height="50" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="83" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">exec.Command</text>
+      <text x="83" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">组装 Path / Args</text>
+
+      <line x1="142" y1="121" x2="236" y2="121" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="236" y="82" width="154" height="78" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="313" y="104" text-anchor="middle" font-size="11" fill="var(--d-text)">Start()</text>
+      <text x="313" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">os.StartProcess</text>
+      <text x="313" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">构造 0/1/2 号 fd 重定向</text>
+      <text x="313" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">填充 Process</text>
+
+      <line x1="390" y1="121" x2="486" y2="121" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="486" y="66" width="142" height="110" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="557" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">I/O goroutines</text>
+      <text x="557" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">stdin copy</text>
+      <text x="557" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">stdout copy</text>
+      <text x="557" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">stderr copy</text>
+      <text x="557" y="154" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Pipe 用完要 Close 送 EOF</text>
+
+      <line x1="628" y1="121" x2="720" y2="121" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="596" y="194" width="140" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="666" y="214" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Wait()</text>
+      <text x="666" y="230" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">等子进程 + 等拷贝 goroutine + 关管道</text>
+
+      <line x1="666" y1="176" x2="666" y2="194" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+
+      <rect x="154" y="194" width="236" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="272" y="214" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">CommandContext 取消路径</text>
+      <text x="272" y="230" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">ctx 超时后终止子进程；Go 1.20+ 可用 WaitDelay 留一点优雅退出时间</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'signal-notify-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="os/signal 通知流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">os/signal 的主线是：runtime 先接住信号，再按订阅关系把信号非阻塞地分发给 channel 或 NotifyContext</text>
+
+      <rect x="28" y="96" width="104" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="80" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Kernel</text>
+      <text x="80" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">SIGTERM / HUP</text>
+
+      <line x1="132" y1="120" x2="222" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="222" y="84" width="150" height="72" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="297" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">runtime signal handler</text>
+      <text x="297" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">enableSignal 之后开始捕获</text>
+      <text x="297" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">交给 os/signal.process</text>
+
+      <line x1="372" y1="120" x2="468" y2="120" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="468" y="74" width="142" height="92" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="539" y="96" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">handlers map</text>
+      <text x="539" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">signal -> channels</text>
+      <text x="539" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">ref 计数决定是否继续捕获</text>
+      <text x="539" y="146" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">满缓冲时直接丢弃，不阻塞</text>
+
+      <line x1="610" y1="120" x2="706" y2="88" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="610" y1="120" x2="706" y2="152" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="618" y="66" width="118" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="677" y="86" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">signal.Notify</text>
+      <text x="677" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">缓冲 channel</text>
+      <rect x="618" y="134" width="118" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="677" y="154" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">NotifyContext</text>
+      <text x="677" y="170" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">收到后 cancel()</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">要么自己 Stop(channel)，要么让 NotifyContext 的 cancel 回收订阅；缓冲通常给 1 就够用</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'log-output-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="log.Logger 输出流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">log.Logger 的关键不是“功能多”，而是持锁复用缓冲、一次性写出，尽量把每条日志压成一次 out.Write</text>
+
+      <rect x="24" y="96" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="83" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Print / Printf /</text>
+      <text x="83" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Println</text>
+
+      <line x1="142" y1="120" x2="236" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="236" y="76" width="156" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="314" y="98" text-anchor="middle" font-size="11" fill="var(--d-text)">Logger.Output</text>
+      <text x="314" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">mu.Lock()</text>
+      <text x="314" y="132" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">buf = buf[:0] 复用</text>
+      <text x="314" y="148" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">保证并发安全</text>
+
+      <line x1="392" y1="120" x2="486" y2="120" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="486" y="76" width="148" height="88" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="560" y="98" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">formatHeader</text>
+      <text x="560" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">prefix / date / time</text>
+      <text x="560" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">shortfile / longfile</text>
+      <text x="560" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">自动补换行</text>
+
+      <line x1="634" y1="120" x2="726" y2="120" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="614" y="188" width="122" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="675" y="208" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">out.Write(buf)</text>
+      <text x="675" y="224" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">尽量一次系统调用</text>
+
+      <line x1="675" y1="164" x2="675" y2="188" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+
+      <rect x="128" y="188" width="250" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="253" y="208" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">Fatal / Panic 是分叉行为</text>
+      <text x="253" y="224" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">写完日志后分别走 os.Exit(1) 或 panic(s)</text>
     </svg>
 
     <svg
@@ -349,6 +849,44 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
+      v-else-if="kind === 'testing-run-flow'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="testing t.Run 执行流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">t.Run 的关键是父测试和子测试共享一棵执行树：同步子测试直接跑，并行子测试先挂起，等父测试同步部分结束后再一起跑</text>
+
+      <rect x="28" y="98" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">parent T</text>
+      <text x="87" y="134" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">for _, tc := range ...</text>
+
+      <line x1="146" y1="122" x2="240" y2="122" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="240" y="84" width="144" height="76" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="312" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">t.Run(name, fn)</text>
+      <text x="312" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">创建 child T</text>
+      <text x="312" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">记录 parent / cleanup / output</text>
+
+      <line x1="384" y1="122" x2="486" y2="90" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="384" y1="122" x2="486" y2="154" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="486" y="62" width="120" height="54" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="546" y="84" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">同步子测试</text>
+      <text x="546" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">当前 goroutine 直接执行</text>
+
+      <rect x="486" y="132" width="120" height="54" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="546" y="154" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">t.Parallel()</text>
+      <text x="546" y="170" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">先挂起，进入并行队列</text>
+
+      <line x1="606" y1="159" x2="716" y2="159" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <rect x="616" y="196" width="120" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="676" y="216" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">父测试同步代码结束后</text>
+      <text x="676" y="232" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">统一等待并行子测试 + Cleanup</text>
+
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以并行子测试里最容易踩坑的是共享循环变量和共享可变状态，而不是 t.Run 这个 API 本身</text>
+    </svg>
+
+    <svg
       v-else-if="kind === 'mock-boundary'"
       viewBox="0 0 760 240"
       xmlns="http://www.w3.org/2000/svg"
@@ -437,6 +975,43 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="508" y="182" width="180" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
       <text x="598" y="202" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">benchstat old.txt new.txt</text>
       <text x="598" y="218" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">多次采样后再比较</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'fuzz-lifecycle'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Go Fuzz 生命周期图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Fuzz 的主线是：种子语料起步，变异输入扩大覆盖率，发现崩溃或有价值样本后落到语料库里复现</text>
+
+      <rect x="24" y="94" width="132" height="52" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="90" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">f.Add()</text>
+      <text x="90" y="130" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">seed corpus</text>
+
+      <line x1="156" y1="120" x2="248" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="248" y="82" width="154" height="76" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="325" y="104" text-anchor="middle" font-size="11" fill="var(--d-text)">mutation engine</text>
+      <text x="325" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">翻转 / 截断 / 追加 / 组合</text>
+      <text x="325" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">优先保留增加覆盖率的输入</text>
+
+      <line x1="402" y1="120" x2="494" y2="120" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="494" y="82" width="132" height="76" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="560" y="104" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Fuzz func</text>
+      <text x="560" y="122" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Unmarshal / Parse /</text>
+      <text x="560" y="138" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">业务不变量断言</text>
+
+      <line x1="626" y1="120" x2="714" y2="88" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="626" y1="120" x2="714" y2="152" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="620" y="66" width="116" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="678" y="86" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">有价值输入</text>
+      <text x="678" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">加入 corpus</text>
+      <rect x="620" y="134" width="116" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="678" y="154" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">panic / crash</text>
+      <text x="678" y="170" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">落盘到 testdata/fuzz</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">日常 CI 常只跑种子；长时间 fuzz 搜索通常单独跑，并把新语料提交回仓库，保证问题可复现</text>
     </svg>
 
     <svg

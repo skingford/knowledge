@@ -2,7 +2,15 @@
 import { computed } from 'vue'
 import DiagramFrame from './DiagramFrame.vue'
 
-type DiagramKind = 'slice-header' | 'slice-shared-array' | 'map-hmap' | 'map-grow' | 'channel-hchan'
+type DiagramKind =
+  | 'slice-header'
+  | 'slice-shared-array'
+  | 'map-swiss'
+  | 'map-hmap'
+  | 'map-grow'
+  | 'channel-hchan'
+  | 'heap-array-tree'
+  | 'list-sentinel'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -11,9 +19,12 @@ const props = defineProps<{
 const maxWidthByKind: Record<DiagramKind, string> = {
   'slice-header': '600px',
   'slice-shared-array': '600px',
+  'map-swiss': '700px',
   'map-hmap': '620px',
   'map-grow': '600px',
   'channel-hchan': '640px',
+  'heap-array-tree': '760px',
+  'list-sentinel': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -123,6 +134,55 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
         </marker>
         <marker id="arrOrangeS2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-cur-border)"/>
+        </marker>
+      </defs>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'map-swiss'" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">图3 Go 1.24+ Swiss Table 结构与查找</text>
+      <rect x="28" y="48" width="180" height="168" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="118" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">Map 顶层</text>
+      <rect x="48" y="84" width="140" height="26" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="118" y="101" text-anchor="middle" font-size="9" fill="var(--d-text)">used / seed</text>
+      <rect x="48" y="116" width="140" height="26" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="118" y="133" text-anchor="middle" font-size="9" fill="var(--d-text)">dirPtr / dirLen</text>
+      <rect x="48" y="148" width="140" height="26" rx="5" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="118" y="165" text-anchor="middle" font-size="9" fill="var(--d-text)">globalDepth / writing</text>
+      <text x="118" y="196" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">先用目录选 table，再在 table 内探测 group</text>
+
+      <line x1="208" y1="132" x2="308" y2="132" stroke="var(--d-blue-border)" stroke-width="1.5" marker-end="url(#arrBlueSwiss)"/>
+
+      <rect x="308" y="48" width="174" height="168" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="395" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">table</text>
+      <rect x="328" y="84" width="134" height="26" rx="5" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1"/>
+      <text x="395" y="101" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">used / capacity / growthLeft</text>
+      <rect x="328" y="118" width="134" height="74" rx="8" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+      <text x="395" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">groups[]</text>
+      <text x="395" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">每个 group 固定 8 个槽</text>
+      <text x="395" y="170" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">装不下时走开放寻址继续探测</text>
+
+      <line x1="482" y1="132" x2="582" y2="132" stroke="var(--d-rv-a-border)" stroke-width="1.5" marker-end="url(#arrOrangeSwiss)"/>
+
+      <rect x="582" y="48" width="90" height="168" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="627" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">group</text>
+      <rect x="596" y="86" width="62" height="20" rx="4" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" stroke-width="1"/>
+      <text x="627" y="100" text-anchor="middle" font-size="8" fill="var(--d-cur-text)">ctrl[8]</text>
+      <rect x="596" y="112" width="62" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+      <text x="627" y="128" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">slot0</text>
+      <rect x="596" y="140" width="62" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+      <text x="627" y="156" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">slot1</text>
+      <rect x="596" y="168" width="62" height="24" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1"/>
+      <text x="627" y="184" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">... slot7</text>
+
+      <rect x="86" y="242" width="528" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="350" y="263" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">查找时先算 hash：H1 定位初始 group，H2 与 ctrl 并行比较，命中候选槽后才做完整 key 比较；看到空槽才判定“不存在”</text>
+      <defs>
+        <marker id="arrBlueSwiss" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-blue-border)"/>
+        </marker>
+        <marker id="arrOrangeSwiss" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-rv-a-border)"/>
         </marker>
       </defs>
     </svg>
@@ -323,6 +383,100 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
           <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--d-green)"/>
         </marker>
       </defs>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'heap-array-tree'" viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">堆看起来像树，落地其实只是一个切片；真正要记的是索引关系和 up/down 修复方向</text>
+
+      <rect x="20" y="44" width="300" height="212" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="170" y="66" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">数组表示法</text>
+      <rect x="40" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="57" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">1</text>
+      <rect x="78" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="95" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">3</text>
+      <rect x="116" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="133" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">2</text>
+      <rect x="154" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="171" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">7</text>
+      <rect x="192" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="209" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">5</text>
+      <rect x="230" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="247" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">8</text>
+      <rect x="268" y="90" width="34" height="26" rx="4" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="285" y="107" text-anchor="middle" font-size="9" fill="var(--d-text)">4</text>
+      <text x="170" y="134" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">parent(i)=(i-1)/2  left=2*i+1  right=2*i+2</text>
+
+      <circle cx="170" cy="168" r="18" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="170" y="172" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">1</text>
+      <circle cx="116" cy="206" r="18" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="116" y="210" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">3</text>
+      <circle cx="224" cy="206" r="18" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="224" y="210" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">2</text>
+      <line x1="158" y1="180" x2="128" y2="194" stroke="var(--d-border)" stroke-width="1.2"/>
+      <line x1="182" y1="180" x2="212" y2="194" stroke="var(--d-border)" stroke-width="1.2"/>
+      <text x="170" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">根一定是最小值；其余位置只保证局部堆序</text>
+
+      <rect x="350" y="44" width="390" height="212" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="545" y="66" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">核心操作的修复方向</text>
+
+      <rect x="372" y="88" width="160" height="38" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="452" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">Init：从 n/2-1 往前做 down</text>
+      <text x="452" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">批量建堆 O(n)</text>
+
+      <rect x="558" y="88" width="160" height="38" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="638" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Push：append 到末尾后 up</text>
+      <text x="638" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">新元素向上冒泡</text>
+
+      <rect x="372" y="146" width="160" height="38" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="452" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Pop：根和尾交换后 down</text>
+      <text x="452" y="178" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">最后再弹出末尾</text>
+
+      <rect x="558" y="146" width="160" height="38" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="638" y="164" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">Fix：值变了先试 down</text>
+      <text x="638" y="178" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">down 不动再补一个 up</text>
+
+      <rect x="404" y="206" width="282" height="26" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1"/>
+      <text x="545" y="223" text-anchor="middle" font-size="9" fill="var(--d-text)">优先队列的关键不是“会排序”，而是每次都能用 O(log n) 维护堆顶最值</text>
+    </svg>
+
+    <svg
+          v-else-if="kind === 'list-sentinel'" viewBox="0 0 760 260" xmlns="http://www.w3.org/2000/svg">
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">container/list 靠哨兵节点把边界情况抹平，再让外层用 `*Element` 做 O(1) 删除和移动</text>
+
+      <rect x="20" y="46" width="318" height="188" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="179" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">哨兵 root</text>
+      <circle cx="179" cy="112" r="24" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="179" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">root</text>
+      <circle cx="106" cy="172" r="22" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="106" y="176" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">front</text>
+      <circle cx="252" cy="172" r="22" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="252" y="176" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">back</text>
+      <line x1="161" y1="128" x2="120" y2="156" stroke="var(--d-border)" stroke-width="1.3"/>
+      <line x1="197" y1="128" x2="238" y2="156" stroke="var(--d-border)" stroke-width="1.3"/>
+      <path d="M 84 172 C 70 130, 88 88, 150 84" fill="none" stroke="var(--d-blue-border)" stroke-width="1.3" stroke-dasharray="4,2"/>
+      <path d="M 274 172 C 288 130, 270 88, 208 84" fill="none" stroke="var(--d-blue-border)" stroke-width="1.3" stroke-dasharray="4,2"/>
+      <text x="179" y="214" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">空链表时 root.next = root.prev = &amp;root，所以 Push/Remove 不必特判头尾</text>
+
+      <rect x="368" y="46" width="372" height="188" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5"/>
+      <text x="554" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text-sub)">为什么 LRU 喜欢它</text>
+      <rect x="390" y="92" width="124" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2"/>
+      <text x="452" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">map[key]*Element</text>
+      <text x="452" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">O(1) 定位节点</text>
+      <line x1="514" y1="112" x2="592" y2="112" stroke="var(--d-rv-b-border)" stroke-width="1.4"/>
+      <rect x="592" y="92" width="126" height="40" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2"/>
+      <text x="655" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">MoveToFront(e)</text>
+      <text x="655" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">命中后直接提到头部</text>
+
+      <rect x="390" y="154" width="124" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2"/>
+      <text x="452" y="172" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Back()</text>
+      <text x="452" y="186" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">直接拿最久未使用节点</text>
+      <line x1="514" y1="174" x2="592" y2="174" stroke="var(--d-rv-a-border)" stroke-width="1.4"/>
+      <rect x="592" y="154" width="126" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2"/>
+      <text x="655" y="172" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">Remove(e)</text>
+      <text x="655" y="186" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">淘汰尾部仍是 O(1)</text>
+
+      <text x="554" y="220" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">它不擅长随机访问，但特别适合“已经拿到节点句柄后再频繁移动”的场景</text>
     </svg>
   </DiagramFrame>
 </template>

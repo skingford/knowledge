@@ -6,8 +6,12 @@ description: 精读 strconv 包的 ParseInt/FormatFloat 实现，理解零分配
 # strconv：字符串转换源码精读
 
 > 核心源码：`src/strconv/atoi.go`、`src/strconv/ftoa.go`、`src/strconv/itoa.go`
+>
+> 图例参考：这里补了 `AppendXxx` 零分配图，先把 `Parse / Format / Append` 三条路径的成本差异看清，再回头读 `atoi.go` / `itoa.go` / `ftoa.go`。
 
 ## 包结构图
+
+<GoLanguageDiagram kind="strconv-append" />
 
 ```
 strconv 包功能全景
@@ -134,6 +138,8 @@ ParseInt 快速路径优化（Atoi）
 ---
 
 ## 三、AppendXxx 零分配模式
+
+<GoLanguageDiagram kind="strconv-append" />
 
 ```
 AppendInt vs FormatInt 的内存对比

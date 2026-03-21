@@ -6,6 +6,10 @@ description: 精读 os/signal 的信号处理实现，掌握优雅关闭、SIGHU
 # os/signal：信号处理源码精读
 
 > 核心源码：`src/os/signal/signal.go`、`src/os/signal/signal_unix.go`
+>
+> 图例参考：
+> - `GoEngineeringDiagram`：`signal-notify-flow`
+> - `GoNetworkDiagram`：`graceful-shutdown`
 
 ## 包结构图
 
@@ -88,11 +92,15 @@ func process(sig os.Signal) {
 }
 ```
 
+<GoEngineeringDiagram kind="signal-notify-flow" />
+
 ---
 
 ## 二、代码示例
 
 ### 优雅关闭 HTTP 服务器
+
+<GoNetworkDiagram kind="graceful-shutdown" />
 
 ```go
 import (

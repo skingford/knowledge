@@ -9,11 +9,17 @@ type DiagramKind =
   | 'escape-scenarios'
   | 'gc-tricolor'
   | 'allocator-hierarchy'
+  | 'stack-capture-flow'
+  | 'gc-control-knobs'
+  | 'time-dual-clock'
   | 'timer-heap'
   | 'happens-before'
   | 'concurrent-append'
   | 'slice-safe-patterns'
   | 'channel-manager'
+  | 'unsafe-pointer-flow'
+  | 'finalizer-lifecycle'
+  | 'metrics-read-flow'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -26,11 +32,17 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'escape-scenarios': '760px',
   'gc-tricolor': '760px',
   'allocator-hierarchy': '760px',
+  'stack-capture-flow': '760px',
+  'gc-control-knobs': '760px',
+  'time-dual-clock': '760px',
   'timer-heap': '760px',
   'happens-before': '760px',
   'concurrent-append': '760px',
   'slice-safe-patterns': '760px',
   'channel-manager': '760px',
+  'unsafe-pointer-flow': '760px',
+  'finalizer-lifecycle': '760px',
+  'metrics-read-flow': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -274,6 +286,113 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
+      v-else-if="kind === 'stack-capture-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="runtime debug 栈捕获图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">debug.Stack 的主线是不断尝试更大的缓冲区，直到 runtime.Stack 能把当前 goroutine 的栈完整写进去</text>
+
+      <rect x="30" y="92" width="110" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="85" y="112" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">recover / debug</text>
+      <text x="85" y="128" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">调用 debug.Stack()</text>
+
+      <line x1="140" y1="116" x2="238" y2="116" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="238" y="72" width="162" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="319" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)">debug.Stack</text>
+      <text x="319" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">buf := make([]byte, 1024)</text>
+      <text x="319" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">调用 runtime.Stack(buf, false)</text>
+      <text x="319" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">不够就翻倍重试</text>
+
+      <line x1="400" y1="116" x2="500" y2="116" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="500" y="62" width="136" height="108" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="568" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">runtime.Stack</text>
+      <text x="568" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">收集当前 goroutine 栈帧</text>
+      <text x="568" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">false = 不抓其他 goroutine</text>
+      <text x="568" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">true 时会得到全局 dump</text>
+      <text x="568" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">返回实际写入长度</text>
+
+      <line x1="636" y1="116" x2="732" y2="116" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="622" y="194" width="114" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="679" y="215" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">[]byte stack dump</text>
+
+      <rect x="126" y="194" width="382" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="317" y="215" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">所以 `debug.Stack()` 适合 panic 恢复现场；要抓所有 goroutine 或更细粒度 PCs，回到 `runtime.Stack` / `runtime.Callers`</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'gc-control-knobs'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="GC 控制旋钮图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">runtime/debug 里和 GC 相关的几个 API，本质是在调“何时更积极回收、何时允许多占内存”这组节流阀</text>
+
+      <rect x="24" y="96" width="132" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="90" y="116" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">SetGCPercent(n)</text>
+      <text x="90" y="132" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">GOGC</text>
+
+      <line x1="156" y1="120" x2="256" y2="88" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="156" y1="120" x2="256" y2="152" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+
+      <rect x="256" y="62" width="168" height="58" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="340" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">heap growth trigger</text>
+      <text x="340" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">越小越频繁 GC，越大越省 GC 但峰值更高</text>
+
+      <rect x="256" y="136" width="168" height="58" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="340" y="158" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">SetMemoryLimit(limit)</text>
+      <text x="340" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">GOMEMLIMIT 软上限，逼近时强推 GC</text>
+
+      <line x1="424" y1="91" x2="528" y2="91" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="424" y1="165" x2="528" y2="165" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="528" y="62" width="120" height="132" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="588" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">GC pacer</text>
+      <text x="588" y="102" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">决定何时启动</text>
+      <text x="588" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">决定多激进回收</text>
+      <text x="588" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">容器内通常两者一起看</text>
+      <text x="588" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">不是单靠某一个旋钮</text>
+      <text x="588" y="166" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">调到极端可能抖动</text>
+
+      <line x1="648" y1="128" x2="736" y2="128" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <rect x="624" y="204" width="112" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="680" y="225" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">FreeOSMemory / ReadGCStats 只是观测或补刀，不是常态主控手段</text>
+
+      <text x="380" y="238" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">容器里常见做法是先给 `SetMemoryLimit`，再看是否还需要改 `SetGCPercent`；一上来就 `-1` 或超大 GOGC 往往只是在把问题往后拖</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'time-dual-clock'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="time.Time 双时钟结构图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">time.Time 同时带 wall clock 和 monotonic clock：前者负责“表示时间”，后者负责“稳定计时”</text>
+
+      <rect x="286" y="58" width="188" height="74" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="82" text-anchor="middle" font-size="12" fill="var(--d-text)">time.Now()</text>
+      <text x="380" y="100" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Time { wall, ext, loc }</text>
+      <text x="380" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">wall 里带挂钟时间，ext 可能带单调时钟</text>
+
+      <line x1="380" y1="132" x2="212" y2="176" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="380" y1="132" x2="548" y2="176" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+
+      <rect x="48" y="176" width="328" height="58" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="212" y="198" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">wall clock 路径</text>
+      <text x="212" y="216" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Format / Marshal / In / UTC / Zone</text>
+      <text x="212" y="232" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">受 NTP、手工改时钟、时区影响，用来“展示同一时刻”</text>
+
+      <rect x="384" y="176" width="328" height="58" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="548" y="198" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">monotonic clock 路径</text>
+      <text x="548" y="216" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Since / Until / Sub / 超时 / benchmark 计时</text>
+      <text x="548" y="232" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">只增不减，适合测耗时；序列化或格式化时通常会被剥离</text>
+
+      <text x="380" y="154" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">只关心“过了多久”时看单调时钟；只关心“显示成什么日期时间”时看 wall time</text>
+    </svg>
+
+    <svg
       v-else-if="kind === 'timer-heap'"
       viewBox="0 0 760 260"
       xmlns="http://www.w3.org/2000/svg"
@@ -455,6 +574,128 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="676" y="180" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">不能直接拿内部切片本体</text>
 
       <text x="380" y="266" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">强项是状态所有权清晰；风险是模型复杂度和背压处理会迅速上升</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'unsafe-pointer-flow'"
+      viewBox="0 0 760 270"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="unsafe Pointer 与 uintptr 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">unsafe 真正要分清的是“GC 还能不能追踪这块内存”，不是会不会做类型转换</text>
+
+      <rect x="20" y="46" width="210" height="190" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="125" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">安全主线</text>
+      <rect x="44" y="92" width="162" height="30" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="125" y="111" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">*T → unsafe.Pointer</text>
+      <rect x="44" y="130" width="162" height="30" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="125" y="149" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">unsafe.Add / Slice / String</text>
+      <rect x="44" y="168" width="162" height="30" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="125" y="187" text-anchor="middle" font-size="10" fill="var(--d-text)">unsafe.Pointer → *U</text>
+      <text x="125" y="216" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">指针身份还在，GC 仍能看见对象</text>
+
+      <rect x="274" y="46" width="212" height="190" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="380" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">危险点</text>
+      <rect x="298" y="100" width="164" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="120" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">unsafe.Pointer → uintptr</text>
+      <rect x="298" y="146" width="164" height="34" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="166" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">把地址存进变量后跨语句使用</text>
+      <text x="380" y="204" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">这时它只是普通整数，GC 不会因为它而保活对象</text>
+
+      <rect x="530" y="46" width="210" height="190" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="635" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">推荐写法</text>
+      <rect x="552" y="92" width="166" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="635" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">单一表达式里完成</text>
+      <text x="635" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Pointer → uintptr → Pointer</text>
+      <rect x="552" y="144" width="166" height="42" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="635" y="162" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Go 1.17+ 优先用 Add/Slice</text>
+      <text x="635" y="178" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Go 1.20+ 优先用 String/StringData</text>
+      <text x="635" y="216" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">少直接碰 uintptr，少自己拼 header，少跨函数保存裸地址</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'finalizer-lifecycle'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="finalizer 生命周期图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">finalizer 不是“对象死了立刻执行”，而是“GC 发现对象不可达后，先排队执行，再等下一轮 GC 真回收”</text>
+
+      <rect x="26" y="92" width="118" height="44" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="85" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">对象分配</text>
+
+      <line x1="144" y1="114" x2="228" y2="114" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="228" y="92" width="142" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="299" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">SetFinalizer(obj, f)</text>
+      <text x="299" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">注册终结器</text>
+
+      <line x1="370" y1="114" x2="454" y2="114" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="454" y="92" width="132" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="520" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">对象不可达</text>
+      <text x="520" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">但还不能马上回收</text>
+
+      <line x1="586" y1="114" x2="674" y2="114" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <rect x="674" y="92" width="60" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="704" y="111" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">GC</text>
+      <text x="704" y="125" text-anchor="middle" font-size="8" fill="var(--d-warn-text)">标记到</text>
+
+      <line x1="704" y1="136" x2="704" y2="172" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <rect x="554" y="172" width="180" height="42" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="644" y="190" text-anchor="middle" font-size="10" fill="var(--d-text)">finalizer goroutine</text>
+      <text x="644" y="206" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">异步执行 f(obj)</text>
+
+      <line x1="554" y1="193" x2="452" y2="193" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="286" y="172" width="166" height="42" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="369" y="190" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">下一次 GC</text>
+      <text x="369" y="206" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">对象才真正释放</text>
+
+      <rect x="26" y="172" width="220" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="136" y="190" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">KeepAlive(x)</text>
+      <text x="136" y="206" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">用于阻止编译器过早判定对象已死</text>
+
+      <text x="380" y="244" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 finalizer 只能做兜底，不该承担确定性 close/rollback 之类的主逻辑</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'metrics-read-flow'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="runtime metrics 读取流图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">runtime/metrics 的使用姿势是：先固定采样清单，再批量 Read，然后把标量和直方图分别消费</text>
+
+      <rect x="22" y="56" width="180" height="170" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="112" y="78" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">预定义 samples</text>
+      <rect x="44" y="96" width="136" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="112" y="114" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">/gc/heap/live:bytes</text>
+      <rect x="44" y="132" width="136" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="112" y="150" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">/sched/goroutines:goroutines</text>
+      <rect x="44" y="168" width="136" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="112" y="186" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">/sched/latencies:seconds</text>
+
+      <line x1="202" y1="141" x2="312" y2="141" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="312" y="84" width="136" height="114" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">metrics.Read(samples)</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">按 Name 批量填充 Value</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">线程安全</text>
+      <text x="380" y="156" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">无需像 MemStats 那样整块读</text>
+      <text x="380" y="172" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">也能拿到 histogram</text>
+
+      <line x1="448" y1="141" x2="540" y2="104" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="448" y1="141" x2="540" y2="178" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="540" y="66" width="184" height="60" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="632" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">标量指标</text>
+      <text x="632" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Uint64 / Float64 → Gauge / Counter</text>
+
+      <rect x="540" y="146" width="184" height="60" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="632" y="168" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">分布指标</text>
+      <text x="632" y="186" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Float64Histogram → P50 / P99 / buckets</text>
+
+      <text x="380" y="244" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">高频上报时重点是复用 `samples` 切片，别每次 tick 都重新分配和拼指标名</text>
     </svg>
   </DiagramFrame>
 </template>

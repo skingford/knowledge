@@ -6,6 +6,9 @@ description: 精读 Go 1.18 内置模糊测试实现，掌握 testing.F、种子
 # Go Fuzzing（Go 1.18+）：内置模糊测试源码精读
 
 > 核心：`testing.F`、`go test -fuzz`（Go 1.18+）
+>
+> 图例参考：
+> - `GoEngineeringDiagram`：`fuzz-lifecycle`
 
 ## 包结构图
 
@@ -42,9 +45,13 @@ Go Fuzzing 体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoEngineeringDiagram kind="fuzz-lifecycle" />
+
 ---
 
 ## 一、基础：第一个 Fuzz 测试
+
+<GoEngineeringDiagram kind="fuzz-lifecycle" />
 
 ```go
 // fuzz_test.go
@@ -251,6 +258,8 @@ func FuzzEncryptDecrypt(f *testing.F) {
 ```
 
 ### 语料库管理最佳实践
+
+<GoEngineeringDiagram kind="fuzz-lifecycle" />
 
 ```go
 // 1. 提交有价值的种子到 testdata/fuzz/

@@ -6,6 +6,9 @@ description: 精读 Go go/types 类型检查器实现，掌握类型推断、作
 # go/types：类型检查器源码精读
 
 > 核心源码：`src/go/types/checker.go`、`src/go/types/typexpr.go`、`src/go/types/scope.go`
+>
+> 图例参考：
+> - `GoCodegenDiagram`：`types-checker-flow`、`analyzer-pipeline`
 
 ## 包结构图
 
@@ -86,6 +89,8 @@ func (conf *Config) Check(path string, fset *token.FileSet,
     return check.Files(files)
 }
 ```
+
+<GoCodegenDiagram kind="types-checker-flow" />
 
 ---
 
@@ -304,6 +309,8 @@ func analyzeStruct(pkg *types.Package, typeName string) {
 ```
 
 ### golang.org/x/tools/go/analysis：现代分析框架
+
+<GoCodegenDiagram kind="analyzer-pipeline" />
 
 ```go
 // 使用 go/analysis 框架（go vet / staticcheck 底层）

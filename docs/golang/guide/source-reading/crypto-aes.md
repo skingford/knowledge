@@ -6,6 +6,10 @@ description: 精读 crypto/aes 与 crypto/cipher 的对称加密实现，掌握 
 # crypto/aes + crypto/cipher：对称加密源码精读
 
 > 核心源码：`src/crypto/aes/aes.go`、`src/crypto/cipher/gcm.go`、`src/crypto/cipher/cbc.go`
+>
+> 图例参考：
+> - `GoSecurityDiagram`：`aead-seal-open`
+> - `GoSecurityDiagram`：`cipher-interface-stack`
 
 ## 包结构图
 
@@ -42,6 +46,8 @@ Go 对称加密体系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoSecurityDiagram kind="cipher-interface-stack" />
+
 ---
 
 ## 一、AES-GCM 工作原理
@@ -71,6 +77,8 @@ AES-GCM 加密流程
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoSecurityDiagram kind="aead-seal-open" />
 
 ---
 

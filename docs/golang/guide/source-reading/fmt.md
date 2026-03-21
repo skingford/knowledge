@@ -6,8 +6,12 @@ description: 精读 fmt.Fprintf/Sprintf 的反射驱动实现，理解 Stringer/
 # fmt：格式化 I/O 源码精读
 
 > 核心源码：`src/fmt/format.go`、`src/fmt/print.go`、`src/fmt/scan.go`
+>
+> 图例参考：这里补了 `Printf` 主流程图，并复用错误链图解释 `fmt.Errorf("%w", err)` 的包装语义，先看格式化分派顺序，再回头读 `print.go` / `errors.go`。
 
 ## 包结构图
+
+<GoLanguageDiagram kind="fmt-printf-flow" />
 
 ```
 fmt 包功能分层
@@ -186,6 +190,8 @@ fmt.Printf("%v\n", m)
 ---
 
 ## 四、fmt.Errorf 与 %w
+
+<GoLanguageDiagram kind="error-chain" />
 
 ```go
 // src/fmt/errors.go

@@ -6,6 +6,10 @@ description: 精读 os.File、os.Process 与标准流的底层实现，理解 Go
 # os：文件与进程源码精读
 
 > 核心源码：`src/os/file.go`、`src/os/exec.go`、`src/os/proc.go`
+>
+> 图例参考：
+> - `GoNetworkDiagram`：`netpoller-flow`、`walkdir-flow`
+> - `GoEngineeringDiagram`：`os-file-open`
 
 ## 包结构图
 
@@ -88,6 +92,8 @@ File → poll.FD → netpoller 关系
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoNetworkDiagram kind="netpoller-flow" />
+
 ---
 
 ## 二、文件打开流程
@@ -117,6 +123,8 @@ os.Open / os.OpenFile 流程
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoEngineeringDiagram kind="os-file-open" />
 
 ---
 
@@ -226,6 +234,8 @@ func appendLog(path, line string) error {
 ```
 
 ### 目录遍历（Go 1.16+ WalkDir）
+
+<GoNetworkDiagram kind="walkdir-flow" />
 
 ```go
 import "io/fs"

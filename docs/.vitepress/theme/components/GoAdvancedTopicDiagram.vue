@@ -14,6 +14,11 @@ type DiagramKind =
   | 'iterator-range-func'
   | 'middleware-decorator'
   | 'error-types'
+  | 'math-big-layout'
+  | 'bits-intrinsics'
+  | 'rand-source-modes'
+  | 'crc32-update-flow'
+  | 'unique-interning'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -31,6 +36,11 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'iterator-range-func': '760px',
   'middleware-decorator': '760px',
   'error-types': '760px',
+  'math-big-layout': '760px',
+  'bits-intrinsics': '760px',
+  'rand-source-modes': '760px',
+  'crc32-update-flow': '760px',
+  'unique-interning': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -373,6 +383,220 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="654" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">errors.As 取字段</text>
 
       <text x="380" y="214" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">哨兵适合稳定类别，自定义类型适合携带结构化信息，二者可以组合，但都别退化成比较 `err.Error()`</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'math-big-layout'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="math big 数据布局与运算流图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">math/big 的核心是把大数拆成 `[]Word` 来做运算，再把结果写回接收者复用内存</text>
+
+      <rect x="20" y="46" width="224" height="184" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="132" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">big.Int</text>
+      <rect x="44" y="88" width="176" height="30" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="132" y="107" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">neg bool</text>
+      <rect x="44" y="126" width="176" height="44" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="132" y="145" text-anchor="middle" font-size="10" fill="var(--d-text)">abs nat = []Word</text>
+      <text x="132" y="160" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">小端序：低位 Word 在前</text>
+      <rect x="56" y="184" width="44" height="24" rx="6" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1" />
+      <text x="78" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">w0</text>
+      <rect x="108" y="184" width="44" height="24" rx="6" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1" />
+      <text x="130" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">w1</text>
+      <rect x="160" y="184" width="44" height="24" rx="6" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1" />
+      <text x="182" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">w2</text>
+      <text x="132" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">真正的大数加减乘除都落在 nat 上</text>
+
+      <rect x="268" y="46" width="224" height="184" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="380" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">类型家族</text>
+      <rect x="292" y="88" width="176" height="32" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">Int = 符号 + nat</text>
+      <rect x="292" y="128" width="176" height="32" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="148" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Rat = 分子 Int + 分母 nat</text>
+      <rect x="292" y="168" width="176" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="187" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Float = prec + mant + exp</text>
+      <text x="380" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">尾数仍然是 nat</text>
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">统一复用 nat，外层只是在语义上包了一层</text>
+
+      <rect x="516" y="46" width="224" height="184" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="628" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">运算流</text>
+      <rect x="538" y="88" width="66" height="28" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="571" y="106" text-anchor="middle" font-size="9" fill="var(--d-text)">x.abs</text>
+      <rect x="652" y="88" width="66" height="28" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="685" y="106" text-anchor="middle" font-size="9" fill="var(--d-text)">y.abs</text>
+      <line x1="604" y1="102" x2="646" y2="102" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="562" y="130" width="132" height="48" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="628" y="149" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">add / mul / div / expNN</text>
+      <text x="628" y="165" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">小数 O(n²)，大数切 Karatsuba</text>
+      <line x1="628" y1="178" x2="628" y2="196" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <rect x="548" y="196" width="160" height="24" rx="6" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="628" y="212" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">z.Add(x, y) 把结果写回 z，减少分配</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'bits-intrinsics'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="math bits intrinsic 与软件回退图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">math/bits 提供的是“语义稳定的位操作 API”，编译器再决定走单条指令还是软件回退</text>
+
+      <rect x="20" y="52" width="182" height="168" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="111" y="74" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">源码层 API</text>
+      <rect x="42" y="90" width="138" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="111" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">OnesCount64</text>
+      <rect x="42" y="126" width="138" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="111" y="144" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">LeadingZeros64 / Len64</text>
+      <rect x="42" y="162" width="138" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="111" y="180" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">Add64 / Sub64 / Mul64</text>
+      <text x="111" y="206" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">调用方只写 Go 代码，不碰汇编</text>
+
+      <line x1="202" y1="136" x2="308" y2="136" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="308" y="84" width="144" height="104" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="106" text-anchor="middle" font-size="11" fill="var(--d-text)">compiler intrinsic</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">识别 bits.* 调用</text>
+      <text x="380" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">按目标架构挑实现</text>
+      <text x="380" y="156" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">支持则直接替换成 CPU 指令</text>
+
+      <line x1="452" y1="136" x2="540" y2="96" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="452" y1="136" x2="540" y2="176" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="540" y="56" width="188" height="74" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="634" y="78" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">硬件路径</text>
+      <text x="634" y="96" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">POPCNT / LZCNT / TZCNT</text>
+      <text x="634" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">ADCQ / SBBQ / MULQ</text>
+
+      <rect x="540" y="146" width="188" height="74" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="634" y="168" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">软件路径</text>
+      <text x="634" y="186" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">parallel bit hacks / 查表</text>
+      <text x="634" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">手动进位链与高低位拆分</text>
+
+      <text x="380" y="240" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">因此 bits 同时适合写“可移植代码”和“接近硬件极限”的多精度算术、bitmap、哈希下标计算</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'rand-source-modes'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="math rand 随机源与并发选择图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">math/rand/v2 要同时考虑三件事：默认算法、是否可重现、以及并发下怎么减少锁竞争</text>
+
+      <rect x="20" y="50" width="220" height="186" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="130" y="72" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">包级全局</text>
+      <rect x="44" y="90" width="172" height="38" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="130" y="112" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">rand.N / rand.Float64 / Shuffle</text>
+      <rect x="44" y="138" width="172" height="48" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="130" y="158" text-anchor="middle" font-size="10" fill="var(--d-text)">globalRand</text>
+      <text x="130" y="174" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">init 时从 OS 熵源拿种子</text>
+      <text x="130" y="210" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">低并发最省事，但本质仍是共享实例</text>
+
+      <rect x="270" y="50" width="220" height="186" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="380" y="72" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">本地实例</text>
+      <rect x="294" y="90" width="172" height="42" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">rand.New(rand.NewChaCha8(seed))</text>
+      <text x="380" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">确定性强，适合测试与模拟</text>
+      <rect x="294" y="142" width="172" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="160" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">rand.New(rand.NewPCG(seed1, seed2))</text>
+      <text x="380" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">状态更小，纯性能场景更快</text>
+      <text x="380" y="210" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">测试里传 `*rand.Rand`，比到处改全局状态更稳</text>
+
+      <rect x="520" y="50" width="220" height="186" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="630" y="72" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">选择策略</text>
+      <text x="630" y="102" text-anchor="middle" font-size="10" fill="var(--d-text)">低并发：包级全局</text>
+      <text x="630" y="122" text-anchor="middle" font-size="10" fill="var(--d-text)">中并发：`sync.Pool` 复用 `*rand.Rand`</text>
+      <text x="630" y="142" text-anchor="middle" font-size="10" fill="var(--d-text)">高并发：每 worker 持有独立实例</text>
+      <rect x="542" y="162" width="176" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="630" y="180" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">安全场景不要用 math/rand</text>
+      <text x="630" y="196" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">token / key / salt 一律走 crypto/rand</text>
+      <text x="630" y="222" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">算法质量、锁竞争、是否可重现，要分开判断</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'crc32-update-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="CRC32 流式更新图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">CRC32 的关键不是“一次算完”，而是把旧 crc 当状态反复 Update，天然适合流式校验</text>
+
+      <rect x="20" y="52" width="180" height="166" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="110" y="74" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">多项式与查表</text>
+      <rect x="42" y="92" width="136" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="110" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">IEEE / Castagnoli</text>
+      <rect x="42" y="130" width="136" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="110" y="150" text-anchor="middle" font-size="10" fill="var(--d-text)">MakeTable(poly)</text>
+      <text x="110" y="182" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">先固定规则，再反复更新</text>
+
+      <line x1="200" y1="135" x2="306" y2="135" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="306" y="70" width="148" height="130" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="380" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">状态推进</text>
+      <rect x="328" y="108" width="104" height="28" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="126" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">crc = 0 / oldCRC</text>
+      <rect x="328" y="144" width="104" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="162" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">Update(crc, tab, chunk)</text>
+      <text x="380" y="186" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">Write 一次，状态就向前推进一次</text>
+
+      <line x1="454" y1="135" x2="560" y2="96" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <line x1="454" y1="135" x2="560" y2="174" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+
+      <rect x="560" y="56" width="176" height="72" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="648" y="78" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">软件路径</text>
+      <text x="648" y="96" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">slicing-by-8</text>
+      <text x="648" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">8 个查表并行吃掉 8 字节</text>
+
+      <rect x="560" y="144" width="176" height="72" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="648" y="166" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">硬件路径</text>
+      <text x="648" y="184" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">SSE4.2 / ARM64 指令</text>
+      <text x="648" y="200" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">runtime 启动时探测后切换</text>
+
+      <text x="380" y="240" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">文件校验、网络分块、ZIP 验证都只是同一个状态机的不同喂数方式</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'unique-interning'"
+      viewBox="0 0 760 260"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="unique 驻留与弱引用图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">unique.Make 做的是“规范化句柄”：相同值只保留一份底层对象，比较时直接比句柄指针</text>
+
+      <rect x="20" y="52" width="170" height="170" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="105" y="74" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">调用入口</text>
+      <rect x="42" y="96" width="126" height="36" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="105" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">Make("content-type")</text>
+      <rect x="42" y="146" width="126" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="105" y="168" text-anchor="middle" font-size="10" fill="var(--d-text)">按类型找到 intern 表</text>
+      <text x="105" y="206" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`T comparable` 才能做规范化键</text>
+
+      <line x1="190" y1="136" x2="292" y2="136" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="292" y="70" width="176" height="132" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="380" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">intern map[T]weakPtr</text>
+      <rect x="316" y="108" width="128" height="28" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="126" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">命中：复用已存在对象</text>
+      <rect x="316" y="144" width="128" height="28" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="162" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">未命中：分配新对象后登记</text>
+      <text x="380" y="188" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">并发目标是“只让一份真实值存活”</text>
+
+      <line x1="468" y1="136" x2="570" y2="100" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="468" y1="136" x2="570" y2="176" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+
+      <rect x="570" y="66" width="166" height="64" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="653" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Handle[T]{ptr}</text>
+      <text x="653" y="106" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">`==` 变成 O(1) 指针比较</text>
+
+      <rect x="570" y="148" width="166" height="70" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="653" y="170" text-anchor="middle" font-size="11" fill="var(--d-warn-text)">弱引用 + GC</text>
+      <text x="653" y="188" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">最后一个 Handle 消失后</text>
+      <text x="653" y="204" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">条目可被回收，下次再惰性重建</text>
+
+      <text x="380" y="246" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">因此 unique 适合“重复值很多、唯一值不多”的 tag、header、枚举型 key，而不是无限增长的原始业务数据</text>
     </svg>
   </DiagramFrame>
 </template>

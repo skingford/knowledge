@@ -6,6 +6,9 @@ description: 精读 math/big 的任意精度算术实现，掌握 Int/Float/Rat 
 # math/big：任意精度算术源码精读
 
 > 核心源码：`src/math/big/int.go`、`src/math/big/nat.go`、`src/math/big/float.go`
+>
+> 图例参考：
+> - `GoAdvancedTopicDiagram`：`math-big-layout`
 
 ## 包结构图
 
@@ -40,6 +43,8 @@ math/big 类型体系
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoAdvancedTopicDiagram kind="math-big-layout" />
 
 ---
 

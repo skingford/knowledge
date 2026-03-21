@@ -6,6 +6,9 @@ description: 精读 Go testing 包的 T/B/F 结构体实现，理解表驱动测
 # testing：测试框架源码精读
 
 > 核心源码：`src/testing/testing.go`、`src/testing/benchmark.go`、`src/testing/fuzz.go`
+>
+> 图例参考：
+> - `GoEngineeringDiagram`：`testing-run-flow`、`benchmark-reading`、`fuzz-lifecycle`
 
 ## 包结构图
 
@@ -97,6 +100,8 @@ t.Run 执行流程
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoEngineeringDiagram kind="testing-run-flow" />
+
 ```go
 // 示例：并行子测试正确写法
 func TestParallel(t *testing.T) {
@@ -164,6 +169,8 @@ Benchmark 自动调整 N 的算法
 ══════════════════════════════════════════════════════════════════
 ```
 
+<GoEngineeringDiagram kind="benchmark-reading" />
+
 ---
 
 ## 四、Fuzzing（模糊测试）
@@ -195,6 +202,8 @@ Fuzz 执行模式
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoEngineeringDiagram kind="fuzz-lifecycle" />
 
 ---
 

@@ -14,6 +14,12 @@ type DiagramKind =
   | 'generics-constraint'
   | 'error-chain'
   | 'builder-flow'
+  | 'fmt-printf-flow'
+  | 'strconv-append'
+  | 'utf8-decode'
+  | 'regexp-engine'
+  | 'pdqsort-flow'
+  | 'generic-stdlib-trio'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -31,6 +37,12 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'generics-constraint': '720px',
   'error-chain': '760px',
   'builder-flow': '760px',
+  'fmt-printf-flow': '760px',
+  'strconv-append': '760px',
+  'utf8-decode': '760px',
+  'regexp-engine': '760px',
+  'pdqsort-flow': '760px',
+  'generic-stdlib-trio': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -442,6 +454,204 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="380" y="184" text-anchor="middle" font-size="10" fill="var(--d-text)">重点 1：适合“最终结果就是字符串”的高频拼接</text>
       <text x="380" y="202" text-anchor="middle" font-size="10" fill="var(--d-text)">重点 2：不要复制一个非零值 Builder，否则会共享内部状态</text>
       <text x="380" y="220" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">如果主要处理的是字节流和 I/O 缓冲，更通用的工具仍然是 bytes.Buffer</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'fmt-printf-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="fmt Printf 格式化流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`fmt.Printf/Fprintf/Sprintf` 的主线是：拿到一个 `pp`，扫描格式串，优先走接口方法，再退回到反射分派</text>
+
+      <rect x="28" y="90" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">fmt.Fprintf</text>
+      <text x="87" y="126" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">w, format, args</text>
+
+      <line x1="146" y1="114" x2="240" y2="114" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="240" y="70" width="150" height="88" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="315" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">pp from sync.Pool</text>
+      <text x="315" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">内部带 `buf []byte`</text>
+      <text x="315" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">避免每次都新建状态机</text>
+      <text x="315" y="142" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">开始 doPrintf</text>
+
+      <line x1="390" y1="114" x2="486" y2="114" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="486" y="58" width="132" height="112" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="552" y="80" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">扫描格式串</text>
+      <text x="552" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">普通字节直接写 buf</text>
+      <text x="552" y="114" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">遇到 `%` 解析 verb</text>
+      <text x="552" y="130" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">取下一个参数</text>
+      <text x="552" y="146" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">检查 flags/width/precision</text>
+
+      <line x1="618" y1="114" x2="714" y2="96" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="618" y1="114" x2="714" y2="132" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="614" y="74" width="118" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="673" y="95" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Formatter/Stringer/error</text>
+      <rect x="614" y="118" width="118" height="34" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="673" y="139" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">否则走 reflect.Kind 分支</text>
+
+      <text x="380" y="214" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">`Fprintf` 直接写 `io.Writer`；`Sprintf` 最后还要把内部缓冲转成 string，所以热路径里常被 `strconv.AppendXxx` 和手工拼接替代</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'strconv-append'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="strconv AppendXxx 零分配图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`strconv.AppendXxx` 的价值在于：直接把格式化结果追加到现有 `[]byte`，绕开 `fmt.Sprintf` 的反射和中间字符串分配</text>
+
+      <rect x="28" y="84" width="170" height="70" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="113" y="106" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">预分配 buf</text>
+      <text x="113" y="124" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">make([]byte, 0, 64)</text>
+      <text x="113" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">持续复用同一块切片</text>
+
+      <line x1="198" y1="119" x2="308" y2="119" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="308" y="68" width="146" height="102" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="381" y="90" text-anchor="middle" font-size="11" fill="var(--d-text)">AppendInt / Float / Bool</text>
+      <text x="381" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">直接把字符写进 buf</text>
+      <text x="381" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">适合 CSV / JSON / 日志 ID</text>
+      <text x="381" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">热路径零中间字符串</text>
+      <text x="381" y="156" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">最后再一次 `string(buf)`</text>
+
+      <line x1="454" y1="119" x2="564" y2="100" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="454" y1="119" x2="564" y2="138" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="564" y="76" width="168" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="648" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">高频场景：批量拼接数字字段</text>
+      <rect x="564" y="122" width="168" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="648" y="144" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">低频场景：可读性优先仍可用 Format/Itoa</text>
+
+      <text x="380" y="206" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">不是所有地方都要抠这点分配，但一旦你已经在 `[]byte` 链路里，就没必要再绕去 `Sprintf` 造临时 string</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'utf8-decode'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="UTF-8 解码与校验图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">UTF-8 解码的核心是：先看首字节决定宽度，再验证后续字节是否都是 `10xxxxxx`；非法序列立刻退化成 `RuneError`</text>
+
+      <rect x="28" y="78" width="132" height="54" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="94" y="99" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">首字节</text>
+      <text x="94" y="117" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">0xxxxxxx / 110xxxxx / ...</text>
+
+      <line x1="160" y1="105" x2="276" y2="105" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="276" y="58" width="208" height="94" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="82" text-anchor="middle" font-size="11" fill="var(--d-text)">utf8.DecodeRune</text>
+      <text x="380" y="100" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">查表决定预期宽度 1/2/3/4</text>
+      <text x="380" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">验证续字节是否 `10xxxxxx`</text>
+      <text x="380" y="132" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">合法则拼成 rune，非法则返回 RuneError</text>
+
+      <line x1="484" y1="105" x2="594" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="484" y1="105" x2="594" y2="124" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="594" y="66" width="138" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="663" y="88" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">合法：返回 (rune, size)</text>
+      <rect x="594" y="110" width="138" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="663" y="132" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">非法：返回 (RuneError, 1)</text>
+
+      <rect x="142" y="184" width="476" height="28" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">`for range string` 本质上就是不断调用这套逻辑；而按字节截断时，`RuneStart` 的作用就是帮你回退到一个合法起始边界</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'regexp-engine'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="regexp 编译与执行流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Go 正则的主线是：先把模式编译成语法树和指令流，再由 onepass / backtrack / Thompson NFA 中最合适的执行器去跑</text>
+
+      <rect x="24" y="88" width="126" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="108" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">regexp.Compile</text>
+      <text x="87" y="124" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">"a(b|c)+d"</text>
+
+      <line x1="150" y1="112" x2="250" y2="112" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="250" y="66" width="172" height="92" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="336" y="90" text-anchor="middle" font-size="11" fill="var(--d-text)">regexp/syntax</text>
+      <text x="336" y="108" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Parse -> AST</text>
+      <text x="336" y="124" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Compile -> Prog 指令流</text>
+      <text x="336" y="140" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">顺便预计算 prefix / onepass 条件</text>
+
+      <line x1="422" y1="112" x2="520" y2="112" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="520" y="56" width="212" height="112" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="626" y="80" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">执行器选择</text>
+      <text x="626" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">onepass：无歧义时最快</text>
+      <text x="626" y="116" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">backtrack：短输入优化</text>
+      <text x="626" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Thompson NFA：通用兜底</text>
+      <text x="626" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">保证线性时间，不做 PCRE 式指数回溯</text>
+
+      <rect x="154" y="194" width="452" height="30" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="380" y="213" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">这也是 Go 不支持反向引用和 lookaround 的原因之一：换来的是可证明的线性时间上界，而不是更花哨但可被 ReDoS 打爆的能力集</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'pdqsort-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="pdqsort 选择流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">pdqsort 不是“永远快排”，而是一个带退化检测的混合排序器：小数组走插入排序，正常路径走快排，退化时切到堆排保底</text>
+
+      <rect x="34" y="90" width="116" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="92" y="110" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">pdqsort(x)</text>
+      <text x="92" y="126" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">sort / slices.Sort</text>
+
+      <line x1="150" y1="114" x2="250" y2="114" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="250" y="60" width="140" height="108" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="320" y="82" text-anchor="middle" font-size="11" fill="var(--d-text)">分支判断</text>
+      <text x="320" y="100" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">len <= 小阈值</text>
+      <text x="320" y="116" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">选主元：median / ninther</text>
+      <text x="320" y="132" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">三路 partition</text>
+      <text x="320" y="148" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">记录 bad pivot 次数</text>
+
+      <line x1="390" y1="114" x2="500" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="390" y1="114" x2="500" y2="114" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="390" y1="114" x2="500" y2="142" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="500" y="68" width="190" height="32" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="595" y="89" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">小切片：插入排序，缓存更友好</text>
+      <rect x="500" y="106" width="190" height="32" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="595" y="127" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">正常：快排递归，平均 O(n log n)</text>
+      <rect x="500" y="144" width="190" height="32" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="595" y="165" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">退化太多次：切堆排，最坏 O(n log n)</text>
+
+      <rect x="152" y="194" width="456" height="30" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="213" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">所以 Go 里的默认不稳定排序既保住了快排的平均速度，也避免了“几乎有序 / 重复值很多 / 恶意输入”把复杂度拖成 O(n²)</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'generic-stdlib-trio'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="slices maps cmp 泛型标准库三件套图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Go 1.21 之后的 `slices / maps / cmp` 是一套配合使用的泛型工具链：容器操作、比较规则和排序搜索语义终于在标准库里对齐了</text>
+
+      <rect x="24" y="64" width="220" height="144" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="134" y="88" text-anchor="middle" font-size="12" fill="var(--d-rv-c-text)">slices</text>
+      <text x="134" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Sort / SortFunc / BinarySearch</text>
+      <text x="134" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">Delete / Insert / Compact / Clip</text>
+      <text x="134" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">类型安全，替代 sort.Slice 反射风格</text>
+
+      <rect x="270" y="64" width="220" height="144" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="88" text-anchor="middle" font-size="12" fill="var(--d-text)">maps</text>
+      <text x="380" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Keys / Values / Clone / Copy</text>
+      <text x="380" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Equal / DeleteFunc</text>
+      <text x="380" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">把常见样板逻辑拉回标准库</text>
+
+      <rect x="516" y="64" width="220" height="144" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="626" y="88" text-anchor="middle" font-size="12" fill="var(--d-rv-a-text)">cmp</text>
+      <text x="626" y="112" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Compare / Less / Or</text>
+      <text x="626" y="128" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">为排序、二分、三目式兜底提供统一比较语义</text>
+      <text x="626" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">和泛型约束 `cmp.Ordered` 配套</text>
+
+      <text x="380" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">新代码优先用这套泛型 API；只有在兼容老版本或必须走 `sort.Interface`/自定义容器接口时，才回到旧写法</text>
     </svg>
 
     <svg

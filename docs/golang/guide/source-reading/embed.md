@@ -6,8 +6,12 @@ description: 精读 Go 1.16+ embed 包的 //go:embed 指令机制、fs.FS 接口
 # embed：静态资源嵌入源码精读
 
 > 核心源码：`src/embed/embed.go`、编译器处理：`cmd/compile/internal/noder/`
+>
+> 图例参考：这里补了 `//go:embed` 编译期打包流程图，并复用 `io/fs` 抽象图，先把“资源是在编译期进入二进制，不是在运行时读磁盘”这件事看清，再回头读 `embed.go`。
 
 ## 包结构图
+
+<GoNetworkDiagram kind="embed-build-flow" />
 
 ```
 embed 包架构
@@ -121,6 +125,8 @@ embed.FS 的数据存储原理
 ---
 
 ## 三、fs.FS 接口体系
+
+<GoNetworkDiagram kind="fs-abstraction" />
 
 ```go
 // src/io/fs/fs.go

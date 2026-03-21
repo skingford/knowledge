@@ -9,6 +9,8 @@ type DiagramKind =
   | 'sql-pool-stats'
   | 'redis-client-types'
   | 'redis-pipeline'
+  | 'redis-distributed-lock'
+  | 'redis-watch-tx'
   | 'redis-pubsub'
   | 'cache-penetration'
   | 'cache-breakdown'
@@ -31,6 +33,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'sql-pool-stats': '760px',
   'redis-client-types': '760px',
   'redis-pipeline': '760px',
+  'redis-distributed-lock': '760px',
+  'redis-watch-tx': '760px',
   'redis-pubsub': '760px',
   'cache-penetration': '760px',
   'cache-breakdown': '760px',
@@ -282,6 +286,72 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="644" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">subscriber B</text>
 
       <text x="380" y="190" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">需要持久消费、重试、确认时，更适合 Stream / MQ；Pub/Sub 适合在线通知、广播事件、低可靠性实时消息</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'redis-distributed-lock'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Redis 分布式锁图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">Redis 分布式锁最关键的不是“能不能加锁”，而是“释放时不能删掉别人后来拿到的新锁”</text>
+
+      <rect x="28" y="88" width="126" height="50" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="91" y="109" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">client A</text>
+      <text x="91" y="125" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">SET key val NX PX ttl</text>
+
+      <line x1="154" y1="113" x2="260" y2="113" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="260" y="70" width="174" height="86" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="347" y="92" text-anchor="middle" font-size="11" fill="var(--d-text)">Redis key: lock:order</text>
+      <text x="347" y="110" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">value = uuid-A</text>
+      <text x="347" y="126" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ttl 倒计时保护死锁</text>
+      <text x="347" y="142" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">只有 key 不存在才成功</text>
+
+      <line x1="434" y1="113" x2="528" y2="113" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="528" y="78" width="198" height="70" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="627" y="100" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">临界区业务</text>
+      <text x="627" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">持锁期间处理订单 / 扣库存</text>
+      <text x="627" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">超时要靠 TTL 自动释放</text>
+
+      <rect x="76" y="184" width="252" height="32" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="202" y="204" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">正确解锁：Lua = `if GET == value then DEL end`</text>
+
+      <rect x="392" y="176" width="304" height="48" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="544" y="196" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">错误做法：业务超时后直接 DEL</text>
+      <text x="544" y="212" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">A 的锁过期后 B 已重拿锁，A 再删会把 B 的锁误删掉</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'redis-watch-tx'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Redis Watch 与 TxPipeline 图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`Watch + TxPipeline` 是乐观锁：先读当前值，再在 `MULTI/EXEC` 提交；若监视 key 被别人改过，`EXEC` 直接失败并重试</text>
+
+      <rect x="34" y="98" width="110" height="44" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="89" y="118" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">GET stock:123</text>
+      <text x="89" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">当前库存 = 10</text>
+
+      <line x1="144" y1="120" x2="252" y2="120" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="252" y="72" width="188" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="346" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)">WATCH stock:123</text>
+      <text x="346" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">业务逻辑检查库存是否足够</text>
+      <text x="346" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">TxPipeline 中准备 DecrBy</text>
+      <text x="346" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">等待 EXEC 提交</text>
+
+      <line x1="440" y1="120" x2="548" y2="92" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="440" y1="120" x2="548" y2="148" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="548" y="72" width="166" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="631" y="98" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">没人改动 key -> EXEC 成功</text>
+      <rect x="548" y="128" width="166" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="631" y="146" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">别人先改了 key -> TxFailedErr</text>
+      <text x="631" y="162" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">回到起点重读再试</text>
+
+      <rect x="222" y="196" width="316" height="30" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="215" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">它不是阻塞其他客户端，而是用冲突检测换重试成本，适合库存扣减这类短事务</text>
     </svg>
 
     <svg

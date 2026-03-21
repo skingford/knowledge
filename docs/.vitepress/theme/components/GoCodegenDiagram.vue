@@ -8,6 +8,9 @@ type DiagramKind =
   | 'mockgen-modes'
   | 'wire-di'
   | 'ast-pipeline'
+  | 'analysis-pass-flow'
+  | 'types-checker-flow'
+  | 'format-roundtrip'
   | 'template-codegen'
   | 'go-embed'
   | 'meta-choice'
@@ -24,6 +27,9 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'mockgen-modes': '760px',
   'wire-di': '760px',
   'ast-pipeline': '760px',
+  'analysis-pass-flow': '760px',
+  'types-checker-flow': '760px',
+  'format-roundtrip': '760px',
   'template-codegen': '760px',
   'go-embed': '760px',
   'meta-choice': '760px',
@@ -164,6 +170,84 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="520" y="120" width="206" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
       <text x="623" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">生成器：输出 handler / validator / mapper 代码</text>
       <text x="380" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">AST 是代码生成和自定义静态分析的共同底座，正则只能临时演示，做不成稳定工具</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'analysis-pass-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="analysis Pass 流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`go/analysis` 真正有价值的不是遍历 AST 本身，而是把 AST、类型信息、前置分析结果和诊断输出统一塞进一个 `Pass` 里</text>
+      <rect x="28" y="86" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Analyzer</text>
+      <text x="87" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">Name / Run / Requires</text>
+      <line x1="146" y1="110" x2="254" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="254" y="62" width="188" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="348" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">Pass</text>
+      <text x="348" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Files / Fset / Pkg / TypesInfo</text>
+      <text x="348" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ResultOf[requiredAnalyzer]</text>
+      <text x="348" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Report / Reportf / SuggestedFix</text>
+      <line x1="442" y1="110" x2="548" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="442" y1="110" x2="548" y2="134" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="548" y="66" width="178" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="637" y="90" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">分析 AST + types，识别违规模式</text>
+      <rect x="548" y="118" width="178" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="637" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">输出 Diagnostic / Fix，交给 gopls、vet、CI 消费</text>
+      <text x="380" y="206" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">所以 `Requires + ResultOf` 的意义是把分析器做成可组合流水线，而不是每个 linter 都重复加载一遍世界</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'types-checker-flow'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="go/types 类型检查流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`go/types` 的关键不是“再解析一遍代码”，而是在 AST 之上补齐作用域、对象绑定和表达式类型，让后续工具终于知道每个名字到底指向什么</text>
+      <rect x="28" y="86" width="118" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="87" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">AST files</text>
+      <text x="87" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">go/parser 输出</text>
+      <line x1="146" y1="110" x2="256" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="256" y="62" width="178" height="96" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="345" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">types.Config.Check</text>
+      <text x="345" y="102" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Importer 加载依赖包</text>
+      <text x="345" y="118" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Checker 建 Scope / Object / Type</text>
+      <text x="345" y="134" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">校验赋值、调用、接口实现</text>
+      <line x1="434" y1="110" x2="542" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="434" y1="110" x2="542" y2="134" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="542" y="66" width="184" height="40" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="634" y="90" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Package + Scope：包级符号表和可见性链</text>
+      <rect x="542" y="118" width="184" height="40" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="634" y="142" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Info：Types / Defs / Uses / Selections / Scopes</text>
+      <text x="380" y="204" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">没有 `Info`，linter 看到的只是“叫 Sleep 的标识符”；有了 `Info`，它才能知道这到底是不是 `time.Sleep`，以及每个表达式的真实类型</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'format-roundtrip'"
+      viewBox="0 0 760 230"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="go format 往返流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`go/format` 的主线是“源码先过 parser 变 AST，再交给 printer 重排文本”；它不是字符串美化器，而是一次语法树往返</text>
+      <rect x="34" y="86" width="132" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="100" y="106" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">ugly source</text>
+      <text x="100" y="122" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">缩进乱 / 空格乱 / 注释在</text>
+      <line x1="166" y1="110" x2="272" y2="110" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="272" y="64" width="170" height="92" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="357" y="86" text-anchor="middle" font-size="11" fill="var(--d-text)">format.Source</text>
+      <text x="357" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">parser.ParseFile(ParseComments)</text>
+      <text x="357" y="120" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">得到 AST</text>
+      <text x="357" y="136" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">再交给 printer.Fprint</text>
+      <line x1="442" y1="110" x2="550" y2="110" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="550" y="64" width="176" height="92" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="638" y="86" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">formatted output</text>
+      <text x="638" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Tab 缩进 / 空格归一</text>
+      <text x="638" y="120" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">注释尽量保住原语义位置</text>
+      <text x="638" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">生成代码也能马上过 CI</text>
+      <text x="380" y="192" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">这也是为什么语法错误时 `format.Source` 会直接失败：前半段根本过不了 parser，就无从谈起“格式化”</text>
     </svg>
 
     <svg

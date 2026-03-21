@@ -14,6 +14,10 @@ type DiagramKind =
   | 'secret-lifecycle'
   | 'gosec-pipeline'
   | 'brute-force-protection'
+  | 'aead-seal-open'
+  | 'cipher-interface-stack'
+  | 'secure-random-source'
+  | 'hash-hmac-flow'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -31,6 +35,10 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'secret-lifecycle': '760px',
   'gosec-pipeline': '760px',
   'brute-force-protection': '760px',
+  'aead-seal-open': '760px',
+  'cipher-interface-stack': '760px',
+  'secure-random-source': '760px',
+  'hash-hmac-flow': '760px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -331,6 +339,163 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="566" y="120" width="162" height="40" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
       <text x="647" y="144" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">攻击者：尝试越多，等待越久，最终被封锁</text>
       <text x="380" y="196" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">只按全局 QPS 限流很容易误伤正常用户，也挡不住分布式代理池攻击</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'aead-seal-open'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="AEAD Seal 与 Open 流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">AEAD 的关键不是“能加密”，而是 `Seal` 同时产出密文和认证标签，`Open` 先验签再解密</text>
+
+      <rect x="20" y="52" width="220" height="170" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="130" y="74" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">输入材料</text>
+      <rect x="42" y="92" width="176" height="26" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="130" y="109" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">key</text>
+      <rect x="42" y="126" width="176" height="26" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="130" y="143" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">nonce</text>
+      <rect x="42" y="160" width="176" height="26" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="130" y="177" text-anchor="middle" font-size="10" fill="var(--d-text)">plaintext + aad</text>
+      <text x="130" y="207" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">同一个 `(key, nonce)` 绝不能复用</text>
+
+      <line x1="240" y1="137" x2="342" y2="137" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="342" y="82" width="164" height="110" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="424" y="104" text-anchor="middle" font-size="11" fill="var(--d-text)">AEAD.Seal</text>
+      <text x="424" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">CTR/stream 路径负责加密</text>
+      <text x="424" y="138" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">GHASH / Poly1305 负责认证</text>
+      <text x="424" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">输出 `ciphertext || tag`</text>
+      <text x="424" y="170" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">常见格式：`nonce || ciphertext || tag`</text>
+
+      <line x1="506" y1="137" x2="608" y2="102" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="506" y1="137" x2="608" y2="172" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="608" y="72" width="124" height="54" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="670" y="94" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">AEAD.Open</text>
+      <text x="670" y="110" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">先验证 tag</text>
+
+      <rect x="608" y="144" width="124" height="54" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="670" y="166" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">tag 不匹配</text>
+      <text x="670" y="182" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">直接报错，不返回明文</text>
+
+      <text x="380" y="242" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">新代码默认优先 AEAD；CBC/CTR 这类“只有加密没有认证”的模式，要额外补完整性保护</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cipher-interface-stack'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="crypto cipher 接口分层图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`crypto/cipher` 的设计是把“分组原语”和“工作模式”拆开，调用方只在顶层选择自己真正需要的安全语义</text>
+
+      <rect x="24" y="78" width="140" height="90" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="94" y="100" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">Block</text>
+      <text x="94" y="118" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">AES / 3DES</text>
+      <text x="94" y="134" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">只会处理单个 block</text>
+      <text x="94" y="150" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">不直接面向业务使用</text>
+
+      <line x1="164" y1="123" x2="286" y2="90" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <line x1="164" y1="123" x2="286" y2="154" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+
+      <rect x="286" y="62" width="188" height="56" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="84" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">AEAD</text>
+      <text x="380" y="100" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">GCM / ChaCha20-Poly1305</text>
+
+      <rect x="286" y="132" width="188" height="56" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="380" y="154" text-anchor="middle" font-size="11" fill="var(--d-rv-a-text)">Stream / BlockMode</text>
+      <text x="380" y="170" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">CTR / CBC / OFB / CFB</text>
+
+      <line x1="474" y1="90" x2="596" y2="90" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <line x1="474" y1="160" x2="596" y2="160" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+
+      <rect x="596" y="62" width="136" height="56" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="664" y="84" text-anchor="middle" font-size="11" fill="var(--d-text)">推荐</text>
+      <text x="664" y="100" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">直接拿来做应用层加密</text>
+
+      <rect x="596" y="132" width="136" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="664" y="154" text-anchor="middle" font-size="11" fill="var(--d-warn-text)">谨慎</text>
+      <text x="664" y="170" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">需要你自己补认证和填充</text>
+
+      <text x="380" y="224" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">因此“能加密”不代表“方案安全”；你选的是接口层级，其实也在选风险边界</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'secure-random-source'"
+      viewBox="0 0 760 240"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="crypto rand 随机源图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`crypto/rand` 的价值不在 API 多简单，而在它把所有随机需求都统一接到了操作系统的 CSPRNG 上</text>
+
+      <rect x="28" y="72" width="176" height="94" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="116" y="94" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">操作系统熵源</text>
+      <text x="116" y="114" text-anchor="middle" font-size="9" fill="var(--d-text)">Linux: getrandom / urandom</text>
+      <text x="116" y="130" text-anchor="middle" font-size="9" fill="var(--d-text)">macOS: arc4random_buf</text>
+      <text x="116" y="146" text-anchor="middle" font-size="9" fill="var(--d-text)">Windows: BCryptGenRandom</text>
+
+      <line x1="204" y1="120" x2="314" y2="120" stroke="var(--d-border)" stroke-width="1.4" />
+      <rect x="314" y="72" width="132" height="94" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="380" y="94" text-anchor="middle" font-size="11" fill="var(--d-text)">rand.Reader</text>
+      <text x="380" y="112" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">全局 io.Reader</text>
+      <text x="380" y="128" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Read / Int / Prime</text>
+      <text x="380" y="144" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">拒绝采样保证均匀分布</text>
+
+      <line x1="446" y1="120" x2="552" y2="86" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <line x1="446" y1="120" x2="552" y2="154" stroke="var(--d-blue-border)" stroke-width="1.4" />
+
+      <rect x="552" y="58" width="180" height="56" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="642" y="80" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">安全用途</text>
+      <text x="642" y="96" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">token / salt / key / UUID / prime</text>
+
+      <rect x="552" y="126" width="180" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="642" y="148" text-anchor="middle" font-size="11" fill="var(--d-warn-text)">不要混用</text>
+      <text x="642" y="164" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">测试采样/游戏概率走 math/rand/v2</text>
+
+      <text x="380" y="222" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">一旦结果会进认证、加密、身份标识，就别再考虑性能更快的伪随机源</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'hash-hmac-flow'"
+      viewBox="0 0 760 250"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="hash 与 HMAC 流程图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">`hash.Hash` 负责流式摘要，HMAC 再在它外面包两层 keyed hash，把“可篡改的摘要”变成“只有共享密钥双方才能伪造”的 MAC</text>
+
+      <rect x="22" y="72" width="184" height="120" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
+      <text x="114" y="94" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--d-text)">hash.Hash</text>
+      <text x="114" y="114" text-anchor="middle" font-size="9" fill="var(--d-text)">Write(chunk1)</text>
+      <text x="114" y="130" text-anchor="middle" font-size="9" fill="var(--d-text)">Write(chunk2)</text>
+      <text x="114" y="146" text-anchor="middle" font-size="9" fill="var(--d-text)">...</text>
+      <text x="114" y="162" text-anchor="middle" font-size="9" fill="var(--d-text)">Sum(nil)</text>
+      <text x="114" y="178" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">适合文件、流、Merkle 节点</text>
+
+      <line x1="206" y1="132" x2="318" y2="96" stroke="var(--d-border)" stroke-width="1.4" />
+      <line x1="206" y1="132" x2="318" y2="168" stroke="var(--d-border)" stroke-width="1.4" />
+
+      <rect x="318" y="66" width="124" height="60" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="380" y="88" text-anchor="middle" font-size="11" fill="var(--d-rv-b-text)">inner hash</text>
+      <text x="380" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">K ⊕ ipad || message</text>
+
+      <rect x="318" y="138" width="124" height="60" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="380" y="160" text-anchor="middle" font-size="11" fill="var(--d-rv-c-text)">outer hash</text>
+      <text x="380" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">K ⊕ opad || innerDigest</text>
+
+      <line x1="442" y1="168" x2="552" y2="168" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <rect x="552" y="138" width="180" height="60" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="642" y="160" text-anchor="middle" font-size="11" fill="var(--d-text)">HMAC output</text>
+      <text x="642" y="176" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">hmac.Equal 常量时间比较</text>
+
+      <rect x="552" y="66" width="180" height="48" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="642" y="88" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">普通 SHA256 只做完整性，不做身份认证</text>
+      <text x="642" y="102" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">攻击者能重算摘要时，它就不是签名</text>
+
+      <text x="380" y="232" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">密码存储别用 SHA/HMAC；那是认证和完整性工具，不是慢哈希</text>
     </svg>
   </DiagramFrame>
 </template>

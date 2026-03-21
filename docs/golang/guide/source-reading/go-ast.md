@@ -6,6 +6,9 @@ description: 精读 go/ast 与 go/parser 的 Go 源码解析实现，掌握 AST 
 # go/ast + go/parser：源码解析与 AST 精读
 
 > 核心源码：`src/go/ast/ast.go`、`src/go/parser/parser.go`、`src/go/token/token.go`
+>
+> 图例参考：
+> - `GoCodegenDiagram`：`ast-pipeline`
 
 ## 包结构图
 
@@ -52,6 +55,8 @@ Go AST 工具链
 
 ══════════════════════════════════════════════════════════════════
 ```
+
+<GoCodegenDiagram kind="ast-pipeline" />
 
 ---
 
@@ -175,6 +180,8 @@ func checkErrorHandling(src string) []string {
 ```
 
 ### 代码生成：自动生成 String() 方法
+
+<GoCodegenDiagram kind="ast-pipeline" />
 
 ```go
 // 解析结构体，自动生成 String() 方法
