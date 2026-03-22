@@ -319,6 +319,20 @@ const categories: Category[] = [
         url: "https://www.figma.com/",
       },
       {
+        name: "Color Hunt",
+        desc: "高质量配色灵感站，适合快速挑选 UI 与品牌色板",
+        domain: "www.colorhunt.co",
+        fallback: "🌈",
+        url: "https://www.colorhunt.co/",
+      },
+      {
+        name: "ColorDrop",
+        desc: "配色灵感与色板浏览工具，适合快速发现 UI 和品牌用色方案",
+        domain: "colordrop.io",
+        fallback: "🎨",
+        url: "https://colordrop.io/",
+      },
+      {
         name: "Pencil",
         desc: "开源界面设计与原型工具，适合快速画线框和流程页面",
         domain: "pencil.evolus.vn",
