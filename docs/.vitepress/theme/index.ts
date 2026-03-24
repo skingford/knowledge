@@ -26,6 +26,7 @@ import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiag
 import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
 import GoSourceReadingDiagram from './components/GoSourceReadingDiagram.vue'
 import KafkaDiagram from './components/KafkaDiagram.vue'
+import K8sDiagram from './components/K8sDiagram.vue'
 import MySQLDurabilityDiagram from './components/MySQLDurabilityDiagram.vue'
 import MySQLTransactionIsolationDiagram from './components/MySQLTransactionIsolationDiagram.vue'
 import MySQLHighAvailabilityDiagram from './components/MySQLHighAvailabilityDiagram.vue'
@@ -77,6 +78,7 @@ export default {
     app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)
     app.component('GoSourceReadingDiagram', GoSourceReadingDiagram)
     app.component('KafkaDiagram', KafkaDiagram)
+    app.component('K8sDiagram', K8sDiagram)
     app.component('MySQLDurabilityDiagram', MySQLDurabilityDiagram)
     app.component('MySQLTransactionIsolationDiagram', MySQLTransactionIsolationDiagram)
     app.component('MySQLHighAvailabilityDiagram', MySQLHighAvailabilityDiagram)

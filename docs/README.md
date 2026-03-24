@@ -24,6 +24,7 @@
 - [架构案例实战](./architecture/case-studies/)
 - [AI / Agent 方向](./ai/)
 - [Golang 方向](./golang/)
+- [Rust 方向](./rust/)
 
 ## 推荐入口
 
@@ -37,18 +38,55 @@
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
 - [Go 学习路径与资料导航](./golang/learning-path.md)
 - [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
+- [Rust 学习路径与资料导航](./rust/learning-path.md)
+- [Rust 必备知识总览](./rust/essential-knowledge.md)
+- [Rust Borrow Checker 常见报错排障指南](./rust/borrow-checker-troubleshooting-guide.md)
+- [Rust DTO、领域模型与存储模型分层实践](./rust/dto-domain-and-persistence-model-practice.md)
+- [Rust 输入校验与边界建模实践](./rust/validation-and-input-boundaries-practice.md)
+- [Rust 常用 crate 选型与工程边界](./rust/crate-selection-and-boundaries.md)
+- [Rust CLI 工具实践](./rust/cli-tool-practice.md)
+- [Rust 配置管理实践](./rust/configuration-management-practice.md)
+- [Rust Workspace 与 Monorepo 实践](./rust/workspace-and-monorepo-practice.md)
+- [Rust HTTP Client 与外部 API 实践](./rust/http-client-and-external-api-practice.md)
+- [Rust 后台任务与 Worker 实践](./rust/background-jobs-and-worker-practice.md)
+- [Rust 定时任务、调度与 Leader Election 实践](./rust/scheduler-and-leader-election-practice.md)
+- [Rust 缓存与 Redis 实践](./rust/cache-and-redis-practice.md)
+- [Rust 限流、超时与负载保护实践](./rust/rate-limit-timeout-and-overload-protection-practice.md)
+- [Rust API 错误响应与响应体设计实践](./rust/api-error-and-response-design-practice.md)
+- [Rust API Versioning、兼容演进与弃用治理实践](./rust/api-versioning-and-compatibility-governance-practice.md)
+- [Rust 列表查询、过滤、排序与分页实践](./rust/pagination-filter-and-sorting-practice.md)
+- [Rust 事务、锁与并发更新实践](./rust/transaction-locking-and-concurrent-update-practice.md)
+- [Rust 数据库迁移、Schema 演进与兼容发布实践](./rust/database-migration-and-schema-evolution-practice.md)
+- [Rust 幂等、状态机与 Outbox 实践](./rust/idempotency-state-machine-and-outbox-practice.md)
+- [Rust 消息队列与事件驱动实践](./rust/message-queue-and-event-driven-practice.md)
+- [Rust 文件上传、对象存储与 S3 实践](./rust/file-upload-and-object-storage-practice.md)
+- [Rust 导出、报表与大结果集实践](./rust/export-report-and-large-result-practice.md)
+- [Rust 认证、授权与请求上下文实践](./rust/auth-authorization-and-request-context-practice.md)
+- [Rust Secrets、密钥与凭证轮换实践](./rust/secret-management-and-credential-rotation-practice.md)
+- [Rust Feature Flag、运行时开关与灰度治理实践](./rust/feature-flag-and-runtime-governance-practice.md)
+- [Rust 多租户与数据隔离实践](./rust/multi-tenant-and-data-isolation-practice.md)
+- [Rust 审计日志与操作记录实践](./rust/audit-log-and-operation-history-practice.md)
+- [Rust Webhook、回调与签名校验实践](./rust/webhook-and-callback-practice.md)
+- [Rust WebSocket 与 SSE 实践](./rust/websocket-and-sse-practice.md)
+- [Rust Metrics 与 OpenTelemetry 实践](./rust/metrics-and-opentelemetry-practice.md)
+- [Rust 测试替身与依赖隔离实践](./rust/test-doubles-and-dependency-isolation-practice.md)
+- [Rust 能力自检高频题示例代码片段](./rust/interview-code-snippets.md)
+- [Rust 性能分析与 Profiling 指南](./rust/performance-and-profiling-guide.md)
 
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
 - [Go 能力自检与面试准备导航](./golang/interview-prep.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
+- [Rust 能力自检与面试准备导航](./rust/interview-prep.md)
+- [Rust 能力自检高频题示例代码片段](./rust/interview-code-snippets.md)
 
 ## 当前规模
 
 - `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
+- `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
 
 ## 整理规则
 
@@ -57,6 +95,7 @@
 - 优先按“概览 -> 路线 -> 资料 -> 实践/能力自检”组织结构
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
+- 新增主题时同步更新 `docs/.vitepress/theme/content-data.ts`，保证首页、总览页与侧边栏一致
 - 文档内部跳转统一使用相对链接，例如 `[Go 源码阅读主线](./golang/guide/source-reading/learning-path.md)`，这样本地预览和线上发布都能直接使用
 - 不要把 `/Users/...`、`file://...` 这类机器相关绝对路径写进正文链接文字或 `href`
 - 如果只想在自己机器上直接打开文件，优先使用编辑器的“打开链接/打开文件”能力；若必须使用本地协议，建议只在不发布的个人笔记里使用 `vscode://file/...`
@@ -75,3 +114,4 @@
 - `architecture/`：系统设计、架构方法、分布式与治理、案例实战
 - `ai/`：Agent、LLM 应用、RAG、工作流
 - `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读
+- `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践
