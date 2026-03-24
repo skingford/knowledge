@@ -39,6 +39,7 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 ## 高并发活动系统专题
 
 - [大促活动预热、压测与开关治理手册](/architecture/promotion-readiness-pressure-test-and-switch-governance)
+- [秒杀系统压测脚本、容量估算与演练方法论](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)
 - [活动复盘模板与容量回归手册](/architecture/activity-postmortem-and-capacity-regression-playbook)
 - [营销活动平台设计：模板、规则、发放、核销的一体化架构](/architecture/marketing-activity-platform-architecture)
 - [秒杀系统风控、防刷与资格校验设计](/architecture/seckill-risk-control-and-eligibility-design)

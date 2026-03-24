@@ -23,6 +23,8 @@ description: 系统讲清 Kubernetes 中 readiness、preStop、SIGTERM、termina
 
 如果想把这里反复出现的 `EndpointSlice` 摘流量、`ready / serving / terminating` 状态和 Pod 终止时的后端收敛边界单独讲透，可以继续看 [EndpointSlice、Ready 与服务后端收敛边界实战](./service-backend-readiness-and-endpointslice.md)。
 
+如果想把这里反复出现的 `PDB`、`Eviction API`、`kubectl drain` 和维护窗口预算边界单独讲透，可以继续看 [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)。
+
 ## 1. 先回答零停机到底依赖什么
 
 如果只用一句话说：
@@ -287,6 +289,7 @@ spec:
 - [调度与驱逐链路实战](./scheduling-and-eviction.md)
 - [弹性扩缩容与容量协同实战](./autoscaling-and-capacity-control-chain.md)
 - [副本打散与拓扑高可用实战](./replica-spread-and-topology-ha.md)
+- [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)
 - [K8s 网络排障手册](./network-troubleshooting.md)
 - [StatefulSet 与 Headless Service 实战](./statefulset-headless-service.md)
 - [externalTrafficPolicy Local 实战与边界](./external-traffic-policy-local.md)

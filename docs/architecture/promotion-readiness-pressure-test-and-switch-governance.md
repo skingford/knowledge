@@ -509,6 +509,7 @@ flowchart TD
 
 ## 相关阅读
 
+- [秒杀系统压测脚本、容量估算与演练方法论](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)
 - [活动复盘模板与容量回归手册](/architecture/activity-postmortem-and-capacity-regression-playbook)
 - [秒杀系统风控、防刷与资格校验设计](/architecture/seckill-risk-control-and-eligibility-design)
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)

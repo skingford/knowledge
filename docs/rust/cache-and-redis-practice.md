@@ -287,6 +287,10 @@ impl UserRedisCache {
 4. 回填 Redis
 5. 再回填本地缓存
 
+如果你想把按批扫描、checkpoint、限速执行和历史回填主线单独理顺，继续看：
+
+- [Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
+
 写路径则通常仍然优先：
 
 1. 写数据库

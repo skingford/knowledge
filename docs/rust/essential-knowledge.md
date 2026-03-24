@@ -167,12 +167,15 @@ Rust 不会因为你用了线程、channel、`Arc<Mutex<T>>` 或 async/await 就
 - [Rust API Versioning、兼容演进与弃用治理实践](./api-versioning-and-compatibility-governance-practice.md)：把路径 / header 版本策略、兼容新增、弃用窗口和多版本观测收成一页
 - [Rust 认证、授权与请求上下文实践](./auth-authorization-and-request-context-practice.md)：把 middleware、extractor、route_layer、当前用户和 request id 这些服务边界收成一页
 - [Rust Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)：把 secret 注入、JWK / webhook secret 轮换、对象存储凭证和外部 token 脱敏收成一页
+- [Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)：把 DTO 暴露、日志 / trace / audit 脱敏、导出和对象存储交付边界收成一页
 - [Rust Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)：把静态配置和运行时开关分层、kill switch、按租户 / 按比例灰度和回退治理收成一页
 - [Rust WebSocket 与 SSE 实践](./websocket-and-sse-practice.md)：把 WebSocketUpgrade、SSE、broadcast/watch、慢消费者和长连接生命周期收成一页
 - [SQLx 数据库访问实践](./sqlx-database-practice.md)：补连接池、事务、迁移和分层设计
 - [Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)：把事务边界、隔离级别、条件更新、乐观锁和 `FOR UPDATE` 收成一页
 - [Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)：把 expand / contract、历史数据回填、双读双写和回滚边界收成一页
 - [Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)：把 query DTO、排序白名单、offset / cursor、`total` 成本和索引约束收成一页
+- [Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)：把搜索 query DTO、索引文档、异步同步、回填重建和 alias 切换收成一页
+- [Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)：把分批扫描、checkpoint、限速、dry-run、补跑和历史修复收成一页
 - [Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)：把请求级幂等键、业务唯一键、条件更新、状态机和 Outbox 一起收成有副作用操作的一致性主线
 - [Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)：把 producer、consumer、事件契约、至少一次投递、重试、死信和幂等消费收成一页
 - [Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)：把 multipart、预签名 URL、对象 key、元数据落库、异步后处理和 orphan 清理收成一页

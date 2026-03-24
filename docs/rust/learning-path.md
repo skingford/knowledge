@@ -90,6 +90,7 @@ search: false
 - 版本演进实践：[Rust API Versioning、兼容演进与弃用治理实践](./api-versioning-and-compatibility-governance-practice.md)
 - 认证与上下文实践：[Rust 认证、授权与请求上下文实践](./auth-authorization-and-request-context-practice.md)
 - Secret 与轮换实践：[Rust Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
+- 脱敏与日志安全实践：[Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
 - 运行时开关实践：[Rust Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
 - 多租户主线：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - 审计记录主线：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
@@ -99,6 +100,8 @@ search: false
 - 并发写路径主线：[Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)
 - Schema 演进主线：[Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
 - 列表查询实践：[Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
+- 搜索与检索实践：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
+- 批处理与回填实践：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 一致性主线：[Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 文件与对象存储实践：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
@@ -121,6 +124,7 @@ search: false
 - API versioning、兼容新增字段、错误码稳定性和弃用窗口应该怎样一起治理
 - 认证、授权、request id 和当前用户上下文应该落在哪些边界
 - secret、JWK、webhook secret、对象存储凭证和外部 API token 应该怎样注入、脱敏和轮换
+- DTO、响应、日志、trace、审计、导出和对象存储交付里的敏感字段应该怎样最小暴露、分级脱敏和留痕
 - 静态配置、运行时 feature flag、kill switch、按租户 / 按比例放量和请求内决策一致性应该怎样分层
 - tenant context、数据权限、缓存 key 和对象 key 应该怎样一起守住租户隔离
 - actor、tenant、resource、request id 和操作审计记录应该怎样一起落库和回查
@@ -130,6 +134,8 @@ search: false
 - 事务边界、条件更新、版本号和 `FOR UPDATE` 应该怎样一起守住并发更新
 - expand / contract、历史数据回填、双读双写和回滚应该怎样一起设计
 - 列表接口的过滤、排序、分页和 `count(*)` 成本应该怎么设计
+- 搜索 query、过滤 / 排序、索引文档、增量同步、回填重建和 alias 切换应该怎么一起设计
+- 分批扫描、checkpoint、限速、dry-run、补跑 / 重放和历史数据修复应该怎么一起设计
 - 大结果集导出、异步报表、对象存储交付和租户配额应该怎么一起设计
 - 幂等键、状态推进、条件更新和 Outbox 应该怎么配合
 - producer、consumer、重试、死信和事件契约应该怎样组成消息驱动闭环
@@ -201,6 +207,7 @@ search: false
 | 想补 API versioning、兼容新增字段、弃用窗口和多版本治理 | `api-versioning-and-compatibility-governance-practice` |
 | 想补认证、授权和 request context | `auth-authorization-and-request-context-practice` |
 | 想补 secret、JWK、webhook secret、对象存储凭证和外部 token 轮换 | `secret-management-and-credential-rotation-practice` |
+| 想补 DTO 暴露、日志 / trace / audit 脱敏和导出链路数据最小暴露 | `data-masking-privacy-and-log-safety-practice` |
 | 想补运行时 feature flag、kill switch、按租户 / 按比例灰度和回退治理 | `feature-flag-and-runtime-governance-practice` |
 | 想补 tenant context、数据隔离和跨租户防漏 | `multi-tenant-and-data-isolation-practice` |
 | 想补 actor、tenant、resource、request id 和操作审计记录边界 | `audit-log-and-operation-history-practice` |
@@ -210,6 +217,8 @@ search: false
 | 想补事务、隔离级别、条件更新、版本号和 `FOR UPDATE` 边界 | `transaction-locking-and-concurrent-update-practice` |
 | 想补 expand / contract、回填、双读双写和兼容发布边界 | `database-migration-and-schema-evolution-practice` |
 | 想补过滤、排序、分页和 cursor 边界 | `pagination-filter-and-sorting-practice` |
+| 想补搜索 query、索引同步、回填重建和零停机切换 | `search-index-and-retrieval-practice` |
+| 想补分批扫描、checkpoint、历史回填、批量修复和可恢复执行 | `batch-processing-backfill-and-historical-repair-practice` |
 | 想补大结果集导出、异步报表和对象存储交付边界 | `export-report-and-large-result-practice` |
 | 想补幂等、状态机和 Outbox | `idempotency-state-machine-and-outbox-practice` |
 | 想补 producer、consumer、重试和死信边界 | `message-queue-and-event-driven-practice` |
@@ -264,35 +273,38 @@ search: false
 23. [Rust API Versioning、兼容演进与弃用治理实践](./api-versioning-and-compatibility-governance-practice.md)
 24. [Rust 认证、授权与请求上下文实践](./auth-authorization-and-request-context-practice.md)
 25. [Rust Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
-26. [Rust Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
-27. [Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
-28. [Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
-29. [Rust Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
-30. [Rust WebSocket 与 SSE 实践](./websocket-and-sse-practice.md)
-31. [SQLx 数据库访问实践](./sqlx-database-practice.md)
-32. [Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)
-33. [Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
-34. [Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
-35. [Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
-36. [Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
-37. [Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
-38. [Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
-39. [Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
-40. [Axum + SQLx 服务落地模板](./axum-sqlx-service-template.md)
-41. [Serde 与数据序列化实践](./serde-and-data-serialization.md)
-42. [Tracing 与可观测性实践](./tracing-and-observability-practice.md)
-43. [Rust Metrics 与 OpenTelemetry 实践](./metrics-and-opentelemetry-practice.md)
-44. [Rust 性能分析与 Profiling 指南](./performance-and-profiling-guide.md)
-45. [服务配置与优雅关闭](./service-configuration-and-graceful-shutdown.md)
-46. [Rust 后端项目骨架](./backend-project-skeleton.md)
-47. [Rust 服务部署与发布清单](./deployment-and-release-checklist.md)
-48. [宏与元编程基础](./macros-and-metaprogramming.md)
-49. [Unsafe 与 FFI 边界](./unsafe-and-ffi-boundaries.md)
-50. [测试与质量实践](./testing-and-quality-practice.md)
-51. [Rust 测试替身与依赖隔离实践](./test-doubles-and-dependency-isolation-practice.md)
-52. [Rust 能力自检与面试准备导航](./interview-prep.md)
-53. [Rust 必备问题清单](./essential-questions.md)
-54. [Rust 能力自检高频题示例代码片段](./interview-code-snippets.md)
+26. [Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
+27. [Rust Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
+28. [Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
+29. [Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
+30. [Rust Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+31. [Rust WebSocket 与 SSE 实践](./websocket-and-sse-practice.md)
+32. [SQLx 数据库访问实践](./sqlx-database-practice.md)
+33. [Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)
+34. [Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
+35. [Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
+36. [Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
+37. [Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
+38. [Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
+39. [Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
+40. [Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
+41. [Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+42. [Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
+43. [Axum + SQLx 服务落地模板](./axum-sqlx-service-template.md)
+44. [Serde 与数据序列化实践](./serde-and-data-serialization.md)
+45. [Tracing 与可观测性实践](./tracing-and-observability-practice.md)
+46. [Rust Metrics 与 OpenTelemetry 实践](./metrics-and-opentelemetry-practice.md)
+47. [Rust 性能分析与 Profiling 指南](./performance-and-profiling-guide.md)
+48. [服务配置与优雅关闭](./service-configuration-and-graceful-shutdown.md)
+49. [Rust 后端项目骨架](./backend-project-skeleton.md)
+50. [Rust 服务部署与发布清单](./deployment-and-release-checklist.md)
+51. [宏与元编程基础](./macros-and-metaprogramming.md)
+52. [Unsafe 与 FFI 边界](./unsafe-and-ffi-boundaries.md)
+53. [测试与质量实践](./testing-and-quality-practice.md)
+54. [Rust 测试替身与依赖隔离实践](./test-doubles-and-dependency-isolation-practice.md)
+55. [Rust 能力自检与面试准备导航](./interview-prep.md)
+56. [Rust 必备问题清单](./essential-questions.md)
+57. [Rust 能力自检高频题示例代码片段](./interview-code-snippets.md)
 
 ## 当前整理原则
 

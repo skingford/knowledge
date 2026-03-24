@@ -287,6 +287,8 @@ Kubernetes 官方 StatefulSet 强制删除文档也明确说：
 
 - 节点控制面自动故障处理
 
+如果想把 `PDB`、`Eviction API`、`429` 和 `drain` 为什么会卡住单独讲透，可以继续看 [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)。
+
 ### 8.3 `Ready=False / Unknown`
 
 这属于：
@@ -409,6 +411,7 @@ DaemonSet 对 `not-ready/unreachable` 的容忍是特殊处理，不代表普通
 - [Pod 生命周期与探针实战](./pod-lifecycle-and-probes.md)
 - [删除、Finalizers 与 Terminating 边界实战](./deletion-finalizers-and-terminating-boundaries.md)
 - [副本打散与拓扑高可用实战](./replica-spread-and-topology-ha.md)
+- [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)
 - [StatefulSet 与 Headless Service 实战](./statefulset-headless-service.md)
 - [K8s 网络排障手册](./network-troubleshooting.md)
 - [K8s 核心概念与对象模型](./core-concepts.md)

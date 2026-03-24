@@ -402,6 +402,7 @@ search: false
 
 如果你想把批处理、队列和重试边界单独理顺，继续看：
 
+- [Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - [Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
 - [Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)
 
@@ -542,8 +543,10 @@ search: false
 - 数据访问主线：[SQLx 数据库访问实践](./sqlx-database-practice.md)
 - 事务与并发写路径：[Rust 事务、锁与并发更新实践](./transaction-locking-and-concurrent-update-practice.md)
 - 后台任务与回填执行：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
+- 批处理与历史修复：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 多租户迁移边界：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - DTO 与兼容模型：[Rust DTO、领域模型与存储模型分层实践](./dto-domain-and-persistence-model-practice.md)
+- 搜索索引演进：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
 - 缓存演进边界：[Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
 - 消息契约演进：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 上线与回滚：[Rust 服务部署与发布清单](./deployment-and-release-checklist.md)

@@ -520,6 +520,7 @@ src/
 - 序列化边界：[Serde 与数据序列化实践](./serde-and-data-serialization.md)
 - Web 输入输出：[Axum Web 服务实践](./axum-web-service-practice.md)
 - API 版本治理：[Rust API Versioning、兼容演进与弃用治理实践](./api-versioning-and-compatibility-governance-practice.md)
+- 字段暴露与日志脱敏：[Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
 - 数据访问边界：[SQLx 数据库访问实践](./sqlx-database-practice.md)
 - Schema 演进主线：[Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
 - 列表查询边界：[Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)

@@ -471,6 +471,7 @@ spec:
 - [K8s 核心概念与对象模型](./core-concepts.md)
 - [K8s 必备问题清单](./essential-questions.md)
 - [调度与驱逐链路实战](./scheduling-and-eviction.md)
+- [PriorityClass、Preemption 与调度让路边界实战](./priorityclass-preemption-and-scheduling-boundaries.md)
 - [弹性扩缩容与容量协同实战](./autoscaling-and-capacity-control-chain.md)
 - [Namespace 资源治理与配额边界实战](./namespace-resource-governance-and-quota.md)
 - [K8s 网络排障手册](./network-troubleshooting.md)

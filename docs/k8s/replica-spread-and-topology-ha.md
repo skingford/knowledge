@@ -550,5 +550,6 @@ PDB 约束的是 voluntary disruption，不是突然宕机。
 - [调度与驱逐链路实战](./scheduling-and-eviction.md)
 - [弹性扩缩容与容量协同实战](./autoscaling-and-capacity-control-chain.md)
 - [零停机发布链路实战](./zero-downtime-rollout.md)
+- [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)
 - [externalTrafficPolicy Local 实战与边界](./external-traffic-policy-local.md)
 - [K8s 必备问题清单](./essential-questions.md)

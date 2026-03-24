@@ -528,10 +528,12 @@ Excel 并不是不能做，但它通常更适合：
 
 - 列表查询边界：[Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
 - 后台任务主线：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
+- 批处理与回填主线：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 文件与对象存储：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 多租户与配额：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - 限流与超时：[Rust 限流、超时与负载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
 - 审计记录边界：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
+- 数据最小暴露：[Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 测试隔离：[Rust 测试替身与依赖隔离实践](./test-doubles-and-dependency-isolation-practice.md)
 

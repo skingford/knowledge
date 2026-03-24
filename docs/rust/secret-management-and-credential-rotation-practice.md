@@ -474,6 +474,7 @@ Secrets 和轮换相关测试，至少值得覆盖：
 - 文件与对象存储：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 上线与注入：[Rust 服务部署与发布清单](./deployment-and-release-checklist.md)
 - 审计与脱敏：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
+- 数据最小暴露：[Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
 - 结构化观测：[Tracing 与可观测性实践](./tracing-and-observability-practice.md)
 
 ## 自检

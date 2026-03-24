@@ -526,10 +526,12 @@ pub struct ScheduledTrigger {
 ## 推荐回查入口
 
 - 后台任务主线：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
+- 批处理与历史修复：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 消息和异步消费：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 幂等与状态推进：[Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 - 缓存后台刷新：[Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+- 搜索索引重建：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
 - 文件和后处理任务：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 生命周期与关闭：[服务配置与优雅关闭](./service-configuration-and-graceful-shutdown.md)
 - 上线与发布窗口：[Rust 服务部署与发布清单](./deployment-and-release-checklist.md)

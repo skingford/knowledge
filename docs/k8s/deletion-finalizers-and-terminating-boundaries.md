@@ -488,6 +488,7 @@ Pod 的 `Terminating` 很多时候卡在：
 - [K8s 必备问题清单](./essential-questions.md)
 - [Pod 生命周期与探针实战](./pod-lifecycle-and-probes.md)
 - [零停机发布链路实战](./zero-downtime-rollout.md)
+- [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)
 - [控制器与 Reconcile 链路实战](./controllers-and-reconcile.md)
 - [控制面主线实战](./control-plane-mainline.md)
 - [节点心跳、Lease 与失联驱逐边界实战](./node-heartbeat-lease-and-failure-eviction.md)

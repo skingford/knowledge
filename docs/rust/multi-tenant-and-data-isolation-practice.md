@@ -592,6 +592,7 @@ RLS（Row Level Security）可以提供额外兜底。
 - 数据访问边界：[SQLx 数据库访问实践](./sqlx-database-practice.md)
 - Schema 演进主线：[Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
 - 列表查询边界：[Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
+- 搜索结果隔离：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
 - 缓存边界：[Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
 - 服务保护边界：[Rust 限流、超时与负载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)

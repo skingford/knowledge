@@ -68,6 +68,10 @@ type DiagramKind =
   | 'service-dns-answer-map'
   | 'endpointslice-reconcile-chain'
   | 'endpoint-conditions-boundary-map'
+  | 'pdb-eviction-drain-chain'
+  | 'disruption-budget-boundary-map'
+  | 'priority-preemption-scheduling-chain'
+  | 'priority-preemption-boundary-map'
   | 'service-dataplane-chain'
   | 'iptables-vs-ipvs-map'
   | 'networkpolicy-enforcement-chain'
@@ -147,6 +151,10 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'service-dns-answer-map': '860px',
   'endpointslice-reconcile-chain': '860px',
   'endpoint-conditions-boundary-map': '860px',
+  'pdb-eviction-drain-chain': '860px',
+  'disruption-budget-boundary-map': '860px',
+  'priority-preemption-scheduling-chain': '860px',
+  'priority-preemption-boundary-map': '860px',
   'service-dataplane-chain': '860px',
   'iptables-vs-ipvs-map': '860px',
   'networkpolicy-enforcement-chain': '860px',
@@ -3689,6 +3697,273 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="116" y="352" width="628" height="28" rx="14" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
       <text x="430" y="371" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">
         口诀：先分 `Running / Ready`，再分 `ready / serving / terminating`，最后再看是不是人为开启了 `publishNotReadyAddresses`
+      </text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'pdb-eviction-drain-chain'"
+      viewBox="0 0 860 402"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s PDB Eviction API drain 维护链路图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-pdb-chain" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 72 - `PDB` 不直接迁 Pod；真正的维护链路通常是 `kubectl drain` 发起 eviction，由 apiserver 按 budget 决定放行还是拒绝
+      </text>
+
+      <rect x="28" y="106" width="138" height="96" rx="14" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="97" y="134" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">维护发起方</text>
+      <text x="97" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">平台运维</text>
+      <text x="97" y="170" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">节点升级 / 迁移</text>
+      <text x="97" y="186" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">人工或自动化维护</text>
+
+      <rect x="198" y="92" width="166" height="124" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="281" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-c-text)">`kubectl drain`</text>
+      <text x="281" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">先 cordon</text>
+      <text x="281" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">再尝试迁走节点上的 Pod</text>
+      <text x="281" y="172" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">默认优先走 eviction</text>
+      <rect x="229" y="188" width="104" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="281" y="202" text-anchor="middle" font-size="9" fill="var(--d-text)">默认尊重预算</text>
+
+      <rect x="396" y="92" width="168" height="124" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="480" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-b-text)">Eviction API</text>
+      <text x="480" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">apiserver 收到 eviction 请求</text>
+      <text x="480" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">检查目标 Pod 命中的 `PDB`</text>
+      <text x="480" y="172" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">看 `disruptionsAllowed` 是否够</text>
+      <rect x="428" y="188" width="104" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="480" y="202" text-anchor="middle" font-size="9" fill="var(--d-text)">预算闸门</text>
+
+      <rect x="596" y="92" width="236" height="124" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="714" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-warn-text)">`PDB` 当前状态</text>
+      <text x="714" y="140" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`currentHealthy / desiredHealthy`</text>
+      <text x="714" y="156" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">`disruptionsAllowed`</text>
+      <text x="714" y="172" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">决定这次驱逐是放行还是拒绝</text>
+      <rect x="661" y="188" width="106" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="714" y="202" text-anchor="middle" font-size="9" fill="var(--d-text)">别只看 YAML</text>
+
+      <line x1="166" y1="154" x2="198" y2="154" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-pdb-chain)" />
+      <line x1="364" y1="154" x2="396" y2="154" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-pdb-chain)" />
+      <line x1="564" y1="154" x2="596" y2="154" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-pdb-chain)" />
+
+      <rect x="112" y="270" width="286" height="84" rx="16" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="255" y="298" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-cur-text)">预算允许</text>
+      <text x="255" y="318" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">eviction 被接受</text>
+      <text x="255" y="336" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">Pod 进入正常终止链路</text>
+
+      <rect x="462" y="270" width="286" height="84" rx="16" fill="var(--d-danger-bg)" stroke="var(--d-danger-border)" />
+      <text x="605" y="298" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-danger-text)">预算不允许</text>
+      <text x="605" y="318" text-anchor="middle" font-size="10" fill="var(--d-danger-text)">常见表现：`429 Too Many Requests`</text>
+      <text x="605" y="336" text-anchor="middle" font-size="10" fill="var(--d-danger-text)">`drain` 重试 / 等待，不是集群一定坏了</text>
+
+      <line x1="650" y1="216" x2="308" y2="270" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-pdb-chain)" />
+      <line x1="778" y1="216" x2="552" y2="270" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-pdb-chain)" />
+
+      <path d="M281 216 C281 244, 424 244, 424 320" fill="none" stroke="var(--d-danger-text)" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#k8s-arrow-pdb-chain)" />
+      <text x="368" y="246" text-anchor="middle" font-size="9" fill="var(--d-danger-text)">`--disable-eviction` / 直接 `delete pod` 会绕过 PDB</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'disruption-budget-boundary-map'"
+      viewBox="0 0 860 404"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s disruption budget 边界图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-disruption-map" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 73 - 讲 `PDB` 时要先分清四类场景：维护驱逐、故障中断、工作负载 rollout、直接 delete；它们不是一条控制线
+      </text>
+
+      <rect x="28" y="92" width="188" height="246" rx="16" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="122" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-text)">维护驱逐</text>
+      <text x="122" y="146" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">`kubectl drain`</text>
+      <text x="122" y="164" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">Eviction API</text>
+      <text x="122" y="182" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">节点迁移 / 缩容</text>
+      <text x="122" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">`PDB` 有效</text>
+      <text x="122" y="246" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">核心问题：预算是否允许</text>
+      <rect x="74" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="122" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">预算主场</text>
+
+      <rect x="234" y="92" width="188" height="246" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="328" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-c-text)">故障中断</text>
+      <text x="328" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">节点宕机</text>
+      <text x="328" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">宿主机丢失</text>
+      <text x="328" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">网络分区 / 节点失联</text>
+      <text x="328" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">`PDB` 无法阻止</text>
+      <text x="328" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">核心问题：故障收敛与容灾</text>
+      <rect x="280" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="328" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">不是预算线</text>
+
+      <rect x="440" y="92" width="188" height="246" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="534" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-b-text)">工作负载 rollout</text>
+      <text x="534" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">Deployment 更新</text>
+      <text x="534" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">StatefulSet 逐个替换</text>
+      <text x="534" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">看策略和 readiness 收敛</text>
+      <text x="534" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">不由 `PDB` 直接控节奏</text>
+      <text x="534" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">核心问题：发布速度与零停机</text>
+      <rect x="486" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="534" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">不是 rollout 控制器</text>
+
+      <rect x="646" y="92" width="188" height="246" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="740" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-warn-text)">直接 delete / 绕过</text>
+      <text x="740" y="146" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`kubectl delete pod`</text>
+      <text x="740" y="164" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`drain --disable-eviction`</text>
+      <text x="740" y="182" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">预算闸门不参与</text>
+      <text x="740" y="228" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">风险：一次少掉太多副本</text>
+      <text x="740" y="246" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">核心问题：是不是绕过保护</text>
+      <rect x="692" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="740" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">最危险的快路径</text>
+
+      <line x1="216" y1="206" x2="234" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-disruption-map)" />
+      <line x1="422" y1="206" x2="440" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-disruption-map)" />
+      <line x1="628" y1="206" x2="646" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-disruption-map)" />
+
+      <rect x="96" y="356" width="668" height="26" rx="13" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="430" y="374" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">
+        口诀：先分场景，再谈预算；节点压力下的 `Evicted` 也不走这条 `PDB -> Eviction API -> drain` 维护链
+      </text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'priority-preemption-scheduling-chain'"
+      viewBox="0 0 860 408"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s PriorityClass 与 Preemption 调度让路链路图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-priority-chain" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 74 - 优先级先影响排队顺序；只有正常调度失败后，scheduler 才可能进入 preemption，在单个节点上选择低优先级 victim 为更高优先级 Pod 让路
+      </text>
+
+      <rect x="20" y="112" width="148" height="100" rx="14" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="94" y="140" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">Pending Pod P</text>
+      <text x="94" y="160" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">`priorityClassName`</text>
+      <text x="94" y="176" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">高优先级只是先排</text>
+      <text x="94" y="192" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">不是直接落地</text>
+
+      <rect x="194" y="96" width="170" height="132" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="279" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-c-text)">Scheduler 正常调度</text>
+      <text x="279" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">先按优先级排队</text>
+      <text x="279" y="160" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">再跑 Filter / Score</text>
+      <text x="279" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">看 requests、亲和、污点、PVC</text>
+      <rect x="236" y="192" width="86" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="279" y="206" text-anchor="middle" font-size="9" fill="var(--d-text)">先看可行性</text>
+
+      <rect x="390" y="96" width="170" height="132" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="475" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-b-text)">PostFilter / Preemption</text>
+      <text x="475" y="144" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">所有节点都放不下</text>
+      <text x="475" y="160" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">才尝试在某个节点上</text>
+      <text x="475" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">移走更低优先级 victim</text>
+      <rect x="432" y="192" width="86" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="475" y="206" text-anchor="middle" font-size="9" fill="var(--d-text)">不是默认必走</text>
+
+      <rect x="586" y="84" width="248" height="156" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="710" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-warn-text)">候选节点 N</text>
+      <text x="710" y="132" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">挑出比 P 更低优先级的 victim</text>
+      <text x="710" y="148" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">victim 先终止，不是瞬间消失</text>
+      <text x="710" y="164" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">Pod P 可能写入 `nominatedNodeName`</text>
+      <rect x="642" y="182" width="136" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="710" y="196" text-anchor="middle" font-size="9" fill="var(--d-text)">只是候选，不是承诺</text>
+
+      <line x1="168" y1="162" x2="194" y2="162" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-priority-chain)" />
+      <line x1="364" y1="162" x2="390" y2="162" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-priority-chain)" />
+      <line x1="560" y1="162" x2="586" y2="162" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-priority-chain)" />
+
+      <rect x="90" y="286" width="312" height="82" rx="16" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="246" y="314" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-cur-text)">成功路径</text>
+      <text x="246" y="334" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">victim 退出后资源真正空出来</text>
+      <text x="246" y="352" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">Pod P 才有机会最终绑定节点</text>
+
+      <rect x="454" y="286" width="316" height="82" rx="16" fill="var(--d-danger-bg)" stroke="var(--d-danger-border)" />
+      <text x="612" y="314" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-danger-text)">失败或变化路径</text>
+      <text x="612" y="334" text-anchor="middle" font-size="10" fill="var(--d-danger-text)">硬约束仍不满足、victim 退太慢</text>
+      <text x="612" y="352" text-anchor="middle" font-size="10" fill="var(--d-danger-text)">或更高优先级 Pod 抢先来到，P 仍可能继续 Pending</text>
+
+      <line x1="664" y1="240" x2="332" y2="286" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-priority-chain)" />
+      <line x1="760" y1="240" x2="552" y2="286" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-priority-chain)" />
+    </svg>
+
+    <svg
+      v-else-if="kind === 'priority-preemption-boundary-map'"
+      viewBox="0 0 860 408"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s PriorityClass 与 Preemption 边界图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-priority-boundary" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 75 - 讲优先级时要先分清四层边界：排队顺序、单节点让路、硬约束不可绕、以及它和 `PDB` / 节点压力驱逐根本不是一条控制线
+      </text>
+
+      <rect x="28" y="92" width="188" height="248" rx="16" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="122" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-text)">PriorityClass</text>
+      <text x="122" y="146" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">表达相对重要性</text>
+      <text x="122" y="164" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">影响 pending 队列顺序</text>
+      <text x="122" y="182" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">不等于直接调度成功</text>
+      <text x="122" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">核心问题：</text>
+      <text x="122" y="246" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">谁更值得先排</text>
+      <rect x="74" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="122" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">先排，不是直通</text>
+
+      <rect x="234" y="92" width="188" height="248" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="328" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-c-text)">Preemption</text>
+      <text x="328" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">只在正常调度失败后考虑</text>
+      <text x="328" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">只在单个节点上找 victim</text>
+      <text x="328" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">`nominatedNodeName` 只是候选</text>
+      <text x="328" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">核心问题：</text>
+      <text x="328" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">谁该为谁让路</text>
+      <rect x="280" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="328" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">单节点让路</text>
+
+      <rect x="440" y="92" width="188" height="248" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="534" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-b-text)">硬约束</text>
+      <text x="534" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">`requests`、节点亲和</text>
+      <text x="534" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">`taints/tolerations`、PVC</text>
+      <text x="534" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">拓扑与 Pod 亲和/反亲和</text>
+      <text x="534" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">核心问题：</text>
+      <text x="534" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">这件事到底可能吗</text>
+      <rect x="486" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="534" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">绕不过硬约束</text>
+
+      <rect x="646" y="92" width="188" height="248" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="740" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-warn-text)">其他控制线</text>
+      <text x="740" y="146" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`PDB` 在 preemption 里是 best effort</text>
+      <text x="740" y="164" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`drain` 是维护驱逐</text>
+      <text x="740" y="182" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">节点压力驱逐是 kubelet 自保</text>
+      <text x="740" y="228" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">核心问题：</text>
+      <text x="740" y="246" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">别把多条线混成一条</text>
+      <rect x="692" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="740" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">不是同一机制</text>
+
+      <line x1="216" y1="206" x2="234" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-priority-boundary)" />
+      <line x1="422" y1="206" x2="440" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-priority-boundary)" />
+      <line x1="628" y1="206" x2="646" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-priority-boundary)" />
+
+      <rect x="120" y="360" width="620" height="26" rx="13" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="430" y="378" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">
+        口诀：先问能不能放，再问谁先排；放不下才谈让路，别把 preemption、drain、节点压力驱逐混成一句
       </text>
     </svg>
 

@@ -423,6 +423,7 @@ flowchart TD
 ## 相关阅读
 
 - [大促活动预热、压测与开关治理手册](/architecture/promotion-readiness-pressure-test-and-switch-governance)
+- [秒杀系统压测脚本、容量估算与演练方法论](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)
 - [营销活动平台设计：模板、规则、发放、核销的一体化架构](/architecture/marketing-activity-platform-architecture)
 - [秒杀系统监控、告警与应急响应设计](/architecture/seckill-monitoring-alerting-and-incident-response)
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)

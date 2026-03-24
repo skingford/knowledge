@@ -131,6 +131,10 @@ fn authenticate_user(username: &str, password: &str) -> bool {
 - 敏感证件号
 - 大体积请求体
 
+如果你想把响应 DTO 暴露、trace / 审计脱敏、导出文件和对象存储交付里的敏感字段边界单独理顺，继续看：
+
+- [Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
+
 ## 结构化字段比纯字符串更重要
 
 官方示例里一个关键风格是：
