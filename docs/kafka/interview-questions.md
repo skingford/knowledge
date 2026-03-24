@@ -76,6 +76,8 @@ producer.Produce(msg)
 
 </details>
 
+<KafkaDiagram kind="interview-backlog-playbook" />
+
 ## 如何做消费重试和死信处理
 
 <details>
@@ -123,6 +125,8 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
 
 </details>
 
+<KafkaDiagram kind="interview-lost-vs-duplicate" />
+
 ## 幂等性与事务
 
 <details>
@@ -134,6 +138,8 @@ func (c *Consumer) HandleWithRetry(msg *kafka.Message) {
 > 幂等性解决"别重复写"，事务解决"要么一起成，要么一起不成"。
 
 </details>
+
+<KafkaDiagram kind="interview-idempotency-vs-transaction" />
 
 ---
 

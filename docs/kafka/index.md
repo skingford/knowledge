@@ -21,6 +21,8 @@ description: 系统整理 Kafka 核心知识，涵盖消息模型、可靠性机
 - Producer、Broker、Consumer 三层视角的可靠性梳理
 - 面向支付系统的积压、重试、死信治理思路
 
+<KafkaDiagram kind="topic-goals-map" />
+
 ## 内容结构
 
 | 文档 | 覆盖内容 |
