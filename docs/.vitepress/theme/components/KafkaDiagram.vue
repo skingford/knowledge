@@ -22,6 +22,8 @@ type DiagramKind =
   | 'interview-lost-vs-duplicate'
   | 'interview-idempotency-vs-transaction'
   | 'interview-questions'
+  | 'message-lifecycle-send'
+  | 'message-lifecycle-consume'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -47,6 +49,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'interview-lost-vs-duplicate': '860px',
   'interview-idempotency-vs-transaction': '860px',
   'interview-questions': '860px',
+  'message-lifecycle-send': '860px',
+  'message-lifecycle-consume': '860px',
 }
 
 const maxWidth = computed(() => maxWidthByKind[props.kind])
@@ -1111,5 +1115,212 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <line x1="632" y1="113" x2="508" y2="150" stroke="var(--d-arrow)" stroke-width="1.6" />
       <line x1="632" y1="229" x2="508" y2="202" stroke="var(--d-arrow)" stroke-width="1.6" />
     </svg>
+    <svg
+      v-else-if="kind === 'message-lifecycle-send'"
+      viewBox="0 0 860 370"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="消息生命周期：Producer → Broker"
+      role="img"
+    >
+      <defs>
+        <marker id="kafka-arrow-lc-send" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        一条消息从 Producer 到 Broker 落盘的完整路径
+      </text>
+
+      <!-- Producer 流程 -->
+      <rect x="20" y="56" width="120" height="44" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <text x="80" y="74" text-anchor="middle" font-size="11" font-weight="700" fill="var(--d-rv-c-text)">send(record)</text>
+      <text x="80" y="90" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">应用调用</text>
+
+      <line x1="140" y1="78" x2="165" y2="78" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="168" y="56" width="100" height="44" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="218" y="74" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-text)">拦截器链</text>
+      <text x="218" y="90" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">加 trace header</text>
+
+      <line x1="268" y1="78" x2="293" y2="78" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="296" y="56" width="100" height="44" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="346" y="74" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-text)">序列化器</text>
+      <text x="346" y="90" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">key + value → bytes</text>
+
+      <line x1="396" y1="78" x2="421" y2="78" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="424" y="56" width="100" height="44" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="474" y="74" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-text)">分区器</text>
+      <text x="474" y="90" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">hash(key) % N</text>
+
+      <line x1="524" y1="78" x2="549" y2="78" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="552" y="48" width="140" height="60" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="622" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">RecordAccumulator</text>
+      <text x="622" y="86" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">按 &lt;topic, partition&gt; 攒批</text>
+      <text x="622" y="100" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">batch.size / linger.ms</text>
+
+      <line x1="692" y1="78" x2="717" y2="78" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="720" y="56" width="120" height="44" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <text x="780" y="74" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-c-text)">Sender 线程</text>
+      <text x="780" y="90" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">NIO 发送到 Broker</text>
+
+      <!-- 分隔线 -->
+      <line x1="20" y1="128" x2="840" y2="128" stroke="var(--d-border)" stroke-width="1" stroke-dasharray="6 4" />
+      <text x="430" y="148" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">── 网络边界 ──</text>
+
+      <!-- Broker 流程 -->
+      <rect x="40" y="168" width="130" height="44" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <text x="105" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-b-text)">Acceptor 线程</text>
+      <text x="105" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">接收连接</text>
+
+      <line x1="170" y1="190" x2="200" y2="190" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="203" y="168" width="130" height="44" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <text x="268" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-b-text)">Network 线程</text>
+      <text x="268" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">读请求 → 请求队列</text>
+
+      <line x1="333" y1="190" x2="363" y2="190" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="366" y="168" width="130" height="44" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <text x="431" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-b-text)">IO 线程 (×8)</text>
+      <text x="431" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">写入 CommitLog</text>
+
+      <line x1="496" y1="190" x2="526" y2="190" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="529" y="162" width="150" height="56" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="604" y="182" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-a-text)">Partition Log</text>
+      <text x="604" y="198" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">顺序追加 → Page Cache</text>
+      <text x="604" y="212" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">offset 单调递增</text>
+
+      <!-- 副本同步 -->
+      <line x1="604" y1="218" x2="604" y2="254" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <rect x="489" y="256" width="230" height="56" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <text x="604" y="276" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-text)">Follower 副本 fetch 同步</text>
+      <text x="604" y="292" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">ISR 全部同步 → High Watermark 推进</text>
+      <text x="604" y="306" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">消息变为"已提交"（committed）</text>
+
+      <!-- ACK 返回 -->
+      <rect x="40" y="256" width="200" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="140" y="274" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">返回 ACK 给 Producer</text>
+      <text x="140" y="290" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">acks=0：不等  acks=1：Leader 写入即返回</text>
+      <text x="140" y="304" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">acks=all：所有 ISR 确认后返回</text>
+
+      <line x1="489" y1="284" x2="245" y2="284" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-send)" />
+
+      <!-- 底部关键参数 -->
+      <rect x="130" y="332" width="600" height="28" rx="14" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-dasharray="6 4" />
+      <text x="430" y="351" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">
+        关键参数：batch.size · linger.ms · acks · retries · enable.idempotence · max.in.flight.requests.per.connection
+      </text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'message-lifecycle-consume'"
+      viewBox="0 0 860 360"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="消息生命周期：Broker → Consumer"
+      role="img"
+    >
+      <defs>
+        <marker id="kafka-arrow-lc-consume" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        一条消息从 Broker 到 Consumer 处理完成的完整路径
+      </text>
+
+      <!-- Consumer Group 加入 -->
+      <rect x="20" y="56" width="160" height="56" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="100" y="76" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-a-text)">Consumer 启动</text>
+      <text x="100" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">发送 JoinGroup 请求</text>
+      <text x="100" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">到 Group Coordinator</text>
+
+      <line x1="180" y1="84" x2="210" y2="84" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="213" y="56" width="170" height="56" rx="10" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <text x="298" y="76" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-text)">Coordinator 协调</text>
+      <text x="298" y="92" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">选举 Group Leader</text>
+      <text x="298" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">执行分区分配策略</text>
+
+      <line x1="383" y1="84" x2="413" y2="84" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="416" y="56" width="170" height="56" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="501" y="76" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-a-text)">SyncGroup 下发</text>
+      <text x="501" y="92" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">每个 Consumer 知道自己</text>
+      <text x="501" y="104" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">负责哪些 Partition</text>
+
+      <rect x="620" y="56" width="220" height="56" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="730" y="72" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">分配策略</text>
+      <text x="730" y="88" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">Range / RoundRobin / Sticky</text>
+      <text x="730" y="104" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">CooperativeSticky（增量 Rebalance）</text>
+
+      <!-- 分隔线 -->
+      <line x1="20" y1="130" x2="840" y2="130" stroke="var(--d-border)" stroke-width="1" stroke-dasharray="6 4" />
+      <text x="430" y="150" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">── 消费循环 ──</text>
+
+      <!-- Fetch 流程 -->
+      <rect x="20" y="166" width="150" height="50" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="95" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-a-text)">发起 fetch 请求</text>
+      <text x="95" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">指定 offset + maxBytes</text>
+
+      <line x1="170" y1="191" x2="200" y2="191" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="203" y="166" width="160" height="50" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <text x="283" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-b-text)">Leader 读取数据</text>
+      <text x="283" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">Page Cache 命中 → 零拷贝</text>
+
+      <line x1="363" y1="191" x2="393" y2="191" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="396" y="166" width="130" height="50" rx="10" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.2" />
+      <text x="461" y="186" text-anchor="middle" font-size="10" font-weight="600" fill="var(--d-text)">反序列化</text>
+      <text x="461" y="202" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">bytes → 业务对象</text>
+
+      <line x1="526" y1="191" x2="556" y2="191" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="559" y="166" width="130" height="50" rx="10" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.4" />
+      <text x="624" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-c-text)">业务处理</text>
+      <text x="624" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">写 DB / 调 AI / RPC</text>
+
+      <line x1="689" y1="191" x2="719" y2="191" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#kafka-arrow-lc-consume)" />
+
+      <rect x="722" y="166" width="118" height="50" rx="10" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <text x="781" y="186" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-rv-a-text)">提交 offset</text>
+      <text x="781" y="202" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">→ __consumer_offsets</text>
+
+      <!-- 分隔线 -->
+      <line x1="20" y1="234" x2="840" y2="234" stroke="var(--d-border)" stroke-width="1" stroke-dasharray="6 4" />
+      <text x="430" y="254" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">── 异常保障 ──</text>
+
+      <!-- 异常场景 -->
+      <rect x="20" y="270" width="195" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="117" y="290" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">Producer 幂等重试</text>
+      <text x="117" y="308" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">&lt;PID, 分区, 序列号&gt; 去重</text>
+
+      <rect x="235" y="270" width="195" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="332" y="290" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">Broker Leader 选举</text>
+      <text x="332" y="308" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">ISR 中选新 Leader，拒绝 unclean</text>
+
+      <rect x="450" y="270" width="195" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="547" y="290" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">Consumer Rebalance</text>
+      <text x="547" y="308" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">故障 → 重新分配 → 从 offset 续消费</text>
+
+      <rect x="665" y="270" width="175" height="56" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="752" y="290" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-warn-text)">消息过期清理</text>
+      <text x="752" y="308" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">retention.ms 默认 7 天</text>
+
+      <!-- 底部总结 -->
+      <rect x="160" y="340" width="540" height="28" rx="14" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-dasharray="6 4" />
+      <text x="430" y="358" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">
+        可靠性 = Producer 幂等 + Broker 副本 + Consumer 手动提交 + 业务幂等，四层缺一不可
+      </text>
+    </svg>
+
   </DiagramFrame>
 </template>
