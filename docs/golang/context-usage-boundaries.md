@@ -70,6 +70,23 @@ search: false
 
 那它就应该监听 `ctx.Done()`，否则请求早就超时了，后台 Goroutine 还在跑。
 
+### 4. 认清 `net/http` 里的请求生命周期边界
+
+在服务端，`r.Context()` 不是一个“可以长期拿走复用”的上下文。
+
+对传入服务端的 HTTP 请求来说，`r.Context()` 会在下面几种情况被取消：
+
+- 客户端连接关闭
+- HTTP/2 请求被取消
+- `ServeHTTP` 返回
+
+这意味着一个非常重要的结论：
+
+- **只要任务属于当前请求的一部分，就继续透传 `r.Context()`**
+- **只要任务要在请求结束后继续跑，就别再直接用 `r.Context()`**
+
+如果你想把这件事从源码层看清楚，可以继续读 [context 包源码精读](./guide/source-reading/context.md)。
+
 ## 什么时候不该用
 
 ### 1. 不要把它当参数袋
@@ -120,6 +137,37 @@ search: false
 - 下游核心依赖
 - 本该在函数参数里出现的业务输入
 
+### 4. 不要把请求 `ctx` 传给“离线任务”
+
+最常见的误用之一，是在 Handler 里启动 goroutine，然后把 `r.Context()` 直接传给它做：
+
+- 审计日志
+- 推送通知
+- 临时文件清理
+- 异步埋点
+- 非关键链路补偿
+
+问题在于：这类任务往往希望在请求返回后继续执行，但 `r.Context()` 会在 `ServeHTTP` 返回后很快取消。
+
+更稳妥的做法有两种：
+
+- **边界最清晰**：`context.Background()` + 手动复制必要元数据
+- **保留 Value 更方便**：Go 1.21+ 使用 `context.WithoutCancel(r.Context())`
+
+无论哪种做法，都应该再额外加上自己的超时控制，而不是让异步任务无限运行。
+
+### 5. 不要在请求结束后继续依赖 `*http.Request`
+
+即使你已经把 `ctx` 剥离了，也不代表可以继续在后台 goroutine 里随意使用原始请求对象。
+
+更安全的实践是：
+
+- 在启动 goroutine 前，把需要的 `userID`、`traceID`、业务参数先提取出来
+- 不要在后台 goroutine 里继续读 `Request.Body`
+- 不要在后台 goroutine 里继续使用 `ResponseWriter`
+
+请求对象里的数据，应该在请求阶段内完成读取，再以显式参数形式传给后台任务。
+
 ## 常见反模式速查表
 
 | 反模式 | 表现 | 风险 | 更好的做法 |
@@ -128,6 +176,7 @@ search: false
 | 把业务对象塞进 `ctx` | `ctx.Value("user")` 到处飞 | 依赖隐式、难测试 | 显式参数或结构体依赖 |
 | 字符串 key 到处乱用 | `"traceId"`、`"uid"` 分散定义 | key 冲突、可读性差 | 定义私有 key 类型 |
 | 起 Goroutine 不监听 `Done()` | 请求结束后后台任务继续跑 | Goroutine 泄漏 | 在 select 中监听 `ctx.Done()` |
+| 把 `r.Context()` 传给离线任务 | Handler 一返回任务就 `context canceled` | 后台任务被误杀 | 用 `Background()` 或 `WithoutCancel()` 重建边界 |
 | 统一超时过大或过小 | 整条链路一刀切 | 难定位、误伤正常请求 | 在边界处设置局部超时 |
 
 ## 代码评审检查清单
@@ -145,6 +194,8 @@ search: false
 - 新起的 Goroutine 是否有退出条件
 - 阻塞等待是否监听了 `ctx.Done()`
 - 请求结束后是否还会继续占用下游资源
+- 如果是离线任务，是否错误复用了 `r.Context()`
+- 是否给离线任务重新设置了自己的超时
 
 ### 传值层面
 
@@ -168,6 +219,7 @@ search: false
 - 业务对象不得通过 `context` 传递
 - `WithValue` 只允许放请求级元数据
 - 外部调用默认显式设置超时
+- 请求结束后继续执行的任务，不得直接复用 `r.Context()`
 
 ### 工程治理
 
@@ -175,8 +227,44 @@ search: false
 - 对 Goroutine 泄漏、超时失效类事故做复盘归因
 - 给公共库设计明确的 `ctx` 约定，而不是让调用方猜
 
+## 一个高频场景的推荐写法
+
+```go
+func AuditHandler(w http.ResponseWriter, r *http.Request) {
+    userID := UserIDFromContext(r.Context())
+    traceID := TraceIDFromContext(r.Context())
+
+    base := context.WithoutCancel(r.Context())
+
+    go func(userID, traceID string, base context.Context) {
+        defer func() {
+            if rec := recover(); rec != nil {
+                log.Printf("audit panic: %v", rec)
+            }
+        }()
+
+        ctx, cancel := context.WithTimeout(base, 5*time.Second)
+        defer cancel()
+
+        if err := writeAuditLog(ctx, userID, traceID); err != nil {
+            log.Printf("write audit log failed: %v", err)
+        }
+    }(userID, traceID, base)
+
+    w.WriteHeader(http.StatusAccepted)
+}
+```
+
+这段代码的重点不是语法，而是边界：
+
+- 请求内先把必要数据提取出来
+- 异步任务不再直接依赖请求取消信号
+- 异步任务自己拥有独立的超时上限
+- goroutine 内统一做 `recover`
+
 ## 延伸阅读
 
 - 并发主线：[并发编程](./guide/03-concurrency.md)
 - Context 源码：[context 包源码精读](./guide/source-reading/context.md)
+- 版本特性：[Go 1.21 的 `WithoutCancel` 与 `AfterFunc`](./go-version-features.md)
 - 高频题：[30+ 高频 Golang 能力自检题](./go-top-30-interview-questions.md)

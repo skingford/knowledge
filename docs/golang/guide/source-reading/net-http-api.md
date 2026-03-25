@@ -234,6 +234,12 @@ func createUser(w http.ResponseWriter, r *http.Request) error {
 }
 ```
 
+这里把 `r.Context()` 继续传给 `userService.Create(...)` 是刻意的：
+
+- 客户端取消、代理断开或 Handler 返回后，下游调用就能及时收到取消信号
+- 这样数据库、RPC、第三方 HTTP 请求不会在请求已经结束后继续空跑
+- 如果是要脱离请求生命周期继续跑的离线任务，才应该显式重建新的上下文边界
+
 ### API 版本化策略
 
 ```go
@@ -259,6 +265,8 @@ func setupVersionedRouter() http.Handler {
 }
 
 // 方案二：Accept 头版本（Content Negotiation）
+type apiVersionKey struct{}
+
 func versionMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         accept := r.Header.Get("Accept")
@@ -266,7 +274,7 @@ func versionMiddleware(next http.Handler) http.Handler {
         if strings.Contains(accept, "application/vnd.myapi.v2+json") {
             version = "v2"
         }
-        ctx := context.WithValue(r.Context(), "apiVersion", version)
+        ctx := context.WithValue(r.Context(), apiVersionKey{}, version)
         next.ServeHTTP(w, r.WithContext(ctx))
     })
 }

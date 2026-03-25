@@ -29,6 +29,7 @@ outline: false
 | 想补设计、安全、容器化和代码生成 | [进阶专题](./guide/10-advanced-topics.md) | 统一收口 `10-*` 系列专题入口 |
 | 想补线上排障 | [Pprof 排障指南](./pprof-troubleshooting-guide.md) | 先从 profile 和 trace 的实操路径开始 |
 | 想看工程边界问题 | [Context 使用边界](./context-usage-boundaries.md) | 适合补服务治理、取消传播和值传递边界 |
+| 想从源码看懂 `context` | [context 包源码精读](./guide/source-reading/context.md) | 适合补取消树、`WithoutCancel` 和 `net/http` 请求生命周期 |
 
 ## 目录结构
 
@@ -68,12 +69,14 @@ golang/
 
 - [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 - [Go 源码精读总览](./guide/source-reading/index.md)
+- [context 包源码精读](./guide/source-reading/context.md)
 
 ### 3. 实战补充页
 
 这些页不属于“大纲章节”，但在工程里会被频繁回查。
 
 - [Context 使用边界](./context-usage-boundaries.md)
+- [context 包源码精读](./guide/source-reading/context.md)
 - [Pprof 排障指南](./pprof-troubleshooting-guide.md)
 - [database/sql 与连接池](./guide/06-database-sql-and-connection.md)
 - [Go 版本特性总结](./go-version-features.md)

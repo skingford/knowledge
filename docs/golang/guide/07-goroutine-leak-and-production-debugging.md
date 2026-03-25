@@ -293,9 +293,11 @@ func (m *Metrics) RecordError(api string, err error) {
 	log.Printf("[METRIC] api=%s error=%v", api, err)
 }
 
+type traceIDKey struct{}
+
 // 模拟结构化日志
 func logWithTrace(ctx context.Context, level, msg string, fields map[string]interface{}) {
-	traceID := ctx.Value("trace_id")
+	traceID, _ := ctx.Value(traceIDKey{}).(string)
 	log.Printf("[%s] trace_id=%v msg=%s fields=%v", level, traceID, msg, fields)
 }
 
@@ -336,7 +338,7 @@ func processOrder(ctx context.Context, metrics *Metrics) error {
 
 func main() {
 	metrics := &Metrics{}
-	ctx := context.WithValue(context.Background(), "trace_id", "abc-123")
+	ctx := context.WithValue(context.Background(), traceIDKey{}, "abc-123")
 
 	for i := 0; i < 5; i++ {
 		if err := processOrder(ctx, metrics); err != nil {

@@ -105,11 +105,12 @@ func WithClientTrace(ctx context.Context, trace *ClientTrace) context.Context {
 
 ```go
 import (
+    "context"
     "net/http/httptrace"
     "time"
 )
 
-func traceRequest(url string) {
+func traceRequest(ctx context.Context, url string) {
     var (
         dnsStart, dnsDone     time.Time
         connectStart, connectDone time.Time
@@ -146,7 +147,7 @@ func traceRequest(url string) {
     }
 
     req, _ := http.NewRequestWithContext(
-        httptrace.WithClientTrace(context.Background(), trace),
+        httptrace.WithClientTrace(ctx, trace),
         "GET", url, nil,
     )
 
@@ -169,6 +170,13 @@ func traceRequest(url string) {
     fmt.Printf("Total:   %v\n", total)
 }
 ```
+
+这里的 `ctx` 最好由调用方传入：
+
+- 独立脚本、压测工具、CLI 诊断可以传 `context.Background()`
+- 如果这是请求链路中的下游 HTTP 调用，应直接传上游的 `r.Context()`
+
+这样客户端断开、请求超时或上游取消后，`httptrace` 绑定的外部请求也会及时停止。
 
 ### 连接复用诊断（排查连接池问题）
 
@@ -214,10 +222,11 @@ func (s *ConnectionStats) Report() {
 // 使用
 stats := &ConnectionStats{}
 client := &http.Client{}
+ctx := context.Background() // 如果在 Handler / RPC 方法里，改为传入上游 ctx
 
 for i := 0; i < 100; i++ {
     req, _ := http.NewRequestWithContext(
-        httptrace.WithClientTrace(context.Background(), stats.trace()),
+        httptrace.WithClientTrace(ctx, stats.trace()),
         "GET", "https://api.example.com/data", nil,
     )
     resp, _ := client.Do(req)
