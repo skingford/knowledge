@@ -2,6 +2,11 @@ import { fileURLToPath, URL } from 'node:url'
 import type { UserConfig } from 'vite'
 
 const docsViteConfig: UserConfig = {
+  build: {
+    // Local search index is emitted as a lazy-loaded chunk and is expected to be larger than
+    // regular route assets for this knowledge base.
+    chunkSizeWarningLimit: 5000,
+  },
   optimizeDeps: {
     include: [
       '@braintree/sanitize-url',

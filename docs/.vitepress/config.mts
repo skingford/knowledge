@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import { localSearchOptions } from './config/search'
 import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
 
@@ -154,14 +155,7 @@ export default defineConfig({
 
     search: {
       provider: 'local',
-      options: {
-        miniSearch: {
-          searchOptions: {
-            fuzzy: 0.2,
-            prefix: true,
-          },
-        },
-      },
+      options: localSearchOptions,
     },
 
     outline: {
