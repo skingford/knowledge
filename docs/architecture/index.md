@@ -52,4 +52,4 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 
 ## 岗位面试专题
 
-- [AI、IM/直播与云原生架构面试专题](/architecture/ai-im-k8s-architecture-interview-guide)
+- [AI、IM/直播与云原生架构](/architecture/ai-im-k8s-architecture-interview-guide)

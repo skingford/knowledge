@@ -82,7 +82,7 @@
 ### 想从能力自检准备开始
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
-- [AI、IM/直播与云原生架构面试专题](./architecture/ai-im-k8s-architecture-interview-guide.md)
+- [AI、IM/直播与云原生架构](./architecture/ai-im-k8s-architecture-interview-guide.md)
 - [Go 能力自检与面试准备导航](./golang/interview-prep.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 - [Rust 能力自检与面试准备导航](./rust/interview-prep.md)
