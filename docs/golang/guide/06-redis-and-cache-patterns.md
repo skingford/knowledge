@@ -5,7 +5,7 @@ search: false
 head:
   - - meta
     - http-equiv: refresh
-      content: 0; url=/knowledge/redis/redis-and-cache-patterns.html
+      content: 0; url=../../redis/redis-and-cache-patterns.html
 ---
 
 # 页面已迁移

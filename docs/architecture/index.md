@@ -49,3 +49,7 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 - [秒杀系统监控、告警与应急响应设计](/architecture/seckill-monitoring-alerting-and-incident-response)
 - [抢券系统设计专题：与秒杀系统的异同](/architecture/coupon-claim-system-design-and-comparison)
 - [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+
+## 岗位面试专题
+
+- [AI、IM/直播与云原生架构面试专题](/architecture/ai-im-k8s-architecture-interview-guide)

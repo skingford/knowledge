@@ -6,6 +6,7 @@ import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
 
 const siteUrl = 'https://skingford.github.io/knowledge/'
+const siteBase = process.env.VITEPRESS_BASE || (process.env.GITHUB_ACTIONS === 'true' ? '/knowledge/' : '/')
 const voidHtmlTagPattern = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)(\s[^<>]*?)?\s*(\/?)>/gi
 
 function normalizeVoidHtmlTags(html: string) {
@@ -38,7 +39,7 @@ export default defineConfig({
   titleTemplate: ':title | 学习知识库',
   description: '涵盖 AI / Agent、架构设计、Golang、Rust、Git、运维与工具的学习资料、路线图与专题索引',
 
-  base: '/knowledge/',
+  base: siteBase,
   srcExclude: ['README.md', 'TEMPLATE.md'],
   rewrites: {
     'golang/legacy/golang-advanced-learning-guide.md': 'golang/golang-advanced-learning-guide.md',
@@ -67,7 +68,7 @@ export default defineConfig({
   },
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${siteBase}favicon.svg` }],
     ['meta', { name: 'theme-color', content: '#d46f4d' }],
     ['meta', { property: 'og:site_name', content: '学习知识库' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
@@ -96,7 +97,7 @@ export default defineConfig({
       md.renderer.rules.html_inline = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
         defaultHtmlInline(tokens, idx, options, env, self),
       )
-      MermaidMarkdown(md)
+      MermaidMarkdown(md, {})
       md.use(tabsMarkdownPlugin)
     },
   },

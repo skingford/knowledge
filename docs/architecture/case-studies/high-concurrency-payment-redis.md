@@ -5,7 +5,7 @@ search: false
 head:
   - - meta
     - http-equiv: refresh
-      content: 0; url=/knowledge/redis/payment-practice.html
+      content: 0; url=../../redis/payment-practice.html
 ---
 
 # 页面已迁移
