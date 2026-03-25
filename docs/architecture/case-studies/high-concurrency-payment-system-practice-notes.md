@@ -45,7 +45,7 @@ vocabulary:
 
 - [runtime：GMP 调度器](/golang/guide/source-reading/runtime-scheduler)
 - [channel：底层实现](/golang/guide/source-reading/channel)
-- [context：上下文传播](/golang/guide/source-reading/context)
+- [context：上下文传播源码精读](/golang/guide/source-reading/context)
 - [Context 使用边界](/golang/context-usage-boundaries)
 - [runtime：GC 垃圾回收](/golang/guide/source-reading/runtime-gc)
 - [runtime/pprof：性能剖析](/golang/guide/source-reading/runtime-pprof)
@@ -60,12 +60,14 @@ vocabulary:
 
 - **GMP 调度模型**：G（goroutine）、M（OS 线程）、P（逻辑处理器）。P 绑定本地队列，M 从 P 获取 G 执行；当 M 阻塞时，P 会转移给空闲 M，保证并发度不降。
 - **Channel 底层实现**：底层是带锁的环形缓冲区 + 发送/接收等待队列。无缓冲 channel 是同步交换，有缓冲是异步队列。关闭后读取返回零值。
-- **`context` 超时与取消传播**：`context.WithTimeout` 创建定时取消上下文，子 context 会随父 context 一起取消，实现链路级超时传播。
+- **`context` 超时与取消传播**：`context.WithTimeout` 创建定时取消上下文，子 context 会随父 context 一起取消，实现链路级超时传播；`cancel()` 仍然要主动调用，避免 timer 和子节点引用滞留。
+- **请求上下文边界**：支付请求内的数据库、Redis、RPC、HTTP 下游调用应继续透传 `r.Context()`；但审计日志、通知补发、异步补偿这类离线任务，不应直接复用请求 `ctx`，否则 Handler 一返回就可能收到 `context canceled`。
+- **离线任务治理**：Go 1.21+ 可用 `context.WithoutCancel()` 保留请求元数据但切断父级取消信号；同时要重新设置独立超时，防止后台任务无限运行。
 - **goroutine 泄漏识别与治理**：`pprof` 查看 goroutine 数量趋势；常见原因是 channel 无人读/写、HTTP 请求未设超时。治理靠 `context` 控制生命周期 + `select` 监听 `ctx.Done()`。
 
 结合支付语境理解时，可以这样表述：
 
-> 支付链路里最怕长事务、慢下游和超时扩散，所以 `context` 不是为了代码优雅，而是为了控制整条资金链路的超时边界，防止资源泄漏和雪崩。
+> 支付链路里最怕长事务、慢下游和超时扩散，所以 `context` 不是为了代码优雅，而是为了控制整条资金链路的超时边界；请求内任务要跟着请求一起收敛，离线任务则要显式重建自己的生命周期，避免资源泄漏和雪崩。
 
 ### 2. 内存与性能
 

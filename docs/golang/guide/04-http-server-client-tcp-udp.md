@@ -85,9 +85,14 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// 模拟耗时请求
-		time.Sleep(2 * time.Second)
-		w.Write([]byte("done"))
+		// 模拟耗时请求：请求内逻辑应继续透传 r.Context()
+		select {
+		case <-time.After(2 * time.Second):
+			w.Write([]byte("done"))
+		case <-r.Context().Done():
+			// 客户端断开或请求已取消，尽快退出
+			return
+		}
 	})
 
 	server := &http.Server{
@@ -130,6 +135,7 @@ func main() {
 1. **每个连接一个 goroutine**：`ListenAndServe` 内部对每个 Accept 到的连接启动独立 goroutine，这是 Go HTTP 服务高并发的基础，但也意味着需要注意 goroutine 泄漏。
 2. **避免使用 DefaultServeMux**：`http.HandleFunc` 注册到全局 `DefaultServeMux`，在测试和多模块项目中容易产生路由冲突，推荐用 `http.NewServeMux()` 创建独立路由。
 3. **Graceful Shutdown 是生产必备**：`server.Shutdown` 会停止接收新连接，等待已有请求处理完毕后再退出，避免请求被截断。
+4. **区分进程级 ctx 和请求级 ctx**：这里 `server.Shutdown` 使用 `context.Background()` 是合理的，因为它描述的是进程退出流程；但 Handler 内部调 DB / RPC 时，应继续透传 `r.Context()`，不要切断请求的取消链路。
 
 ---
 

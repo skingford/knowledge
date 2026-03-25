@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import DiagramFrame from './DiagramFrame.vue'
+import DiagramFrame from '@docs-components/DiagramFrame.vue'
 
 type DiagramKind =
   | 'multistage-docker'

@@ -79,7 +79,10 @@ func InitTracer(ctx context.Context, serviceName string) (func(), error) {
 
     // 返回清理函数
     cleanup := func() {
-        if err := tp.Shutdown(ctx); err != nil {
+        // TracerProvider 关闭属于进程级收尾，不能复用可能已经超时或取消的业务 ctx。
+        shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+        if err := tp.Shutdown(shutdownCtx); err != nil {
             log.Printf("shutdown tracer: %v", err)
         }
     }
@@ -156,6 +159,44 @@ func processOrder(ctx context.Context) (string, error) {
 }
 ```
 
+如果你的 HTTP 服务已经用 `otelhttp.NewHandler(...)` 做了自动插桩，那 `r.Context()` 里通常已经带着提取后的 Span 上下文，就不需要在 Handler 里再次手动 `Extract(...)`。
+
+### 5.2.1 请求内传播 vs 离线异步任务
+
+```go
+func handleAsyncNotify(w http.ResponseWriter, r *http.Request) {
+    // 先保存链路关联信息
+    link := trace.LinkFromContext(r.Context())
+    base := context.WithoutCancel(r.Context()) // Go 1.21+
+
+    go func(base context.Context, link trace.Link) {
+        ctx, cancel := context.WithTimeout(base, 3*time.Second)
+        defer cancel()
+
+        // 新起根 Span，并用 Link 关联回原请求。
+        ctx, span := tracer.Start(ctx, "AsyncNotify",
+            trace.WithNewRoot(),
+            trace.WithLinks(link),
+        )
+        defer span.End()
+
+        if err := sendNotification(ctx); err != nil {
+            span.RecordError(err)
+            span.SetStatus(codes.Error, err.Error())
+        }
+    }(base, link)
+
+    w.WriteHeader(http.StatusAccepted)
+}
+```
+
+这个模式适合：
+
+- 请求已经结束，但异步通知、审计日志、补偿任务还要继续执行
+- 希望保留与原请求的可观测性关联
+
+不建议的做法是：在 Handler 返回后继续把后台任务作为原请求 Span 的普通子 Span 挂着跑。
+
 ### 5.3 gRPC 拦截器集成追踪
 
 ```go
@@ -187,6 +228,7 @@ func newTracedGRPCConn(addr string) (*grpc.ClientConn, error) {
 - **Context 传播是核心**：Trace 信息通过 `context.Context` 在进程内传递，通过 HTTP Header / gRPC Metadata 跨进程传递。丢失 context 就断链。
 - **采样策略**：生产环境不能 100% 采样（性能开销大），常用 `TraceIDRatioBased` 按比例采样或 `ParentBased` 跟随上游决策。
 - **Span 命名规范**：Span name 应体现操作语义（如 `CreateOrder`、`QueryDB`），不要包含动态参数（如订单号），动态数据放 attributes。
+- **请求边界要和 Trace 边界一起看**：请求内操作继续透传 `r.Context()`；离线任务要重建自己的生命周期，必要时用新的根 Span + Link 关联回原请求。
 
 ---
 

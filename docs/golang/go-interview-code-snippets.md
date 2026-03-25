@@ -27,7 +27,7 @@ search: false
 | Interface | Nil Interface | `go-top-30-interview-questions` 基础与底层 |
 | Defer | 参数求值 | `go-top-30-interview-questions` 基础与底层 |
 | Channel | 无缓冲同步 | `guide/03-channel-select-context` |
-| Context | 取消传播 | `context-usage-boundaries` + `guide/03-channel-select-context` |
+| Context | 取消传播 + 请求边界 | `context-usage-boundaries` + `guide/source-reading/context` |
 | WaitGroup | 正确等待方式 | `guide/03-sync-primitives` |
 | Mutex | 共享状态保护 | `guide/03-sync-primitives` |
 | 逃逸分析 | `-gcflags=-m` | `guide/02-escape-analysis` |
@@ -164,6 +164,56 @@ func main() {
 
 - Context 适合超时和取消治理
 - 子任务应监听 `ctx.Done()`
+- `cancel()` 通常要 `defer` 调用，避免 timer 和子节点引用滞留
+
+### HTTP 请求结束后的异步任务边界
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"time"
+)
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	userID := r.Header.Get("X-User-ID") // 先把需要的数据拷出来
+	base := context.WithoutCancel(r.Context()) // Go 1.21+
+
+	go func(userID string, base context.Context) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				log.Printf("async panic: %v", rec)
+			}
+		}()
+
+		ctx, cancel := context.WithTimeout(base, 3*time.Second)
+		defer cancel()
+
+		writeAuditLog(ctx, userID)
+	}(userID, base)
+
+	w.WriteHeader(http.StatusAccepted)
+}
+
+func writeAuditLog(ctx context.Context, userID string) {
+	select {
+	case <-time.After(500 * time.Millisecond):
+		log.Printf("audit ok: %s", userID)
+	case <-ctx.Done():
+		log.Printf("audit cancelled: %v", ctx.Err())
+	}
+}
+```
+
+讲解重点：
+
+- `r.Context()` 会在客户端断开或 `ServeHTTP` 返回后失效
+- 请求内任务继续透传 `r.Context()`；离线任务不要直接复用它
+- Go 1.21+ 可以用 `context.WithoutCancel()` 保留元数据但切断父取消
+- 离线任务仍然要重新设置自己的超时，避免后台 goroutine 无限运行
 
 ### WaitGroup 正确用法
 

@@ -121,6 +121,7 @@ func initTracer(ctx context.Context) (func(), error) {
 
     // 返回 shutdown 函数
     return func() {
+        // 关闭 TracerProvider 属于进程级收尾，不应复用可能已取消的请求 ctx。
         ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
         defer cancel()
         tp.Shutdown(ctx)
@@ -228,6 +229,46 @@ func handleGetUser(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(user)
 }
 ```
+
+这里 `r.Context()` 的语义要特别清楚：
+
+- 它既承载了请求取消信号，也承载了当前 Trace / Span 上下文
+- 只要逻辑仍属于当前请求，就应该继续把这个 `ctx` 往下传
+- 一旦 Handler 返回，请求 Span 也应该随请求一起结束
+
+### 请求结束后的异步任务：不要继续把后台 Span 挂在请求 Span 下面
+
+```go
+func handleCreateAudit(w http.ResponseWriter, r *http.Request) {
+    // 在请求阶段先提取需要保留的链路关联信息
+    link := trace.LinkFromContext(r.Context())
+    base := context.WithoutCancel(r.Context()) // Go 1.21+，保留 baggage / 值链
+
+    go func(base context.Context, link trace.Link) {
+        ctx, cancel := context.WithTimeout(base, 5*time.Second)
+        defer cancel()
+
+        // 后台任务不再作为请求 Span 的普通子 Span，而是新起根 Span，再链接回原请求。
+        ctx, span := tracer.Start(ctx, "AuditLog.Send",
+            trace.WithNewRoot(),
+            trace.WithLinks(link),
+        )
+        defer span.End()
+
+        if err := auditSvc.Send(ctx); err != nil {
+            span.RecordError(err)
+        }
+    }(base, link)
+
+    w.WriteHeader(http.StatusAccepted)
+}
+```
+
+这段代码的边界是：
+
+- 请求 Span 应该随请求结束，不要让后台任务继续占着它
+- 如果后台任务需要保留观测关联性，更稳妥的是**新建根 Span + link 回原请求**
+- `WithoutCancel` 只负责切断父级取消，不负责给后台任务兜底；后台任务仍要设置自己的超时
 
 ### gRPC 自动插桩
 

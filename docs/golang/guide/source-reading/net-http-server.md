@@ -151,6 +151,42 @@ func startServer(handler http.Handler) error {
 }
 ```
 
+这里的 `context.Background()` 也是**刻意为之**：
+
+- `signal.NotifyContext(context.Background(), ...)` 管的是**进程生命周期**
+- `srv.Shutdown(context.WithTimeout(...))` 管的是**服务关闭窗口**
+- 这和 Handler 里的请求上下文不是一回事，不要混用
+
+### 请求 Context 生命周期：请求一结束就会取消
+
+对服务端收到的 HTTP 请求来说，`r.Context()` 会在下面几种情况失效：
+
+- 客户端连接关闭
+- HTTP/2 请求被取消
+- `ServeHTTP` 返回
+
+因此在 Handler 中：
+
+- 请求内的 DB / Redis / RPC / HTTP 下游调用，应继续透传 `r.Context()`
+- 需要在请求结束后继续执行的离线任务，不应直接复用 `r.Context()`
+
+```go
+func getOrder(w http.ResponseWriter, r *http.Request) {
+    ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+    defer cancel()
+
+    order, err := orderService.Get(ctx, r.PathValue("id"))
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusGatewayTimeout)
+        return
+    }
+
+    _ = json.NewEncoder(w).Encode(order)
+}
+```
+
+如果你要在请求结束后继续写审计日志、异步补偿或发通知，应该改用 `context.WithoutCancel(r.Context())`（Go 1.21+）或 `context.Background()` 重建任务边界，并重新设置独立超时。
+
 ### Middleware 链：洋葱模型
 
 <GoNetworkDiagram kind="middleware-chain" />

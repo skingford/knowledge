@@ -1,9 +1,12 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
+import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import { localSearchOptions } from './config/search'
+import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
 
 const siteUrl = 'https://skingford.github.io/knowledge/'
+const siteBase = process.env.VITEPRESS_BASE || (process.env.GITHUB_ACTIONS === 'true' ? '/knowledge/' : '/')
 const voidHtmlTagPattern = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)(\s[^<>]*?)?\s*(\/?)>/gi
 
 function normalizeVoidHtmlTags(html: string) {
@@ -30,13 +33,13 @@ const sectionNavItems = sections
   activeMatch: `^${section.base}`,
 }))
 
-export default withMermaid(defineConfig({
+export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang、Git、运维与工具的学习资料、路线图与专题索引',
+  description: '涵盖 AI / Agent、架构设计、Golang、Rust、Git、运维与工具的学习资料、路线图与专题索引',
 
-  base: '/knowledge/',
+  base: siteBase,
   srcExclude: ['README.md', 'TEMPLATE.md'],
   rewrites: {
     'golang/legacy/golang-advanced-learning-guide.md': 'golang/golang-advanced-learning-guide.md',
@@ -51,6 +54,7 @@ export default withMermaid(defineConfig({
   router: {
     prefetchLinks: false,
   },
+  vite: docsViteConfig,
   shouldPreload(link) {
     if (link.includes('@localSearchIndexroot')) {
       return false
@@ -64,7 +68,7 @@ export default withMermaid(defineConfig({
   },
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${siteBase}favicon.svg` }],
     ['meta', { name: 'theme-color', content: '#d46f4d' }],
     ['meta', { property: 'og:site_name', content: '学习知识库' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
@@ -93,6 +97,7 @@ export default withMermaid(defineConfig({
       md.renderer.rules.html_inline = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
         defaultHtmlInline(tokens, idx, options, env, self),
       )
+      MermaidMarkdown(md, {})
       md.use(tabsMarkdownPlugin)
     },
   },
@@ -151,14 +156,7 @@ export default withMermaid(defineConfig({
 
     search: {
       provider: 'local',
-      options: {
-        miniSearch: {
-          searchOptions: {
-            fuzzy: 0.2,
-            prefix: true,
-          },
-        },
-      },
+      options: localSearchOptions,
     },
 
     outline: {
@@ -180,4 +178,4 @@ export default withMermaid(defineConfig({
       next: '下一篇',
     },
   },
-}))
+})

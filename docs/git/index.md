@@ -9,7 +9,7 @@ pageClass: claude-home-page
 ---
 
 <script setup lang="ts">
-import { sections } from '../.vitepress/theme/content-data'
+import { sections } from '@docs-content'
 
 const { landing } = sections.find((section) => section.key === 'git')!
 </script>

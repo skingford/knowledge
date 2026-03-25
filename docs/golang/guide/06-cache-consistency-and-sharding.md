@@ -90,7 +90,9 @@ func updateUserWithDoubleDelete(ctx context.Context, rdb *redis.Client, db *sql.
 	// 3. 延迟再删一次缓存（覆盖在步骤 1 和 2 之间被其他读请求回填的旧数据）
 	go func() {
 		time.Sleep(500 * time.Millisecond) // 延迟时间 > 一次读请求的耗时
-		bgCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		// 延迟双删通常需要在原请求结束后继续执行，因此不要直接复用可能已取消的请求 ctx。
+		base := context.WithoutCancel(ctx) // Go 1.21+
+		bgCtx, cancel := context.WithTimeout(base, 3*time.Second)
 		defer cancel()
 		if err := rdb.Del(bgCtx, key).Err(); err != nil {
 			log.Printf("double delete failed for %s: %v", key, err)

@@ -1,47 +1,63 @@
 import DefaultTheme from 'vitepress/theme-without-fonts'
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
-import { h } from 'vue'
+import type { Theme } from 'vitepress'
+import { defineAsyncComponent, h } from 'vue'
 import './custom.css'
-import QuickNav from './components/QuickNav.vue'
-import ClaudeHome from './components/ClaudeHome.vue'
-import SectionLanding from './components/SectionLanding.vue'
-import OverviewLanding from './components/OverviewLanding.vue'
-import GoSchedulerDiagram from './components/GoSchedulerDiagram.vue'
-import GoLanguageDiagram from './components/GoLanguageDiagram.vue'
-import GoRuntimeDiagram from './components/GoRuntimeDiagram.vue'
-import GoLeakRaceDiagram from './components/GoLeakRaceDiagram.vue'
-import GoChannelDiagram from './components/GoChannelDiagram.vue'
-import GoNetworkDiagram from './components/GoNetworkDiagram.vue'
-import GoEngineeringDiagram from './components/GoEngineeringDiagram.vue'
-import GoDataCacheDiagram from './components/GoDataCacheDiagram.vue'
-import GoPerformanceDiagram from './components/GoPerformanceDiagram.vue'
-import GoMicroserviceDiagram from './components/GoMicroserviceDiagram.vue'
-import GoHighConcurrencySystemDesignDiagram from './components/GoHighConcurrencySystemDesignDiagram.vue'
-import GoAdvancedTopicDiagram from './components/GoAdvancedTopicDiagram.vue'
-import GoSecurityDiagram from './components/GoSecurityDiagram.vue'
-import GoCloudNativeDiagram from './components/GoCloudNativeDiagram.vue'
-import GoCodegenDiagram from './components/GoCodegenDiagram.vue'
-import GoInternalsDiagram from './components/GoInternalsDiagram.vue'
-import GoAdvancedConcurrencyDiagram from './components/GoAdvancedConcurrencyDiagram.vue'
-import GoSyncPrimitiveDiagram from './components/GoSyncPrimitiveDiagram.vue'
-import GoSourceReadingDiagram from './components/GoSourceReadingDiagram.vue'
-import KafkaDiagram from './components/KafkaDiagram.vue'
-import MySQLDurabilityDiagram from './components/MySQLDurabilityDiagram.vue'
-import MySQLTransactionIsolationDiagram from './components/MySQLTransactionIsolationDiagram.vue'
-import MySQLHighAvailabilityDiagram from './components/MySQLHighAvailabilityDiagram.vue'
-import MySQLReplicaDelayDiagram from './components/MySQLReplicaDelayDiagram.vue'
-import MySQLLargeQueryMemoryDiagram from './components/MySQLLargeQueryMemoryDiagram.vue'
-import MySQLInsertLocksDiagram from './components/MySQLInsertLocksDiagram.vue'
-import MySQLInternalTempTableDiagram from './components/MySQLInternalTempTableDiagram.vue'
-import MySQLJoinUsageDiagram from './components/MySQLJoinUsageDiagram.vue'
-import MySQLJoinOptimizationDiagram from './components/MySQLJoinOptimizationDiagram.vue'
-import MySQLInnoDBVsMemoryDiagram from './components/MySQLInnoDBVsMemoryDiagram.vue'
-import MySQLAutoIncrementGapsDiagram from './components/MySQLAutoIncrementGapsDiagram.vue'
-import MySQLIndexRedundancyDiagram from './components/MySQLIndexRedundancyDiagram.vue'
-import WechatQrNotice from './components/WechatQrNotice.vue'
-import DocAfterSlot from './components/DocAfterSlot.vue'
+import QuickNav from '@docs-components/QuickNav.vue'
+import ClaudeHome from '@docs-components/ClaudeHome.vue'
+import SectionLanding from '@docs-components/SectionLanding.vue'
+import OverviewLanding from '@docs-components/OverviewLanding.vue'
+import Mermaid from '@docs-components/Mermaid.vue'
+import WechatQrNotice from '@docs-components/WechatQrNotice.vue'
+import DocAfterSlot from '@docs-components/DocAfterSlot.vue'
 
-export default {
+const staticGlobalComponents = {
+  QuickNav,
+  ClaudeHome,
+  SectionLanding,
+  OverviewLanding,
+  Mermaid,
+}
+
+const asyncGlobalComponents = {
+  GoSchedulerDiagram: () => import('@docs-components/GoSchedulerDiagram.vue'),
+  GoLanguageDiagram: () => import('@docs-components/GoLanguageDiagram.vue'),
+  GoRuntimeDiagram: () => import('@docs-components/GoRuntimeDiagram.vue'),
+  GoLeakRaceDiagram: () => import('@docs-components/GoLeakRaceDiagram.vue'),
+  GoChannelDiagram: () => import('@docs-components/GoChannelDiagram.vue'),
+  GoNetworkDiagram: () => import('@docs-components/GoNetworkDiagram.vue'),
+  GoEngineeringDiagram: () => import('@docs-components/GoEngineeringDiagram.vue'),
+  GoDataCacheDiagram: () => import('@docs-components/GoDataCacheDiagram.vue'),
+  GoPerformanceDiagram: () => import('@docs-components/GoPerformanceDiagram.vue'),
+  GoMicroserviceDiagram: () => import('@docs-components/GoMicroserviceDiagram.vue'),
+  GoHighConcurrencySystemDesignDiagram: () => import('@docs-components/GoHighConcurrencySystemDesignDiagram.vue'),
+  GoAdvancedTopicDiagram: () => import('@docs-components/GoAdvancedTopicDiagram.vue'),
+  GoSecurityDiagram: () => import('@docs-components/GoSecurityDiagram.vue'),
+  GoCloudNativeDiagram: () => import('@docs-components/GoCloudNativeDiagram.vue'),
+  GoCodegenDiagram: () => import('@docs-components/GoCodegenDiagram.vue'),
+  GoInternalsDiagram: () => import('@docs-components/GoInternalsDiagram.vue'),
+  GoAdvancedConcurrencyDiagram: () => import('@docs-components/GoAdvancedConcurrencyDiagram.vue'),
+  GoSyncPrimitiveDiagram: () => import('@docs-components/GoSyncPrimitiveDiagram.vue'),
+  GoSourceReadingDiagram: () => import('@docs-components/GoSourceReadingDiagram.vue'),
+  KafkaDiagram: () => import('@docs-components/KafkaDiagram.vue'),
+  K8sDiagram: () => import('@docs-components/K8sDiagram.vue'),
+  MySQLDurabilityDiagram: () => import('@docs-components/MySQLDurabilityDiagram.vue'),
+  MySQLTransactionIsolationDiagram: () => import('@docs-components/MySQLTransactionIsolationDiagram.vue'),
+  MySQLHighAvailabilityDiagram: () => import('@docs-components/MySQLHighAvailabilityDiagram.vue'),
+  MySQLReplicaDelayDiagram: () => import('@docs-components/MySQLReplicaDelayDiagram.vue'),
+  MySQLLargeQueryMemoryDiagram: () => import('@docs-components/MySQLLargeQueryMemoryDiagram.vue'),
+  MySQLInsertLocksDiagram: () => import('@docs-components/MySQLInsertLocksDiagram.vue'),
+  MySQLInternalTempTableDiagram: () => import('@docs-components/MySQLInternalTempTableDiagram.vue'),
+  MySQLJoinUsageDiagram: () => import('@docs-components/MySQLJoinUsageDiagram.vue'),
+  MySQLJoinOptimizationDiagram: () => import('@docs-components/MySQLJoinOptimizationDiagram.vue'),
+  MySQLInnoDBVsMemoryDiagram: () => import('@docs-components/MySQLInnoDBVsMemoryDiagram.vue'),
+  MySQLAutoIncrementGapsDiagram: () => import('@docs-components/MySQLAutoIncrementGapsDiagram.vue'),
+  MySQLIndexRedundancyDiagram: () => import('@docs-components/MySQLIndexRedundancyDiagram.vue'),
+  RedisCourseDiagram: () => import('@docs-components/RedisCourseDiagram.vue'),
+  RedisCourseFigure: () => import('@docs-components/RedisCourseFigure.vue'),
+}
+
+const theme: Theme = {
   extends: DefaultTheme,
   Layout() {
     return h('div', null, [
@@ -53,41 +69,15 @@ export default {
   },
   enhanceApp({ app }) {
     enhanceAppWithTabs(app)
-    app.component('QuickNav', QuickNav)
-    app.component('ClaudeHome', ClaudeHome)
-    app.component('SectionLanding', SectionLanding)
-    app.component('OverviewLanding', OverviewLanding)
-    app.component('GoSchedulerDiagram', GoSchedulerDiagram)
-    app.component('GoLanguageDiagram', GoLanguageDiagram)
-    app.component('GoRuntimeDiagram', GoRuntimeDiagram)
-    app.component('GoLeakRaceDiagram', GoLeakRaceDiagram)
-    app.component('GoChannelDiagram', GoChannelDiagram)
-    app.component('GoNetworkDiagram', GoNetworkDiagram)
-    app.component('GoEngineeringDiagram', GoEngineeringDiagram)
-    app.component('GoDataCacheDiagram', GoDataCacheDiagram)
-    app.component('GoPerformanceDiagram', GoPerformanceDiagram)
-    app.component('GoMicroserviceDiagram', GoMicroserviceDiagram)
-    app.component('GoHighConcurrencySystemDesignDiagram', GoHighConcurrencySystemDesignDiagram)
-    app.component('GoAdvancedTopicDiagram', GoAdvancedTopicDiagram)
-    app.component('GoSecurityDiagram', GoSecurityDiagram)
-    app.component('GoCloudNativeDiagram', GoCloudNativeDiagram)
-    app.component('GoCodegenDiagram', GoCodegenDiagram)
-    app.component('GoInternalsDiagram', GoInternalsDiagram)
-    app.component('GoAdvancedConcurrencyDiagram', GoAdvancedConcurrencyDiagram)
-    app.component('GoSyncPrimitiveDiagram', GoSyncPrimitiveDiagram)
-    app.component('GoSourceReadingDiagram', GoSourceReadingDiagram)
-    app.component('KafkaDiagram', KafkaDiagram)
-    app.component('MySQLDurabilityDiagram', MySQLDurabilityDiagram)
-    app.component('MySQLTransactionIsolationDiagram', MySQLTransactionIsolationDiagram)
-    app.component('MySQLHighAvailabilityDiagram', MySQLHighAvailabilityDiagram)
-    app.component('MySQLReplicaDelayDiagram', MySQLReplicaDelayDiagram)
-    app.component('MySQLLargeQueryMemoryDiagram', MySQLLargeQueryMemoryDiagram)
-    app.component('MySQLInsertLocksDiagram', MySQLInsertLocksDiagram)
-    app.component('MySQLInternalTempTableDiagram', MySQLInternalTempTableDiagram)
-    app.component('MySQLJoinUsageDiagram', MySQLJoinUsageDiagram)
-    app.component('MySQLJoinOptimizationDiagram', MySQLJoinOptimizationDiagram)
-    app.component('MySQLInnoDBVsMemoryDiagram', MySQLInnoDBVsMemoryDiagram)
-    app.component('MySQLAutoIncrementGapsDiagram', MySQLAutoIncrementGapsDiagram)
-    app.component('MySQLIndexRedundancyDiagram', MySQLIndexRedundancyDiagram)
+    for (const [name, component] of Object.entries(staticGlobalComponents)) {
+      app.component(name, component)
+    }
+
+    // Heavy diagram components only load on pages that actually render them.
+    for (const [name, loader] of Object.entries(asyncGlobalComponents)) {
+      app.component(name, defineAsyncComponent(loader))
+    }
   },
 }
+
+export default theme

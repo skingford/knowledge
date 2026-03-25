@@ -201,6 +201,12 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
+这里要注意一个很容易混淆的边界：
+
+- `srv.Shutdown(...)` 用 `context.Background()` 是合理的，因为它描述的是**进程级关闭流程**
+- Handler 内部如果要调数据库、Redis、RPC、第三方 HTTP，应继续透传 `r.Context()`
+- 不要在请求链路中途偷偷换成 `context.Background()`，否则客户端断开后下游还会继续空跑
+
 ### 生产级 HTTP 客户端
 
 ```go

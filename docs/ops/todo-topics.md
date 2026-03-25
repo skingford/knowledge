@@ -10,6 +10,7 @@ search: false
 
 - ~~Linux 磁盘清理与进程管理~~ → [Linux 磁盘清理与进程管理](./linux-disk-cleanup.md)
 - ~~Linux 用户管理与权限~~ → [Linux 用户管理与权限](./linux-user-permissions.md)
+- ~~Kubernetes 入门与必备问题~~ → [K8s 专题](/k8s/)
 
 ## 优先级高
 
@@ -28,7 +29,6 @@ search: false
 ## 可后续补充
 
 - CI/CD 流水线搭建（GitHub Actions / Jenkins）
-- Kubernetes 入门与日常运维
 - 安全审计与日志分析
 - 性能基线建立与容量规划
 - 故障复盘模板与 SRE 实践

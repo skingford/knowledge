@@ -34,6 +34,7 @@ search: false
 - 并发编程总览：[并发编程](./guide/03-concurrency.md)
 - 高级并发模式：[高级并发模式](./guide/03-advanced-concurrency-patterns.md)
 - Context 使用边界：[Context 使用边界](./context-usage-boundaries.md)
+- Context 源码精读：[context 包源码精读](./guide/source-reading/context.md)
 - GMP / 调度源码：[GMP 调度器源码精读](./guide/source-reading/runtime-scheduler.md)
 - Goroutine 生命周期：[Goroutine 生命周期源码精读](./guide/source-reading/goroutine.md)
 
@@ -102,6 +103,7 @@ search: false
 
 - `database/sql` 与连接池：[database/sql 与连接池](./guide/06-database-sql-and-connection.md)
 - Context 使用边界：[Context 使用边界](./context-usage-boundaries.md)
+- Context 源码精读：[context 包源码精读](./guide/source-reading/context.md)
 - Pprof 排障指南：[Pprof 排障指南](./pprof-troubleshooting-guide.md)
 - Go 版本特性：[Go 版本特性总结（1.21 ~ 1.24）](./go-version-features.md)
 
