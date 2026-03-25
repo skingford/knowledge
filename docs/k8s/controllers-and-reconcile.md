@@ -416,4 +416,5 @@ CRD 只是定义资源类型。
 - [调度与驱逐链路实战](./scheduling-and-eviction.md)
 - [弹性扩缩容与容量协同实战](./autoscaling-and-capacity-control-chain.md)
 - [StatefulSet 与 Headless Service 实战](./statefulset-headless-service.md)
+- [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)
 - [etcd 专题](/etcd/)

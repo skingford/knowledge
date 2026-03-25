@@ -220,6 +220,10 @@ fn app() -> Router {
 - route 级并发限制
 - route 级 rate limit
 
+如果你想把短信验证码、邮件 / Push 触达、provider 回调和渠道频控单独理顺，继续看：
+
+- [Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)
+
 而不是把整个服务都按最苛刻标准锁死。
 
 如果你想把大结果集导出、异步报表、对象存储下载和租户配额单独理顺，继续看：

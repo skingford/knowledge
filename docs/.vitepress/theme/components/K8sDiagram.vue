@@ -72,6 +72,8 @@ type DiagramKind =
   | 'disruption-budget-boundary-map'
   | 'priority-preemption-scheduling-chain'
   | 'priority-preemption-boundary-map'
+  | 'daemonset-node-resident-chain'
+  | 'daemonset-update-and-drain-boundary-map'
   | 'service-dataplane-chain'
   | 'iptables-vs-ipvs-map'
   | 'networkpolicy-enforcement-chain'
@@ -155,6 +157,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'disruption-budget-boundary-map': '860px',
   'priority-preemption-scheduling-chain': '860px',
   'priority-preemption-boundary-map': '860px',
+  'daemonset-node-resident-chain': '860px',
+  'daemonset-update-and-drain-boundary-map': '860px',
   'service-dataplane-chain': '860px',
   'iptables-vs-ipvs-map': '860px',
   'networkpolicy-enforcement-chain': '860px',
@@ -3964,6 +3968,131 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <rect x="120" y="360" width="620" height="26" rx="13" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
       <text x="430" y="378" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">
         口诀：先问能不能放，再问谁先排；放不下才谈让路，别把 preemption、drain、节点压力驱逐混成一句
+      </text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'daemonset-node-resident-chain'"
+      viewBox="0 0 860 402"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s DaemonSet 节点驻留收敛链路图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-daemonset-chain" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 76 - DaemonSet 真正管的不是“总副本数”，而是“所有符合条件的节点上都得有一份”；节点变化、标签变化后，controller 会持续补齐或回收
+      </text>
+
+      <rect x="26" y="106" width="156" height="104" rx="14" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="104" y="134" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">DaemonSet 模板</text>
+      <text x="104" y="154" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">`nodeSelector`</text>
+      <text x="104" y="170" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">`nodeAffinity`</text>
+      <text x="104" y="186" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">`tolerations`</text>
+
+      <rect x="214" y="92" width="182" height="132" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="305" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-c-text)">DaemonSet controller</text>
+      <text x="305" y="140" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">先计算 eligible nodes</text>
+      <text x="305" y="156" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">为每个目标节点创建一份 Pod</text>
+      <text x="305" y="172" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">节点新增/删除/标签变化后继续收敛</text>
+      <rect x="258" y="188" width="94" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="305" y="202" text-anchor="middle" font-size="9" fill="var(--d-text)">节点覆盖面控制</text>
+
+      <rect x="428" y="84" width="182" height="148" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="519" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-rv-b-text)">目标节点集合</text>
+      <text x="519" y="132" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">node-a</text>
+      <text x="519" y="148" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">node-b</text>
+      <text x="519" y="164" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">node-c</text>
+      <text x="519" y="180" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">只看符合条件的节点</text>
+      <rect x="469" y="196" width="100" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="519" y="210" text-anchor="middle" font-size="9" fill="var(--d-text)">不是固定副本数</text>
+
+      <rect x="642" y="84" width="192" height="148" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="738" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-warn-text)">每节点一份 Pod</text>
+      <text x="738" y="132" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">agent@node-a</text>
+      <text x="738" y="148" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">agent@node-b</text>
+      <text x="738" y="164" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">agent@node-c</text>
+      <text x="738" y="180" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">节点守护进程、日志、监控、CNI、CSI</text>
+      <rect x="693" y="196" width="90" height="20" rx="10" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="738" y="210" text-anchor="middle" font-size="9" fill="var(--d-text)">节点驻留语义</text>
+
+      <line x1="182" y1="158" x2="214" y2="158" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-daemonset-chain)" />
+      <line x1="396" y1="158" x2="428" y2="158" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-daemonset-chain)" />
+      <line x1="610" y1="158" x2="642" y2="158" stroke="var(--d-arrow)" stroke-width="1.7" marker-end="url(#k8s-arrow-daemonset-chain)" />
+
+      <rect x="100" y="276" width="662" height="78" rx="16" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="431" y="304" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-cur-text)">排障时先别问“现在总共有几份”，要先问“哪些节点本来就该有，哪些节点本来就不该有”</text>
+      <text x="431" y="326" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">Node 集合变化、label 变化、taint 变化，都会改变 DaemonSet 最终应该覆盖到的节点面</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'daemonset-update-and-drain-boundary-map'"
+      viewBox="0 0 860 408"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="K8s DaemonSet 更新与 drain 边界图"
+      role="img"
+    >
+      <defs>
+        <marker id="k8s-arrow-daemonset-boundary" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--d-arrow)" />
+        </marker>
+      </defs>
+
+      <text x="430" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+        图 77 - 讲 DaemonSet 时要先分清四层边界：节点覆盖面、自动 toleration、drain 忽略、更新策略；它不是普通副本服务的另一种写法
+      </text>
+
+      <rect x="28" y="92" width="188" height="248" rx="16" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" />
+      <text x="122" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-text)">节点覆盖面</text>
+      <text x="122" y="146" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">每个符合条件的节点一份</text>
+      <text x="122" y="164" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">不是固定副本数</text>
+      <text x="122" y="182" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">Node 变化会触发补齐/回收</text>
+      <text x="122" y="228" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">核心问题：</text>
+      <text x="122" y="246" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">哪些节点本来就该有</text>
+      <rect x="74" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="122" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">先分节点集合</text>
+
+      <rect x="234" y="92" width="188" height="248" rx="16" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" />
+      <text x="328" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-c-text)">自动 toleration</text>
+      <text x="328" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">`unschedulable`</text>
+      <text x="328" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">`not-ready / unreachable`</text>
+      <text x="328" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">压力 taint 与 `hostNetwork` 特例</text>
+      <text x="328" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">核心问题：</text>
+      <text x="328" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">为什么它比普通 Pod 更能忍</text>
+      <rect x="280" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="328" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">别按普通 Pod 推演</text>
+
+      <rect x="440" y="92" width="188" height="248" rx="16" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" />
+      <text x="534" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-b-text)">`drain` 边界</text>
+      <text x="534" y="146" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">`drain` 默认不删 DaemonSet Pod</text>
+      <text x="534" y="164" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">通常要 `--ignore-daemonsets` 才继续</text>
+      <text x="534" y="182" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">删了也会被 controller 补回</text>
+      <text x="534" y="228" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">核心问题：</text>
+      <text x="534" y="246" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">维护迁谁，不迁谁</text>
+      <rect x="486" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="534" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">不是漏删，是设计如此</text>
+
+      <rect x="646" y="92" width="188" height="248" rx="16" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" />
+      <text x="740" y="120" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-warn-text)">更新策略</text>
+      <text x="740" y="146" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`RollingUpdate` 自动替换</text>
+      <text x="740" y="164" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`OnDelete` 手动删才升级</text>
+      <text x="740" y="182" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">`maxUnavailable / maxSurge / minReadySeconds`</text>
+      <text x="740" y="228" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">核心问题：</text>
+      <text x="740" y="246" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">节点级能力怎么滚更安全</text>
+      <rect x="692" y="288" width="96" height="28" rx="14" fill="var(--vp-c-bg-elv)" stroke="var(--d-border)" />
+      <text x="740" y="307" text-anchor="middle" font-size="9" fill="var(--d-text)">按节点而不是按服务副本去想</text>
+
+      <line x1="216" y1="206" x2="234" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-daemonset-boundary)" />
+      <line x1="422" y1="206" x2="440" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-daemonset-boundary)" />
+      <line x1="628" y1="206" x2="646" y2="206" stroke="var(--d-arrow)" stroke-width="1.5" marker-end="url(#k8s-arrow-daemonset-boundary)" />
+
+      <rect x="116" y="360" width="628" height="26" rx="13" fill="var(--d-cur-bg)" stroke="var(--d-cur-border)" />
+      <text x="430" y="378" text-anchor="middle" font-size="10" fill="var(--d-cur-text)">
+        口诀：Deployment 管副本数，StatefulSet 管成员身份，DaemonSet 管节点覆盖面；这三条工作负载语义不能混
       </text>
     </svg>
 

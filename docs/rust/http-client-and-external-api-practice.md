@@ -514,6 +514,7 @@ pub async fn get_repo(&self, owner: &str, repo: &str) -> Result<RepoDto, ApiErro
 - 回调验签：[Rust Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
 - Tokio 主线：[Tokio 与 Async 工程实践](./tokio-and-async-practice.md)
 - 可观测性：[Tracing 与可观测性实践](./tracing-and-observability-practice.md)
+- 通知与消息触达：[Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)
 - 数据脱敏与日志安全：[Rust 数据脱敏、隐私字段与日志安全实践](./data-masking-privacy-and-log-safety-practice.md)
 
 如果你已经会写 Rust，但每次一接外部 HTTP API 就开始在超时、认证、重试和错误边界上反复返工，这页应该放进服务工程主线的必读列表。

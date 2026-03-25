@@ -237,6 +237,8 @@ spec:
 - 或通过亲和性 / 反亲和性把副本更均匀打散到节点
 - 或控制 LB 只面向一小组稳定节点
 
+如果你想单独把入口类 DaemonSet 为什么更容易配合 `Local`，以及它在 `cordon/drain` 下的特殊边界讲透，继续看 [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)。
+
 ### 8.2 把 readiness 和摘流量时序调顺
 
 要点是：
@@ -296,6 +298,7 @@ spec:
 - [kube-proxy 与 Service 数据面实战](./kube-proxy-and-service-dataplane.md)
 - [K8s 网络排障手册](./network-troubleshooting.md)
 - [K8s 固定入口、固定出口与白名单实战](./fixed-ip-and-whitelist.md)
+- [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)
 - [K8s 必备问题清单](./essential-questions.md)
 - [K8s 核心概念与对象模型](./core-concepts.md)
 - [容器化与云原生实践](/golang/guide/10-containerization-cloud-native)

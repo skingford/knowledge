@@ -529,6 +529,7 @@ webhook 测试如果只测：
 - API 版本治理：[Rust API Versioning、兼容演进与弃用治理实践](./api-versioning-and-compatibility-governance-practice.md)
 - 幂等与状态机：[Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
+- 通知与消息触达：[Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)
 - 审计记录边界：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
 - 测试隔离：[Rust 测试替身与依赖隔离实践](./test-doubles-and-dependency-isolation-practice.md)
 

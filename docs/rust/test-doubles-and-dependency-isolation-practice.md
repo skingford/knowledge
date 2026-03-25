@@ -417,6 +417,7 @@ Tokio 官方 `#[tokio::test]` 文档明确说明：
 - HTTP 边界测试：[Rust HTTP Client 与外部 API 实践](./http-client-and-external-api-practice.md)
 - 后台任务测试：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
 - 消息消费测试：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
+- 通知与消息触达：[Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)
 - 对象存储边界：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 回调协议边界：[Rust Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
 - 数据访问分层：[SQLx 数据库访问实践](./sqlx-database-practice.md)

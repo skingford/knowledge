@@ -175,11 +175,14 @@ Rust 不会因为你用了线程、channel、`Arc<Mutex<T>>` 或 async/await 就
 - [Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)：把 expand / contract、历史数据回填、双读双写和回滚边界收成一页
 - [Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)：把 query DTO、排序白名单、offset / cursor、`total` 成本和索引约束收成一页
 - [Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)：把搜索 query DTO、索引文档、异步同步、回填重建和 alias 切换收成一页
+- [Rust 软删除、恢复与删除语义实践](./soft-delete-restore-and-deletion-semantics-practice.md)：把 deleted_at、恢复窗口、物理删除时机和查询边界收成一页
 - [Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)：把分批扫描、checkpoint、限速、dry-run、补跑和历史修复收成一页
 - [Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)：把请求级幂等键、业务唯一键、条件更新、状态机和 Outbox 一起收成有副作用操作的一致性主线
 - [Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)：把 producer、consumer、事件契约、至少一次投递、重试、死信和幂等消费收成一页
+- [Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)：把通知意图、模板、渠道选择、回调状态和限流收成一页
 - [Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)：把 multipart、预签名 URL、对象 key、元数据落库、异步后处理和 orphan 清理收成一页
 - [Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)：把异步导出任务、对象存储交付、租户配额和审计留痕收成一页
+- [Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)：把保留窗口、冷热分层、归档恢复和对象冷存储边界收成一页
 - [Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)：把 tenant context、SQL 过滤、租户内唯一约束、缓存 key、对象 key 和租户配额收成一页
 - [Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)：把 actor、tenant、resource、request id、结果状态和异步审计落库边界收成一页
 - [Rust Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)：把原始 body 验签、重放防护、重复与乱序回调、2xx / 5xx 返回语义和异步解耦收成一页

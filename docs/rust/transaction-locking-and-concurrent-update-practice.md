@@ -487,6 +487,7 @@ pub async fn transfer(
 - 后台任务主线：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 列表查询边界：[Rust 列表查询、过滤、排序与分页实践](./pagination-filter-and-sorting-practice.md)
+- 删除与恢复并发语义：[Rust 软删除、恢复与删除语义实践](./soft-delete-restore-and-deletion-semantics-practice.md)
 - 服务落地模板：[Axum + SQLx 服务落地模板](./axum-sqlx-service-template.md)
 - 性能排障：[Rust 性能分析与 Profiling 指南](./performance-and-profiling-guide.md)
 

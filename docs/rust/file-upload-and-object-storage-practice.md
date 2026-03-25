@@ -503,6 +503,10 @@ pub trait ObjectStorage {
 
 时间一长，对象存储里通常会堆出大量业务上已经无效的文件。
 
+如果你想把保留窗口、归档前缀、冷存储和恢复路径单独理顺，继续看：
+
+- [Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)
+
 ## 推荐回查入口
 
 - 输入校验边界：[Rust 输入校验与边界建模实践](./validation-and-input-boundaries-practice.md)
@@ -511,6 +515,7 @@ pub trait ObjectStorage {
 - 后台任务主线：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+- 归档与冷热分层：[Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)
 - 审计记录边界：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)
 - Secrets 与轮换：[Rust Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
 - 发布与配置：[Rust 服务部署与发布清单](./deployment-and-release-checklist.md)

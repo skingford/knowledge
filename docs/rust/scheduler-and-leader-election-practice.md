@@ -531,6 +531,7 @@ pub struct ScheduledTrigger {
 - 幂等与状态推进：[Rust 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 - 缓存后台刷新：[Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+- 归档与冷热分层：[Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)
 - 搜索索引重建：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
 - 文件和后处理任务：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 生命周期与关闭：[服务配置与优雅关闭](./service-configuration-and-graceful-shutdown.md)

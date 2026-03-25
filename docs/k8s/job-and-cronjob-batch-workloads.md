@@ -360,6 +360,8 @@ spec:
 - Job：一次性成功完成的任务
 - CronJob：按计划反复创建 Job
 
+如果你想把 DaemonSet 的“节点驻留”语义、更新方式和 `drain` 边界单独讲透，继续看 [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)。
+
 真正要避免的是两类误用：
 
 - 用 Deployment 硬跑批处理
@@ -471,3 +473,4 @@ spec:
 - [资源规格与运行时压力实战](./resource-specs-and-runtime-pressure.md)
 - [Pod 生命周期与探针实战](./pod-lifecycle-and-probes.md)
 - [StatefulSet 与 Headless Service 实战](./statefulset-headless-service.md)
+- [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)

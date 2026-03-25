@@ -39,6 +39,8 @@ import MySQLJoinOptimizationDiagram from './components/MySQLJoinOptimizationDiag
 import MySQLInnoDBVsMemoryDiagram from './components/MySQLInnoDBVsMemoryDiagram.vue'
 import MySQLAutoIncrementGapsDiagram from './components/MySQLAutoIncrementGapsDiagram.vue'
 import MySQLIndexRedundancyDiagram from './components/MySQLIndexRedundancyDiagram.vue'
+import RedisCourseDiagram from './components/RedisCourseDiagram.vue'
+import RedisCourseFigure from './components/RedisCourseFigure.vue'
 import WechatQrNotice from './components/WechatQrNotice.vue'
 import DocAfterSlot from './components/DocAfterSlot.vue'
 
@@ -91,5 +93,7 @@ export default {
     app.component('MySQLInnoDBVsMemoryDiagram', MySQLInnoDBVsMemoryDiagram)
     app.component('MySQLAutoIncrementGapsDiagram', MySQLAutoIncrementGapsDiagram)
     app.component('MySQLIndexRedundancyDiagram', MySQLIndexRedundancyDiagram)
+    app.component('RedisCourseDiagram', RedisCourseDiagram)
+    app.component('RedisCourseFigure', RedisCourseFigure)
   },
 }

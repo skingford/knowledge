@@ -611,6 +611,7 @@ pub async fn list_users(
 - 多租户隔离：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - 数据访问边界：[SQLx 数据库访问实践](./sqlx-database-practice.md)
 - 搜索与检索边界：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
+- 删除语义边界：[Rust 软删除、恢复与删除语义实践](./soft-delete-restore-and-deletion-semantics-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
 - DTO 分层：[Rust DTO、领域模型与存储模型分层实践](./dto-domain-and-persistence-model-practice.md)
 - 性能排障：[Rust 性能分析与 Profiling 指南](./performance-and-profiling-guide.md)

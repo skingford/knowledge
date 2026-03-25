@@ -56,13 +56,16 @@
 - [Rust API Versioning、兼容演进与弃用治理实践](./rust/api-versioning-and-compatibility-governance-practice.md)
 - [Rust 列表查询、过滤、排序与分页实践](./rust/pagination-filter-and-sorting-practice.md)
 - [Rust 搜索、索引与检索实践](./rust/search-index-and-retrieval-practice.md)
+- [Rust 软删除、恢复与删除语义实践](./rust/soft-delete-restore-and-deletion-semantics-practice.md)
 - [Rust 批处理、回填与历史数据修复实践](./rust/batch-processing-backfill-and-historical-repair-practice.md)
 - [Rust 事务、锁与并发更新实践](./rust/transaction-locking-and-concurrent-update-practice.md)
 - [Rust 数据库迁移、Schema 演进与兼容发布实践](./rust/database-migration-and-schema-evolution-practice.md)
 - [Rust 幂等、状态机与 Outbox 实践](./rust/idempotency-state-machine-and-outbox-practice.md)
 - [Rust 消息队列与事件驱动实践](./rust/message-queue-and-event-driven-practice.md)
+- [Rust 通知、邮件、短信与消息触达实践](./rust/notification-email-sms-and-delivery-practice.md)
 - [Rust 文件上传、对象存储与 S3 实践](./rust/file-upload-and-object-storage-practice.md)
 - [Rust 导出、报表与大结果集实践](./rust/export-report-and-large-result-practice.md)
+- [Rust 数据归档、保留策略与冷热分层实践](./rust/data-archiving-retention-and-hot-cold-tiering-practice.md)
 - [Rust 认证、授权与请求上下文实践](./rust/auth-authorization-and-request-context-practice.md)
 - [Rust Secrets、密钥与凭证轮换实践](./rust/secret-management-and-credential-rotation-practice.md)
 - [Rust 数据脱敏、隐私字段与日志安全实践](./rust/data-masking-privacy-and-log-safety-practice.md)
@@ -89,7 +92,7 @@
 - `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
-- `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、搜索 / 索引 / 检索、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
+- `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、通知 / 邮件 / 短信 / Push、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
 
 ## 整理规则
 
@@ -117,4 +120,4 @@
 - `architecture/`：系统设计、架构方法、分布式与治理、案例实战
 - `ai/`：Agent、LLM 应用、RAG、工作流
 - `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读
-- `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、搜索 / 索引 / 检索、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践
+- `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、通知 / 邮件 / 短信 / Push、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践

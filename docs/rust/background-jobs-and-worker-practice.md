@@ -478,6 +478,7 @@ Rust 后台任务还有一个高频误区：
 - 调度与选主：[Rust 定时任务、调度与 Leader Election 实践](./scheduler-and-leader-election-practice.md)
 - 批处理与回填主线：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 消息系统边界：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
+- 通知与消息触达：[Rust 通知、邮件、短信与消息触达实践](./notification-email-sms-and-delivery-practice.md)
 - 搜索索引与回填：[Rust 搜索、索引与检索实践](./search-index-and-retrieval-practice.md)
 - 文件后处理边界：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
 - 导出与报表边界：[Rust 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)

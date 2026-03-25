@@ -450,6 +450,10 @@ Excel 并不是不能做，但它通常更适合：
 - 导出结果默认短生命周期
 - 真要长期留存，另走归档语义
 
+如果你想把保留窗口、归档路径、冷存储和恢复语义单独理顺，继续看：
+
+- [Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)
+
 否则时间一长，最常见的结果就是：
 
 - bucket 里堆满没人再会下载的历史文件
@@ -530,6 +534,7 @@ Excel 并不是不能做，但它通常更适合：
 - 后台任务主线：[Rust 后台任务与 Worker 实践](./background-jobs-and-worker-practice.md)
 - 批处理与回填主线：[Rust 批处理、回填与历史数据修复实践](./batch-processing-backfill-and-historical-repair-practice.md)
 - 文件与对象存储：[Rust 文件上传、对象存储与 S3 实践](./file-upload-and-object-storage-practice.md)
+- 归档与冷热分层：[Rust 数据归档、保留策略与冷热分层实践](./data-archiving-retention-and-hot-cold-tiering-practice.md)
 - 多租户与配额：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - 限流与超时：[Rust 限流、超时与负载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
 - 审计记录边界：[Rust 审计日志与操作记录实践](./audit-log-and-operation-history-practice.md)

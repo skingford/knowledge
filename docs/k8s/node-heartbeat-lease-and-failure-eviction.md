@@ -199,6 +199,8 @@ Kubernetes 官方 taints 文档明确说：
 - 这类 Pod 会一直忍着
 - 目的就是保证节点级代理、日志采集、网络组件这类守护进程别因为短暂节点问题全掉光
 
+如果想把这类“节点驻留工作负载”为什么和普通 Deployment 边界不同单独讲透，继续看 [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)。
+
 ### 6.3 为什么现在文档里经常单独提 `taint-eviction-controller`
 
 Kubernetes 官方 taints 文档明确说明：
@@ -413,6 +415,7 @@ DaemonSet 对 `not-ready/unreachable` 的容忍是特殊处理，不代表普通
 - [副本打散与拓扑高可用实战](./replica-spread-and-topology-ha.md)
 - [PDB、Eviction API 与 drain 边界实战](./pdb-eviction-api-and-drain-boundaries.md)
 - [StatefulSet 与 Headless Service 实战](./statefulset-headless-service.md)
+- [DaemonSet 节点驻留与更新边界实战](./daemonset-node-resident-and-update-boundaries.md)
 - [K8s 网络排障手册](./network-troubleshooting.md)
 - [K8s 核心概念与对象模型](./core-concepts.md)
 - [K8s 必备问题清单](./essential-questions.md)

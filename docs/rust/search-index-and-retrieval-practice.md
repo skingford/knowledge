@@ -500,6 +500,7 @@ src/
 - 消息驱动主线：[Rust 消息队列与事件驱动实践](./message-queue-and-event-driven-practice.md)
 - 多租户与隔离：[Rust 多租户与数据隔离实践](./multi-tenant-and-data-isolation-practice.md)
 - Schema 演进与回填：[Rust 数据库迁移、Schema 演进与兼容发布实践](./database-migration-and-schema-evolution-practice.md)
+- 删除与恢复语义：[Rust 软删除、恢复与删除语义实践](./soft-delete-restore-and-deletion-semantics-practice.md)
 - 限流与过载保护：[Rust 限流、超时与负载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
 - 缓存与热点读路径：[Rust 缓存与 Redis 实践](./cache-and-redis-practice.md)
 - 结构化观测：[Tracing 与可观测性实践](./tracing-and-observability-practice.md)
