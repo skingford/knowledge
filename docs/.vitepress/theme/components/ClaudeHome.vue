@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { withBase } from 'vitepress'
-import { homeHighlights as highlights, homePrinciples as principles, homeTracks as tracks } from '../content-data'
+import { homeHighlights as highlights, homePrinciples as principles, homeTracks as tracks } from '@docs-content'
 </script>
 
 <template>

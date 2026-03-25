@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import DiagramFrame from './DiagramFrame.vue'
+import DiagramFrame from '@docs-components/DiagramFrame.vue'
 
 type DiagramKind = 'double-m-switch' | 'reliability-first-switch' | 'crash-unavailable' | 'delay-angle' | 'three-node-loop'
 

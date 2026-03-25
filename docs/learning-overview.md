@@ -9,7 +9,7 @@ pageClass: claude-home-page
 ---
 
 <script setup lang="ts">
-import { learningOverviewGoals, learningOverviewTracks } from './.vitepress/theme/content-data'
+import { learningOverviewGoals, learningOverviewTracks } from '@docs-content'
 </script>
 
 <OverviewLanding

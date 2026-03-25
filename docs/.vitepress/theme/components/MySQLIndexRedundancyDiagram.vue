@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DiagramFrame from './DiagramFrame.vue'
+import DiagramFrame from '@docs-components/DiagramFrame.vue'
 </script>
 
 <template>

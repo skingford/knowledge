@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
+import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
 
 const siteUrl = 'https://skingford.github.io/knowledge/'
@@ -30,7 +31,7 @@ const sectionNavItems = sections
   activeMatch: `^${section.base}`,
 }))
 
-export default withMermaid(defineConfig({
+export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
@@ -51,6 +52,7 @@ export default withMermaid(defineConfig({
   router: {
     prefetchLinks: false,
   },
+  vite: docsViteConfig,
   shouldPreload(link) {
     if (link.includes('@localSearchIndexroot')) {
       return false
@@ -93,6 +95,7 @@ export default withMermaid(defineConfig({
       md.renderer.rules.html_inline = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
         defaultHtmlInline(tokens, idx, options, env, self),
       )
+      MermaidMarkdown(md)
       md.use(tabsMarkdownPlugin)
     },
   },
@@ -180,4 +183,4 @@ export default withMermaid(defineConfig({
       next: '下一篇',
     },
   },
-}))
+})

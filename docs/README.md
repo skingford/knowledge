@@ -102,6 +102,7 @@
 - 相近内容尽量合并，避免同一主题在多个文件中重复堆叠
 - 优先按主题归档到子目录，例如 `architecture/`、`ai/`、`golang/`
 - 新增主题时同步更新 `docs/.vitepress/theme/content-data.ts`，保证首页、总览页与侧边栏一致
+- Vite / VitePress alias 统一维护在 `docs/.vitepress/config/vite.ts`，文档脚本里的共享数据导入优先使用 `@docs-content`、`@docs-vocabulary`、`@docs-components`
 - 文档内部跳转统一使用相对链接，例如 `[Go 源码阅读主线](./golang/guide/source-reading/learning-path.md)`，这样本地预览和线上发布都能直接使用
 - 不要把 `/Users/...`、`file://...` 这类机器相关绝对路径写进正文链接文字或 `href`
 - 如果只想在自己机器上直接打开文件，优先使用编辑器的“打开链接/打开文件”能力；若必须使用本地协议，建议只在不发布的个人笔记里使用 `vscode://file/...`

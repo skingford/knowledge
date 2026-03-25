@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
-import DiagramFrame from './DiagramFrame.vue'
+import DiagramFrame from '@docs-components/DiagramFrame.vue'
 import ThreadVsGoroutineDiagram from './go-scheduler/ThreadVsGoroutineDiagram.vue'
 import LifecycleDiagram from './go-scheduler/LifecycleDiagram.vue'
 import RolesDiagram from './go-scheduler/RolesDiagram.vue'
