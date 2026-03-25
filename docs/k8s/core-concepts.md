@@ -482,6 +482,8 @@ Deployment 的滚动更新核心是：
 - [Helm 与包管理实战](./helm-and-package-management.md)
 - [可观测性与监控实战](./observability-and-monitoring.md)
 - [GitOps 与持续交付实战](./gitops-and-delivery.md)
+- [实战部署指南](./production-deployment-guide.md)
+- [内网离线集群搭建操作指南](./offline-cluster-setup-guide.md)
 - [容器化与云原生实践](/golang/guide/10-containerization-cloud-native)
 - [os/signal：K8s Pod 终止流程](/golang/guide/source-reading/os-signal)
 - [etcd 专题](/etcd/)
