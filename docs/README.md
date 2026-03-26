@@ -23,6 +23,7 @@
 - [架构方向](./architecture/)
 - [架构案例实战](./architecture/case-studies/)
 - [AI / Agent 方向](./ai/)
+- [Docker 专题](./docker/)
 - [Golang 方向](./golang/)
 - [Rust 方向](./rust/)
 
@@ -36,6 +37,9 @@
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
+- [Docker 专题](./docker/index.md)
+- [Docker 容器生命周期与运行模型](./docker/container-lifecycle-and-runtime.md)
+- [Docker 镜像仓库、Harbor 与发布治理](./docker/registry-and-image-governance.md)
 - [Go 学习路径与资料导航](./golang/learning-path.md)
 - [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
 - [Rust 学习路径与资料导航](./rust/learning-path.md)
@@ -83,6 +87,7 @@
 
 - [架构能力自检准备清单](./architecture/architect-interview-prep-checklist.md)
 - [AI、IM/直播与云原生架构](./architecture/ai-im-k8s-architecture-interview-guide.md)
+- [Docker 高频问题与自检清单](./docker/interview-questions.md)
 - [Go 能力自检与面试准备导航](./golang/interview-prep.md)
 - [30 个高频 Golang 能力自检题 + 简答](./golang/go-top-30-interview-questions.md)
 - [Rust 能力自检与面试准备导航](./rust/interview-prep.md)
@@ -92,6 +97,7 @@
 
 - `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
+- `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
 - `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、通知 / 邮件 / 短信 / Push、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
 
@@ -122,5 +128,6 @@
 
 - `architecture/`：系统设计、架构方法、分布式与治理、案例实战
 - `ai/`：Agent、LLM 应用、RAG、工作流
+- `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读
 - `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、通知 / 邮件 / 短信 / Push、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践
