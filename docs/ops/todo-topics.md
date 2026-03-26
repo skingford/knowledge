@@ -11,6 +11,9 @@ search: false
 - ~~Linux 磁盘清理与进程管理~~ → [Linux 磁盘清理与进程管理](./linux-disk-cleanup.md)
 - ~~Linux 用户管理与权限~~ → [Linux 用户管理与权限](./linux-user-permissions.md)
 - ~~Kubernetes 入门与必备问题~~ → [K8s 专题](/k8s/)
+- ~~Docker Compose 部署实践~~ → [Docker Compose 部署实践](/docker/compose-deployment-practice)
+- ~~Docker 镜像仓库与发布治理~~ → [Docker 镜像仓库、Harbor 与发布治理](/docker/registry-and-image-governance)
+- ~~Docker 容器生命周期与运行模型~~ → [Docker 容器生命周期与运行模型](/docker/container-lifecycle-and-runtime)
 
 ## 优先级高
 
@@ -20,7 +23,6 @@ search: false
 
 ## 优先级中
 
-- Docker Compose 部署实践
 - Linux 网络排障（tcpdump / ss / iptables）
 - 监控告警（Prometheus + Grafana 入门）
 - 定时任务管理（cron / systemd timer）

@@ -757,6 +757,14 @@ Kafka 的横向吞吐来自 Partition。
 - 对明显 CPU 密集或 GPU 密集型工作负载，优先做专用节点池和资源隔离
 - HPA 不能只看 CPU，很多 AI 服务更应该看并发数、队列长度、P95 延迟或自定义业务指标
 
+图例参考：Pod 生命周期里最容易讲混的是三类探针。先看清 `startupProbe` 负责保护慢启动，`readinessProbe` 决定能不能接流量，`livenessProbe` 才是长期存活检查。
+
+<K8sDiagram kind="probe-gating-chain" />
+
+图例参考：优雅终止也不能只背 `SIGTERM`。真正顺序是先摘流量，再执行 `preStop`，给应用处理存量请求的时间，超时后才会被 `SIGKILL` 强杀。
+
+<K8sDiagram kind="pod-termination-timeline" />
+
 图例参考：K8s 弹性不是只开 HPA，而是指标、调度、Pending、节点扩容和 Ready 接流量的一整条链。
 
 <K8sDiagram kind="autoscaling-control-chain" />
@@ -838,6 +846,10 @@ Kafka 的横向吞吐来自 Partition。
 - 一次核心链路重构
 - 一次跨团队推动的平台化治理
 
+图例参考：项目复盘最怕讲成流水账。尤其是线上事故，最好按“发现 -> 止血 -> 定位 -> 修复 -> 验证 -> 复盘”的顺序讲，面试官更容易判断你是不是有真实一线经验。
+
+<GoPerformanceDiagram kind="incident-workflow" />
+
 ### 2. 质量管理
 
 可以围绕这几个点展开：
@@ -846,6 +858,10 @@ Kafka 的横向吞吐来自 Partition。
 - Code Review 的价值是防止架构腐化和隐患进入主干，而不是只看代码风格
 - 设计模式不是背概念，而是为了控制复杂度，比如状态机、策略模式、责任链、模板方法
 
+图例参考：质量管理如果只说“写单测、做 Review”还是太空。先把测试用例组织方式看清，再往下讲边界覆盖、异常路径和 CI 卡口，会更像真实工程实践。
+
+<GoEngineeringDiagram kind="unit-test-patterns" />
+
 ### 3. 远程协作
 
 远程岗位常见关注点：
@@ -853,6 +869,10 @@ Kafka 的横向吞吐来自 Partition。
 - 你是否会写清楚设计文档、复盘文档和发布说明
 - 你是否能把同步沟通前置成异步文档，减少低效会议
 - 你是否能明确风险、依赖和时间边界，而不是等问题爆出来再说
+
+图例参考：远程协作如果只靠即时沟通，很容易出现“大家都聊过，但没有稳定沉淀”的问题。更稳的做法是把协作收束到可审计的 PR、测试和发布链路里，减少口头同步依赖。
+
+<GoEngineeringDiagram kind="ci-pipeline" />
 
 ## 高频追问题库
 
@@ -990,6 +1010,10 @@ Kafka 的横向吞吐来自 Partition。
 图例参考：防丢失也不能只背 `acks=all`。把 Producer、Broker、Consumer 三端各自兜什么风险看成一条闭环，为什么还需要业务幂等就会自然说出来。
 
 <KafkaDiagram kind="reliability-chain" />
+
+图例参考：如果继续追问“只要手动提交 offset 就够了吗”，就要把业务结果和可信位点一起回答。真正稳定的恢复点，往往是能和业务事务一起提交的外部状态，而不是只记 Kafka 自身 offset。
+
+<KafkaDiagram kind="offset-transaction" />
 
 ::: details 完整参考答案
 
@@ -1337,6 +1361,10 @@ SSE 事件建议拆成几类：
 - Metrics 看成功率、P95、工具超时率、取消率、队列长度、SSE 断流率
 - Log 保留结构化字段，例如租户、会话、节点类型、工具名、错误码
 - 对慢模型、慢工具、积压队列设专门告警
+
+图例参考：观测不是三套系统各摆一份大盘。最好用同一个 `trace_id` 把 Metrics、Logs、Trace 串成证据链，先发现异常，再定位阶段，最后回到根因和修复动作。
+
+<GoPerformanceDiagram kind="telemetry-triad" />
 
 ### 11. 一段适合口述的总结版答案
 
@@ -1794,6 +1822,32 @@ WHERE id = 1
 | HPA | AI 服务不只看 CPU，看并发数/队列长度/P95。KEDA 支持自定义指标 |
 | 固定出口 IP | NAT 网关统一出口，不是固定 Pod IP。Istio Egress Gateway 做细粒度控制 |
 | CI/CD | 提交 → 测试+构建+扫描 → 版本化镜像 → Helm/GitOps 发布 → 探针+灰度+回滚 |
+
+## 最后收束
+
+如果前面内容已经很多，最后可以把整页压回三条主线：
+
+- 数据面：数据库、缓存、一致性和热点治理
+- 异步面：消息系统里的不丢、不乱、不堵
+- 平台面：K8s 从会用到会稳、会排障、会讲机制
+
+### 1. 数据与缓存收束
+
+图例参考：数据库和缓存题，最后几乎都会落回“连接模型、缓存异常、一致性与分片复杂度”这条主线。把这张图记住，很多零散问题都能重新挂回去。
+
+<GoDataCacheDiagram kind="overview" />
+
+### 2. 消息与异步收束
+
+图例参考：Kafka 真正的答题主线，不是参数清单，而是“不丢、不乱、不堵”。把这三个目标和对应手段压成一张图，追问时不容易散。
+
+<KafkaDiagram kind="topic-goals-map" />
+
+### 3. 云原生与交付收束
+
+图例参考：K8s 题如果只停在 Deployment 和 Service，深度不够。把“会用对象 -> 会做治理 -> 会定位问题 -> 会讲机制”这条阶梯记住，答题会更有层次。
+
+<K8sDiagram kind="depth-map" />
 
 ## 面试题 → 底层原理对照表
 

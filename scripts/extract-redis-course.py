@@ -107,6 +107,9 @@ NUMERIC_TITLE_RE = re.compile(r"^(?P<num>\d{2})\s*[：:、.．]\s*(?P<rest>.+)$"
 
 
 IMAGE_REPLACEMENTS: dict[str, dict[int, str]] = {
+    "00-preface": {
+        1: '<RedisCourseFigure kind="preface-knowledge-map" />',
+    },
     "01-basic-architecture": {
         1: '<RedisCourseFigure kind="simplekv-modules" />',
         2: '<RedisCourseFigure kind="simplekv-to-redis" />',

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import DiagramFrame from '@docs-components/DiagramFrame.vue'
 
 type FigureKind =
+  | 'preface-knowledge-map'
   | 'simplekv-modules'
   | 'simplekv-to-redis'
   | 'io-throughput-threads'
@@ -45,6 +46,7 @@ const props = defineProps<{
 }>()
 
 const maxWidthByKind: Record<FigureKind, string> = {
+  'preface-knowledge-map': '860px',
   'simplekv-modules': '860px',
   'simplekv-to-redis': '920px',
   'io-throughput-threads': '780px',
@@ -89,7 +91,83 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
 <template>
   <DiagramFrame :max-width="maxWidth">
     <svg
-      v-if="kind === 'simplekv-modules'"
+      v-if="kind === 'preface-knowledge-map'"
+      viewBox="0 0 860 430"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Redis 两大维度三大主线知识全景图"
+      role="img"
+    >
+      <rect x="16" y="16" width="828" height="398" rx="18" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.4" />
+      <text x="430" y="58" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-text)">Redis 的“两大维度，三大主线”</text>
+
+      <text x="112" y="116" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">
+        <tspan x="112" dy="0">应用</tspan>
+        <tspan x="112" dy="22">维度</tspan>
+      </text>
+
+      <text x="112" y="244" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">
+        <tspan x="112" dy="0">系统</tspan>
+        <tspan x="112" dy="22">维度</tspan>
+      </text>
+
+      <line x1="164" y1="166" x2="744" y2="166" stroke="var(--d-border)" stroke-width="1.4" />
+      <line x1="398" y1="182" x2="398" y2="372" stroke="var(--d-border-dash)" stroke-width="1.4" stroke-dasharray="6 6" />
+      <line x1="594" y1="182" x2="594" y2="372" stroke="var(--d-border-dash)" stroke-width="1.4" stroke-dasharray="6 6" />
+
+      <rect x="186" y="92" width="126" height="48" rx="12" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.3" />
+      <text x="249" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">缓存应用</text>
+      <rect x="360" y="92" width="126" height="48" rx="12" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.3" />
+      <text x="423" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">集群应用</text>
+      <rect x="534" y="92" width="144" height="48" rx="12" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.3" />
+      <text x="606" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">数据结构应用</text>
+
+      <text x="176" y="208" text-anchor="end" font-size="12" font-weight="600" fill="var(--d-text)">处理层</text>
+      <text x="176" y="260" text-anchor="end" font-size="12" font-weight="600" fill="var(--d-text)">内存层</text>
+      <text x="176" y="314" text-anchor="end" font-size="12" font-weight="600" fill="var(--d-text)">存储层</text>
+      <text x="176" y="366" text-anchor="end" font-size="12" font-weight="600" fill="var(--d-text)">网络层</text>
+
+      <rect x="194" y="186" width="138" height="36" rx="9" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="263" y="209" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">线程模型</text>
+      <rect x="194" y="238" width="138" height="36" rx="9" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="263" y="261" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">数据结构</text>
+      <rect x="194" y="342" width="154" height="36" rx="9" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="271" y="365" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">epoll 网络框架</text>
+
+      <rect x="410" y="186" width="112" height="36" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="466" y="209" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">主从复制</text>
+      <rect x="410" y="238" width="112" height="36" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="466" y="261" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">哨兵机制</text>
+
+      <rect x="618" y="186" width="112" height="36" rx="9" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="674" y="209" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">数据分片</text>
+      <rect x="618" y="290" width="112" height="36" rx="9" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="674" y="313" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">负载均衡</text>
+
+      <rect
+        x="258"
+        y="290"
+        width="280"
+        height="46"
+        rx="12"
+        fill="none"
+        stroke="var(--d-text-sub)"
+        stroke-width="1.8"
+        stroke-dasharray="7 5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <rect x="270" y="296" width="96" height="34" rx="9" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="318" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">AOF</text>
+      <rect x="430" y="296" width="96" height="34" rx="9" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="478" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="var(--d-text)">RDB</text>
+
+      <text x="272" y="396" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">高性能主线</text>
+      <text x="496" y="396" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">高可靠主线</text>
+      <text x="676" y="396" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">高可扩展主线</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'simplekv-modules'"
       viewBox="0 0 860 310"
       xmlns="http://www.w3.org/2000/svg"
       aria-label="SimpleKV 基本组件图"

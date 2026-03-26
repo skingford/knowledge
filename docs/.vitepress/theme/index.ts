@@ -10,6 +10,7 @@ import OverviewLanding from '@docs-components/OverviewLanding.vue'
 import Mermaid from '@docs-components/Mermaid.vue'
 import WechatQrNotice from '@docs-components/WechatQrNotice.vue'
 import DocAfterSlot from '@docs-components/DocAfterSlot.vue'
+import SvgPreview from '@docs-components/SvgPreview.vue'
 
 const staticGlobalComponents = {
   QuickNav,
@@ -64,6 +65,7 @@ const theme: Theme = {
       h(DefaultTheme.Layout, null, {
         'doc-after': () => h(DocAfterSlot),
       }),
+      h(SvgPreview),
       h(WechatQrNotice),
     ])
   },
