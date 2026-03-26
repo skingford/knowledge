@@ -8,6 +8,7 @@ const ZOOM_STEP = 0.25
 const MIN_PREVIEW_WIDTH = 180
 const MIN_PREVIEW_HEIGHT = 96
 const MIN_PREVIEW_AREA = 28000
+const PAN_OVERFLOW_TOLERANCE = 12
 
 const route = useRoute()
 
@@ -19,12 +20,16 @@ const baseHeight = ref(360)
 const previewGraphicHost = ref<HTMLElement | null>(null)
 const previewViewport = ref<HTMLElement | null>(null)
 const closeButton = ref<HTMLButtonElement | null>(null)
+const isDragging = ref(false)
+const canPanX = ref(false)
+const canPanY = ref(false)
 
 let activeSource: SVGSVGElement | null = null
 let activeClone: SVGSVGElement | null = null
 let lastTrigger: SVGSVGElement | null = null
 let refreshTimer: number | null = null
 let domObserver: MutationObserver | null = null
+let viewportResizeObserver: ResizeObserver | null = null
 let previewSerial = 0
 let pointerPan:
   | {
@@ -39,6 +44,7 @@ let pointerPan:
 const zoomPercent = computed(() => `${Math.round(zoom.value * 100)}%`)
 const canZoomIn = computed(() => zoom.value < MAX_ZOOM)
 const canZoomOut = computed(() => zoom.value > MIN_ZOOM)
+const isPannable = computed(() => canPanX.value || canPanY.value)
 
 function getFitZoom() {
   if (!previewViewport.value) {
@@ -229,7 +235,32 @@ function applyCloneScale() {
   activeClone.style.height = 'auto'
 }
 
-function centerPreviewHorizontally() {
+function updatePanCapability() {
+  if (!previewViewport.value) {
+    canPanX.value = false
+    canPanY.value = false
+    isDragging.value = false
+    return
+  }
+
+  const horizontalOverflow = previewViewport.value.scrollWidth - previewViewport.value.clientWidth
+  const verticalOverflow = previewViewport.value.scrollHeight - previewViewport.value.clientHeight
+
+  canPanX.value = horizontalOverflow > PAN_OVERFLOW_TOLERANCE
+  canPanY.value = verticalOverflow > PAN_OVERFLOW_TOLERANCE
+
+  if (!canPanX.value && !canPanY.value) {
+    isDragging.value = false
+  }
+}
+
+function schedulePanCapabilityUpdate() {
+  window.requestAnimationFrame(() => {
+    updatePanCapability()
+  })
+}
+
+function centerPreview() {
   if (!previewViewport.value) {
     return
   }
@@ -239,12 +270,73 @@ function centerPreviewHorizontally() {
       return
     }
 
-    const offset = Math.max(
+    const left = Math.max(
       (previewViewport.value.scrollWidth - previewViewport.value.clientWidth) / 2,
       0,
     )
-    previewViewport.value.scrollTo({ left: offset, top: 0 })
+    const top = Math.max(
+      (previewViewport.value.scrollHeight - previewViewport.value.clientHeight) / 2,
+      0,
+    )
+    previewViewport.value.scrollTo({ left, top })
   })
+}
+
+function captureViewportAnchor() {
+  if (!previewViewport.value) {
+    return null
+  }
+
+  return {
+    ratioX: previewViewport.value.scrollWidth <= 0
+      ? 0.5
+      : (previewViewport.value.scrollLeft + (previewViewport.value.clientWidth / 2)) / previewViewport.value.scrollWidth,
+    ratioY: previewViewport.value.scrollHeight <= 0
+      ? 0.5
+      : (previewViewport.value.scrollTop + (previewViewport.value.clientHeight / 2)) / previewViewport.value.scrollHeight,
+  }
+}
+
+function restoreViewportAnchor(anchor: { ratioX: number, ratioY: number }) {
+  if (!previewViewport.value) {
+    return
+  }
+
+  window.requestAnimationFrame(() => {
+    if (!previewViewport.value) {
+      return
+    }
+
+    const left = (previewViewport.value.scrollWidth * anchor.ratioX) - (previewViewport.value.clientWidth / 2)
+    const top = (previewViewport.value.scrollHeight * anchor.ratioY) - (previewViewport.value.clientHeight / 2)
+
+    previewViewport.value.scrollTo({
+      left: Math.max(Math.min(left, previewViewport.value.scrollWidth - previewViewport.value.clientWidth), 0),
+      top: Math.max(Math.min(top, previewViewport.value.scrollHeight - previewViewport.value.clientHeight), 0),
+    })
+
+    updatePanCapability()
+  })
+}
+
+function applyZoom(nextZoom: number, options?: { center?: boolean }) {
+  const clampedZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number(nextZoom.toFixed(2))))
+  if (Math.abs(clampedZoom - zoom.value) < 0.001) {
+    if (options?.center) {
+      centerPreview()
+    }
+    return
+  }
+
+  const anchor = options?.center ? null : captureViewportAnchor()
+  zoom.value = clampedZoom
+
+  if (anchor) {
+    restoreViewportAnchor(anchor)
+    return
+  }
+
+  centerPreview()
 }
 
 function renderPreviewClone() {
@@ -269,6 +361,7 @@ function renderPreviewClone() {
   activeClone = clone
   previewGraphicHost.value.append(clone)
   applyCloneScale()
+  schedulePanCapabilityUpdate()
 }
 
 async function openPreview(svg: SVGSVGElement) {
@@ -285,7 +378,7 @@ async function openPreview(svg: SVGSVGElement) {
   renderPreviewClone()
   zoom.value = getRecommendedOpenZoom()
   applyCloneScale()
-  centerPreviewHorizontally()
+  centerPreview()
   closeButton.value?.focus()
 }
 
@@ -293,6 +386,9 @@ function clearPreview() {
   activeClone = null
   activeSource = null
   pointerPan = null
+  isDragging.value = false
+  canPanX.value = false
+  canPanY.value = false
 
   if (previewGraphicHost.value) {
     previewGraphicHost.value.innerHTML = ''
@@ -310,28 +406,25 @@ function closePreview() {
 }
 
 function setZoom(nextZoom: number) {
-  zoom.value = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Number(nextZoom.toFixed(2))))
+  applyZoom(nextZoom)
 }
 
 function stepZoom(direction: 1 | -1) {
-  setZoom(zoom.value + direction * ZOOM_STEP)
+  applyZoom(zoom.value + direction * ZOOM_STEP)
 }
 
 function resetZoom() {
-  setZoom(getFitZoom())
-  centerPreviewHorizontally()
+  applyZoom(getFitZoom(), { center: true })
 }
 
 function toggleZoomPreset() {
   const fitZoom = getFitZoom()
 
   if (Math.abs(zoom.value - fitZoom) < 0.08) {
-    setZoom(Math.min(MAX_ZOOM, Math.max(1.9, fitZoom + 0.5)))
+    applyZoom(Math.min(MAX_ZOOM, Math.max(1.9, fitZoom + 0.5)))
   } else {
-    setZoom(fitZoom)
+    applyZoom(fitZoom, { center: true })
   }
-
-  centerPreviewHorizontally()
 }
 
 function handleDocumentClick(event: MouseEvent) {
@@ -398,7 +491,15 @@ function handleDocumentKeydown(event: KeyboardEvent) {
 }
 
 function handlePointerDown(event: PointerEvent) {
-  if (event.pointerType !== 'mouse' || event.button !== 0 || !previewViewport.value) {
+  if (!previewViewport.value) {
+    return
+  }
+
+  if (!isPannable.value) {
+    return
+  }
+
+  if (event.pointerType === 'mouse' && event.button !== 0) {
     return
   }
 
@@ -410,7 +511,9 @@ function handlePointerDown(event: PointerEvent) {
     scrollTop: previewViewport.value.scrollTop,
   }
 
+  isDragging.value = true
   previewViewport.value.setPointerCapture(event.pointerId)
+  event.preventDefault()
 }
 
 function handlePointerMove(event: PointerEvent) {
@@ -418,8 +521,13 @@ function handlePointerMove(event: PointerEvent) {
     return
   }
 
-  previewViewport.value.scrollLeft = pointerPan.scrollLeft - (event.clientX - pointerPan.startX)
-  previewViewport.value.scrollTop = pointerPan.scrollTop - (event.clientY - pointerPan.startY)
+  if (canPanX.value) {
+    previewViewport.value.scrollLeft = pointerPan.scrollLeft - (event.clientX - pointerPan.startX)
+  }
+
+  if (canPanY.value) {
+    previewViewport.value.scrollTop = pointerPan.scrollTop - (event.clientY - pointerPan.startY)
+  }
 }
 
 function handlePointerEnd(event: PointerEvent) {
@@ -429,6 +537,7 @@ function handlePointerEnd(event: PointerEvent) {
 
   previewViewport.value.releasePointerCapture(event.pointerId)
   pointerPan = null
+  isDragging.value = false
 }
 
 function handleViewportWheel(event: WheelEvent) {
@@ -440,9 +549,28 @@ function handleViewportWheel(event: WheelEvent) {
   stepZoom(event.deltaY < 0 ? 1 : -1)
 }
 
+function handleDragStart(event: DragEvent) {
+  event.preventDefault()
+}
+
 watch(zoom, () => {
   applyCloneScale()
+  schedulePanCapabilityUpdate()
 })
+
+watch(
+  () => previewViewport.value,
+  (viewport, previousViewport) => {
+    if (previousViewport) {
+      viewportResizeObserver?.unobserve(previousViewport)
+    }
+
+    if (viewport) {
+      viewportResizeObserver?.observe(viewport)
+      schedulePanCapabilityUpdate()
+    }
+  },
+)
 
 watch(
   () => route.path,
@@ -471,12 +599,17 @@ onMounted(() => {
     childList: true,
     subtree: true,
   })
+
+  viewportResizeObserver = new ResizeObserver(() => {
+    schedulePanCapabilityUpdate()
+  })
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleDocumentClick)
   document.removeEventListener('keydown', handleDocumentKeydown)
   domObserver?.disconnect()
+  viewportResizeObserver?.disconnect()
 
   if (refreshTimer !== null) {
     window.clearTimeout(refreshTimer)
@@ -555,7 +688,12 @@ onBeforeUnmount(() => {
           <div
             ref="previewViewport"
             class="svg-preview__viewport"
+            :class="{
+              'svg-preview__viewport--dragging': isDragging,
+              'svg-preview__viewport--pannable': isPannable,
+            }"
             @dblclick="toggleZoomPreset"
+            @dragstart="handleDragStart"
             @pointerdown="handlePointerDown"
             @pointermove="handlePointerMove"
             @pointerup="handlePointerEnd"
@@ -767,15 +905,21 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: auto;
   padding: 92px 24px 24px;
-  cursor: grab;
-  touch-action: pan-x pan-y;
+  cursor: default;
+  overscroll-behavior: contain;
+  touch-action: none;
   background:
     radial-gradient(circle at center, rgba(126, 169, 230, 0.12), transparent 28%),
     radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 46%),
     linear-gradient(180deg, rgba(8, 11, 18, 0.98), rgba(4, 7, 12, 1));
 }
 
-.svg-preview__viewport:active {
+.svg-preview__viewport--pannable {
+  cursor: grab;
+}
+
+.svg-preview__viewport--pannable:active,
+.svg-preview__viewport--dragging {
   cursor: grabbing;
 }
 
@@ -801,6 +945,7 @@ onBeforeUnmount(() => {
 
 .svg-preview__stage {
   position: relative;
+  flex: none;
   isolation: isolate;
   display: inline-flex;
   align-items: center;
@@ -828,8 +973,10 @@ onBeforeUnmount(() => {
 }
 
 .svg-preview__graphic-host {
+  flex: none;
   position: relative;
   z-index: 1;
+  user-select: none;
 }
 
 .svg-preview__canvas :deep(.svg-preview__graphic) {
@@ -838,6 +985,8 @@ onBeforeUnmount(() => {
   height: auto !important;
   background: transparent;
   filter: drop-shadow(0 12px 28px rgba(15, 23, 42, 0.08));
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .svg-preview__hint {
