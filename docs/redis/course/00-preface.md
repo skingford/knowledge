@@ -54,7 +54,7 @@ description: "极客时间《Redis 核心技术与实战》开篇词：这样学
 
 那么，所谓的 Redis 知识全景图都包括什么呢？简单来说，就是“两大维度，三大主线”。
 
-![原文配图 1](https://static001.geekbang.org/resource/image/79/e7/79da7093ed998a99d9abe91e610b74e7.jpg)
+<RedisCourseFigure kind="preface-knowledge-map" />
 
 “两大维度”就是指系统维度和应用维度，“三大主线”也就是指高性能、高可靠和高可扩展（可以简称为“三高”）。
 

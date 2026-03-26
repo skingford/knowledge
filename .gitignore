@@ -1,9 +1,16 @@
 /node_modules
 .obsidian
+
+# docs vitepress
 docs/.vitepress/cache
 docs/.vitepress/dist
+docs/.vitepress/.temp
+
+# vitepress
 .vitepress/cache
 .vitepress/dist
+.vitepress/.temp
+
 .agents/
 .vscode/
 .tmp-mobile-check/
