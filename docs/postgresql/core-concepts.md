@@ -7,6 +7,22 @@ description: PostgreSQL 高频考点：MVCC 与可见性、索引与查询计划
 
 > 这几个问题可以按"MVCC -> 索引 -> 锁事务 -> 批量写入 -> 分区扩容 -> 高可用"的顺序准备，先把单机能力讲清，再讲集群治理。
 
+## 图例速览
+
+这页最容易答散的，不是某个单点知识，而是主线没立住。先看下面 3 张 SVG 图例，把“准备顺序、MVCC 本质、高可用回答框架”挂牢，再去展开每个问题会更顺。
+
+### 1. 准备顺序
+
+<PostgreSQLCoreDiagram kind="roadmap" />
+
+### 2. MVCC 版本链
+
+<PostgreSQLCoreDiagram kind="mvcc-chain" />
+
+### 3. 高可用回答框架
+
+<PostgreSQLCoreDiagram kind="ha-answer-frame" />
+
 ## 高频问题总览
 
 | 题目 | 核心矛盾 | 典型风险 | 首先要答什么 |

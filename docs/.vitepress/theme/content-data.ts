@@ -1551,6 +1551,102 @@ export const sections: SectionConfig[] = [
     ],
   },
   {
+    key: 'nginx',
+    base: '/nginx/',
+    navText: 'Nginx',
+    overviewDescription:
+      '系统整理 Nginx 必须掌握的核心知识，覆盖请求匹配、反向代理、gRPC / HTTP/2 / WebSocket 边界、HTTPS、静态资源、性能优化、安全基线与常见排障。',
+    landing: {
+      eyebrow: 'Nginx',
+      title: 'Nginx 专题',
+      intro:
+        '把 Nginx 从“会抄一份配置”提升到“能解释请求怎么匹配、代理怎么转发、协议边界怎么区分、HTTPS 怎么落、故障怎么排”的层面，先建立统一对象模型，再展开配置、协议边界、性能与运维主线。',
+      primary: { title: '专题总览', href: '/nginx/', description: '从总览页开始，先建立完整框架。' },
+      secondary: { title: '配置、Location 匹配与反向代理', href: '/nginx/config-and-reverse-proxy', description: '先把最容易写错的匹配和代理规则讲清。' },
+      scope: [
+        'master / worker 与事件驱动',
+        'server_name 与 location 匹配',
+        'root / alias / try_files',
+        'proxy_pass 与转发头',
+        'gRPC / HTTP/2 / WebSocket 边界',
+        '负载均衡与 WebSocket',
+        'HTTPS 与 TLS 终止',
+        '静态资源缓存与压缩',
+        '限流、安全基线与日常排障',
+        '高频问题与自检口径',
+      ],
+      docs: [
+        { title: 'Nginx 核心概念与请求处理模型', href: '/nginx/core-concepts', description: '从角色、对象模型、请求主线到 server/location/upstream 职责，建立统一认知。' },
+        { title: 'Nginx 配置、Location 匹配与反向代理', href: '/nginx/config-and-reverse-proxy', description: '系统讲清配置结构、location 优先级、root 与 alias、try_files、proxy_pass、负载均衡与 WebSocket。' },
+        { title: 'Nginx 上游、负载均衡与失败处理', href: '/nginx/upstream-load-balancing-and-failure-handling', description: '系统讲清 upstream、轮询、least_conn、ip_hash、keepalive、超时、失败重试与会话粘性边界。' },
+        { title: 'Nginx gRPC、HTTP/2 与 WebSocket 边界实战', href: '/nginx/grpc-http2-and-websocket-boundaries', description: '系统讲清 client 侧 HTTP/2、grpc_pass、WebSocket Upgrade、h2 / h2c / TLS 区别与最常见误区。' },
+        { title: 'Nginx HTTPS、性能优化与安全基线', href: '/nginx/https-performance-and-security', description: '系统讲清证书链、TLS 终止、缓存头、压缩、静态资源优化、限流与基础安全配置。' },
+        { title: 'Nginx + Let’s Encrypt / certbot 自动续期实战', href: '/nginx/lets-encrypt-and-certbot-renewal-practice', description: '系统讲清 HTTP-01、webroot、standalone、证书路径、自动续期、deploy hook 与续期后 reload。' },
+        { title: 'Nginx 限流、黑白名单与基础安全防护实战', href: '/nginx/rate-limit-allowlist-and-security-hardening', description: '系统讲清 limit_req、limit_conn、白名单、Basic Auth、方法限制、上传限制与敏感路径收口。' },
+        { title: 'Nginx 排障与日常运维', href: '/nginx/troubleshooting-and-operations', description: '系统整理配置校验、平滑 reload、日志分析、403/404/499/502/504 的排查路径。' },
+        { title: 'Nginx 日志、监控与告警实战', href: '/nginx/logging-monitoring-and-alerting-practice', description: '系统讲清 log_format、访问日志分析、stub_status、基础指标、Prometheus / Grafana 思路与告警分级。' },
+        { title: 'Nginx 常见场景与配置模板', href: '/nginx/common-scenarios-and-config-templates', description: '整理 SPA、API、WebSocket、上传下载、维护页和真实客户端 IP 的高频模板。' },
+        { title: 'Nginx + Docker Compose 部署实战', href: '/nginx/docker-compose-deployment-practice', description: '系统讲清单机部署目录结构、Compose 编排、配置挂载、HTTPS、发布回滚与 Nginx 入口协作。' },
+        { title: 'Nginx 灰度发布、蓝绿切换与维护页切流实战', href: '/nginx/gray-release-blue-green-and-maintenance-switching', description: '系统讲清 Host/Header 灰度、split_clients、蓝绿切换、维护页开关、切流观察与快速回滚。' },
+        { title: 'Nginx 必备问题与自检清单', href: '/nginx/essential-questions', description: '按由浅入深整理对象模型、匹配规则、反向代理、HTTPS 与排障的高频问题与回答主线。' },
+      ],
+      order: [
+        'Nginx 核心概念与请求处理模型',
+        'Nginx 配置、Location 匹配与反向代理',
+        'Nginx 上游、负载均衡与失败处理',
+        'Nginx gRPC、HTTP/2 与 WebSocket 边界实战',
+        'Nginx HTTPS、性能优化与安全基线',
+        'Nginx + Let’s Encrypt / certbot 自动续期实战',
+        'Nginx 限流、黑白名单与基础安全防护实战',
+        'Nginx 排障与日常运维',
+        'Nginx 日志、监控与告警实战',
+        'Nginx 常见场景与配置模板',
+        'Nginx + Docker Compose 部署实战',
+        'Nginx 灰度发布、蓝绿切换与维护页切流实战',
+        'Nginx 必备问题与自检清单',
+      ],
+    },
+    sidebar: [
+      {
+        text: '全局认知',
+        items: [
+          { text: '专题总览', link: '/nginx/' },
+          { text: '核心概念与请求处理模型', link: '/nginx/core-concepts' },
+        ],
+      },
+      {
+        text: '配置与代理',
+        collapsed: true,
+        items: [
+          { text: '配置、Location 匹配与反向代理', link: '/nginx/config-and-reverse-proxy' },
+          { text: '上游、负载均衡与失败处理', link: '/nginx/upstream-load-balancing-and-failure-handling' },
+          { text: 'gRPC、HTTP/2 与 WebSocket 边界实战', link: '/nginx/grpc-http2-and-websocket-boundaries' },
+        ],
+      },
+      {
+        text: '上线与优化',
+        collapsed: true,
+        items: [
+          { text: 'HTTPS、性能优化与安全基线', link: '/nginx/https-performance-and-security' },
+          { text: 'Let’s Encrypt / certbot 自动续期', link: '/nginx/lets-encrypt-and-certbot-renewal-practice' },
+          { text: '限流、黑白名单与基础安全防护', link: '/nginx/rate-limit-allowlist-and-security-hardening' },
+          { text: '常见场景与配置模板', link: '/nginx/common-scenarios-and-config-templates' },
+          { text: 'Docker Compose 部署实战', link: '/nginx/docker-compose-deployment-practice' },
+          { text: '灰度发布、蓝绿切换与维护页切流', link: '/nginx/gray-release-blue-green-and-maintenance-switching' },
+        ],
+      },
+      {
+        text: '运维与复习',
+        collapsed: true,
+        items: [
+          { text: '排障与日常运维', link: '/nginx/troubleshooting-and-operations' },
+          { text: '日志、监控与告警实战', link: '/nginx/logging-monitoring-and-alerting-practice' },
+          { text: '必备问题与自检清单', link: '/nginx/essential-questions' },
+        ],
+      },
+    ],
+  },
+  {
     key: 'k8s',
     base: '/k8s/',
     navText: 'K8s',
@@ -1835,7 +1931,7 @@ export const sections: SectionConfig[] = [
     base: '/ops/',
     navText: '运维',
     overviewDescription:
-      '适合需要日常运维能力的开发和运维工程师，重点覆盖磁盘排查、日志管理、进程管理等实操技能。',
+      '适合需要日常运维能力的开发和运维工程师，重点覆盖磁盘排查、日志管理、进程管理、权限管理与 Nginx 入口治理等实操技能。',
     landing: {
       eyebrow: 'Ops',
       title: '运维方向',
@@ -1846,20 +1942,27 @@ export const sections: SectionConfig[] = [
         href: '/ops/linux-disk-cleanup',
         description: '从磁盘排查到进程管理的实战指南。',
       },
+      secondary: {
+        title: 'Nginx 专题',
+        href: '/nginx/',
+        description: '把 Nginx 的配置、代理、HTTPS 和排障主线补齐。',
+      },
       scope: [
         '磁盘空间排查与清理',
         '日志管理与轮转',
         '缓存清理（Go / Node / Docker）',
         'PM2 进程管理',
         '用户管理与权限（chmod / chown / umask）',
+        'Nginx 配置、反向代理与 HTTPS',
         '常用运维工具',
       ],
       docs: [
         { title: 'Linux 磁盘清理与进程管理', href: '/ops/linux-disk-cleanup', description: '磁盘排查、日志清理、缓存管理、PM2 进程管理的实战操作指南。' },
         { title: 'Linux 用户管理与权限', href: '/ops/linux-user-permissions', description: '用户切换、chmod、chown、umask、用户目录管理的实战指南。' },
+        { title: 'Nginx 专题', href: '/nginx/', description: '系统整理 Nginx 配置、反向代理、HTTPS、性能优化与常见排障。' },
         { title: '待补主题清单', href: '/ops/todo-topics', description: '查看运维方向后续计划补充的主题。' },
       ],
-      order: ['Linux 磁盘清理与进程管理', 'Linux 用户管理与权限'],
+      order: ['Linux 磁盘清理与进程管理', 'Linux 用户管理与权限', 'Nginx 专题'],
     },
     sidebar: [
       {
@@ -1868,6 +1971,7 @@ export const sections: SectionConfig[] = [
           { text: '方向概览', link: '/ops/' },
           { text: 'Linux 磁盘清理与进程管理', link: '/ops/linux-disk-cleanup' },
           { text: 'Linux 用户管理与权限', link: '/ops/linux-user-permissions' },
+          { text: 'Nginx 专题', link: '/nginx/' },
           { text: '待补主题清单', link: '/ops/todo-topics' },
         ],
       },
@@ -2002,6 +2106,8 @@ export const homeTracks = sections
                   ? '系统整理 etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch 与运维边界。'
                   : section.key === 'docker'
                     ? '系统整理 Docker 必备知识，涵盖镜像构建、私有仓库与 Harbor、容器生命周期、数据卷、Compose 与安全排障。'
+                  : section.key === 'nginx'
+                    ? '系统整理 Nginx 必须掌握的核心知识，覆盖请求匹配、反向代理、HTTPS、性能优化、安全基线与常见排障。'
                   : section.key === 'k8s'
                     ? '系统整理 Kubernetes 必备知识，涵盖核心对象、调度与资源、发布治理、网络存储与控制面机制。'
                     : section.key === 'postgresql'

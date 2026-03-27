@@ -14,6 +14,29 @@ description: 系统整理 MySQL 核心知识，聚焦事务、查询优化、GOR
 - 准备技术面试，需要理清索引设计、死锁、热点更新等高频话题的人
 - 希望从"能用"提升到"用好" MySQL 的后端工程师
 
+## 图例速览
+
+MySQL 专题最容易先散掉的，通常是“事务一致性、查询与索引、高可用切换”这三条线没有同时立住。下面三张 SVG 图例先把主骨架搭起来，再去展开各篇细节会更顺。
+
+### 1. MVCC 版本链
+
+<MySQLTransactionIsolationDiagram kind="mvcc-chain" />
+
+### 2. 两阶段提交
+
+<MySQLDurabilityDiagram kind="two-phase-commit" />
+
+### 3. 主备切换
+
+<MySQLHighAvailabilityDiagram kind="double-m-switch" />
+
+## 快速导航
+
+- [图例速览](#图例速览)
+- [内容结构](#内容结构)
+- [建议阅读顺序](#建议阅读顺序)
+- [关联资料](#关联资料)
+
 ## 内容结构
 
 ### 基础专题
