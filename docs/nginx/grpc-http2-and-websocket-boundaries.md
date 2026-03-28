@@ -285,6 +285,7 @@ server {
 - [Nginx 专题总览](./index.md)
 - [配置、Location 匹配与反向代理](./config-and-reverse-proxy.md)
 - [上游、负载均衡与失败处理](./upstream-load-balancing-and-failure-handling.md)
+- [Nginx Ingress、K8s 网关映射与配置迁移实战](./ingress-k8s-gateway-mapping-and-config-migration.md)
 - [常见场景与配置模板](./common-scenarios-and-config-templates.md)
 - [排障与日常运维](./troubleshooting-and-operations.md)
 - [Nginx 灰度发布、蓝绿切换与维护页切流实战](./gray-release-blue-green-and-maintenance-switching.md)

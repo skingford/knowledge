@@ -342,6 +342,8 @@ server {
 
 - [Nginx 专题总览](./index.md)
 - [HTTPS、性能优化与安全基线](./https-performance-and-security.md)
+- [Nginx 缓存、回源与静态资源加速实战](./cache-origin-and-static-acceleration-practice.md)
+- [Nginx 与 CDN、对象存储和大文件分发协同实战](./cdn-object-storage-and-large-file-distribution-practice.md)
 - [Nginx 限流、黑白名单与基础安全防护实战](./rate-limit-allowlist-and-security-hardening.md)
 - [排障与日常运维](./troubleshooting-and-operations.md)
 - [Nginx + Docker Compose 部署实战](./docker-compose-deployment-practice.md)

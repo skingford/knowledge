@@ -408,6 +408,8 @@ location = /healthz {
 
 - [Nginx 专题总览](./index.md)
 - [上游、负载均衡与失败处理](./upstream-load-balancing-and-failure-handling.md)
+- [Nginx 多环境配置治理、配置拆分与变更发布实战](./multi-environment-config-governance-and-change-release.md)
+- [Nginx 与 OpenResty、Lua 扩展边界和适用场景实战](./openresty-lua-extension-boundaries-and-use-cases.md)
 - [常见场景与配置模板](./common-scenarios-and-config-templates.md)
 - [Nginx + Docker Compose 部署实战](./docker-compose-deployment-practice.md)
 - [排障与日常运维](./troubleshooting-and-operations.md)

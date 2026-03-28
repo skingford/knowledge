@@ -337,6 +337,10 @@ curl -v http://app:8080/health
 
 - [Nginx 专题总览](./index.md)
 - [Nginx + Let's Encrypt / certbot 自动续期实战](./lets-encrypt-and-certbot-renewal-practice.md)
+- [Nginx 缓存、回源与静态资源加速实战](./cache-origin-and-static-acceleration-practice.md)
+- [Nginx 与 CDN、对象存储和大文件分发协同实战](./cdn-object-storage-and-large-file-distribution-practice.md)
+- [Nginx Ingress、K8s 网关映射与配置迁移实战](./ingress-k8s-gateway-mapping-and-config-migration.md)
+- [Nginx 多环境配置治理、配置拆分与变更发布实战](./multi-environment-config-governance-and-change-release.md)
 - [Nginx 日志、监控与告警实战](./logging-monitoring-and-alerting-practice.md)
 - [Nginx 灰度发布、蓝绿切换与维护页切流实战](./gray-release-blue-green-and-maintenance-switching.md)
 - [常见场景与配置模板](./common-scenarios-and-config-templates.md)

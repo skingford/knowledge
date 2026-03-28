@@ -367,5 +367,6 @@ openssl s_client -connect example.com:443 -servername example.com
 
 - [Nginx 专题总览](./index.md)
 - [HTTPS、性能优化与安全基线](./https-performance-and-security.md)
+- [Nginx 多环境配置治理、配置拆分与变更发布实战](./multi-environment-config-governance-and-change-release.md)
 - [Nginx + Docker Compose 部署实战](./docker-compose-deployment-practice.md)
 - [排障与日常运维](./troubleshooting-and-operations.md)

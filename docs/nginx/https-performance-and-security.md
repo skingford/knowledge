@@ -255,6 +255,7 @@ server {
 - [Nginx 专题总览](./index.md)
 - [配置、Location 匹配与反向代理](./config-and-reverse-proxy.md)
 - [上游、负载均衡与失败处理](./upstream-load-balancing-and-failure-handling.md)
+- [Nginx 缓存、回源与静态资源加速实战](./cache-origin-and-static-acceleration-practice.md)
 - [Nginx + Let's Encrypt / certbot 自动续期实战](./lets-encrypt-and-certbot-renewal-practice.md)
 - [Nginx 限流、黑白名单与基础安全防护实战](./rate-limit-allowlist-and-security-hardening.md)
 - [Nginx 日志、监控与告警实战](./logging-monitoring-and-alerting-practice.md)

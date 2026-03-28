@@ -291,6 +291,8 @@ location = /index.html {
 - [配置、Location 匹配与反向代理](./config-and-reverse-proxy.md)
 - [上游、负载均衡与失败处理](./upstream-load-balancing-and-failure-handling.md)
 - [Nginx gRPC、HTTP/2 与 WebSocket 边界实战](./grpc-http2-and-websocket-boundaries.md)
+- [Nginx 缓存、回源与静态资源加速实战](./cache-origin-and-static-acceleration-practice.md)
+- [Nginx 与 CDN、对象存储和大文件分发协同实战](./cdn-object-storage-and-large-file-distribution-practice.md)
 - [Nginx 灰度发布、蓝绿切换与维护页切流实战](./gray-release-blue-green-and-maintenance-switching.md)
 - [Nginx + Docker Compose 部署实战](./docker-compose-deployment-practice.md)
 - [排障与日常运维](./troubleshooting-and-operations.md)
