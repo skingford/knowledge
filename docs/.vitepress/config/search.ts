@@ -2,7 +2,7 @@ import type { DefaultTheme } from 'vitepress'
 
 const headingRegex = /<h(\d*).*?>(.*?<a.*? href="#.*?".*?>.*?<\/a>)<\/h\1>/gi
 const headingContentRegex = /(.*?)<a.*? href="#(.*?)".*?>.*?<\/a>/i
-const maxSectionTextLength = 800
+const maxSectionTextLength = 400
 const maxIndexedHeadingDepth = 1
 const searchNoisePatterns = [
   /<svg\b[\s\S]*?<\/svg>/gi,

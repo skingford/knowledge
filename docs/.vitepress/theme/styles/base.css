@@ -1,0 +1,62 @@
+html,
+body {
+  background: var(--site-bg);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  color: var(--vp-c-text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 24%, transparent);
+  color: var(--vp-c-text-1);
+}
+
+:is(a, button, summary, input, select, textarea, [tabindex]):focus-visible,
+.VPButton:focus-visible,
+.claude-home__button:focus-visible,
+.claude-home__track:focus-visible,
+.claude-home__highlight:focus-visible,
+.section-landing__card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--vp-c-brand-1) 72%, white 12%);
+  outline-offset: 3px;
+}
+
+/* VitePress local search already highlights the search bar via :focus-within. */
+.VPLocalSearchBox .search-input:focus-visible {
+  outline: none;
+}
+
+:target {
+  scroll-margin-top: calc(var(--vp-nav-height) + 24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .claude-home__button:hover,
+  .claude-home__track:hover,
+  .claude-home__highlight:hover,
+  .section-landing__card:hover {
+    transform: none;
+  }
+}
