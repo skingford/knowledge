@@ -52,42 +52,31 @@ export const learningOverviewGoals = [
   { title: '想做能力自检准备', href: '/architecture/architect-interview-prep-checklist', description: '架构和 Go 都提供适合阶段复盘或面试准备的清单和题目。' },
 ]
 
+const homeTrackDescriptions: Record<string, string> = {
+  ai: '从 Agent 模式、Tool Calling 到 RAG 与 workflow，把概念、设计和可落地实现串成完整路径。',
+  architecture: '围绕系统设计、高并发与分布式治理，构建能复用到真实业务的判断框架与清单。',
+  golang: '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。',
+  python: '从语法、函数、对象模型到 typing、asyncio 与工程化，把 Python 学习主线整理成一套清晰入口。',
+  rust: '聚焦所有权、类型系统、错误处理、Cargo 工程化与并发 async，建立 Rust 的核心能力主线。',
+  mysql: '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。',
+  redis: '系统整理 Redis 核心知识，涵盖缓存治理、分布式锁、高并发集群与支付场景实战。',
+  kafka: '系统整理 Kafka 核心知识，涵盖消息可靠性、顺序性、积压治理与支付场景实战。',
+  etcd: '系统整理 etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch 与运维边界。',
+  docker: '系统整理 Docker 必备知识，涵盖镜像构建、私有仓库与 Harbor、容器生命周期、数据卷、Compose 与安全排障。',
+  nginx: '系统整理 Nginx 必须掌握的核心知识，覆盖请求匹配、反向代理、HTTPS、性能优化、安全基线与常见排障。',
+  k8s: '系统整理 Kubernetes 必备知识，涵盖核心对象、调度与资源、发布治理、网络存储与控制面机制。',
+  postgresql: '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。',
+  ops: '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
+  git: '集中整理 Git 工作流、PR 与 Code Review、GitHub Actions 排障、发布与回滚实践。',
+}
+
+const defaultTrackDescription = '按主题整理路线图、专题和能力自检入口，方便持续学习和回查。'
+
 export const homeTracks = sections
   .filter((section) => section.key !== 'tools')
   .map((section) => ({
     title: section.navText,
-    description:
-      section.key === 'ai'
-        ? '从 Agent 模式、Tool Calling 到 RAG 与 workflow，把概念、设计和可落地实现串成完整路径。'
-        : section.key === 'architecture'
-          ? '围绕系统设计、高并发与分布式治理，构建能复用到真实业务的判断框架与清单。'
-          : section.key === 'golang'
-            ? '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。'
-            : section.key === 'python'
-              ? '从语法、函数、对象模型到 typing、asyncio 与工程化，把 Python 学习主线整理成一套清晰入口。'
-            : section.key === 'rust'
-              ? '聚焦所有权、类型系统、错误处理、Cargo 工程化与并发 async，建立 Rust 的核心能力主线。'
-              : section.key === 'mysql'
-              ? '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。'
-              : section.key === 'redis'
-                ? '系统整理 Redis 核心知识，涵盖缓存治理、分布式锁、高并发集群与支付场景实战。'
-            : section.key === 'kafka'
-                ? '系统整理 Kafka 核心知识，涵盖消息可靠性、顺序性、积压治理与支付场景实战。'
-                : section.key === 'etcd'
-                  ? '系统整理 etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch 与运维边界。'
-                  : section.key === 'docker'
-                    ? '系统整理 Docker 必备知识，涵盖镜像构建、私有仓库与 Harbor、容器生命周期、数据卷、Compose 与安全排障。'
-                  : section.key === 'nginx'
-                    ? '系统整理 Nginx 必须掌握的核心知识，覆盖请求匹配、反向代理、HTTPS、性能优化、安全基线与常见排障。'
-                  : section.key === 'k8s'
-                    ? '系统整理 Kubernetes 必备知识，涵盖核心对象、调度与资源、发布治理、网络存储与控制面机制。'
-                    : section.key === 'postgresql'
-                      ? '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。'
-                      : section.key === 'ops'
-                        ? '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。'
-                        : section.key === 'git'
-                          ? '集中整理 Git 工作流、PR 与 Code Review、GitHub Actions 排障、发布与回滚实践。'
-                          : '按主题整理路线图、专题和能力自检入口，方便持续学习和回查。',
+    description: homeTrackDescriptions[section.key] ?? defaultTrackDescription,
     href: section.base,
   }))
 
