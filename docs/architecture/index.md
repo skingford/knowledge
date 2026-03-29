@@ -25,6 +25,29 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
   :order="landing.order"
 />
 
+## 图例速览
+
+架构专题入口最容易先散掉的，通常不是单篇文章，而是三条主线没有同时建立：交易一致性怎么兜底、高并发活动系统怎么拆、面试和系统设计怎么把基础设施串起来。下面三张 SVG 图例先把这三层骨架立住。
+
+### 1. 交易一致性主线
+
+<GoMicroserviceDiagram kind="outbox-pattern" />
+
+### 2. 高并发系统骨架
+
+<GoHighConcurrencySystemDesignDiagram kind="core-path" />
+
+### 3. 架构面试知识地图
+
+<K8sDiagram kind="depth-map" />
+
+## 快速导航
+
+- [图例速览](#图例速览)
+- [交易系统一致性主线](#交易系统一致性主线)
+- [高并发活动系统专题](#高并发活动系统专题)
+- [岗位面试专题](#岗位面试专题)
+
 ## 交易系统一致性主线
 
 - [交易系统一致性设计总览](/architecture/transaction-system-consistency-overview)

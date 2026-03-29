@@ -1,0 +1,206 @@
+.wechat-qr-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+}
+
+.wechat-qr-notice__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 18, 15, 0.58);
+  backdrop-filter: blur(10px);
+}
+
+.wechat-qr-notice__panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(92vw, 420px);
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 26%, white 18%);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(212, 111, 77, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(250, 243, 234, 0.96));
+  box-shadow: 0 30px 90px rgba(39, 29, 21, 0.22);
+}
+
+.dark .wechat-qr-notice__panel {
+  background:
+    radial-gradient(circle at top right, rgba(240, 141, 104, 0.2), transparent 32%),
+    linear-gradient(180deg, rgba(34, 28, 25, 0.98), rgba(24, 20, 18, 0.96));
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.45);
+}
+
+.wechat-qr-notice__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 18px 16px;
+  background: linear-gradient(135deg, var(--vp-c-brand-1), #b95a3a);
+  color: #fffaf4;
+}
+
+.wechat-qr-notice__header-copy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.wechat-qr-notice__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 250, 244, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.wechat-qr-notice__title {
+  margin: 0;
+  color: inherit;
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.wechat-qr-notice__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 250, 244, 0.92);
+  color: var(--vp-c-brand-2);
+  font-size: 1.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.wechat-qr-notice__close:hover {
+  transform: rotate(90deg);
+  background: #ffffff;
+}
+
+.wechat-qr-notice__body {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.wechat-qr-notice__lead {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--vp-c-text-1);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.wechat-qr-notice__figure {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--site-panel-border);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.dark .wechat-qr-notice__figure {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.wechat-qr-notice__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+.wechat-qr-notice__hint {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.wechat-qr-notice__actions {
+  display: grid;
+}
+
+.wechat-qr-notice__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 700;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.wechat-qr-notice__action:hover {
+  transform: translateY(-1px);
+}
+
+.wechat-qr-notice__action--primary {
+  background: var(--vp-c-brand-1);
+  color: #fffaf4;
+  box-shadow: 0 16px 34px rgba(212, 111, 77, 0.24);
+}
+
+.wechat-qr-notice__action--primary:hover {
+  color: #fffaf4;
+  background: var(--vp-c-brand-2);
+}
+
+.wechat-qr-notice-enter-active,
+.wechat-qr-notice-leave-active {
+  transition: opacity 220ms ease;
+}
+
+.wechat-qr-notice-enter-active .wechat-qr-notice__panel,
+.wechat-qr-notice-leave-active .wechat-qr-notice__panel {
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.wechat-qr-notice-enter-from,
+.wechat-qr-notice-leave-to {
+  opacity: 0;
+}
+
+.wechat-qr-notice-enter-from .wechat-qr-notice__panel,
+.wechat-qr-notice-leave-to .wechat-qr-notice__panel {
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 16px)) scale(0.97);
+}
+
+@media (max-width: 640px) {
+  .wechat-qr-notice__panel {
+    width: min(94vw, 420px);
+    border-radius: 24px;
+  }
+
+  .wechat-qr-notice__header {
+    padding: 16px 16px 14px;
+  }
+
+  .wechat-qr-notice__body {
+    padding: 18px;
+  }
+
+}

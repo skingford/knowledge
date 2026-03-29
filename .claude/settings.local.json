@@ -1,4 +1,10 @@
 {
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://43.153.213.46:8486",
+    "ANTHROPIC_AUTH_TOKEN": "sk-zEZV4fWBe9inVfj4Jfjpfzd5oRM6AbKz6sOK2nq8f87CDq3r"
+  },
+  "model": "claude-opus-4-6",
+  "skipDangerousModePermissionPrompt": true,
   "permissions": {
     "allow": [
       "Bash(wc -l /Users/kingford/kingford_bc/github.com/knowledge/docs/golang/guide/*.md)",

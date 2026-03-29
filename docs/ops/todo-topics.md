@@ -14,10 +14,10 @@ search: false
 - ~~Docker Compose 部署实践~~ → [Docker Compose 部署实践](/docker/compose-deployment-practice)
 - ~~Docker 镜像仓库与发布治理~~ → [Docker 镜像仓库、Harbor 与发布治理](/docker/registry-and-image-governance)
 - ~~Docker 容器生命周期与运行模型~~ → [Docker 容器生命周期与运行模型](/docker/container-lifecycle-and-runtime)
+- ~~Nginx 配置与常见排障~~ → [Nginx 专题](/nginx/)
 
 ## 优先级高
 
-- Nginx 配置与常见排障
 - SSH 安全加固与密钥管理
 - systemd 服务管理与自定义 unit
 

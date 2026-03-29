@@ -1,0 +1,509 @@
+.Layout,
+.VPContent,
+.VPDoc,
+.VPDoc.has-aside .content-container {
+  background: transparent;
+}
+
+.VPNavBar,
+.VPLocalNav {
+  background: color-mix(in srgb, var(--vp-c-bg) 82%, transparent) !important;
+  border-bottom: 1px solid var(--vp-c-divider) !important;
+  backdrop-filter: blur(14px);
+}
+
+.VPNav {
+  border-bottom: none !important;
+}
+
+.VPNavScreen {
+  background-color: var(--vp-c-bg) !important;
+  z-index: 100 !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .VPNavScreen {
+    height: 100dvh;
+    overflow-y: auto;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+  }
+
+  .VPNavScreen .container,
+  .VPNavScreen .VPNavScreenMenu,
+  .VPNavScreen .items {
+    min-height: max-content;
+  }
+}
+
+html:has(#VPNavScreen),
+body:has(#VPNavScreen) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.VPNavBarTitle .title {
+  font-family: var(--site-serif);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup .button,
+.VPNavBarAppearance .text {
+  color: var(--vp-c-text-2) !important;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+}
+
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuGroup .button:hover,
+.VPNavBarAppearance:hover .text {
+  color: var(--vp-c-text-1) !important;
+}
+
+.VPButton {
+  min-width: 128px;
+  border-radius: 999px !important;
+  padding: 0 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  box-shadow: none !important;
+}
+
+.VPButton.medium {
+  line-height: 40px !important;
+}
+
+.vp-doc {
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4,
+.vp-doc h5,
+.vp-doc h6 {
+  font-family: var(--site-serif);
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc h1 {
+  margin-top: 8px;
+  font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.vp-doc h2 {
+  margin-top: 40px;
+  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 20px;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.vp-doc h3 {
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  font-weight: 650;
+}
+
+.vp-doc p,
+.vp-doc li {
+  font-size: 1rem;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc strong {
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc ul > li::marker,
+.vp-doc ol > li::marker {
+  color: var(--vp-c-brand-2);
+}
+
+.vp-doc a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.vp-doc details {
+  margin: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.vp-doc details summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 2px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--vp-c-brand-1);
+  font-weight: 650;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.vp-doc details summary::-webkit-details-marker {
+  display: none;
+}
+
+.vp-doc details summary::before {
+  content: '';
+  flex: 0 0 0.38rem;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.vp-doc details summary::after {
+  content: '+';
+  margin-left: auto;
+  color: var(--vp-c-brand-2);
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.vp-doc details summary strong {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.vp-doc details[open] summary {
+  background: transparent;
+}
+
+.vp-doc details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.vp-doc details > :not(summary) {
+  padding-right: 0;
+  padding-left: 0.95rem;
+}
+
+.vp-doc details > :last-child {
+  padding-bottom: 4px;
+}
+
+.vp-doc details > summary + * {
+  padding-top: 4px;
+}
+
+.vp-doc details:hover summary {
+  color: var(--vp-c-brand-2);
+}
+
+.vp-doc details summary:focus,
+.vp-doc details summary:focus-visible {
+  outline: none;
+}
+
+.vp-doc details summary:focus-visible strong {
+  text-decoration-thickness: 2px;
+}
+
+.vp-doc details summary:focus-visible::after {
+  color: var(--vp-c-brand-1);
+}
+
+.vp-doc img,
+.vp-doc video,
+.vp-doc iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+.vp-doc table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vp-doc :not(pre) > code {
+  padding: 0.22rem 0.45rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 84%, transparent);
+  color: var(--vp-c-brand-2);
+}
+
+.vp-doc div[class*='language-'] {
+  border: 1px solid var(--site-panel-border);
+  border-radius: 24px;
+  background: #f0ebe1 !important;
+  box-shadow: var(--site-shadow);
+}
+
+/* Shiki 会内联背景色到 pre/code，覆盖为透明让外层背景生效 */
+.vp-doc div[class*='language-'] pre,
+.vp-doc div[class*='language-'] code {
+  background: transparent !important;
+}
+
+.vp-doc div[class*='language-'] code {
+  font-size: 0.92rem;
+}
+
+.dark .vp-doc div[class*='language-'] {
+  background: rgba(27, 23, 20, 0.96) !important;
+}
+
+.vp-doc blockquote {
+  border-left: 3px solid rgba(212, 111, 77, 0.4);
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 76%, transparent);
+  border-radius: 0 18px 18px 0;
+}
+
+.VPDocAsideOutline .content,
+.VPDocAsideCarbonAds,
+.VPDocFooter,
+.VPFooter {
+  background: transparent !important;
+}
+
+/* 桌面端 sidebar 透明，融入页面背景 */
+@media (min-width: 960px) {
+  .VPSidebar {
+    background: transparent !important;
+  }
+}
+
+/* 移动端 sidebar 作为遮罩层，必须不透明 */
+@media (max-width: 959px) {
+  .VPSidebar {
+    top: calc(var(--vp-nav-height) + 8px) !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    width: calc(100vw - 80px) !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--site-panel-border) !important;
+    background-color: var(--vp-c-bg-soft) !important;
+    background-image: linear-gradient(160deg, rgba(212, 111, 77, 0.05) 0%, transparent 50%) !important;
+    box-shadow: var(--site-shadow) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 顶部品牌色装饰条 */
+  .VPSidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-3));
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+  }
+
+  /* 背景光晕装饰 */
+  .VPSidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle at top right, rgba(212, 111, 77, 0.1), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* section 标题（如"架构"） */
+  .VPSidebar .VPSidebarItem.level-0 > .item .text {
+    position: relative;
+    z-index: 1;
+    padding: 0 4px !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--vp-c-brand-1) !important;
+  }
+
+  /* 所有导航链接项统一加内边距 */
+  .VPSidebar .VPSidebarItem.level-1 > .item .link,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link {
+    position: relative;
+    z-index: 1;
+    padding: 2px 10px !important;
+    margin: 1px 0 !important;
+    border-radius: 10px;
+    transition: background 0.18s ease;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1 > .item .link .text,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link .text {
+    padding: 5px 0 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1 > .item .link:hover,
+  .VPSidebar .VPSidebarItem.level-2 > .item .link:hover {
+    background: color-mix(in srgb, var(--vp-c-brand-1) 7%, transparent);
+  }
+
+  /* 选中项：有内边距的高亮块 */
+  .VPSidebar .VPSidebarItem.level-1.is-active > .item .link,
+  .VPSidebar .VPSidebarItem.level-2.is-active > .item .link {
+    background: color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent) !important;
+  }
+
+  .VPSidebar .VPSidebarItem.level-1.is-active > .item .link .text,
+  .VPSidebar .VPSidebarItem.level-2.is-active > .item .link .text {
+    font-weight: 600 !important;
+    color: var(--vp-c-brand-1) !important;
+  }
+
+  /* 可折叠的子分组标题 */
+  .VPSidebar .VPSidebarItem.level-0.collapsible > .item {
+    padding: 6px 4px !important;
+    margin-top: 4px !important;
+    border-top: 1px solid var(--vp-c-divider);
+  }
+
+  .VPSidebar .VPSidebarItem.level-0:first-child > .item {
+    border-top: none !important;
+    margin-top: 0 !important;
+  }
+}
+
+.VPSidebar {
+  border-right: 1px solid color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
+}
+
+.VPSidebarItem.level-0.is-active > .item .link > .text,
+.VPSidebarItem.level-1.is-active > .item .link > .text,
+.VPDocOutlineItem.active > .outline-link {
+  color: var(--vp-c-text-1) !important;
+  font-weight: 700;
+}
+
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.claude-home-page .VPDoc {
+  padding-top: 0;
+}
+
+.claude-home-page .container {
+  max-width: 1280px !important;
+}
+
+.claude-home-page .content {
+  max-width: none !important;
+}
+
+.claude-home-page .content-container {
+  max-width: none !important;
+}
+
+/* Quick Nav page — full-width centered layout */
+.quick-nav-page .VPDoc .container {
+  max-width: 1440px !important;
+  margin: 0 auto !important;
+}
+
+.quick-nav-page .VPDoc .content {
+  max-width: none !important;
+  padding: 0 48px !important;
+}
+
+.quick-nav-page .VPDoc .content-container {
+  max-width: none !important;
+}
+
+.quick-nav-page .VPDoc .aside {
+  display: none !important;
+}
+
+.quick-nav-page .VPDoc.has-aside .content {
+  padding-right: 48px !important;
+}
+
+.dark .vp-doc h1,
+.dark .vp-doc h2,
+.dark .claude-home__title,
+.dark .claude-home__section-heading h2,
+.dark .section-landing__title,
+.dark .section-landing__heading h2,
+.dark .claude-home__track-title,
+.dark .claude-home__highlight-title,
+.dark .section-landing__card h3 {
+  color: #fbf2e8;
+}
+
+@media (max-width: 768px) {
+  .VPButton {
+    min-width: 0;
+  }
+
+  .VPDoc .content,
+  .VPDoc.has-aside .content {
+    padding: 0 16px !important;
+  }
+
+  .VPSidebarItem .link,
+  .VPSidebarItem .item,
+  .VPDocFooter .edit-link-button,
+  .VPLocalNavOutlineDropdown .menu-button,
+  .VPLocalNavOutlineDropdown .outline-link,
+  .VPLocalNavOutlineDropdown .items .link {
+    min-height: 44px;
+  }
+
+  .VPSidebarItem .link,
+  .VPDocFooter .edit-link-button,
+  .VPLocalNavOutlineDropdown .menu-button,
+  .VPLocalNavOutlineDropdown .outline-link,
+  .VPLocalNavOutlineDropdown .items .link {
+    display: flex;
+    align-items: center;
+  }
+
+  .quick-nav-page .VPDoc .content,
+  .quick-nav-page .VPDoc.has-aside .content {
+    padding: 0 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .VPDoc .content,
+  .VPDoc.has-aside .content {
+    padding: 0 12px !important;
+  }
+
+  .quick-nav-page .VPDoc .content,
+  .quick-nav-page .VPDoc.has-aside .content {
+    padding: 0 12px !important;
+  }
+}

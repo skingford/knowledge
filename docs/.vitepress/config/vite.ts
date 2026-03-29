@@ -6,6 +6,16 @@ const docsViteConfig: UserConfig = {
     // Local search index is emitted as a lazy-loaded chunk and is expected to be larger than
     // regular route assets for this knowledge base.
     chunkSizeWarningLimit: 5000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Isolate heavy third-party libraries so they are only loaded on pages that need them.
+          // mermaid internally imports cytoscape, so they share a chunk to avoid circular refs.
+          if (id.includes('mermaid') || id.includes('cytoscape') || id.includes('cose-bilkent')) return 'vendor-mermaid'
+          if (id.includes('katex')) return 'vendor-katex'
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: [

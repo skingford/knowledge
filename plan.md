@@ -1,178 +1,160 @@
-# Implementation Plan: 补充 MySQL 实战 45 讲所有示意图
+# 实施计划：大文件整理优化 & 加载响应速度提升
 
-## Requirements Restatement
+## 需求重述
 
-为 MySQL 实战 45 讲的笔记文档（04-45 讲）补充所有缺失的示意图。目前只有 01、02、03 讲已有 HTML/CSS styled 示意图，其余 40+ 个文件中引用了大量"图"但缺少实际的可视化内容。
+对 VitePress 知识库项目进行**大文件拆分整理**和**加载响应速度优化**。当前项目有 587 个 Markdown 文件，总构建产物 141MB。主要瓶颈：
 
-**目标**：使用与现有文件一致的 inline HTML/SVG + CSS 变量风格，为每个文件中引用的示意图补充对应的可视化内容。
+| 瓶颈 | 现状 | 影响 |
+|---|---|---|
+| 搜索索引 `@localSearchIndexroot` | **4.2 MB** 单文件 JS | 首次搜索时阻塞主线程 |
+| `content-data.ts` | **2178 行** 单文件 | 维护困难，修改一处全量重编译 |
+| `custom.css` | **1880 行** 单文件 | 样式混杂：布局/组件/图表/微信弹窗/词汇卡片 |
+| `K8sDiagram.vue` | **4817 行** 单文件 | 即使已 async，chunk 仍 389KB |
+| 超大 Markdown 页面 | Top5 页面 60-110KB 源文件 | 构建出的页面 JS 300-458KB，首屏渲染慢 |
+| Mermaid 相关 chunks | treemap 454KB + core 497KB + 多个子图表 | 仅部分页面需要，但 chunk 体积大 |
 
-## Current State Analysis
+## 风险评估
 
-### 已完成（有示意图）
-- `01-sql-query-execution.md` - MySQL 架构图 ✅
-- `02-sql-update-log-system.md` - 架构图 + redo log 环形图 + 两阶段提交图 ✅
-- `03-transaction-isolation.md` - 事务时序表 + MVCC 回滚链 + read-view 示意 ✅
+| 风险 | 等级 | 应对 |
+|---|---|---|
+| 拆分 content-data.ts 后导入路径变化导致构建失败 | 🔴 高 | 每步拆分后执行 `docs:build` 验证 |
+| CSS 拆分后样式优先级或变量作用域变化 | 🟡 中 | 拆分时保持相同选择器，不改变 import 顺序 |
+| 搜索索引优化可能影响搜索质量 | 🟡 中 | 只调参数不改逻辑，优化前后对比搜索结果 |
+| 大 Markdown 拆分涉及内容重组 | 🟡 中 | **本次不拆分 Markdown 内容**，只从构建配置侧优化 |
+| K8sDiagram 拆分可能破坏组件内部逻辑 | 🟡 中 | 按视觉区块拆分为子组件，保持接口不变 |
 
-### 图表技术风格
-- **Inline HTML/CSS** with CSS variables (`var(--d-*)`) for dark/light theme support
-- **SVG** for complex shapes (circular diagrams, trees)
-- **Styled HTML tables** for timeline/sequence scenarios
-- **Flexbox layouts** for flow diagrams and comparison charts
-- No external images, no mermaid — all self-contained inline
-
-## Implementation Phases
-
-按文件的**主题相关性**和**难度**分 8 个批次，每批 5-6 个文件：
-
----
-
-### Phase 1: 索引基础篇（5 files, ~20 diagrams）
-**Files**: 04, 05, 09, 11, 13
-
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 04-index-part1 | 哈希表、有序数组、二叉搜索树、InnoDB B+树索引 | SVG 结构图 |
-| 05-index-part2 | InnoDB 索引结构、联合索引、索引下推流程 | SVG + 流程图 |
-| 09-normal-vs-unique-index | change buffer 更新/读流程 | 流程图 |
-| 11-string-index | email 索引结构、前缀索引结构 | SVG 树形图 |
-| 13-table-space-reclaim | B+树页分裂、Online DDL 流程 | SVG + 流程图 |
-
-**Complexity**: HIGH（B+ 树 SVG 较复杂）
+## 实施阶段
 
 ---
 
-### Phase 2: 锁机制篇（4 files, ~20 diagrams）
-**Files**: 06, 07, 20, 21
+### Phase 1: 拆分 `content-data.ts`（2178 行 → 多文件）
 
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 06-global-table-lock | 备份状态不一致场景、MDL 锁时序 | 时序表 |
-| 07-row-lock | 两阶段锁、死锁场景 | 时序表 + 流程图 |
-| 20-phantom-read | 幻读场景（9 张）、gap lock 结构 | 时序表 + 结构图 |
-| 21-single-row-update-many-locks | gap lock 各场景（12 张） | 时序表 + 锁范围图 |
+**目标**：将单体配置文件按 section 拆分，降低维护成本和增量编译范围。
 
-**Complexity**: HIGH（锁场景图多且复杂）
+**步骤**：
+1. 创建 `docs/.vitepress/theme/sections/` 目录
+2. 提取公共类型定义到 `sections/types.ts`
+3. 按 section key 拆分为独立文件：
+   - `sections/ai.ts` — AI / Agent section 配置
+   - `sections/architecture.ts` — 架构 section 配置
+   - `sections/golang.ts` — Golang section 配置（含 `golangSourceReadingSidebar`）
+   - `sections/mysql.ts` — MySQL section 配置
+   - `sections/redis.ts` — Redis section 配置
+   - `sections/k8s.ts` — K8s section 配置
+   - `sections/postgresql.ts` — PostgreSQL section 配置
+   - `sections/ops.ts` — 运维 section 配置
+   - `sections/git.ts` — Git section 配置
+   - `sections/tools.ts` — 工具 section 配置（如有）
+4. 在 `sections/index.ts` 中聚合导出 `sections` 数组
+5. 将 `homeHighlights`、`homePrinciples`、`homeTracks` 等首页数据提取到 `sections/home.ts`
+6. 重构 `content-data.ts` 为只做 re-export 的入口文件（保持对外 API 不变）
+7. 验证构建通过
 
----
-
-### Phase 3: 事务与 MVCC 篇（4 files, ~16 diagrams）
-**Files**: 08, 10, 14, 19
-
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 08-transaction-isolation-detail | 事务执行流程、MVCC 版本链、可见性规则 | 时序表 + 链图 |
-| 10-wrong-index-selection | explain 结果、执行流程 | 表格 + 时序 |
-| 14-count-slow | 会话执行时序（4 张） | 时序表 |
-| 19-single-row-query-slow | MDL 锁等待、行锁、undo log 链 | 时序表 + 结构图 |
-
-**Complexity**: MEDIUM
-
----
-
-### Phase 4: 查询优化篇（4 files, ~25 diagrams）
-**Files**: 12, 16, 17, 18
-
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 12-mysql-flush | 刷脏页过程、redo log 状态、刷页策略 | 流程图 + 状态图 |
-| 16-order-by | 索引示意、全字段排序、rowid 排序流程 | 结构图 + 流程图 |
-| 17-random-message | 排序流程、优先队列算法 | 流程图 |
-| 18-sql-same-logic-diff-perf | 索引示意、类型转换效果 | 结构图 + 对比表 |
-
-**Complexity**: MEDIUM
+**预计效果**：每个 section 文件 100-200 行，维护时只需修改对应文件。
 
 ---
 
-### Phase 5: 高可用与复制篇（5 files, ~36 diagrams）
-**Files**: 23, 24, 25, 26, 27
+### Phase 2: 拆分 `custom.css`（1880 行 → 多文件）
 
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 23-data-durability | binlog 写盘状态、redo log 状态、组提交、两阶段提交 | 状态图 + 流程图 |
-| 24-master-slave-consistency | 主备切换、主备流程、binlog 格式示例 | 架构图 + 示例 |
-| 25-high-availability | 双 M 结构、切换流程、循环复制 | 架构图 + 时序 |
-| 26-slave-delay | 多线程模型、并行复制、hash 表分发 | 架构图 + 模型图 |
-| 27-master-failure | 一主多从结构、主备切换 | 架构图 |
+**目标**：按职责拆分样式，便于维护，减少心智负担。
 
-**Complexity**: HIGH（架构图多）
+**步骤**：
+1. 创建 `docs/.vitepress/theme/styles/` 目录
+2. 按职责拆分：
+   - `styles/variables.css` — CSS 变量（light + dark，约 150 行）
+   - `styles/base.css` — html/body/selection/focus 等基础样式（约 50 行）
+   - `styles/vitepress-overrides.css` — VPNavBar/VPSidebar/VPDoc 等框架覆盖（约 350 行）
+   - `styles/home.css` — `.claude-home__*` 首页样式（约 300 行）
+   - `styles/section-landing.css` — `.section-landing__*` / `.overview-landing__*`（约 250 行）
+   - `styles/wechat-qr.css` — `.wechat-qr-notice__*` 微信二维码弹窗（约 200 行）
+   - `styles/vocabulary.css` — `.vocab-*` 词汇卡片样式（约 270 行）
+   - `styles/diagrams.css` — `svg.diagram-mysql-*` 等 SVG 图表样式（约 110 行）
+3. 将 `custom.css` 改为只做 `@import` 的入口文件
+4. 验证构建和样式一致性
 
----
-
-### Phase 6: 读写分离与运维篇（5 files, ~21 diagrams）
-**Files**: 22, 28, 29, 31, 32
-
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 22-emergency-perf-boost | sleep 线程状态、查询重写 | 状态图 + 对比 |
-| 28-read-write-split-pitfalls | 读写分离架构、GTID 方案流程 | 架构图 + 流程图 |
-| 29-database-health-check | 查询 blocked、系统锁死状态 | 状态图 |
-| 31-data-recovery | 数据恢复流程（mysqlbinlog/主备法） | 流程图 |
-| 32-unkillable-query | kill query 效果、connection 效果 | 时序图 |
-
-**Complexity**: MEDIUM
+**预计效果**：每个文件职责单一，修改图表样式不用在 1880 行里搜索。
 
 ---
 
-### Phase 7: JOIN 与临时表篇（5 files, ~32 diagrams）
-**Files**: 33, 34, 35, 36, 37
+### Phase 3: 搜索索引优化（4.2 MB → 目标 < 2 MB）
 
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 33-large-query-memory | 查询结果发送流程、Buffer Pool | 流程图 + 状态图 |
-| 34-join-usage | NLJ/BNL 执行流程 | 流程图 |
-| 35-join-optimization | MRR 流程、BKA 流程 | 流程图 |
-| 36-temp-table-rename | 分库分表简图、跨库查询流程 | 架构图 + 流程图 |
-| 37-internal-temp-table | union/group by 执行流程（13 张） | 流程图 |
+**目标**：缩小本地搜索索引体积，加快首次搜索响应。
 
-**Complexity**: HIGH（图数量多）
+**步骤**：
+1. 在 `search.ts` 中调整参数：
+   - 将 `maxSectionTextLength` 从 `800` 降到 `400`（每个搜索 section 的索引文本量减半）
+   - 保持 `maxIndexedHeadingDepth = 1` 不变
+2. 在 `config.mts` 的 `srcExclude` 中排除不需要搜索的目录/文件：
+   - 添加 `'**/todo-topics.md'`（待补主题页无搜索价值）
+3. 验证搜索功能正常，对比索引文件大小
 
----
-
-### Phase 8: 存储引擎与高级特性篇（6 files, ~35 diagrams）
-**Files**: 38, 39, 40, 41, 42, 43, 45
-
-| File | Diagrams Needed | Type |
-|------|----------------|------|
-| 38-innodb-vs-memory-engine | InnoDB vs Memory 数据组织对比 | 结构图 |
-| 39-auto-increment-gaps | 自增值分配、唯一键冲突 | 时序图 |
-| 40-insert-locks | 并发 insert、死锁场景 | 时序图 + 状态图 |
-| 41-fastest-table-copy | 物理拷贝流程、load data 同步 | 流程图 |
-| 42-grant-flush-privileges | 权限数据结构、操作效果 | 结构图 + 时序 |
-| 43-partition-table | 分区文件、分区锁范围 | 结构图 + 锁图 |
-| 45-auto-increment-overflow | row_id 溢出、trx_id 验证 | 时序图 |
-
-**Complexity**: MEDIUM-HIGH
+**预计效果**：索引体积减少 30-50%，搜索质量基本无影响。
 
 ---
 
-## Risks & Considerations
+### Phase 4: Vite 构建配置优化
 
-| Risk | Level | Mitigation |
-|------|-------|------------|
-| CSS 变量兼容性 — 需确保所有 `var(--d-*)` 变量在项目主题中已定义 | HIGH | 先检查现有文件的 CSS 变量列表，统一使用 |
-| B+ 树等复杂 SVG 图形制作耗时 | HIGH | 可先用简化版本，后续迭代优化 |
-| 文件数量大（40+ 文件，200+ 示意图） | HIGH | 分 8 个 Phase 逐步实施 |
-| 图表在不同宽度下的响应式显示 | MEDIUM | 使用 max-width + flex 布局 |
-| 部分"图"实际是 explain 输出/命令输出，可用代码块替代 | LOW | 对于纯文本输出用 styled code block |
+**目标**：通过 Rollup 手动分包策略，优化 chunk 粒度，减少不必要加载。
 
-## Estimated Complexity: **VERY HIGH**
+**步骤**：
+1. 在 `vite.ts` 中添加 `build.rollupOptions.output.manualChunks`：
+   ```ts
+   manualChunks(id) {
+     if (id.includes('mermaid')) return 'vendor-mermaid'
+     if (id.includes('cytoscape')) return 'vendor-cytoscape'
+     if (id.includes('katex')) return 'vendor-katex'
+   }
+   ```
+2. 在 `config.mts` 的 `shouldPreload` 中进一步排除大 chunk 的预加载：
+   - 排除 vendor-mermaid、vendor-cytoscape、vendor-katex chunk 的预加载
+3. 验证构建产物分包是否符合预期
 
-- Total files to modify: **40+**
-- Total diagrams to create: **~200+**
-- Diagram types: SVG structures, HTML timeline tables, flow diagrams, architecture diagrams
-- Estimated work: Each file averages ~5 diagrams, each diagram ~15-30 min → significant effort
-
-## Recommended Approach
-
-1. **先建立 CSS 变量规范** — 从 01-03 提取完整的 CSS 变量清单，确保统一
-2. **建立可复用的图表模板** — 为常见图表类型（时序表、流程图、B+ 树、架构图）建立 HTML 模板
-3. **按 Phase 顺序执行** — 每完成一个 Phase 可独立 commit
-4. **优先处理核心概念图** — 如 B+ 树、锁范围图、复制架构图等高复用概念
+**预计效果**：首页和普通页面不再预加载 mermaid (497KB)、cytoscape (442KB) 等大 chunk。
 
 ---
 
-**WAITING FOR CONFIRMATION**: 是否按此计划执行？你可以：
-- 选择从某个特定 Phase 开始
-- 调整 Phase 的优先级
-- 指定只做某些文件
-- 修改图表风格要求
+### Phase 5: K8sDiagram.vue 拆分（4817 行 → 子组件）
+
+**目标**：将超大组件拆分为子组件，减少单 chunk 体积（当前 389KB）。
+
+**步骤**：
+1. 阅读 K8sDiagram.vue 结构，识别可拆分的视觉区块
+2. 创建 `docs/.vitepress/theme/components/k8s/` 目录
+3. 将各区块提取为独立子组件（如 `K8sCore.vue`、`K8sScheduling.vue`、`K8sNetworking.vue` 等）
+4. 在 K8sDiagram.vue 中以 `defineAsyncComponent` 按需加载子组件
+5. 验证功能和展示一致性
+
+**预计效果**：单 chunk 从 389KB 拆分为多个 50-100KB 的子 chunk，按需加载。
+
+---
+
+## 实施顺序与依赖
+
+```
+Phase 1 (content-data 拆分) ──┐
+                               ├── Phase 3 (搜索优化) ── Phase 4 (Vite 构建) ── Phase 5 (K8s 拆分)
+Phase 2 (CSS 拆分) ───────────┘
+```
+
+Phase 1-2 为**代码组织优化**（主要提升维护体验）
+Phase 3-5 为**加载性能优化**（主要提升用户体验）
+
+## 不在本次范围
+
+- ❌ 拆分大 Markdown 文件内容（涉及内容重组，需要人工判断章节边界）
+- ❌ 更换搜索方案（如 Algolia）
+- ❌ CDN / 图片优化（不在当前代码层面）
+- ❌ SSR / ISR 配置变更
+
+## 预估复杂度：MEDIUM
+
+- Phase 1: ~1.5h（机械拆分，但需仔细核对导入路径）
+- Phase 2: ~1h（纯搬移 CSS，无逻辑变化）
+- Phase 3: ~0.5h（改几个参数）
+- Phase 4: ~0.5h（加构建配置）
+- Phase 5: ~1.5h（需理解组件结构后拆分）
+- **总计: ~5h**
+
+---
+
+**等待确认**: 是否按此计划执行？可调整任意阶段的优先级或跳过某些阶段。

@@ -1,0 +1,132 @@
+import type { SectionConfig } from './types'
+
+export const kafkaSection: SectionConfig = {
+    key: 'kafka',
+    base: '/kafka/',
+    navText: 'Kafka',
+    overviewDescription:
+      '系统整理 Kafka 核心知识，并收录《深入拆解消息队列 47 讲》章节笔记，覆盖分区、副本、顺序性、延时、事务、架构升级与运维运营。',
+    landing: {
+      eyebrow: 'Kafka',
+      title: 'Kafka 专题',
+      intro:
+        '把 Kafka 快速上手资料和《深入拆解消息队列 47 讲》的章节笔记收敛到一个入口，既能先搭基本盘，也能沿着消息队列主线系统精读。',
+      primary: { title: '专题总览', href: '/kafka/', description: '从总览页开始，按主题查阅。' },
+      secondary: { title: '核心概念', href: '/kafka/core-concepts', description: '从 Producer/Broker/Consumer 开始。' },
+      scope: [
+        'Producer/Consumer/Broker',
+        'Topic/Partition/Offset',
+        'Consumer Group 与 Rebalance',
+        '高可用与副本机制',
+        '支付场景消息可靠性',
+        '顺序性、积压治理与死信',
+        '消息队列 47 讲章节精读',
+      ],
+      docs: [
+        { title: '核心概念', href: '/kafka/core-concepts', description: 'Producer/Consumer/Broker、Topic/Partition、Consumer Group、高可用机制与性能原理。' },
+        { title: '支付实战', href: '/kafka/payment-practice', description: 'TCC+Kafka、本地消息表、Offset 补偿、全链路闭环、延迟队列与生产治理。' },
+        { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '消息不丢失、顺序性、积压处理、重试与死信、幂等与事务、英语术语速查。' },
+      ],
+      order: [
+        '核心概念',
+        '支付实战',
+        '深入追问与词汇',
+      ],
+    },
+    sidebar: [
+      {
+        text: 'Kafka 专题',
+        items: [
+          { text: '专题总览', link: '/kafka/' },
+          { text: '核心概念', link: '/kafka/core-concepts' },
+          { text: '支付实战', link: '/kafka/payment-practice' },
+          { text: '深入追问与词汇', link: '/kafka/interview-questions' },
+        ],
+      },
+      {
+        text: '预习篇',
+        collapsed: true,
+        items: [
+          { text: '00 开篇导读', link: '/kafka/00-preface' },
+          { text: '01 发展脉络', link: '/kafka/01-mq-evolution' },
+          { text: '02 核心概念', link: '/kafka/02-mq-concepts' },
+        ],
+      },
+      {
+        text: '基础篇',
+        collapsed: true,
+        items: [
+          { text: '03 通信协议', link: '/kafka/03-protocol-design' },
+          { text: '04 网络模块', link: '/kafka/04-network-module' },
+          { text: '05 存储设计', link: '/kafka/05-storage-model' },
+          { text: '06 存储优化', link: '/kafka/06-storage-reliability' },
+          { text: '07 生产者 SDK', link: '/kafka/07-producer-sdk' },
+          { text: '08 消费者 SDK（上）', link: '/kafka/08-consumer-sdk-part1' },
+          { text: '09 消费者 SDK（下）', link: '/kafka/09-consumer-sdk-part2' },
+          { text: '10 RabbitMQ 基础架构', link: '/kafka/10-rabbitmq-basic-architecture' },
+          { text: '11 RocketMQ 基础架构', link: '/kafka/11-rocketmq-basic-architecture' },
+          { text: '12 Kafka 基础架构', link: '/kafka/12-kafka-basic-architecture' },
+          { text: '13 Pulsar 基础架构', link: '/kafka/13-pulsar-basic-architecture' },
+        ],
+      },
+      {
+        text: '进阶篇',
+        collapsed: true,
+        items: [
+          { text: '14 集群瓶颈与风险', link: '/kafka/14-cluster-bottlenecks' },
+          { text: '15 集群构建（上）', link: '/kafka/15-cluster-construction-part1' },
+          { text: '16 集群构建（下）', link: '/kafka/16-cluster-construction-part2' },
+          { text: '17 一致性方案', link: '/kafka/17-consistency-patterns' },
+          { text: '18 编码技巧', link: '/kafka/18-java-performance-techniques' },
+          { text: '19 认证鉴权加密', link: '/kafka/19-auth-authz-encryption' },
+          { text: '20 限流方案', link: '/kafka/20-rate-limiting' },
+          { text: '21 监控体系', link: '/kafka/21-monitoring-system' },
+          { text: '22 消息轨迹', link: '/kafka/22-message-trace' },
+          { text: '23 RabbitMQ 集群架构', link: '/kafka/23-rabbitmq-cluster-architecture' },
+          { text: '24 RocketMQ 集群架构', link: '/kafka/24-rocketmq-cluster-architecture' },
+          { text: '25 Kafka 集群架构', link: '/kafka/25-kafka-cluster-architecture' },
+          { text: '26 Pulsar 集群架构', link: '/kafka/26-pulsar-cluster-architecture' },
+        ],
+      },
+      {
+        text: '功能篇',
+        collapsed: true,
+        items: [
+          { text: '27 Topic / 分区 / 订阅', link: '/kafka/27-topic-partition-subscription' },
+          { text: '28 顺序与幂等', link: '/kafka/28-ordering-and-idempotency' },
+          { text: '29 延时消息', link: '/kafka/29-delay-messages' },
+          { text: '30 事务消息', link: '/kafka/30-transaction-messages' },
+          { text: '31 死信与优先级', link: '/kafka/31-dlq-and-priority-queue' },
+          { text: '32 消息查询', link: '/kafka/32-message-query' },
+          { text: '33 Schema 模块', link: '/kafka/33-schema-module' },
+          { text: '34 WebSocket 支持', link: '/kafka/34-websocket-support' },
+          { text: '35 高级功能对比', link: '/kafka/35-advanced-features-comparison' },
+        ],
+      },
+      {
+        text: '架构升级篇',
+        collapsed: true,
+        items: [
+          { text: '36 存算分离', link: '/kafka/36-cloud-native-compute-storage-separation' },
+          { text: '37 分层存储', link: '/kafka/37-tiered-storage' },
+          { text: '38 Serverless 流处理', link: '/kafka/38-serverless-stream-processing' },
+          { text: '39 Serverless 事件驱动', link: '/kafka/39-serverless-event-driven' },
+          { text: '40 连接器与数据集成', link: '/kafka/40-connectors-and-data-integration' },
+          { text: '41 跨地域容灾', link: '/kafka/41-cross-region-disaster-recovery' },
+          { text: '42 消息中台', link: '/kafka/42-message-platform' },
+        ],
+      },
+      {
+        text: '经验总结篇',
+        collapsed: true,
+        items: [
+          { text: '43 未来演进', link: '/kafka/43-future-architecture' },
+          { text: '44 商业化', link: '/kafka/44-commercialization' },
+          { text: '45 成为领域专家', link: '/kafka/45-becoming-a-domain-expert' },
+          { text: '46 产品思维', link: '/kafka/46-product-mindset' },
+          { text: '47 大规模集群运营', link: '/kafka/47-large-scale-mq-operations' },
+          { text: '48 结束语', link: '/kafka/48-conclusion' },
+        ],
+      },
+    ],
+  }
