@@ -73,6 +73,11 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 - [抢券系统设计专题：与秒杀系统的异同](/architecture/coupon-claim-system-design-and-comparison)
 - [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
 
+## 长连接与 IM 系统
+
+- [Go 百万长连接网关架构设计](/architecture/go-million-connection-gateway-design)
+- [Go + EMQX 百万长连接平台架构设计](/architecture/go-emqx-million-connection-platform-design)
+
 ## 岗位面试专题
 
 - [AI、IM/直播与云原生架构](/architecture/ai-im-k8s-architecture-interview-guide)

@@ -499,5 +499,109 @@
     "phoneticUs": "/rɪsk kənˈtroʊl/",
     "phoneticUk": "/rɪsk kənˈtrəʊl/",
     "phoneticSource": "manual-review"
+  },
+  "websocket": {
+    "word": "WebSocket",
+    "meaning": "全双工通信协议；长连接协议",
+    "phoneticUs": "/ˈweb.sɑː.kɪt/",
+    "phoneticUk": "/ˈweb.sɒk.ɪt/",
+    "phoneticSource": "manual-review"
+  },
+  "mqtt": {
+    "word": "MQTT",
+    "meaning": "消息队列遥测传输协议（Message Queuing Telemetry Transport）",
+    "phoneticUs": "/ˌem.kjuː.tiːˈtiː/",
+    "phoneticUk": "/ˌem.kjuː.tiːˈtiː/",
+    "phoneticSource": "official-docs",
+    "phoneticSourceUrl": "https://mqtt.org/mqtt-specification/"
+  },
+  "gateway": {
+    "word": "gateway",
+    "meaning": "网关；入口关卡",
+    "phoneticUs": "/ˈɡeɪt.weɪ/",
+    "phoneticUk": "/ˈɡeɪt.weɪ/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/gateway"
+  },
+  "epoll": {
+    "word": "epoll",
+    "meaning": "Linux I/O 多路复用机制；事件轮询",
+    "phoneticUs": "/ˈiː.poʊl/",
+    "phoneticUk": "/ˈiː.pɒl/",
+    "phoneticSource": "manual-review"
+  },
+  "codec": {
+    "word": "codec",
+    "meaning": "编解码器（coder + decoder）",
+    "phoneticUs": "/ˈkoʊ.dek/",
+    "phoneticUk": "/ˈkəʊ.dek/",
+    "phoneticSource": "merriam-webster",
+    "phoneticSourceUrl": "https://www.merriam-webster.com/dictionary/codec"
+  },
+  "heartbeat": {
+    "word": "heartbeat",
+    "meaning": "心跳；存活检测信号",
+    "phoneticUs": "/ˈhɑːrt.biːt/",
+    "phoneticUk": "/ˈhɑːt.biːt/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/heartbeat"
+  },
+  "session": {
+    "word": "session",
+    "meaning": "会话；交互过程",
+    "phoneticUs": "/ˈseʃ.ən/",
+    "phoneticUk": "/ˈseʃ.ən/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/session"
+  },
+  "consistent-hashing": {
+    "word": "consistent hashing",
+    "meaning": "一致性哈希",
+    "phoneticUs": "/kənˈsɪs.tənt ˈhæʃ.ɪŋ/",
+    "phoneticUk": "/kənˈsɪs.tənt ˈhæʃ.ɪŋ/",
+    "phoneticSource": "manual-review"
+  },
+  "emqx": {
+    "word": "EMQX",
+    "meaning": "开源 MQTT 消息代理；基于 Erlang/OTP 的高可用消息中间件",
+    "phoneticUs": "/iː.ɛm.kjuː.ɛks/",
+    "phoneticUk": "/iː.ɛm.kjuː.ɛks/",
+    "phoneticSource": "manual-review"
+  },
+  "erlang": {
+    "word": "Erlang",
+    "meaning": "面向并发的函数式编程语言；常用于电信和消息系统",
+    "phoneticUs": "/ˈɜːr.læŋ/",
+    "phoneticUk": "/ˈɜː.læŋ/",
+    "phoneticSource": "manual-review"
+  },
+  "rule-engine": {
+    "word": "rule engine",
+    "meaning": "规则引擎；基于条件匹配自动触发动作的处理框架",
+    "phoneticUs": "/ruːl ˈen.dʒɪn/",
+    "phoneticUk": "/ruːl ˈen.dʒɪn/",
+    "phoneticSource": "cambridge",
+    "phoneticSourceUrl": "https://dictionary.cambridge.org/dictionary/english/rule"
+  },
+  "exhook": {
+    "word": "ExHook",
+    "meaning": "EMQX 外部钩子；通过 gRPC 将 EMQX 事件转发到外部服务处理",
+    "phoneticUs": "/ɛks.hʊk/",
+    "phoneticUk": "/ɛks.hʊk/",
+    "phoneticSource": "manual-review"
+  },
+  "replicant": {
+    "word": "replicant",
+    "meaning": "副本节点；EMQX 集群中承载客户端连接的只读节点",
+    "phoneticUs": "/ˈrep.lɪ.kənt/",
+    "phoneticUk": "/ˈrep.lɪ.kənt/",
+    "phoneticSource": "manual-review"
+  },
+  "webhook": {
+    "word": "webhook",
+    "meaning": "网络钩子；事件触发的 HTTP 回调通知机制",
+    "phoneticUs": "/wɛb.hʊk/",
+    "phoneticUk": "/wɛb.hʊk/",
+    "phoneticSource": "manual-review"
   }
 }
