@@ -118,7 +118,7 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
-          v-else-if="kind === 'two-phase-commit'" class="diagram-mysql-23-redo-commit" viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+          v-else-if="kind === 'two-phase-commit'" class="diagram-mysql-23-redo-commit" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
       <defs><marker id="ah4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
       <text x="210" y="22" text-anchor="middle" class="t4">图 4 &nbsp; 两阶段提交</text>
       <!-- Step 1: redo log prepare -->
@@ -144,7 +144,7 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
     </svg>
 
     <svg
-          v-else-if="kind === 'two-phase-detail'" class="diagram-mysql-23-crash-recovery" viewBox="0 0 440 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
+          v-else-if="kind === 'two-phase-detail'" class="diagram-mysql-23-crash-recovery" viewBox="0 0 440 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;font-family:system-ui,sans-serif">
       <defs><marker id="ah5" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--d-text-sub)"/></marker></defs>
       <text x="220" y="22" text-anchor="middle" class="t5">图 5 &nbsp; 两阶段提交细化</text>
       <!-- Step 1: redo log prepare -->
