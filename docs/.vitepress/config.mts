@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import * as vueCompilerSfc from 'vue/compiler-sfc'
 import { localSearchOptions } from './config/search'
 import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
@@ -53,6 +54,11 @@ export default defineConfig({
   },
   router: {
     prefetchLinks: false,
+  },
+  // Keep the SFC compiler available during dev server restarts so Markdown/Vue HMR
+  // does not hit plugin-vue's transient `compiler: null` state.
+  vue: {
+    compiler: vueCompilerSfc,
   },
   vite: docsViteConfig,
   shouldPreload(link) {
