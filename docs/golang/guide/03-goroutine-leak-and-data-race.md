@@ -348,4 +348,9 @@ func main() {
 - **Race Detector 必须用**：在开发和 CI 中始终开启 `-race` 标志。它通过在编译期插桩来检测运行时数据竞争，能发现大多数并发 bug。注意它有 2-10 倍的性能开销和更多内存使用，不要在生产环境开启。
 - **Map 并发写是 fatal**：Go 的 map 并发写不是静默的数据竞争，而是 runtime 会检测到并直接 `fatal error`，进程无法 recover。
 - **闭包捕获**：Go 1.22 之前，`for` 循环变量被闭包捕获是引用而非拷贝。Go 1.22 已修复此行为，但显式传参仍是好习惯。
-- **Happens-before 规则**：Go 内存模型定义了严格的 happens-before 关系：Channel 发送 happens-before 对应接收完成；Mutex Unlock happens-before 下一次 Lock。不依赖这些规则的代码都可能存在数据竞争。
+- **Happens-Before 规则**：Go 内存模型（Go Memory Model）定义了严格的 happens-before 关系，决定了一个 Goroutine 对变量的写入何时能被另一个 Goroutine 观测到。核心规则包括：
+  - Channel 的**发送**一定 happens-before 对应的**接收完成**
+  - **关闭 Channel** 一定 happens-before 接收端收到零值
+  - **Unlock** 操作一定 happens-before 下一次 **Lock**
+  - `sync.Once` 中 `f()` 的执行一定 happens-before 任何 `once.Do(f)` 返回
+  - 不依赖这些规则的代码都可能存在数据竞争

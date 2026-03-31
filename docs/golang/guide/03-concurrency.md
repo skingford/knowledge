@@ -30,7 +30,7 @@ search: false
 
 | 专题 | 内容 |
 | --- | --- |
-| [Goroutine 与 GMP 调度模型](./03-goroutine-and-scheduler.md) | Goroutine 基础、生命周期、GMP 调度模型、Work Stealing 与 Hand-off |
+| [Goroutine 与 GMP 调度模型](./03-goroutine-and-scheduler.md) | Goroutine 基础、生命周期、GMP 调度模型、Work Stealing、Hand-off 与 sysmon |
 | [Channel、select 与 Context](./03-channel-select-context.md) | Channel 用法与原理、select 多路复用、Context 取消与超时传播 |
 | [sync 同步原语与 Atomic](./03-sync-primitives.md) | Mutex、RWMutex、Atomic、WaitGroup、Once、Cond、Pool、sync.Map 与选型决策 |
 | [Goroutine 泄漏与并发安全](./03-goroutine-leak-and-data-race.md) | 泄漏原因与排查、数据竞争检测、Race Detector、闭包陷阱 |

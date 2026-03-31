@@ -39,6 +39,23 @@ search: false
 
 `sync.WaitGroup` 只能等待一组 goroutine 完成，但无法收集错误。`golang.org/x/sync/errgroup` 在此基础上增加了错误传播和 context 取消能力，是生产代码中处理并发任务组的首选。
 
+#### 工厂故事：对讲机与紧急广播
+
+`errgroup` 就是一套**自带对讲机和紧急广播系统的"智能指挥枢纽"**，完美解决 WaitGroup 的两个致命痛点：
+
+1. **无法捕获错误**：WaitGroup 里的协程报错，主协程拿不到。
+2. **缺乏一损俱损的联动**：10 个并发任务，第 1 个瞬间失败，剩下 9 个白白浪费资源。
+
+比喻：老板派 3 个采购员去不同城市买零件，任何一个买不到整个计划就泡汤——
+
+- **用 WaitGroup**：北京采购员第一天发现没货，但没法通知别人。上海和广州还在苦找半个月。
+- **用 errgroup**：北京采购员发现没货，立刻通过对讲机喊报告。总控台收到错误，触发全频道紧急广播（自动 Cancel Context），上海广州立刻买机票回家。
+
+核心三板斧：
+1. `g, ctx := errgroup.WithContext(context.Background())` — 创建 Group 与派生 ctx，任一协程返回 error 则 ctx 自动取消
+2. `g.Go(func() error { ... })` — 派发任务，强制返回 error
+3. `err := g.Wait()` — 等待全部完成，返回第一个 error
+
 ### 基本用法：并发请求多个 API 并收集错误
 
 ```go
@@ -158,6 +175,36 @@ func main() {
 - **性能考量**：`SetLimit(n)` 内部使用 buffered channel 实现信号量，开销极小。不设置限制时每次 `Go()` 直接启动 goroutine。
 - **常见陷阱**：`g.Wait()` 只返回第一个错误，其余错误会被丢弃。如果需要所有错误，应在各 goroutine 内部自行收集。使用 `WithContext` 时，ctx 在第一个错误后即被取消，其余 goroutine 需要检查 `ctx.Err()` 来感知取消。
 - **标准库/开源使用**：Kubernetes controller-runtime 大量使用 errgroup 管理并发 reconciler；Go 标准库 `cmd/go` 内部也使用 errgroup 进行并发编译。
+
+#### 终极必杀技：`SetLimit` 让 errgroup 变身超级 Worker Pool
+
+Go 1.20 引入 `g.SetLimit(n)`，一行代码就让 errgroup 变成自带错误处理和上下文取消的 Worker Pool：
+
+```go
+g, ctx := errgroup.WithContext(context.Background())
+g.SetLimit(3) // 全厂最多 3 个工人同时干活
+
+for i := 0; i < 100; i++ {
+	taskID := i
+	// 达到 3 个并发时，g.Go 自动阻塞等待
+	g.Go(func() error {
+		fmt.Printf("处理任务 %d\n", taskID)
+		return nil
+	})
+}
+
+g.Wait()
+```
+
+> 在绝大多数**不需要流式传递数据**的场景下，可以直接用 `errgroup` + `SetLimit` 替代手写的 channel Worker Pool，代码量减半且更稳健。
+
+#### WaitGroup vs errgroup 选型
+
+| 场景 | 选择 |
+| --- | --- |
+| 无关联的单纯并发等待 | `sync.WaitGroup` |
+| 有关联的业务并发（一损俱损），或需要捕获错误 | `errgroup` |
+| 需要限制并发数 + 错误处理 | `errgroup` + `SetLimit` |
 
 ---
 
@@ -403,6 +450,18 @@ func main() {
 
 Worker Pool 是一种固定数量的工作协程从共享任务队列取任务处理的模式，避免为每个任务都创建 goroutine，适合任务量大、需要控制资源使用的场景。
 
+#### 工厂思维：暴兵流 vs 工作池
+
+假设年底爆单，工厂接到 10,000 个贴标签订单：
+
+- **新手做法（暴兵流）**：直接 `go func()` 启动 10,000 个零时工。结果工厂挤爆，食堂没饭，大门踩塌（内存 OOM，连接池打爆，系统崩溃）。
+- **老手做法（工作池）**：只设 50 个固定工位（Worker Goroutines），把 10,000 个订单扔进一个大筐（Buffered Channel）。谁干完手头的活就去筐里拿下一个，直到筐空。
+
+三大核心组件：
+1. **任务队列（Jobs Channel）**：带缓冲的 Channel，存放待处理任务（订单筐）
+2. **结果队列（Results Channel）**：收集处理完的成品
+3. **工作者（Workers）**：固定数量的 Goroutine，不断从 Jobs Channel 抢任务，处理后塞进 Results Channel
+
 <GoAdvancedConcurrencyDiagram kind="worker-pool" />
 
 ### 完整的 Worker Pool 实现
@@ -552,6 +611,14 @@ func main() {
 - **常见陷阱**：关闭顺序很重要——必须先关闭 taskCh，等所有 worker 退出后再关闭 resultCh，否则会 panic。不要在 worker 内部关闭 resultCh。
 - **动态扩缩容思路**：可以用一个管理 goroutine 监控任务队列长度，当积压超过阈值时启动新 worker，空闲超时后让多余 worker 退出。`ants` 库是 Go 生态中成熟的 goroutine 池实现，支持动态调整。
 - **标准库/开源使用**：`ants`（高性能 goroutine 池）、`tunny`（固定大小 worker pool）；Kubernetes 的 workqueue 也是类似的模式。
+
+#### Pipeline vs Worker Pool 怎么选？
+
+| 选择 | 场景 | 比喻 |
+| --- | --- | --- |
+| **Pipeline** | 多步骤任务（A 洗菜 → B 切菜 → C 炒菜），重点在于数据流经不同工序 | 流水线 |
+| **Worker Pool** | 单一步骤但量极大（10,000 个土豆只需削皮），核心痛点是防止系统被压垮 | 工位制 |
+| **王炸组合** | 流水线的"切菜"环节太耗时，在该环节引入 Worker Pool 让 5 个工人同时切，再汇总到下一道工序 | 混合模式 |
 
 ---
 
