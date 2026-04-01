@@ -28,6 +28,8 @@ search: false
 
 ## 快速导航
 
+底层调度、核心组件、同步原语、并发控制以及高级模式等几个维度深度梳理 Go 的并发知识体系。
+
 | 专题 | 内容 |
 | --- | --- |
 | [Goroutine 与 GMP 调度模型](./03-goroutine-and-scheduler.md) | Goroutine 基础、生命周期、GMP 调度模型、Work Stealing、Hand-off 与 sysmon |
