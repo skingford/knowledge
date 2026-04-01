@@ -52,7 +52,7 @@ const currentDiagram = computed(() => diagramByKind[props.kind])
 </script>
 
 <template>
-  <DiagramFrame :max-width="currentDiagram.maxWidth">
+  <DiagramFrame v-if="currentDiagram" :max-width="currentDiagram.maxWidth">
     <component :is="currentDiagram.component" />
   </DiagramFrame>
 </template>
