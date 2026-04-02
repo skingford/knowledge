@@ -628,7 +628,8 @@ func main() {
 - **性能考量**：worker 数量通常设为 CPU 核数（CPU 密集型）或更高（IO 密集型）。任务通道 buffer 大小影响背压行为——buffer 越大，生产者被阻塞的概率越低，但内存占用越高。
 - **常见陷阱**：关闭顺序很重要——必须先关闭 taskCh，等所有 worker 退出后再关闭 resultCh，否则会 panic。不要在 worker 内部关闭 resultCh。
 - **动态扩缩容思路**：可以用一个管理 goroutine 监控任务队列长度，当积压超过阈值时启动新 worker，空闲超时后让多余 worker 退出。`ants` 库是 Go 生态中成熟的 goroutine 池实现，支持动态调整。
-- **标准库/开源使用**：`ants`（高性能 goroutine 池）、`tunny`（固定大小 worker pool）；Kubernetes 的 workqueue 也是类似的模式。
+- **开源推荐**：如果你在业务里不想自己维护 goroutine 池实现，优先推荐 [ants](https://github.com/panjf2000/ants)。它在 Go 生态里使用很广，提供池容量控制、预分配、非阻塞提交、动态调参等能力，适合把无边界的 `go func()` 收敛成可控的 worker pool。仓库地址：[https://github.com/panjf2000/ants](https://github.com/panjf2000/ants)
+- **标准库/开源使用**：`ants` 适合高性能 goroutine 池场景，`tunny` 更偏固定大小 worker pool；如果你要的是带重试、限速、延迟队列语义的任务消费模型，也可以参考 Kubernetes 的 `workqueue`。相关地址：[tunny](https://github.com/Jeffail/tunny)、[https://github.com/Jeffail/tunny](https://github.com/Jeffail/tunny)；[workqueue](https://github.com/kubernetes/client-go/tree/master/util/workqueue)、[https://github.com/kubernetes/client-go/tree/master/util/workqueue](https://github.com/kubernetes/client-go/tree/master/util/workqueue)
 
 #### Pipeline vs Worker Pool 怎么选？
 

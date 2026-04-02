@@ -23,6 +23,7 @@ outline: false
 | 目标 | 入口 | 说明 |
 | --- | --- | --- |
 | 想系统学 Go 主线 | [Go 学习路径与资料导航](./learning-path.md) | 从阶段学习路径切入，按 01-10 大纲推进 |
+| 想找靠谱的 Go 第三方库 | [Go 优秀第三方库专题](./excellent-open-source.md) | 按并发、Web、数据访问、CLI、日志和测试分类整理 |
 | 想直接读 runtime / 标准库源码 | [Go 源码阅读学习主线](./guide/source-reading/learning-path.md) | 统一收口源码阅读路线、方法和资料 |
 | 想准备面试或做能力自检 | [Go 能力自检与面试准备导航](./interview-prep.md) | 题库、代码片段、专题回查集中在这里 |
 | 想补 `database/sql` 与连接池 | [database/sql 与连接池](./guide/06-database-sql-and-connection.md) | Go 标准库数据库接入与池化配置 |
@@ -37,6 +38,7 @@ outline: false
 golang/
 ├── index.md                        目录总入口
 ├── learning-path.md                通用学习主线
+├── excellent-open-source.md        优秀第三方库专题
 ├── interview-prep.md               能力自检与面试导航
 ├── context-usage-boundaries.md     Context 边界专题
 ├── pprof-troubleshooting-guide.md  性能排障专题
@@ -62,6 +64,7 @@ golang/
 - [性能优化与排障](./guide/07-performance-troubleshooting.md)
 - [微服务与分布式](./guide/08-microservices-distributed.md)
 - [进阶专题](./guide/10-advanced-topics.md)
+- [Go 优秀第三方库专题](./excellent-open-source.md)
 
 ### 2. 源码精读模块
 
@@ -80,6 +83,7 @@ golang/
 - [Pprof 排障指南](./pprof-troubleshooting-guide.md)
 - [database/sql 与连接池](./guide/06-database-sql-and-connection.md)
 - [Go 版本特性总结](./go-version-features.md)
+- [Go 优秀第三方库专题](./excellent-open-source.md)
 
 ### 4. 能力自检模块
 

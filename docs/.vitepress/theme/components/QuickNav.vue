@@ -264,6 +264,13 @@ const categories: Category[] = [
         url: "https://skills.sh/",
       },
       {
+        name: "oh-my-codex",
+        desc: "面向 Codex 的工作流增强仓库，提供 prompts、skills、agent teams、hooks 与运行时辅助能力",
+        domain: "github.com",
+        fallback: "🧰",
+        url: "https://github.com/Yeachan-Heo/oh-my-codex",
+      },
+      {
         name: "BMAD-METHOD",
         desc: "面向 AI 驱动敏捷开发的方法论仓库，提供 agents、workflows、templates 与团队协作流程",
         domain: "github.com",

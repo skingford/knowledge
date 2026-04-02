@@ -1,4 +1,4 @@
-import type { SidebarGroup, SectionConfig } from './types'
+import type { SidebarEntry, SidebarGroup, SectionConfig } from './types'
 
 const golangSourceReadingSidebar: SidebarGroup[] = [
   {
@@ -183,6 +183,7 @@ export const golangSection: SectionConfig = {
     docs: [
       { title: 'Go 文档导航', href: '/golang/', description: '先看目录结构，再决定走学习主线、源码主线还是自检入口。' },
       { title: 'Go 学习路径与资料导航', href: '/golang/learning-path', description: 'Go 总体专题导航，负责串联各阶段专题与练习入口。' },
+      { title: 'Go 优秀第三方库专题', href: '/golang/excellent-open-source', description: '按并发、Web、数据访问、CLI、日志和测试整理常用第三方库。' },
       { title: 'Go 源码阅读学习主线', href: '/golang/guide/source-reading/learning-path', description: '统一维护源码阅读路线、方法、runtime 导读与推荐资料。' },
       { title: 'Go 源码精读总览', href: '/golang/guide/source-reading/', description: '按 runtime、网络、编码、工程化等主题浏览源码文章。' },
       { title: 'Go 能力自检与面试准备导航', href: '/golang/interview-prep', description: '统一整理题库、代码片段与专题回查入口。' },
@@ -195,6 +196,7 @@ export const golangSection: SectionConfig = {
     order: [
       'Go 文档导航',
       'Go 学习路径与资料导航',
+      'Go 优秀第三方库专题',
       'Go 源码阅读学习主线',
       'Go 源码精读总览',
       'Go 能力自检与面试准备导航',
@@ -321,5 +323,6 @@ export const golangSection: SectionConfig = {
       ],
     },
     ...golangSourceReadingSidebar,
-  ],
+    { text: '第三方专题', link: '/golang/excellent-open-source' },
+  ] satisfies SidebarEntry[],
 }

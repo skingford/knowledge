@@ -12,6 +12,7 @@ search: false
 
 - **想系统学一遍**：按“阶段学习路径”从上往下走
 - **想补薄弱项**：直接跳到对应专题入口
+- **想找靠谱第三方库**：直接看 [Go 优秀第三方库专题](./excellent-open-source.md)
 - **想系统读源码**：直接去 [Go 源码阅读学习主线](./guide/source-reading/learning-path.md)
 - **想准备能力自检或面试**：直接看“练习与复盘入口”
 
@@ -76,6 +77,7 @@ search: false
 | --- | --- |
 | 快速建立 Go 全景认知 | `guide/01` → `guide/03` → `guide/05` |
 | 想把并发讲清楚 | `guide/03-concurrency` → `guide/03-advanced-concurrency-patterns` → `runtime-scheduler` |
+| 想找成熟好用的 Go 第三方库 | `excellent-open-source` → 对应场景专题页 |
 | 想补数据库接入与连接池 | `guide/06-database-cache` → `guide/06-database-sql-and-connection` → `source-reading/database-sql` |
 | 想系统理解 Go 高并发设计 | `guide/08-microservices-distributed` → `guide/08-go-high-concurrency-system-design` → `architecture/high-concurrency-system-checklist` |
 | 想提升排障能力 | `guide/07-performance-troubleshooting` → `pprof-troubleshooting-guide` → `runtime-trace` |
@@ -106,6 +108,7 @@ search: false
 - Context 源码精读：[context 包源码精读](./guide/source-reading/context.md)
 - Pprof 排障指南：[Pprof 排障指南](./pprof-troubleshooting-guide.md)
 - Go 版本特性：[Go 版本特性总结（1.21 ~ 1.24）](./go-version-features.md)
+- Go 生态选型参考：[Go 优秀第三方库专题](./excellent-open-source.md)
 
 ## 源码阅读与资料入口
 
