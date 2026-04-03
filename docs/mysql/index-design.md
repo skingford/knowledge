@@ -1147,6 +1147,46 @@ ORDER BY CASE WHEN id IN (1, 2, 5) THEN 0 ELSE 1 END, id;
 - 把排序规则改写成与现有索引顺序一致的形式
 - 或者把这个逻辑提前物化成独立列 / 可索引表达式，再单独设计索引
 
+再补一个最常见的 `EXPLAIN` 对照，你在排查时可以直接套这个思路。
+
+**对照场景**
+
+```sql
+CREATE INDEX idx_status_id ON orders(status, id);
+
+-- 场景 A：排序顺序与索引顺序一致，更容易复用索引
+EXPLAIN
+SELECT id, status
+FROM orders
+WHERE status = 1
+ORDER BY id DESC
+LIMIT 20;
+
+-- 场景 B：排序规则依赖运行时表达式，通常会触发 filesort
+EXPLAIN
+SELECT id, status
+FROM orders
+WHERE status = 1
+ORDER BY CASE WHEN id IN (1, 2, 5) THEN 0 ELSE 1 END, id DESC
+LIMIT 20;
+```
+
+典型预期差异可以记成：
+
+| 场景 | `key` | `Extra` | 说明 |
+| --- | --- | --- | --- |
+| 场景 A | `idx_status_id` | 可能是 `Using where` / `Using index` | `status = 1` 先圈定范围，`id DESC` 直接复用索引顺序 |
+| 场景 B | `idx_status_id` 或 `NULL` | 常见 `Using filesort` | `CASE WHEN` 生成了新排序规则，索引顺序无法直接复用 |
+
+如果把它翻译成执行过程，就是：
+
+- **场景 A**：先在 `status = 1` 这段索引范围里，从后往前扫叶子节点，取够 `20` 行就可以停
+- **场景 B**：先拿到 `status = 1` 的候选行，再逐行计算 `CASE WHEN` 的值，最后额外排序后再取前 `20` 行
+
+所以当你在 `EXPLAIN` 里看到 `Using filesort` 时，第一反应不要只是“它排序了”，而要追问：
+
+> **这个 `ORDER BY` 要求的顺序，真的是索引原本就有的物理顺序吗？**
+
 ### 索引设计黄金法则
 
 真正设计索引时，建议按这个顺序判断：**先看区分度，再看能不能复用顺序，再看能不能覆盖，最后再算维护成本。**
