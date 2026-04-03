@@ -1187,6 +1187,186 @@ LIMIT 20;
 
 > **这个 `ORDER BY` 要求的顺序，真的是索引原本就有的物理顺序吗？**
 
+#### 如何改写，尽量避免 `Using filesort`
+
+看到 `Using filesort` 之后，不要本能地先想“再加一个索引”，而要按下面这个顺序排查：
+
+1. **先看排序规则能不能改写成已有索引顺序**
+2. **再看排序逻辑能不能提前物化**
+3. **最后才考虑为稳定排序场景单独设计索引**
+
+常见改写思路有 3 种：
+
+**思路 1：把表达式排序改成普通列排序**
+
+如果业务允许，不要在 `ORDER BY` 里现场计算：
+
+```sql
+-- 原写法：运行时算优先级
+SELECT id, status
+FROM orders
+WHERE status = 1
+ORDER BY CASE WHEN is_top = 1 THEN 0 ELSE 1 END, id DESC;
+```
+
+可以直接改成：
+
+```sql
+-- 改写后：直接按列排序
+SELECT id, status
+FROM orders
+WHERE status = 1
+ORDER BY is_top DESC, id DESC;
+```
+
+然后再针对稳定查询模式设计索引，比如：
+
+```sql
+CREATE INDEX idx_status_top_id ON orders(status, is_top, id);
+```
+
+这样优化器才有机会直接复用 `(status, is_top, id)` 的顺序。
+
+**思路 2：把动态规则提前物化成独立字段**
+
+如果优先级不是临时算出来的，而是某种可以提前确定的业务状态，比如：
+
+- 是否置顶
+- 是否优先处理
+- 是否命中白名单
+- 订单展示优先级
+
+那更适合在表里存一个明确的排序字段，例如 `priority_rank`，写入或更新时维护，而不是每次查询时再用 `CASE WHEN` 现算。
+
+```sql
+SELECT id, status
+FROM orders
+WHERE status = 1
+ORDER BY priority_rank ASC, id DESC;
+```
+
+这个思路本质上是：**把“运行时逻辑”变成“可索引数据”。**
+
+**思路 3：接受排序，但先尽量缩小候选集**
+
+有些排序逻辑确实无法完全索引化，比如用户临时勾选了多个复杂优先规则。这时候优化目标就不是“彻底消灭 filesort”，而是“先把参与排序的数据量压到足够小”。
+
+例如先用高选择性条件缩小范围：
+
+```sql
+SELECT id, status
+FROM orders
+WHERE merchant_id = ?
+  AND created_at >= ?
+  AND status = 1
+ORDER BY CASE WHEN id IN (1, 2, 5) THEN 0 ELSE 1 END, id DESC
+LIMIT 20;
+```
+
+这类 SQL 即使最终还会 `Using filesort`，只要前面的 `WHERE` 已经把候选集压得足够小，代价仍然可能是可接受的。
+
+一句话记忆：
+
+> **能改写成索引顺序，就别现场算；必须现场算，就先把参与排序的数据量压小。**
+
+#### 面试里怎么回答这类问题
+
+如果面试官问你：“为什么 `CASE WHEN ORDER BY` 容易让索引失效，出现 `Using filesort`？”，可以压成 4 句：
+
+1. **B+ 树只能直接提供它本来就有的物理顺序。**
+2. **`CASE WHEN` 生成的是运行时的新排序规则，不是索引里已有的顺序。**
+3. **所以 MySQL 往往要先取结果、再计算表达式、再额外排序，`EXPLAIN` 里就容易看到 `Using filesort`。**
+4. **优化方向通常是改写成普通列排序，或者把排序规则物化成可索引字段。**
+
+#### 反例：有索引，为什么还是可能 `Using filesort`
+
+这里还有一个很容易误判的点：**“有索引”不等于“排序一定能吃到索引”。**
+
+最常见的反例有 4 类：
+
+**反例 1：排序列不连续命中联合索引**
+
+假设有索引：
+
+```sql
+CREATE INDEX idx_user_status_time ON orders(user_id, status, create_time);
+```
+
+下面这条 SQL 即使“看起来相关列都有索引”，也仍然可能出现 `Using filesort`：
+
+```sql
+EXPLAIN
+SELECT *
+FROM orders
+WHERE status = 1
+ORDER BY create_time DESC;
+```
+
+原因不是没索引，而是**跳过了最左列 `user_id`**。索引的全局顺序先按 `user_id` 组织，缺少这层约束后，`create_time` 的顺序就不能被独立复用。
+
+**反例 2：中间列出现范围查询**
+
+```sql
+EXPLAIN
+SELECT *
+FROM orders
+WHERE user_id = 1001
+  AND status > 1
+ORDER BY create_time DESC;
+```
+
+这里即使命中了联合索引前两列，也不代表 `ORDER BY create_time DESC` 一定能免排序。因为 `status > 1` 已经把第二列从“等值命中”变成了“范围扫描”，后面的 `create_time` 往往就很难继续同时服务排序。
+
+**反例 3：排序方向和索引顺序不一致**
+
+```sql
+CREATE INDEX idx_a_b ON t(a ASC, b ASC);
+
+EXPLAIN
+SELECT *
+FROM t
+WHERE a = 1
+ORDER BY b DESC;
+```
+
+在一些场景下，即使列命中了，排序方向不一致也可能让 MySQL 无法直接复用现有顺序，最终还是要额外排序。工程上要特别注意：**不仅列要对，方向也要对。**
+
+**反例 4：排序前已经做了函数或表达式计算**
+
+```sql
+EXPLAIN
+SELECT *
+FROM orders
+WHERE user_id = 1001
+ORDER BY DATE(create_time) DESC;
+```
+
+这里 `create_time` 虽然有索引，但 `ORDER BY DATE(create_time)` 要的已经不是原始列顺序，而是函数计算后的结果顺序，所以仍然可能出现 `Using filesort`。
+
+把这 4 个反例压成一句话：
+
+> **排序想吃到索引，要求的不只是“有这个索引”，而是“过滤条件、列顺序、排序方向、表达式形态”都要和索引顺序兼容。**
+
+#### 检查清单：排序到底能不能吃到索引
+
+以后看到一条 `ORDER BY`，可以直接按这 5 条过一遍：
+
+1. **最左列命中了吗？** 没从联合索引最左前缀开始，排序通常很难直接复用索引
+2. **中间有跳列吗？** 前面列不连续，后面列的顺序性通常就断了
+3. **中间有范围查询吗？** 一旦某列从等值变成范围，后续列往往难继续同时服务排序
+4. **排序方向一致吗？** 列顺序对了还不够，`ASC / DESC` 也要和可利用的索引顺序兼容
+5. **排序前做表达式了吗？** `CASE WHEN`、函数、运算会把“原始列顺序”变成“计算后顺序”，更容易触发 `Using filesort`
+
+如果这 5 条里有任意一条答“否”或“有问题”，就要高度警惕：
+
+- `EXPLAIN` 里出现 `Using filesort`
+- 排序前扫描行数过大
+- `LIMIT` 看起来很小，但 SQL 实际还是慢
+
+把这张清单压成一句口诀就是：
+
+> **先看最左，再看连续；再看范围、方向、表达式。**
+
 ### 索引设计黄金法则
 
 真正设计索引时，建议按这个顺序判断：**先看区分度，再看能不能复用顺序，再看能不能覆盖，最后再算维护成本。**
@@ -1296,6 +1476,54 @@ SELECT name FROM user WHERE status = 1;
 3. `SELECT` 字段能不能做成覆盖索引，减少回表？
 4. SQL 里有没有函数、计算、类型转换或 `CASE WHEN` 破坏索引顺序？
 5. 这条索引带来的收益，值得它的写入和空间成本吗？
+
+#### 慢 SQL 排查路径图
+
+如果线上拿到一条慢 SQL，不要一上来就“拍脑袋加索引”，更稳妥的顺序是：
+
+```text
+先看 WHERE
+  -> 再看 ORDER BY / GROUP BY
+    -> 再看是否回表
+      -> 最后用 EXPLAIN / EXPLAIN ANALYZE 验证
+```
+
+把它展开，就是 4 步：
+
+**第 1 步：先看 `WHERE` 能不能把数据量压小**
+
+- 有没有命中联合索引最左前缀
+- 有没有函数、表达式、隐式类型转换
+- 有没有低区分度条件导致“看似有索引，实际过滤很弱”
+
+如果这一层就没把候选集压下来，后面的排序、分组、回表基本都会一起变贵。
+
+**第 2 步：再看 `ORDER BY` / `GROUP BY` 能不能复用索引顺序**
+
+- 排序列和分组列是否与索引顺序一致
+- 中间有没有跳列、范围查询、方向不一致、表达式计算
+- `GROUP BY` 和 `ORDER BY` 是否尽量一致，避免同时出现 `Using temporary` 和 `Using filesort`
+
+很多 SQL 慢，不是慢在过滤，而是慢在“过滤完之后又排了一次、分了一次”。
+
+**第 3 步：再看是不是被回表拖慢了**
+
+- `SELECT *` 是否取了太多不必要字段
+- 能不能把高频查询改成覆盖索引
+- 命中行数不小的时候，是否出现“扫索引 + 大量回表”反而比全表扫描还贵
+
+这一层特别容易被忽略：**不是走了索引就一定快，还要看走索引之后回表回了多少次。**
+
+**第 4 步：最后用 `EXPLAIN` / `EXPLAIN ANALYZE` 把猜测坐实**
+
+- `key` 看是否真的用了你预期的索引
+- `rows` 看扫描规模是否合理
+- `Extra` 重点看 `Using index`、`Using index condition`、`Using filesort`、`Using temporary`
+- 如果还不确定，就用 `EXPLAIN ANALYZE` 对照预估行数和实际行数
+
+一句话记忆：
+
+> **先判断“扫了多少”，再判断“排了没有”，再判断“回了多少次表”，最后再用执行计划验证。**
 
 **支付场景索引示例**
 
