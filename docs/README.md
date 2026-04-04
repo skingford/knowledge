@@ -25,6 +25,7 @@
 - [AI / Agent 方向](./ai/)
 - [Docker 专题](./docker/)
 - [Golang 方向](./golang/)
+- [Node.js 专题](./nodejs/)
 - [Rust 方向](./rust/)
 
 ## 推荐入口
@@ -42,7 +43,15 @@
 - [Docker 镜像仓库、Harbor 与发布治理](./docker/registry-and-image-governance.md)
 - [Go 学习路径与资料导航](./golang/learning-path.md)
 - [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
+- [Node.js 模块系统、ESM/CommonJS 与 monorepo 工程边界](./nodejs/module-system-esm-commonjs-and-monorepo-boundaries.md)
+- [Node.js 运行时、事件循环与性能排障](./nodejs/runtime-event-loop-and-performance-troubleshooting.md)
+- [Node.js 测试、Mock 与工程化实践](./nodejs/testing-mock-and-engineering-practice.md)
+- [Node.js 配置管理、日志、Tracing 与可观测性实践](./nodejs/config-logging-tracing-and-observability-practice.md)
+- [Node.js 数据库、事务与 ORM/Query Builder 实践](./nodejs/database-transaction-and-orm-practice.md)
+- [Express / Fastify Web 服务实践](./nodejs/express-fastify-web-service-practice.md)
+- [Node.js 队列、定时任务与 Worker 实战](./nodejs/queue-scheduler-and-worker-practice.md)
 - [Rust 学习路径与资料导航](./rust/learning-path.md)
+- [NestJS 实战指南](./nodejs/nestjs-practice-guide.md)
 - [Rust 必备知识总览](./rust/essential-knowledge.md)
 - [Rust Borrow Checker 常见报错排障指南](./rust/borrow-checker-troubleshooting-guide.md)
 - [Rust DTO、领域模型与存储模型分层实践](./rust/dto-domain-and-persistence-model-practice.md)
@@ -99,6 +108,7 @@
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
+- `nodejs/`：Node.js 服务端专题总览、模块系统与 monorepo 边界、运行时与性能排障、测试工程化、配置与可观测性、数据库实践、Web 服务实践、队列与 Worker、NestJS 工程实践
 - `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、通知 / 邮件 / 短信 / Push、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
 
 ## 整理规则
@@ -130,4 +140,5 @@
 - `ai/`：Agent、LLM 应用、RAG、工作流
 - `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读
+- `nodejs/`：Node.js 服务端模块系统、ESM/CommonJS、monorepo、运行时、事件循环、性能排障、测试工程化、配置治理、日志、Tracing、数据库、事务、Web 服务实践、队列与 Worker、NestJS 实践
 - `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、通知 / 邮件 / 短信 / Push、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践

@@ -4,6 +4,7 @@ import { aiSection } from './ai'
 import { architectureSection } from './architecture'
 import { golangSection } from './golang'
 import { pythonSection } from './python'
+import { nodejsSection } from './nodejs'
 import { rustSection } from './rust'
 import { mysqlSection } from './mysql'
 import { redisSection } from './redis'
@@ -22,6 +23,7 @@ export const sections: SectionConfig[] = [
   architectureSection,
   golangSection,
   pythonSection,
+  nodejsSection,
   rustSection,
   mysqlSection,
   redisSection,
