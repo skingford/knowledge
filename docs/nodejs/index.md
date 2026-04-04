@@ -1,7 +1,7 @@
 ---
 layout: page
 title: false
-description: Node.js 专题入口，覆盖模块系统、运行时、高并发治理、配置治理、可观测性、监控告警与压测演练、导出与大结果集治理、Feature Flag 与运行时治理、Webhook 与回调边界、数据库边界、测试工程化、Web 服务与 NestJS 工程实践。
+description: Node.js 专题入口，覆盖模块系统、运行时、高并发治理、配置治理、Secrets 与凭证轮换、可观测性、监控告警与压测演练、导出与大结果集治理、Feature Flag 与运行时治理、Webhook 与回调边界、数据库边界、测试工程化、Web 服务与 NestJS 工程实践。
 search: false
 aside: false
 outline: false
@@ -42,18 +42,19 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 6. 再读 [Node.js Redis 实战：客户端、连接池、Pipeline 与 Lua 脚本边界](./redis-client-pipeline-and-lua-practice.md)，把 Redis client 复用、key 设计、Pipeline、Lua 和高并发下的热点治理边界立住
 7. 再读 [Node.js 限流、超时与过载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)，把 rate limit、concurrency limit、timeout、backpressure 和快速失败这些高并发保护边界拆开理解
 8. 再读 [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md)，把第三方依赖调用、timeout、重试预算、退避和熔断这条下游保护主线立住
-9. 再读 [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)，把原始 body 验签、重放防护、2xx/5xx 返回语义、重复回调和异步解耦讲清
+9. 再读 [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)，把原始 body 验签、重放防护、2xx/5xx 返回语义、重复回调和异步解耦讲清
 10. 再读 [Node.js 秒杀 / 抢券系统实践](./seckill-and-coupon-claim-system-practice.md)，把限流、资格校验、Redis 预扣减、异步排队、幂等补偿和结果查询放回同一个典型业务里理解
 11. 再读 [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)，把重复请求、状态推进、本地事务、Outbox 和补偿放回同一条一致性主线
 12. 然后读 [Node.js 测试、Mock 与工程化实践](./testing-mock-and-engineering-practice.md)，把项目结构、依赖管理、测试分层和 CI 基本盘补齐
 13. 再读 [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md)，把配置收口、结构化日志、trace 和指标主线理顺
 14. 再读 [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)，把 runtime 指标、依赖指标、业务指标、告警分级、压测和演练闭环理顺
 15. 再读 [Node.js Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)，把灰度放量、kill switch、request 级 snapshot、回退与拆除治理讲清
-16. 再读 [Node.js 数据库、事务与 ORM/Query Builder 实践](./database-transaction-and-orm-practice.md)，把事务边界、连接管理、Repository 和 ORM 取舍讲清
-17. 再读 [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)，把异步链路、重试、幂等和优雅关闭主线理顺
-18. 再读 [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)，把异步导出、游标扫描、流式生成、对象存储交付和导出配额讲清
-19. 然后读 [Express / Fastify Web 服务实践](./express-fastify-web-service-practice.md)，把 Node.js Web 服务的路由、中间件、错误处理和分层边界讲清
-20. 最后看 [NestJS 实战指南](./nestjs-practice-guide.md)，把框架能力放回 Node.js 服务端整体工程里理解
+16. 再读 [Node.js Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)，把 secret 注入、日志脱敏、Webhook / JWT 兼容窗口、对象存储凭证和外部 API token 轮换这条主线补齐
+17. 再读 [Node.js 数据库、事务与 ORM/Query Builder 实践](./database-transaction-and-orm-practice.md)，把事务边界、连接管理、Repository 和 ORM 取舍讲清
+18. 再读 [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)，把异步链路、重试、幂等和优雅关闭主线理顺
+19. 再读 [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)，把异步导出、游标扫描、流式生成、对象存储交付和导出配额讲清
+20. 然后读 [Express / Fastify Web 服务实践](./express-fastify-web-service-practice.md)，把 Node.js Web 服务的路由、中间件、错误处理和分层边界讲清
+21. 最后看 [NestJS 实战指南](./nestjs-practice-guide.md)，把框架能力放回 Node.js 服务端整体工程里理解
 
 ## 这个专题的重点
 
@@ -66,6 +67,7 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 - 把典型高并发业务场景单独落地：秒杀、抢券、资格发放、异步排队、结果查询和补偿收口
 - 把一致性问题单独收成执行主线：幂等、状态机、Outbox、本地事务、补偿和最终一致性
 - 让配置、日志、Tracing、数据库事务这些真正影响线上稳定性的基础设施边界尽早收口
+- 把 Secrets、签名密钥、短期凭证和对象存储访问能力单独收成生命周期边界，不和普通配置混在一起
 - 把可观测性继续推进到监控、告警、压测和故障演练，不只停留在“能看日志和图表”
 - 把导出、报表和大结果集从“顺手做个下载接口”升级成异步任务、流式生成、对象存储交付和清理回收的完整链路
 - 把 Feature Flag、灰度、kill switch 和运行时回退从“几个临时 bool”升级成可观测、可审计、可拆除的治理体系
@@ -86,13 +88,14 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 | [Node.js Redis 实战：客户端、连接池、Pipeline 与 Lua 脚本边界](./redis-client-pipeline-and-lua-practice.md) | 重点补 Redis client 复用、Pipeline、Lua、热点 Key、大 Key、慢命令和高并发治理边界 |
 | [Node.js 限流、超时与过载保护实践](./rate-limit-timeout-and-overload-protection-practice.md) | 重点补 rate limit、并发限制、timeout、backpressure、快速失败和高风险接口保护组合 |
 | [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md) | 重点补 client 复用、timeout、错误分层、重试预算、退避、熔断和下游保护边界 |
-| [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md) | 重点补原始 body 验签、时间戳与重放防护、重复与乱序回调、2xx/5xx 返回语义和异步解耦 |
+| [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice) | 重点补原始 body 验签、时间戳与重放防护、重复与乱序回调、2xx/5xx 返回语义和异步解耦 |
 | [Node.js 秒杀 / 抢券系统实践](./seckill-and-coupon-claim-system-practice.md) | 重点补活动预热、资格校验、限流削峰、Redis 预扣减、异步排队、补偿和结果查询主线 |
 | [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md) | 重点补重复请求、状态推进、本地事务、Outbox、异步补偿和最终一致性主线 |
 | [Node.js 测试、Mock 与工程化实践](./testing-mock-and-engineering-practice.md) | 重点补目录结构、依赖管理、单元/集成/e2e 测试、Mock 边界、日志配置和 CI |
 | [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md) | 重点补配置收口、request id、trace、结构化日志、metrics 和线上排障观测 |
 | [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md) | 重点补 runtime / 依赖 / 队列 / 业务四层指标、告警分级、压测建模、故障演练与阈值回写 |
 | [Node.js Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md) | 重点补静态配置与运行时开关分层、灰度放量、kill switch、snapshot、审计观测与拆除治理 |
+| [Node.js Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md) | 重点补普通配置 / secret / 签名密钥 / 短期凭证区分、脱敏、兼容窗口、client 边界和轮换生效策略 |
 | [Node.js 数据库、事务与 ORM/Query Builder 实践](./database-transaction-and-orm-practice.md) | 重点补连接管理、事务边界、Repository 分层、Prisma/ORM/Query Builder 取舍和常见坑 |
 | [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md) | 重点补异步任务拆分、BullMQ / 队列思维、重试幂等、死信、调度和优雅退出 |
 | [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md) | 重点补同步小导出、异步导出任务、游标扫描、流式生成、对象存储交付、配额与过期清理 |

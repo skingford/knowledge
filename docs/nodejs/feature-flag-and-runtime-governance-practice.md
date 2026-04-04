@@ -185,6 +185,10 @@ Node.js 服务里一个非常常见的问题是：
 - [Express / Fastify Web 服务实践](./express-fastify-web-service-practice.md)
 - [NestJS 实战指南](./nestjs-practice-guide.md)
 
+如果你还想把静态配置、运行时开关和 secret / 凭证轮换边界拆开看，继续看：
+
+- [Node.js Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
+
 ## 灰度、kill switch、dark launch、shadow read / write 要先分清
 
 这些词经常被混着用，但治理目标不同。

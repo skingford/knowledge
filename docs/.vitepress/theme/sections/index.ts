@@ -2,6 +2,7 @@ import type { SectionConfig } from './types'
 
 import { aiSection } from './ai'
 import { architectureSection } from './architecture'
+import { networkSection } from './network'
 import { golangSection } from './golang'
 import { pythonSection } from './python'
 import { nodejsSection } from './nodejs'
@@ -21,6 +22,7 @@ import { toolsSection } from './tools'
 export const sections: SectionConfig[] = [
   aiSection,
   architectureSection,
+  networkSection,
   golangSection,
   pythonSection,
   nodejsSection,

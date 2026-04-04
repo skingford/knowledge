@@ -238,6 +238,10 @@ Node.js 服务至少建议先盯这些指标：
 - 在日志边界层统一处理
 - 不要把脱敏责任留给每个业务同学手动判断
 
+如果你想把 secret 注入、日志脱敏、JWK / webhook secret 兼容窗口和凭证轮换策略单独理顺，继续看：
+
+- [Node.js Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
+
 ## 告警不要只盯 500
 
 很多线上事故不一定先表现成 500 暴涨，也可能先表现为：

@@ -304,7 +304,7 @@ Outbox 更稳的核心思路通常是：
 
 如果你想把原始 body 验签、时间戳、防重放和回调入口返回语义单独理顺，继续看：
 
-- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+- [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)
 
 ### 2. 秒杀 / 抢券结果落账
 

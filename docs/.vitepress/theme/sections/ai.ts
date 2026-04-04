@@ -3,12 +3,12 @@ import type { SectionConfig } from './types'
 export const aiSection: SectionConfig = {
   key: 'ai',
   base: '/ai/',
-  navText: 'AI / Agent',
+  navText: 'Agent',
   overviewDescription:
     '适合希望系统入门 Agent 和 LLM 应用开发的工程师，重点是 Agent、Tool Calling、RAG 与 workflow。',
   landing: {
-    eyebrow: 'AI / Agent',
-    title: 'AI / Agent 方向',
+    eyebrow: 'Agent',
+    title: 'Agent 方向',
     intro:
       '从 Agent 模式、Tool Calling、RAG 到 workflow 设计，把零散资料收敛成一条更适合工程师持续推进的学习路径。',
     primary: { title: '知识地图', href: '/ai/knowledge-map', description: '先建立全局地图。' },

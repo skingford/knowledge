@@ -446,7 +446,7 @@ Node.js 高并发业务里，业务指标通常比机器指标更早暴露问题
 
 如果你想把 webhook 回调入口的验签、重试语义和异步收口单独理顺，继续看：
 
-- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+- [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)
 
 ### 4. 队列 backlog、consumer timeout 或死信上升
 

@@ -296,7 +296,7 @@ Web 服务测试至少建议覆盖：
 
 如果你想把外部回调入口、原始 body 验签和回调返回语义单独理顺，继续看：
 
-- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+- [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)
 
 ## 和 NestJS 的关系
 

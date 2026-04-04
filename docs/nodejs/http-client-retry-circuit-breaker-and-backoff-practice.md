@@ -159,6 +159,10 @@ export class UserCenterClient {
 - [Express / Fastify Web 服务实践](./express-fastify-web-service-practice.md)
 - [NestJS 实战指南](./nestjs-practice-guide.md)
 
+如果你还想把外部 API token、对象存储凭证、client 边界与凭证轮换策略一起理顺，继续看：
+
+- [Node.js Secrets、密钥与凭证轮换实践](./secret-management-and-credential-rotation-practice.md)
+
 ## timeout 必须显式设计，而且要分层
 
 timeout 最容易被误解成：
@@ -377,7 +381,7 @@ Node.js 调下游时，最常见的误区是：
 
 如果你想把 webhook、原始 body 验签、重复投递和 2xx / 5xx 返回语义单独理顺，继续看：
 
-- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+- [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)
 
 ### 4. 后台批量同步
 

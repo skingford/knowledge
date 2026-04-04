@@ -427,7 +427,7 @@ timeout 真正保证的是：
 
 如果你想把 webhook、签名校验、重复投递和最小回调入口设计单独理顺，继续看：
 
-- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+- [Node.js Webhook、回调与签名校验实践](/nodejs/webhook-and-callback-practice)
 
 ## 指标与压测怎么验证保护是否生效
 

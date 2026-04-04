@@ -26,19 +26,21 @@ const sidebar = Object.fromEntries(
     .map((section) => [section.base, section.sidebar]),
 )
 
-const sectionNavItems = sections
-  .filter((section) => section.key !== 'tools')
-  .map((section) => ({
-  text: section.navText,
-  link: section.base,
-  activeMatch: `^${section.base}`,
-}))
+const sectionsByKey = Object.fromEntries(
+  sections.map((s) => [s.key, s]),
+)
+
+function navItem(key: string) {
+  const s = sectionsByKey[key]
+  return { text: s.navText, link: s.base, activeMatch: `^${s.base}` }
+}
+
 
 export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
-  description: '涵盖 AI / Agent、架构设计、Golang、Python、Node.js、Rust、Git、运维与工具的学习资料、路线图与专题索引',
+  description: '涵盖 AI / Agent、架构设计、网络、Golang、Python、Node.js、Rust、Git、运维与工具的学习资料、路线图与专题索引',
 
   base: siteBase,
   srcExclude: ['README.md', 'TEMPLATE.md'],
@@ -46,6 +48,7 @@ export default defineConfig({
     'golang/legacy/golang-advanced-learning-guide.md': 'golang/golang-advanced-learning-guide.md',
     'golang/legacy/golang-recommended-resources.md': 'golang/golang-recommended-resources.md',
     'golang/guide/legacy/09-runtime-source.md': 'golang/guide/09-runtime-source.md',
+    'architecture/high-concurrency-system-design-core-points.md': 'architecture/architecture.md',
   },
   lastUpdated: true,
   appearance: true,
@@ -142,19 +145,36 @@ export default defineConfig({
     nav: [
       quickNavLink,
       {
-        text: '学习方向',
-        items: [{ text: '学习导航总览', link: '/learning-overview' }, ...sectionNavItems],
+        text: 'AI/架构',
+        items: [
+          { text: '学习导航总览', link: '/learning-overview' },
+          navItem('ai'),
+          navItem('architecture'),
+          navItem('network'),
+        ],
+      },
+      {
+        text: '编程语言',
+        items: [navItem('golang'), navItem('python'), navItem('nodejs'), navItem('rust')],
+      },
+      {
+        text: '数据与中间件',
+        items: [navItem('mysql'), navItem('postgresql'), navItem('redis'), navItem('kafka'), navItem('etcd')],
+      },
+      {
+        text: '基础设施',
+        items: [navItem('docker'), navItem('nginx'), navItem('k8s'), navItem('ops'), navItem('git')],
       },
       {
         text: '工具',
         items: [
-          { text: 'Claude Code 使用指南', link: '/tools/claude-code' },
-          { text: 'Codex 使用指南', link: '/tools/codex' },
-          { text: 'Gemini CLI 使用指南', link: '/tools/gemini-cli' },
-          { text: 'Cursor 使用指南', link: '/tools/cursor' },
-          { text: 'Vim 实用方案', link: '/tools/vim' },
-          { text: 'iTerm2 配置指南', link: '/tools/iterm2' },
-          { text: 'Mac 效率工具', link: '/tools/mac' },
+          { text: 'Claude Code', link: '/tools/claude-code' },
+          { text: 'Codex', link: '/tools/codex' },
+          { text: 'Gemini', link: '/tools/gemini-cli' },
+          { text: 'Cursor', link: '/tools/cursor' },
+          { text: 'Vim', link: '/tools/vim' },
+          { text: 'iTerm2', link: '/tools/iterm2' },
+          { text: 'Mac', link: '/tools/mac' },
         ]
       }
     ],
