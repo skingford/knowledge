@@ -183,7 +183,8 @@ brew install --cask rectangle
 
 | 工具 | 用途 | 安装方式 |
 |------|------|---------|
-| Warp / Ghostty | 现代终端 | `brew install --cask warp` |
+| [Ghostty](./ghostty.md) | 现代终端 | `brew install --cask ghostty` |
+| Warp | AI 终端 | `brew install --cask warp` |
 | Dash / DevDocs | 离线文档查阅 | `brew install --cask dash` |
 | Bruno | API 调试（开源替代 Postman） | `brew install --cask bruno` |
 | Sourcetree | Git GUI 客户端 | `brew install --cask sourcetree` |

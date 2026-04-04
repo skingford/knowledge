@@ -1,7 +1,7 @@
 ---
 layout: page
 title: false
-description: 工具方向入口，收录 Vim、iTerm2、Git 和 Mac 开发效率工具的实用配置与技巧。
+description: 工具方向入口，收录 AI 编码工具、Vim、iTerm2、Ghostty 和 Mac 开发效率工具的实用配置与技巧。
 search: false
 aside: false
 outline: false
@@ -62,11 +62,12 @@ const { landing } = sections.find((section) => section.key === 'tools')!
 - [Cursor 使用指南](./cursor.md)：编辑器能力、Agent、Rules、Memories、MCP、Background Agents、Bugbot
 - [Vim 实用方案](./vim.md)：编辑习惯、快捷键、配置和插件
 - [iTerm2 配置指南](./iterm2.md)：终端外观、快捷操作、Shell 集成和效率优化
+- [Ghostty 使用指南](./ghostty.md)：安装、配置文件、主题、Shell Integration、Quick Terminal、AppleScript
 - [Mac 效率工具](./mac.md)：包管理、开发环境和系统级效率工具
 
 ## 建议阅读顺序
 
 1. 先看 [Claude Code 使用指南](./claude-code.md) 和 [Codex 使用指南](./codex.md)，把终端型 AI 编码工作流和项目级上下文建立起来
 2. 再读 [Gemini CLI 使用指南](./gemini-cli.md) 和 [Cursor 使用指南](./cursor.md)，补齐另一类 CLI / 编辑器 Agent 的使用方式
-3. 然后进入 [Vim 实用方案](./vim.md) 和 [iTerm2 配置指南](./iterm2.md)，把本地编辑器和终端工作台打磨顺手
+3. 然后进入 [Vim 实用方案](./vim.md)、[iTerm2 配置指南](./iterm2.md) 和 [Ghostty 使用指南](./ghostty.md)，把本地编辑器和终端工作台打磨顺手
 4. 最后用 [Mac 效率工具](./mac.md) 把开发机环境和系统级效率工具补齐

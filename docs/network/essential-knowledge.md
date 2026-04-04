@@ -302,5 +302,6 @@ CDN 解决的是：
 
 - 想把协议主线讲深：读 [TCP/IP、HTTP 与 HTTPS 主线](./tcp-ip-http-and-https.md)
 - 想补线上基础设施链路：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
+- 想补 NAT、访问控制和远程接入：读 [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)
 - 想把命令和排障动作练熟：读 [网络排障与常用命令](./troubleshooting-and-commands.md)
 - 想拿一份问答清单做复习：读 [网络高频问题与自检清单](./essential-questions.md)

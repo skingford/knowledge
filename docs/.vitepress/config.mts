@@ -174,6 +174,7 @@ export default defineConfig({
           { text: 'Cursor', link: '/tools/cursor' },
           { text: 'Vim', link: '/tools/vim' },
           { text: 'iTerm2', link: '/tools/iterm2' },
+          { text: 'Ghostty', link: '/tools/ghostty' },
           { text: 'Mac', link: '/tools/mac' },
         ]
       }

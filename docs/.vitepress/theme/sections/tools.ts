@@ -5,11 +5,11 @@ export const toolsSection: SectionConfig = {
     base: '/tools/',
     navText: '工具',
     overviewDescription:
-      '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Mac 等日常开发工具的实用配置和技巧。',
+      '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Ghostty、Mac 等日常开发工具的实用配置和技巧。',
     landing: {
       eyebrow: 'Tools',
       title: '工具方向',
-      intro: '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Mac 等日常开发工具的实用配置和技巧，提升开发效率。',
+      intro: '收录 Claude Code、Codex、Gemini CLI、Cursor、Vim、iTerm2、Ghostty、Mac 等日常开发工具的实用配置和技巧，提升开发效率。',
       primary: { title: 'Claude Code 使用指南', href: '/tools/claude-code', description: '整理安装、权限模式、CLAUDE.md、MCP、Hooks 与 VS Code 工作流。' },
       secondary: { title: 'Codex 使用指南', href: '/tools/codex', description: '整理 CLI、IDE、App、Cloud、AGENTS.md、MCP、skills 与自动化用法。' },
       scope: [
@@ -19,6 +19,7 @@ export const toolsSection: SectionConfig = {
         'Cursor / Agent / Rules / MCP / Background Agents',
         'Vim 编辑器配置与技巧',
         'iTerm2 终端美化与效率',
+        'Ghostty 终端配置与自动化',
         'Mac 开发环境与效率工具',
       ],
       docs: [
@@ -28,9 +29,10 @@ export const toolsSection: SectionConfig = {
         { title: 'Cursor 使用指南', href: '/tools/cursor', description: '整理安装、Tab、Inline Edit、Agent、Rules、MCP、Background Agents、Bugbot 与 CLI 用法。' },
         { title: 'Vim 实用方案', href: '/tools/vim', description: 'Vim 编辑器的实用配置、快捷键和插件推荐。' },
         { title: 'iTerm2 配置指南', href: '/tools/iterm2', description: 'iTerm2 终端的美化配置、快捷操作和效率提升。' },
+        { title: 'Ghostty 使用指南', href: '/tools/ghostty', description: '整理安装、配置文件、主题、Shell Integration、Quick Terminal 与 AppleScript。' },
         { title: 'Mac 效率工具', href: '/tools/mac', description: 'Mac 开发环境搭建和效率工具推荐。' },
       ],
-      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Mac 效率工具'],
+      order: ['Claude Code 使用指南', 'Codex 使用指南', 'Gemini CLI 使用指南', 'Cursor 使用指南', 'Vim 实用方案', 'iTerm2 配置指南', 'Ghostty 使用指南', 'Mac 效率工具'],
     },
     sidebar: [
       {
@@ -43,6 +45,7 @@ export const toolsSection: SectionConfig = {
           { text: 'Cursor', link: '/tools/cursor' },
           { text: 'Vim', link: '/tools/vim' },
           { text: 'iTerm2', link: '/tools/iterm2' },
+          { text: 'Ghostty', link: '/tools/ghostty' },
           { text: 'Mac 工具', link: '/tools/mac' },
         ],
       },
