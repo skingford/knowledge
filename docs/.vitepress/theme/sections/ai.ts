@@ -3,12 +3,12 @@ import type { SectionConfig } from './types'
 export const aiSection: SectionConfig = {
   key: 'ai',
   base: '/ai/',
-  navText: 'AI / Agent',
+  navText: 'Agent',
   overviewDescription:
     '适合希望系统入门 Agent 和 LLM 应用开发的工程师，重点是 Agent、Tool Calling、RAG 与 workflow。',
   landing: {
-    eyebrow: 'AI / Agent',
-    title: 'AI / Agent 方向',
+    eyebrow: 'Agent',
+    title: 'Agent 方向',
     intro:
       '从 Agent 模式、Tool Calling、RAG 到 workflow 设计，把零散资料收敛成一条更适合工程师持续推进的学习路径。',
     primary: { title: '知识地图', href: '/ai/knowledge-map', description: '先建立全局地图。' },
@@ -39,27 +39,27 @@ export const aiSection: SectionConfig = {
   },
   sidebar: [
     {
-      text: 'AI / Agent',
+      text: 'AI 专题',
       items: [
         { text: '方向概览', link: '/ai/' },
-        { text: 'Agent 学习综合指南', link: '/ai/agent-learning-guide' },
-        { text: '7 天 Agent 学习路线', link: '/ai/agent-learning-roadmap' },
-        { text: 'Tool Calling 设计清单', link: '/ai/tool-calling-design-checklist' },
-        { text: 'RAG 基础与工作流', link: '/ai/rag-basics-and-workflow' },
-        { text: '待补主题清单', link: '/ai/todo-topics' },
+        { text: '综合指南', link: '/ai/agent-learning-guide' },
+        { text: '七天路线', link: '/ai/agent-learning-roadmap' },
+        { text: 'Tool 清单', link: '/ai/tool-calling-design-checklist' },
+        { text: 'RAG 基础', link: '/ai/rag-basics-and-workflow' },
+        { text: '待补清单', link: '/ai/todo-topics' },
       ],
     },
     {
-      text: '7 天学习路线详解',
+      text: '七天路线',
       collapsed: true,
       items: [
-        { text: 'Day 1: 理解 Agent 是什么', link: '/ai/roadmap/day1-what-is-agent' },
-        { text: 'Day 2: 学会调用 LLM API', link: '/ai/roadmap/day2-llm-api' },
-        { text: 'Day 3: 学会 Tool Calling', link: '/ai/roadmap/day3-tool-calling' },
-        { text: 'Day 4: 学习 Workflow', link: '/ai/roadmap/day4-workflow' },
-        { text: 'Day 5: RAG 和 Memory', link: '/ai/roadmap/day5-rag-memory' },
-        { text: 'Day 6: 评测与安全', link: '/ai/roadmap/day6-eval-safety' },
-        { text: 'Day 7: 完整项目', link: '/ai/roadmap/day7-full-project' },
+        { text: 'D1 Agent 概念', link: '/ai/roadmap/day1-what-is-agent' },
+        { text: 'D2 LLM API', link: '/ai/roadmap/day2-llm-api' },
+        { text: 'D3 Tool 调用', link: '/ai/roadmap/day3-tool-calling' },
+        { text: 'D4 Workflow', link: '/ai/roadmap/day4-workflow' },
+        { text: 'D5 RAG 记忆', link: '/ai/roadmap/day5-rag-memory' },
+        { text: 'D6 评测安全', link: '/ai/roadmap/day6-eval-safety' },
+        { text: 'D7 完整项目', link: '/ai/roadmap/day7-full-project' },
       ],
     },
   ],

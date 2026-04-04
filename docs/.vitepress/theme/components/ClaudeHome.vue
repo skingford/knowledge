@@ -10,7 +10,7 @@ import { homeHighlights as highlights, homePrinciples as principles, homeTracks 
         <p class="claude-home__eyebrow">A focused knowledge base</p>
         <h1 class="claude-home__title">学习知识库</h1>
         <p class="claude-home__subtitle">
-          AI、架构、Golang、数据库、中间件、K8s、运维与工具多个方向，按长期学习更自然的方式重组资料、路线图和自检清单。
+          AI、架构、Golang、Python、Node.js、数据库、中间件、K8s、运维与工具多个方向，按长期学习更自然的方式重组资料、路线图和自检清单。
         </p>
         <div class="claude-home__actions">
           <a

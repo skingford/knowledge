@@ -141,7 +141,7 @@ export const k8sSection: SectionConfig = {
         ],
       },
       {
-        text: 'Pod 与负载',
+        text: 'Pod 负载',
         collapsed: true,
         items: [
           { text: 'Pod 生命周期', link: '/k8s/pod-lifecycle-and-probes' },
@@ -153,7 +153,7 @@ export const k8sSection: SectionConfig = {
         ],
       },
       {
-        text: '调度与资源',
+        text: '调度资源',
         collapsed: true,
         items: [
           { text: '调度与驱逐', link: '/k8s/scheduling-and-eviction' },
@@ -180,11 +180,11 @@ export const k8sSection: SectionConfig = {
         ],
       },
       {
-        text: '网络与发现',
+        text: '网络发现',
         collapsed: true,
         items: [
           { text: '服务暴露', link: '/k8s/service-exposure-and-traffic-entry' },
-          { text: 'Ingress 与 Gateway', link: '/k8s/ingress-and-gateway-controller-chain' },
+          { text: 'Ingress', link: '/k8s/ingress-and-gateway-controller-chain' },
           { text: 'CoreDNS', link: '/k8s/coredns-and-service-discovery' },
           { text: '后端收敛', link: '/k8s/service-backend-readiness-and-endpointslice' },
           { text: 'kube-proxy', link: '/k8s/kube-proxy-and-service-dataplane' },
@@ -196,22 +196,22 @@ export const k8sSection: SectionConfig = {
         ],
       },
       {
-        text: '安全与权限',
+        text: '安全权限',
         collapsed: true,
         items: [
           { text: '认证与授权', link: '/k8s/authn-authz-and-isolation' },
-          { text: 'SA 与身份', link: '/k8s/serviceaccount-token-and-pod-identity' },
+          { text: 'SA 身份', link: '/k8s/serviceaccount-token-and-pod-identity' },
           { text: 'RBAC 权限', link: '/k8s/rbac-and-least-privilege' },
           { text: 'Pod 安全', link: '/k8s/pod-security-and-security-context' },
           { text: '准入治理', link: '/k8s/admission-policy-and-governance' },
           { text: '镜像安全', link: '/k8s/image-security-and-supply-chain-governance' },
-          { text: 'Secret 管理', link: '/k8s/secret-security-and-external-secret-management' },
+          { text: 'Secret', link: '/k8s/secret-security-and-external-secret-management' },
           { text: 'API 审计', link: '/k8s/api-auditing-and-audit-policy-boundary' },
-          { text: '命名空间配额', link: '/k8s/namespace-resource-governance-and-quota' },
+          { text: '命名配额', link: '/k8s/namespace-resource-governance-and-quota' },
         ],
       },
       {
-        text: '控制面与节点',
+        text: '控制面',
         collapsed: true,
         items: [
           { text: '控制面主线', link: '/k8s/control-plane-mainline' },
@@ -221,17 +221,17 @@ export const k8sSection: SectionConfig = {
         ],
       },
       {
-        text: '进阶与生态',
+        text: '进阶生态',
         collapsed: true,
         items: [
-          { text: 'CRD 与 Operator', link: '/k8s/crd-operator-and-extension' },
-          { text: 'Helm 包管理', link: '/k8s/helm-and-package-management' },
+          { text: 'CRD 扩展', link: '/k8s/crd-operator-and-extension' },
+          { text: 'Helm', link: '/k8s/helm-and-package-management' },
           { text: '可观测性', link: '/k8s/observability-and-monitoring' },
-          { text: 'GitOps 交付', link: '/k8s/gitops-and-delivery' },
+          { text: 'GitOps', link: '/k8s/gitops-and-delivery' },
           { text: '实战部署', link: '/k8s/production-deployment-guide' },
           { text: '离线搭建', link: '/k8s/offline-cluster-setup-guide' },
           { text: '管理面板', link: '/k8s/dashboard-and-management-ui' },
-          { text: '集群搭建实操', link: '/k8s/cluster-setup-kubeadm-kubesphere' },
+          { text: '集群实操', link: '/k8s/cluster-setup-kubeadm-kubesphere' },
         ],
       },
     ],

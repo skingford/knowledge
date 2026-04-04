@@ -15,17 +15,19 @@ export interface SectionLandingContent {
   order: string[]
 }
 
-interface Items {
+export interface SidebarItem {
   text: string;
   link: string;
-  items?: Items[];
+  items?: SidebarItem[];
 }
 
 export interface SidebarGroup {
   text: string
   collapsed?: boolean
-  items: Items[]
+  items: SidebarItem[]
 }
+
+export type SidebarEntry = SidebarGroup | SidebarItem
 
 export interface SectionConfig {
   key: string
@@ -33,5 +35,5 @@ export interface SectionConfig {
   navText: string
   overviewDescription: string
   landing: SectionLandingContent
-  sidebar: SidebarGroup[]
+  sidebar: SidebarEntry[]
 }

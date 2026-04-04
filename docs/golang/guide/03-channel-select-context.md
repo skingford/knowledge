@@ -12,6 +12,7 @@ Channel 是 Go 中 Goroutine 间通信的核心机制，遵循 CSP（Communicati
 
 ### 基本用法：无缓冲与有缓冲
 
+::: details 点击查看代码：无缓冲与有缓冲 Channel
 ```go
 package main
 
@@ -36,11 +37,13 @@ func main() {
 	fmt.Println("buffered:", <-buffered, <-buffered, <-buffered)
 }
 ```
+:::
 
 <GoChannelDiagram kind="buffered-vs-unbuffered" />
 
 ### 单向 Channel 与关闭
 
+::: details 点击查看代码：单向 Channel 与关闭
 ```go
 package main
 
@@ -68,6 +71,7 @@ func main() {
 	consume(ch)
 }
 ```
+:::
 
 <GoChannelDiagram kind="channel-close" />
 
@@ -83,6 +87,7 @@ func main() {
 | **Processor** | 加工区 | 从上一条传送带拿数据，处理后放到下一条传送带（可以有多个） |
 | **Sink** | 包装区 | 从最后一条传送带拿出成品，进行最终处理 |
 
+::: details 点击查看代码：Pipeline 模式
 ```go
 package main
 
@@ -120,6 +125,7 @@ func main() {
 	}
 }
 ```
+:::
 
 <GoChannelDiagram kind="pipeline" />
 
@@ -135,6 +141,7 @@ func main() {
 
 解决方案：在全厂安装**广播大喇叭**（`context`），配合 `select` 让每个阶段同时"干活"和"听广播"：
 
+::: details 点击查看代码：防泄漏的流水线（context + select）
 ```go
 package main
 
@@ -195,6 +202,7 @@ func main() {
 	fmt.Println("流水线安全停机")
 }
 ```
+:::
 
 三个关键防御性技巧：
 
@@ -204,6 +212,7 @@ func main() {
 
 ### Fan-out / Fan-in 模式
 
+::: details 点击查看代码：Fan-out / Fan-in 模式
 ```go
 package main
 
@@ -255,6 +264,7 @@ func main() {
 	}
 }
 ```
+:::
 
 <GoChannelDiagram kind="fan-in-out" />
 
@@ -287,6 +297,7 @@ func main() {
 
 ### 基本用法与随机选择
 
+::: details 点击查看代码：基本用法与随机选择
 ```go
 package main
 
@@ -311,9 +322,11 @@ func main() {
 	}
 }
 ```
+:::
 
 ### default 实现非阻塞收发
 
+::: details 点击查看代码：default 实现非阻塞收发
 ```go
 package main
 
@@ -339,11 +352,13 @@ func main() {
 	}
 }
 ```
+:::
 
 <GoChannelDiagram kind="select-flow" />
 
 ### 超时控制
 
+::: details 点击查看代码：超时控制
 ```go
 package main
 
@@ -369,9 +384,11 @@ func main() {
 	}
 }
 ```
+:::
 
 ### 用 select 实现心跳与退出
 
+::: details 点击查看代码：用 select 实现心跳与退出
 ```go
 package main
 
@@ -406,6 +423,7 @@ func main() {
 	fmt.Println("main: done")
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -423,6 +441,7 @@ func main() {
 
 ### WithCancel
 
+::: details 点击查看代码：WithCancel
 ```go
 package main
 
@@ -459,9 +478,11 @@ func main() {
 	fmt.Println("all workers stopped")
 }
 ```
+:::
 
 ### WithTimeout / WithDeadline
 
+::: details 点击查看代码：WithTimeout / WithDeadline
 ```go
 package main
 
@@ -505,9 +526,11 @@ func main() {
 	}
 }
 ```
+:::
 
 ### WithValue 传递请求级数据
 
+::: details 点击查看代码：WithValue 传递请求级数据
 ```go
 package main
 
@@ -538,9 +561,11 @@ func main() {
 	handleRequest(ctx)
 }
 ```
+:::
 
 ### Context 传播链
 
+::: details 点击查看代码：Context 传播链
 ```go
 package main
 
@@ -576,6 +601,7 @@ func main() {
 	serviceA(ctx) // serviceA 内部设置了 2 秒超时，所以 serviceB 会在 2 秒后被取消
 }
 ```
+:::
 
 <GoChannelDiagram kind="context-tree" />
 
@@ -590,6 +616,7 @@ func main() {
 
 #### 核心接口
 
+::: details 点击查看代码：核心接口
 ```go
 type Context interface {
     Deadline() (deadline time.Time, ok bool) // 是否有截止时间
@@ -598,6 +625,7 @@ type Context interface {
     Value(key any) any                      // 请求域的值
 }
 ```
+:::
 
 #### 树根：emptyCtx
 
@@ -607,6 +635,7 @@ type Context interface {
 
 `context.WithCancel(parent)` 底层会把 parent 包装进一个 `cancelCtx`：
 
+::: details 点击查看代码：cancelCtx 的内部构造
 ```go
 type cancelCtx struct {
     Context                          // 匿名字段，保存父节点指针（向上查找）
@@ -616,6 +645,7 @@ type cancelCtx struct {
     err      error                   // 取消原因
 }
 ```
+:::
 
 双向关联的秘密：
 - **向上查找**：通过内嵌的 `Context` 字段，子节点知道父亲是谁
@@ -642,12 +672,14 @@ type cancelCtx struct {
 
 `context.WithValue(parent, key, val)` 底层生成 `valueCtx`：
 
+::: details 点击查看代码：valueCtx 的 O(N) 陷阱
 ```go
 type valueCtx struct {
     Context      // 指向父节点
     key, val any // 注意：没有 map！只存一对 Key-Value
 }
 ```
+:::
 
 连续存 10 个值后会形成**单向链表**：`ctx10 → ctx9 → … → ctx1 → Background`。
 

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: false
-description: 学习知识库总览页，按方向和学习目标组织 AI、架构、Golang、Python、Rust、Go 源码阅读、运维与工具内容入口。
+description: 学习知识库总览页，按方向和学习目标组织 AI、架构、Golang、Python、Node.js、Rust、Go 源码阅读、运维与工具内容入口。
 search: false
 aside: false
 outline: false

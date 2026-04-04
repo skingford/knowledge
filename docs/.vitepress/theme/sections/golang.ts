@@ -1,8 +1,8 @@
-import type { SidebarGroup, SectionConfig } from './types'
+import type { SidebarEntry, SidebarGroup, SectionConfig } from './types'
 
 const golangSourceReadingSidebar: SidebarGroup[] = [
   {
-    text: '先读这几篇',
+    text: '推荐先读',
     items: [
       { text: 'runtime：GMP 调度器', link: '/golang/guide/source-reading/runtime-scheduler' },
       { text: 'runtime：GC 垃圾回收', link: '/golang/guide/source-reading/runtime-gc' },
@@ -13,7 +13,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: '运行时与并发',
+    text: '运行并发',
     collapsed: true,
     items: [
       { text: 'sync：同步原语', link: '/golang/guide/source-reading/sync-primitives' },
@@ -37,7 +37,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: '标准库基础',
+    text: '标准库',
     collapsed: true,
     items: [
       { text: 'errors：错误链', link: '/golang/guide/source-reading/errors' },
@@ -57,7 +57,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: 'I/O、系统与网络',
+    text: 'IO 与网络',
     collapsed: true,
     items: [
       { text: 'io：接口体系', link: '/golang/guide/source-reading/io-interfaces' },
@@ -99,7 +99,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: '数据、编码与模板',
+    text: '编码模板',
     collapsed: true,
     items: [
       { text: 'encoding/json：编解码', link: '/golang/guide/source-reading/encoding-json' },
@@ -122,7 +122,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: '安全与密码学',
+    text: '安全密码',
     collapsed: true,
     items: [
       { text: 'crypto/tls：TLS 实现', link: '/golang/guide/source-reading/crypto-tls' },
@@ -140,7 +140,7 @@ const golangSourceReadingSidebar: SidebarGroup[] = [
     ],
   },
   {
-    text: '工程实践与工具链',
+    text: '工程工具',
     collapsed: true,
     items: [
       { text: 'log/slog：结构化日志', link: '/golang/guide/source-reading/log-slog' },
@@ -183,6 +183,7 @@ export const golangSection: SectionConfig = {
     docs: [
       { title: 'Go 文档导航', href: '/golang/', description: '先看目录结构，再决定走学习主线、源码主线还是自检入口。' },
       { title: 'Go 学习路径与资料导航', href: '/golang/learning-path', description: 'Go 总体专题导航，负责串联各阶段专题与练习入口。' },
+      { title: 'Go 优秀第三方库专题', href: '/golang/excellent-open-source', description: '按并发、Web、数据访问、CLI、日志和测试整理常用第三方库。' },
       { title: 'Go 源码阅读学习主线', href: '/golang/guide/source-reading/learning-path', description: '统一维护源码阅读路线、方法、runtime 导读与推荐资料。' },
       { title: 'Go 源码精读总览', href: '/golang/guide/source-reading/', description: '按 runtime、网络、编码、工程化等主题浏览源码文章。' },
       { title: 'Go 能力自检与面试准备导航', href: '/golang/interview-prep', description: '统一整理题库、代码片段与专题回查入口。' },
@@ -195,6 +196,7 @@ export const golangSection: SectionConfig = {
     order: [
       'Go 文档导航',
       'Go 学习路径与资料导航',
+      'Go 优秀第三方库专题',
       'Go 源码阅读学习主线',
       'Go 源码精读总览',
       'Go 能力自检与面试准备导航',
@@ -214,16 +216,16 @@ export const golangSection: SectionConfig = {
         { text: '源码主线', link: '/golang/guide/source-reading/learning-path' },
         { text: '精读总览', link: '/golang/guide/source-reading/' },
         { text: '能力自检', link: '/golang/interview-prep' },
-        { text: 'SQL 连接池', link: '/golang/guide/06-database-sql-and-connection' },
-        { text: 'Pprof 排障', link: '/golang/pprof-troubleshooting-guide' },
-        { text: 'Context 边界', link: '/golang/context-usage-boundaries' },
+        { text: 'SQL 连接', link: '/golang/guide/06-database-sql-and-connection' },
+        { text: '性能排障', link: '/golang/pprof-troubleshooting-guide' },
+        { text: '上下文边界', link: '/golang/context-usage-boundaries' },
         { text: '版本特性', link: '/golang/go-version-features' },
-        { text: '高频自检题', link: '/golang/go-top-30-interview-questions' },
-        { text: '自检代码片段', link: '/golang/go-interview-code-snippets' },
+        { text: '高频自检', link: '/golang/go-top-30-interview-questions' },
+        { text: '自检代码', link: '/golang/go-interview-code-snippets' },
       ],
     },
     {
-      text: '学习大纲详解',
+      text: '大纲详解',
       collapsed: true,
       items: [
         {
@@ -321,5 +323,6 @@ export const golangSection: SectionConfig = {
       ],
     },
     ...golangSourceReadingSidebar,
-  ],
+    { text: '第三方专题', link: '/golang/excellent-open-source' },
+  ] satisfies SidebarEntry[],
 }

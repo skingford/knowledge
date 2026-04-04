@@ -57,40 +57,40 @@ export const dockerSection: SectionConfig = {
         ],
       },
       {
-        text: '构建与镜像',
+        text: '构建镜像',
         collapsed: true,
         items: [
-          { text: 'Dockerfile 与构建', link: '/docker/dockerfile-and-image-build' },
+          { text: '镜像构建', link: '/docker/dockerfile-and-image-build' },
         ],
       },
       {
-        text: '仓库与发布',
+        text: '仓库发布',
         collapsed: true,
         items: [
-          { text: '镜像仓库、Harbor 与发布治理', link: '/docker/registry-and-image-governance' },
+          { text: '仓库治理', link: '/docker/registry-and-image-governance' },
         ],
       },
       {
-        text: '运行与数据',
+        text: '运行数据',
         collapsed: true,
         items: [
-          { text: '容器生命周期与运行模型', link: '/docker/container-lifecycle-and-runtime' },
-          { text: '网络、存储与 Compose', link: '/docker/network-storage-and-compose' },
+          { text: '生命周期', link: '/docker/container-lifecycle-and-runtime' },
+          { text: '网络存储', link: '/docker/network-storage-and-compose' },
         ],
       },
       {
-        text: '交付与部署',
+        text: '交付部署',
         collapsed: true,
         items: [
-          { text: 'Compose 部署实践', link: '/docker/compose-deployment-practice' },
+          { text: '部署实践', link: '/docker/compose-deployment-practice' },
         ],
       },
       {
-        text: '安全与运维',
+        text: '安全运维',
         collapsed: true,
         items: [
-          { text: '安全与生产实践', link: '/docker/security-and-production-practice' },
-          { text: '排障与日常运维', link: '/docker/troubleshooting-and-operations' },
+          { text: '安全实践', link: '/docker/security-and-production-practice' },
+          { text: '排障运维', link: '/docker/troubleshooting-and-operations' },
         ],
       },
       {
