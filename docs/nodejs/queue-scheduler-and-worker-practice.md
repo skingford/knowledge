@@ -271,6 +271,14 @@ Node.js 服务关闭时，最怕的是：
 
 - [Node.js 运行时、事件循环与性能排障](./runtime-event-loop-and-performance-troubleshooting.md)
 
+如果你的 worker 会调第三方 HTTP API，建议再补：
+
+- [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md)
+
+如果你的 worker 会用 Redis 做协调、限流、轻量状态或幂等，建议再补：
+
+- [Node.js Redis 实战：客户端、连接池、Pipeline 与 Lua 脚本边界](./redis-client-pipeline-and-lua-practice.md)
+
 ## 队列和请求链路怎么分工
 
 一个很稳的思路通常是：
@@ -287,6 +295,18 @@ Node.js 服务关闭时，最怕的是：
 - 长时间等待第三方结果
 
 否则接口和任务系统会一起失控。
+
+如果你想把队列放回限流、缓存、连接池、Worker 和可观测性一起组成的 Node.js 高并发主线里看，继续看：
+
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+
+如果你想把异步排队、补偿和结果查询放回秒杀 / 抢券系统主线里看，继续看：
+
+- [Node.js 秒杀 / 抢券系统实践](./seckill-and-coupon-claim-system-practice.md)
+
+如果你想把 Outbox、消费端幂等、状态机和补偿单独理顺，继续看：
+
+- [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 
 ## 和 NestJS 怎么衔接
 

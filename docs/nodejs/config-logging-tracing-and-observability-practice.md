@@ -177,6 +177,23 @@ Node.js 服务至少建议先盯这些指标：
 
 如果这些都没有，仅靠日志很难形成稳定排障闭环。
 
+如果你想把 event loop delay、连接池、限流命中、队列积压和容量估算放到同一套高并发治理视角里看，继续看：
+
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+
+如果你想把缓存命中率、回源量、热 key 和删除失败这条缓存观测主线单独补齐，继续看：
+
+- [Node.js 缓存、热点 Key 与缓存一致性实践](./cache-hotkey-and-consistency-practice.md)
+- [Node.js Redis 实战：客户端、连接池、Pipeline 与 Lua 脚本边界](./redis-client-pipeline-and-lua-practice.md)
+
+如果你想把依赖级 timeout、retry、breaker 和下游错误分类的观测边界单独理顺，继续看：
+
+- [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md)
+
+如果你想把幂等命中、状态迁移失败、Outbox 积压和补偿任务这条一致性观测主线单独补齐，继续看：
+
+- [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
+
 ## 配置、日志和请求上下文要一起设计
 
 很多工程问题来自这三条线分开补：

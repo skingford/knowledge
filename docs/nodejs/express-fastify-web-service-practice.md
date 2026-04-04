@@ -224,6 +224,10 @@ src/
 
 否则业务和外部依赖会越来越耦合。
 
+如果你想把 HTTP client 复用、timeout、重试和熔断边界单独理顺，继续看：
+
+- [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md)
+
 ## Web 服务和运行时主线要一起看
 
 很多 Web 服务问题看起来像“路由写得不够好”，本质其实是：
@@ -237,6 +241,8 @@ src/
 
 - [Node.js 运行时、事件循环与性能排障](./runtime-event-loop-and-performance-troubleshooting.md)
 - [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md)
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+- [Node.js 限流、超时与过载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
 
 ## 模块边界和 Web 服务边界也要一起看
 

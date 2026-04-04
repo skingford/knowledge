@@ -76,6 +76,10 @@ Node.js 服务端最容易先散掉的，通常不是路由写法，而是这几
 
 - [Node.js 运行时、事件循环与性能排障](./runtime-event-loop-and-performance-troubleshooting.md)
 - [Node.js 模块系统、ESM/CommonJS 与 monorepo 工程边界](./module-system-esm-commonjs-and-monorepo-boundaries.md)
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+- [Node.js 限流、超时与过载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
+- [Node.js HTTP Client、重试、熔断与退避实践](./http-client-retry-circuit-breaker-and-backoff-practice.md)
+- [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 
 NestJS 的典型请求链路可以先理解成：
 

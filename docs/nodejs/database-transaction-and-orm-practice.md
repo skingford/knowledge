@@ -254,6 +254,22 @@ Node.js 项目里很常见的一种坏味道是：
 
 - [NestJS 实战指南](./nestjs-practice-guide.md)
 
+如果你想把连接池、热点写入、幂等、缓存和异步削峰放回 Node.js 高并发方案里统一看，继续看：
+
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+
+如果你想把写库后删缓存、缓存对象边界和热点读治理单独理顺，继续看：
+
+- [Node.js 缓存、热点 Key 与缓存一致性实践](./cache-hotkey-and-consistency-practice.md)
+
+如果你想把库存 / 配额扣减、最终落账、幂等补偿和结果状态放回秒杀 / 抢券业务链路里看，继续看：
+
+- [Node.js 秒杀 / 抢券系统实践](./seckill-and-coupon-claim-system-practice.md)
+
+如果你想把重复请求、状态推进、Outbox、本地事务和补偿单独收成一致性主线，继续看：
+
+- [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
+
 ## 常见坏味道
 
 - 每个请求里临时 new 数据库客户端

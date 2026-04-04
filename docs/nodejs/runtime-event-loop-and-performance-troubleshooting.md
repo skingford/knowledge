@@ -306,6 +306,10 @@ Node.js 里很多性能问题，不是“功能写错”，而是：
 
 那往往该升级成队列或独立 worker，而不是只加 worker threads。
 
+如果你想把 event loop、连接池、限流、缓存、异步削峰和 worker 放回同一张 Node.js 高并发治理图里看，继续看：
+
+- [Node.js 高并发解决方案实践](./high-concurrency-solution-practice.md)
+
 ## 一套够用的定位工具链
 
 实际排障时，至少建议准备：
