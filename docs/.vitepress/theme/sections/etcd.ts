@@ -35,7 +35,7 @@ export const etcdSection: SectionConfig = {
     },
     sidebar: [
       {
-        text: 'etcd 专题',
+        text: '核心入口',
         items: [
           { text: '专题总览', link: '/etcd/' },
         ],

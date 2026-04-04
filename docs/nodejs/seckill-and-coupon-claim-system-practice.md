@@ -373,6 +373,15 @@ Node.js 做这类系统时，最容易先出问题的通常不是“语言本身
 - 队列积压后系统是否还能保持清晰拒绝
 - 回补和补偿逻辑是否能收敛
 
+如果你想把 Node.js 侧的指标、告警、压测和演练闭环单独补齐，继续看：
+
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
+
+如果你想从更偏架构视角把活动监控、压测和应急响应讲透，继续看：
+
+- [秒杀系统监控、告警与应急响应设计](../architecture/seckill-monitoring-alerting-and-incident-response.md)
+- [秒杀系统压测脚本、容量估算与演练方法论](../architecture/seckill-pressure-testing-capacity-estimation-and-drills.md)
+
 ## 常见坏味道
 
 - 一上来就把所有请求打进数据库扣库存

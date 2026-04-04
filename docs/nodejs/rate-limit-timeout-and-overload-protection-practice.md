@@ -408,6 +408,7 @@ timeout 真正保证的是：
 如果你想把导出和后台任务单独理顺，继续看：
 
 - [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)
+- [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
 
 ### 4. Webhook / 支付回调 / 三方回调
 
@@ -423,6 +424,10 @@ timeout 真正保证的是：
 - 不重复处理
 - 不无限等待
 - 不把回调慢依赖放大到主链路
+
+如果你想把 webhook、签名校验、重复投递和最小回调入口设计单独理顺，继续看：
+
+- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
 
 ## 指标与压测怎么验证保护是否生效
 
@@ -463,6 +468,7 @@ timeout 真正保证的是：
 如果你想把日志、Tracing、Metrics 和告警边界单独补齐，继续看：
 
 - [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md)
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
 
 ## 常见误区
 

@@ -34,12 +34,12 @@ export const postgresqlSection: SectionConfig = {
     },
     sidebar: [
       {
-        text: 'PostgreSQL 专题',
+        text: '核心入口',
         items: [
           { text: '专题总览', link: '/postgresql/' },
-          { text: '核心概念与高频考点', link: '/postgresql/core-concepts' },
-          { text: '支付场景追问', link: '/postgresql/payment-practice' },
-          { text: '高可用集群整理', link: '/postgresql/ha-cluster' },
+          { text: '核心考点', link: '/postgresql/core-concepts' },
+          { text: '支付追问', link: '/postgresql/payment-practice' },
+          { text: '高可用', link: '/postgresql/ha-cluster' },
         ],
       },
     ],

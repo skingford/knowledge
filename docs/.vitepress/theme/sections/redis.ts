@@ -40,18 +40,18 @@ export const redisSection: SectionConfig = {
     },
     sidebar: [
       {
-        text: 'Redis 专题',
+        text: '核心入口',
         items: [
           { text: '专题总览', link: '/redis/' },
-          { text: '课程精读总览', link: '/redis/course/' },
-          { text: 'Redis 实践与缓存穿透/击穿/雪崩', link: '/redis/redis-and-cache-patterns' },
-          { text: 'Redis 高并发、集群部署与分布式锁', link: '/redis/high-concurrency-cluster-locks' },
-          { text: 'go-redis 客户端源码精读', link: '/golang/guide/source-reading/go-redis' },
-          { text: '支付系统 Redis 实战', link: '/redis/payment-practice' },
+          { text: '课程精读', link: '/redis/course/' },
+          { text: '缓存治理', link: '/redis/redis-and-cache-patterns' },
+          { text: '集群与锁', link: '/redis/high-concurrency-cluster-locks' },
+          { text: 'go-redis', link: '/golang/guide/source-reading/go-redis' },
+          { text: '支付实战', link: '/redis/payment-practice' },
         ],
       },
       {
-        text: '开篇与基础篇',
+        text: '基础篇',
         collapsed: true,
         items: [
           { text: '00 开篇词', link: '/redis/course/00-preface' },
@@ -68,7 +68,7 @@ export const redisSection: SectionConfig = {
         ],
       },
       {
-        text: '实践篇（11-22）',
+        text: '实践上篇',
         collapsed: true,
         items: [
           { text: '11 String 的边界', link: '/redis/course/11-string-pitfalls' },
@@ -86,7 +86,7 @@ export const redisSection: SectionConfig = {
         ],
       },
       {
-        text: '实践篇（23-38）',
+        text: '实践下篇',
         collapsed: true,
         items: [
           { text: '23 旁路缓存', link: '/redis/course/23-cache-aside' },
@@ -108,7 +108,7 @@ export const redisSection: SectionConfig = {
         ],
       },
       {
-        text: '未来篇与加餐',
+        text: '加餐收官',
         collapsed: true,
         items: [
           { text: '39 Redis 6.0 新特性', link: '/redis/course/39-redis6-new-features' },
@@ -124,7 +124,7 @@ export const redisSection: SectionConfig = {
         ],
       },
       {
-        text: '测试与收官',
+        text: '期中收官',
         collapsed: true,
         items: [
           { text: '49 期中测试题', link: '/redis/course/49-midterm-quiz' },

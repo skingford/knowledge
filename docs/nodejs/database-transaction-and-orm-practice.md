@@ -296,6 +296,10 @@ Node.js 项目里很常见的一种坏味道是：
 - 把复杂查询从 ORM 抽到 Query Builder / SQL
 - 对比改造前后的可维护性和性能
 
+如果你想把报表导出、游标扫描、对象存储交付和任务清理单独补齐，继续看：
+
+- [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+
 ### 3. 支付回调与本地状态收口
 
 目标：

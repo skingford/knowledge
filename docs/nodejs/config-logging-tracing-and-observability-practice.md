@@ -85,6 +85,10 @@ description: 系统整理 Node.js 服务中的配置收口、结构化日志、r
 
 这类配置最怕的是散落在各层到处判断。
 
+如果你想把运行时开关、灰度放量、kill switch 和审计治理单独理顺，继续看：
+
+- [Node.js Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
+
 ## 日志先别想着“多”，先想着“能查”
 
 好的日志最少应该能回答：
@@ -272,6 +276,10 @@ Node.js 服务至少建议先盯这些指标：
 
 - [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)
 
+如果你想把指标、告警、压测和演练闭环单独补齐，继续看：
+
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
+
 ## 常见坏味道
 
 - 配置直接散落在 `process.env` 的读取里
@@ -306,6 +314,10 @@ Node.js 服务至少建议先盯这些指标：
 
 - 从真实故障回推缺失的指标和日志字段
 - 把“人工发现”变成“系统可观测”
+
+如果你想继续把观测推进到阈值设计、压测验证和故障演练，继续看：
+
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
 
 ## 高频自检题
 

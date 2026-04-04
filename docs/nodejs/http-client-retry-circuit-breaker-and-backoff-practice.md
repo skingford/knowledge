@@ -375,6 +375,10 @@ Node.js 调下游时，最常见的误区是：
 - 不重复执行
 - 不错误推进状态
 
+如果你想把 webhook、原始 body 验签、重复投递和 2xx / 5xx 返回语义单独理顺，继续看：
+
+- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+
 ### 4. 后台批量同步
 
 更适合：

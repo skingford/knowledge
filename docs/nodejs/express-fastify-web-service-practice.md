@@ -288,6 +288,15 @@ Web 服务测试至少建议覆盖：
 如果你想把这条异步主线单独展开，继续看：
 
 - [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)
+- [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
+
+如果你想把请求入口上的灰度、kill switch 和运行时决策 snapshot 单独理顺，继续看：
+
+- [Node.js Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
+
+如果你想把外部回调入口、原始 body 验签和回调返回语义单独理顺，继续看：
+
+- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
 
 ## 和 NestJS 的关系
 

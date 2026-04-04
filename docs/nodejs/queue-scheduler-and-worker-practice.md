@@ -308,6 +308,10 @@ Node.js 服务关闭时，最怕的是：
 
 - [Node.js 幂等、状态机与 Outbox 实践](./idempotency-state-machine-and-outbox-practice.md)
 
+如果你想把 backlog 告警、consumer 指标、压测和故障演练闭环单独补齐，继续看：
+
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
+
 ## 和 NestJS 怎么衔接
 
 如果你在 NestJS 里做这些事：
@@ -360,6 +364,10 @@ Node.js 服务关闭时，最怕的是：
 - 把大导出从请求线程迁移到异步 worker
 - 支持任务状态查询
 - 支持优雅关闭与失败恢复
+
+如果你想把游标扫描、流式生成、对象存储交付和导出清理链路单独讲清，继续看：
+
+- [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
 
 ## 高频自检题
 

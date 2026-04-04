@@ -302,6 +302,10 @@ Outbox 更稳的核心思路通常是：
 - 无条件改状态
 - 然后顺手发一堆事件
 
+如果你想把原始 body 验签、时间戳、防重放和回调入口返回语义单独理顺，继续看：
+
+- [Node.js Webhook、回调与签名校验实践](./webhook-and-callback-practice.md)
+
 ### 2. 秒杀 / 抢券结果落账
 
 更稳的方式通常是：
@@ -370,6 +374,7 @@ Outbox 更稳的核心思路通常是：
 如果你想把日志、Tracing 和指标链路单独补齐，继续看：
 
 - [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md)
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
 
 ## 常见坏味道
 

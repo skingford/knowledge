@@ -31,9 +31,9 @@ export const gitSection: SectionConfig = {
         text: 'Git',
         items: [
           { text: '主题概览', link: '/git/' },
-          { text: 'Git 常用技巧', link: '/git/common-tips' },
-          { text: 'GitHub PR 与 Code Review', link: '/git/github-pr-review' },
-          { text: 'GitHub Actions 故障排查', link: '/git/github-actions-troubleshooting' },
+          { text: '常用技巧', link: '/git/common-tips' },
+          { text: 'PR Review', link: '/git/github-pr-review' },
+          { text: 'Actions', link: '/git/github-actions-troubleshooting' },
         ],
       },
     ],

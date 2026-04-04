@@ -550,6 +550,10 @@ Node.js 高并发要稳，数据层至少要解决 4 件事。
 
 - [Node.js 限流、超时与过载保护实践](./rate-limit-timeout-and-overload-protection-practice.md)
 
+如果你想把 kill switch、灰度放量、回退与运行时开关治理单独理顺，继续看：
+
+- [Node.js Feature Flag、运行时开关与灰度治理实践](./feature-flag-and-runtime-governance-practice.md)
+
 ## 可观测性：没有指标就没有高并发治理
 
 Node.js 高并发治理至少建议盯住这些指标：
@@ -579,6 +583,10 @@ Node.js 高并发治理至少建议盯住这些指标：
 如果你想把日志、Tracing、Metrics 和告警链路单独补齐，继续看：
 
 - [Node.js 配置管理、日志、Tracing 与可观测性实践](./config-logging-tracing-and-observability-practice.md)
+
+如果你想把 runtime 指标、依赖告警、压测验证和故障演练收成同一条稳定性闭环，继续看：
+
+- [Node.js 监控、告警与压测演练实践](./monitoring-alerting-and-pressure-drill-practice.md)
 
 如果你想把第三方 HTTP client、重试、熔断和下游保护边界单独补齐，继续看：
 
@@ -655,6 +663,10 @@ Node.js 高并发治理至少建议盯住这些指标：
 - 后台 worker 处理
 - 用户轮询状态或接收通知
 - 文件落对象存储
+
+如果你想把导出任务、流式生成、对象存储交付和配额边界单独理顺，继续看：
+
+- [Node.js 导出、报表与大结果集实践](./export-report-and-large-result-practice.md)
 
 这能显著降低：
 

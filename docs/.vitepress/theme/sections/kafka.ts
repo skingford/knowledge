@@ -35,12 +35,12 @@ export const kafkaSection: SectionConfig = {
     },
     sidebar: [
       {
-        text: 'Kafka 专题',
+        text: '核心入口',
         items: [
           { text: '专题总览', link: '/kafka/' },
           { text: '核心概念', link: '/kafka/core-concepts' },
           { text: '支付实战', link: '/kafka/payment-practice' },
-          { text: '深入追问与词汇', link: '/kafka/interview-questions' },
+          { text: '追问词汇', link: '/kafka/interview-questions' },
         ],
       },
       {
@@ -117,7 +117,7 @@ export const kafkaSection: SectionConfig = {
         ],
       },
       {
-        text: '经验总结篇',
+        text: '总结篇',
         collapsed: true,
         items: [
           { text: '43 未来演进', link: '/kafka/43-future-architecture' },
