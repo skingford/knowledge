@@ -5,6 +5,9 @@ import { architectureSection } from './architecture'
 import { networkSection } from './network'
 import { golangSection } from './golang'
 import { pythonSection } from './python'
+import { reactSection } from './react'
+import { vueSection } from './vue'
+import { svelteSection } from './svelte'
 import { nodejsSection } from './nodejs'
 import { rustSection } from './rust'
 import { mysqlSection } from './mysql'
@@ -24,9 +27,12 @@ const sections: SectionConfig[] = [
   architectureSection,
   networkSection,
   golangSection,
+  rustSection,
   pythonSection,
   nodejsSection,
-  rustSection,
+  reactSection,
+  vueSection,
+  svelteSection,
   mysqlSection,
   redisSection,
   kafkaSection,
@@ -52,6 +58,9 @@ export const learningOverviewGoals = [
   { title: '想快速入门 Agent 开发', href: '/ai/agent-learning-guide', description: '先建立 Agent 全局认知，再展开 Tool Calling 和 RAG。' },
   { title: '想强化 Go 高级能力', href: '/golang/guide/source-reading/learning-path', description: '从源码阅读主线切入，再补性能、排障和高频题。' },
   { title: '想系统补 Python 基础', href: '/python/essential-knowledge', description: '从语法、函数、对象模型到工程化和并发，把 Python 基本盘补扎实。' },
+  { title: '想系统补 React', href: '/react/react-technical-guide', description: '从组件、状态、Effect 到渲染性能，把 React 主线补完整。' },
+  { title: '想系统补 Vue', href: '/vue/technical-guide', description: '从组合式 API、响应式系统到组件边界，把 Vue 3 主线补完整。' },
+  { title: '想系统补 Svelte', href: '/svelte/technical-guide', description: '从 runes、组件通信到更新模型，把 Svelte 5 主线补完整。' },
   { title: '想补 Node.js / NestJS 后端实践', href: '/nodejs/nestjs-practice-guide', description: '从运行时、模块分层到校验、鉴权、事务和部署，把 Node.js 服务端主线串起来。' },
   { title: '想补 Rust 学习主线', href: '/rust/learning-path', description: '按阶段补所有权、类型系统、工程化与 async，不必在专题之间来回跳。' },
   { title: '想专项读 Go 源码', href: '/golang/guide/source-reading/', description: '直接进入独立源码阅读模块，按 runtime、网络、编码等主题深挖。' },
@@ -64,6 +73,9 @@ const homeTrackDescriptions: Record<string, string> = {
   network: '从分层模型、传输层到 HTTP、DNS、CDN 和负载均衡，把网络知识整理成适合工程实践的主线。',
   golang: '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。',
   python: '从语法、函数、对象模型到 typing、asyncio 与工程化，把 Python 学习主线整理成一套清晰入口。',
+  react: '以 React 为主线，围绕组件拆分、状态建模、Effect 边界、高频问题和性能优化建立工程判断。',
+  vue: '围绕 Vue 3 的组合式 API、响应式系统、组件通信和性能优化，建立稳定的组件与响应式心智模型。',
+  svelte: '围绕 Svelte 5 的 runes、组件通信、snippet 和细粒度更新模型，建立稳定的前端工程判断。',
   nodejs: '围绕 Node.js 服务端运行时、工程化和 NestJS 实战，把异步模型、模块边界与后端交付能力串起来。',
   rust: '聚焦所有权、类型系统、错误处理、Cargo 工程化与并发 async，建立 Rust 的核心能力主线。',
   mysql: '系统整理 MySQL 核心知识，从 database/sql 基础到高并发场景下的索引、事务、锁与分库分表。',

@@ -40,7 +40,7 @@ export default defineConfig({
   lang: 'zh-CN',
   title: '学习知识库',
   titleTemplate: ':title | 学习知识库',
-  description: '涵盖 AI / Agent、架构设计、网络、Golang、Python、Node.js、Rust、Git、运维与工具的学习资料、路线图与专题索引',
+  description: '涵盖 AI / Agent、架构设计、网络、React、Vue、Svelte、Golang、Python、Node.js、Rust、Git、运维与工具的学习资料、路线图与专题索引',
 
   base: siteBase,
   srcExclude: ['README.md', 'TEMPLATE.md'],
@@ -155,7 +155,7 @@ export default defineConfig({
       },
       {
         text: '编程语言',
-        items: [navItem('golang'), navItem('python'), navItem('nodejs'), navItem('rust')],
+        items: [navItem('golang'), navItem('rust'), navItem('python'), navItem('nodejs'), navItem('react'), navItem('vue'), navItem('svelte')],
       },
       {
         text: '数据与中间件',
