@@ -5,7 +5,7 @@ import { withBase } from 'vitepress'
 const storageKey = 'knowledge:wechat-qr-notice:dismiss-until'
 const isVisible = ref(false)
 
-const qrImage = computed(() => withBase('/wechat-official-account-qr.svg'))
+const qrImage = computed(() => withBase('/wechat-official-account-qr.jpg'))
 
 function getEndOfDayTimestamp() {
   const now = new Date()
@@ -98,11 +98,7 @@ onMounted(() => {
               >
             </figure>
 
-            <p class="wechat-qr-notice__hint">
-              当前使用的是站点内置占位图。将
-              <code>docs/public/wechat-official-account-qr.svg</code>
-              替换为你的真实公众号二维码即可。
-            </p>
+        
 
             <div class="wechat-qr-notice__actions">
               <button
