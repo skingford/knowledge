@@ -21,6 +21,7 @@ import { postgresqlSection } from './postgresql'
 import { opsSection } from './ops'
 import { gitSection } from './git'
 import { toolsSection } from './tools'
+import { frontendEcosystemSection } from './frontend-ecosystem'
 
 export const sections: SectionConfig[] = [
   aiSection,
@@ -33,6 +34,7 @@ export const sections: SectionConfig[] = [
   reactSection,
   vueSection,
   svelteSection,
+  frontendEcosystemSection,
   mysqlSection,
   redisSection,
   kafkaSection,

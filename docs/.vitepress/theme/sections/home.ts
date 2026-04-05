@@ -21,6 +21,7 @@ import { postgresqlSection } from './postgresql'
 import { opsSection } from './ops'
 import { gitSection } from './git'
 import { toolsSection } from './tools'
+import { frontendEcosystemSection } from './frontend-ecosystem'
 
 const sections: SectionConfig[] = [
   aiSection,
@@ -33,6 +34,7 @@ const sections: SectionConfig[] = [
   reactSection,
   vueSection,
   svelteSection,
+  frontendEcosystemSection,
   mysqlSection,
   redisSection,
   kafkaSection,
@@ -88,6 +90,7 @@ const homeTrackDescriptions: Record<string, string> = {
   postgresql: '系统整理 PostgreSQL 核心知识，涵盖 MVCC、索引、事务、分区表与高可用集群部署。',
   ops: '将日常运维中反复用到的排障命令、清理流程和管理技巧，整理成可复用的操作指南。',
   git: '集中整理 Git 工作流、PR 与 Code Review、GitHub Actions 排障、发布与回滚实践。',
+  'frontend-ecosystem': '整理 React、Vue、Svelte 共用的前端基础设施——Vite 构建、Axios HTTP 客户端、Alova 请求策略。',
 }
 
 const defaultTrackDescription = '按主题整理路线图、专题和能力自检入口，方便持续学习和回查。'

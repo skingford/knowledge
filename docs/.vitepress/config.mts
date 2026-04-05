@@ -155,7 +155,10 @@ export default defineConfig({
       },
       {
         text: '编程语言',
-        items: [navItem('golang'), navItem('rust'), navItem('python'), navItem('nodejs'), navItem('react'), navItem('vue'), navItem('svelte')],
+        items: [
+          { text: '后端', items: [navItem('golang'), navItem('rust'), navItem('python'), navItem('nodejs')] },
+          { text: '前端', items: [navItem('react'), navItem('vue'), navItem('svelte'), navItem('frontend-ecosystem')] },
+        ],
       },
       {
         text: '数据与中间件',
