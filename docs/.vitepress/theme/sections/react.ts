@@ -1,0 +1,72 @@
+import type { SectionConfig } from './types'
+
+export const reactSection: SectionConfig = {
+  key: 'react',
+  base: '/react/',
+  navText: 'React',
+  overviewDescription:
+    '系统整理 React 主线，并补充 Next.js、TanStack Query、Zustand、React Hook Form 等常用生态组合，覆盖组件思维、状态建模、副作用边界与性能优化。',
+  landing: {
+    eyebrow: 'React',
+    title: 'React 专题',
+    intro:
+      '围绕 React 的组件、状态、渲染、Effect、常见陷阱、性能优化和生态配套，整理成一组适合长期回查的文档。重点不是 API 背诵，而是建立稳定的工程判断。',
+    primary: { title: '专题总览', href: '/react/', description: '先看 React 主线和阅读顺序。' },
+    secondary: { title: 'React 技术指南', href: '/react/react-technical-guide', description: '先建立组件、状态、Effect 与通信边界。' },
+    scope: [
+      '组件拆分与数据流',
+      '状态建模与不可变更新',
+      'Props、Context 与 Reducer 取舍',
+      'Effect 边界与副作用清理',
+      '条件渲染、列表与表单',
+      '渲染与提交流程',
+      '高频问题排查',
+      '性能分析与优化',
+      'Next.js 与 React 工程落地',
+      'TanStack Query、Zustand 与表单栈组合',
+      '列表渲染与虚拟化',
+      'Suspense、lazy 与交互流畅性',
+    ],
+    docs: [
+      { title: 'React 专题总览', href: '/react/', description: '先看当前专题范围、阅读顺序和练习建议。' },
+      { title: 'React 技术指南：组件、状态、Effect 与工程边界', href: '/react/react-technical-guide', description: '系统整理 React 组件思维、状态设计、Effect 边界和组件通信。' },
+      { title: 'React 生态组合：一套最好用的务实方案', href: '/react/react-ecosystem-stack', description: '给出一套中型 React 项目里最好落地的框架、UI、状态、表单与测试组合。' },
+      { title: 'React 后台管理系统生态组合：一套高效可维护的方案', href: '/react/react-admin-stack', description: '聚焦中后台场景，整理 Vite、React Router、TanStack Query、RHF 与表格能力的组合。' },
+      { title: 'React 后台权限、菜单与路由设计：一套不容易失控的方案', href: '/react/react-admin-permission-menu-routing', description: '系统梳理路由权限、菜单权限、按钮权限和字段权限的分层设计。' },
+      { title: 'React 后台权限模型的目录结构与代码模板', href: '/react/react-admin-structure-and-template', description: '给出 permissions、router、navigation、features 的目录拆分和最小可用代码模板。' },
+      { title: 'React 后台多租户与多组织权限扩展设计', href: '/react/react-admin-multi-tenant-permission-design', description: '聚焦 tenant、organization、data scope 和上下文切换，扩展单组织权限模型。' },
+      { title: 'React 后台数据权限与列表查询参数设计', href: '/react/react-admin-data-scope-and-query-design', description: '系统梳理 all/org/self 数据范围模型，以及查询参数、筛选器和导出约束的联动设计。' },
+      { title: 'React 高频问题：渲染、状态与副作用排错清单', href: '/react/react-common-questions', description: '集中整理 React 开发中最常见的问题、误区和排查方法。' },
+      { title: 'React 性能优化指南：渲染分析、列表性能与稳定性优化', href: '/react/react-performance-optimization', description: '围绕渲染来源、测量方法、列表性能、代码分割和交互流畅性整理 React 性能主线。' },
+    ],
+    order: [
+      'React 专题总览',
+      'React 技术指南：组件、状态、Effect 与工程边界',
+      'React 生态组合：一套最好用的务实方案',
+      'React 后台管理系统生态组合：一套高效可维护的方案',
+      'React 后台权限、菜单与路由设计：一套不容易失控的方案',
+      'React 后台权限模型的目录结构与代码模板',
+      'React 后台多租户与多组织权限扩展设计',
+      'React 后台数据权限与列表查询参数设计',
+      'React 高频问题：渲染、状态与副作用排错清单',
+      'React 性能优化指南：渲染分析、列表性能与稳定性优化',
+    ],
+  },
+  sidebar: [
+    {
+      text: '核心入口',
+      items: [
+        { text: '专题总览', link: '/react/' },
+        { text: '技术指南', link: '/react/react-technical-guide' },
+        { text: '生态组合', link: '/react/react-ecosystem-stack' },
+        { text: '后台栈', link: '/react/react-admin-stack' },
+        { text: '权限与路由', link: '/react/react-admin-permission-menu-routing' },
+        { text: '结构模板', link: '/react/react-admin-structure-and-template' },
+        { text: '多租户扩展', link: '/react/react-admin-multi-tenant-permission-design' },
+        { text: '数据权限', link: '/react/react-admin-data-scope-and-query-design' },
+        { text: '高频问题', link: '/react/react-common-questions' },
+        { text: '性能优化', link: '/react/react-performance-optimization' },
+      ],
+    },
+  ],
+}

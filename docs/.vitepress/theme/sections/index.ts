@@ -5,6 +5,9 @@ import { architectureSection } from './architecture'
 import { networkSection } from './network'
 import { golangSection } from './golang'
 import { pythonSection } from './python'
+import { reactSection } from './react'
+import { vueSection } from './vue'
+import { svelteSection } from './svelte'
 import { nodejsSection } from './nodejs'
 import { rustSection } from './rust'
 import { mysqlSection } from './mysql'
@@ -18,15 +21,20 @@ import { postgresqlSection } from './postgresql'
 import { opsSection } from './ops'
 import { gitSection } from './git'
 import { toolsSection } from './tools'
+import { frontendEcosystemSection } from './frontend-ecosystem'
 
 export const sections: SectionConfig[] = [
   aiSection,
   architectureSection,
   networkSection,
   golangSection,
+  rustSection,
   pythonSection,
   nodejsSection,
-  rustSection,
+  reactSection,
+  vueSection,
+  svelteSection,
+  frontendEcosystemSection,
   mysqlSection,
   redisSection,
   kafkaSection,

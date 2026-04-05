@@ -25,6 +25,9 @@
 - [AI / Agent 方向](./ai/)
 - [Docker 专题](./docker/)
 - [Golang 方向](./golang/)
+- [React 专题](./react/)
+- [Vue 专题](./vue/)
+- [Svelte 专题](./svelte/)
 - [Node.js 专题](./nodejs/)
 - [Rust 方向](./rust/)
 
@@ -43,6 +46,29 @@
 - [Docker 镜像仓库、Harbor 与发布治理](./docker/registry-and-image-governance.md)
 - [Go 学习路径与资料导航](./golang/learning-path.md)
 - [Go 源码阅读学习主线](./golang/guide/source-reading/learning-path.md)
+- [React 专题](./react/index.md)
+- [Vue 专题](./vue/index.md)
+- [Svelte 专题](./svelte/index.md)
+- [React 技术指南：组件、状态、Effect 与工程边界](./react/react-technical-guide.md)
+- [React 生态组合：一套最好用的务实方案](./react/react-ecosystem-stack.md)
+- [React 后台管理系统生态组合：一套高效可维护的方案](./react/react-admin-stack.md)
+- [React 后台权限、菜单与路由设计：一套不容易失控的方案](./react/react-admin-permission-menu-routing.md)
+- [React 后台权限模型的目录结构与代码模板](./react/react-admin-structure-and-template.md)
+- [React 后台多租户与多组织权限扩展设计](./react/react-admin-multi-tenant-permission-design.md)
+- [React 后台数据权限与列表查询参数设计](./react/react-admin-data-scope-and-query-design.md)
+- [React 高频问题：渲染、状态与副作用排错清单](./react/react-common-questions.md)
+- [React 性能优化指南：渲染分析、列表性能与稳定性优化](./react/react-performance-optimization.md)
+- [Vue 技术指南：组合式 API、响应式系统与组件边界](./vue/technical-guide.md)
+- [Vue 高频问题：响应式、组件通信与模板陷阱排错清单](./vue/common-questions.md)
+- [Vue 性能优化指南：更新机制、异步组件与列表性能](./vue/performance-optimization.md)
+- [Vite 与 Vue 工程化指南：脚手架、环境变量与构建边界](./vue/vite-build-and-env-guide.md)
+- [@vitejs/plugin-vue 指南：SFC 编译、资源处理与编译选项](./vue/vite-plugin-vue-guide.md)
+- [Pinia 状态管理指南：Store 设计、插件扩展与 SSR 边界](./vue/pinia-state-management-guide.md)
+- [Axios 指南：实例、拦截器、取消请求与错误处理](./vue/axios-http-client-guide.md)
+- [Alova 指南：请求策略、缓存与跨组件数据协作](./vue/alova-request-strategy-guide.md)
+- [Svelte 技术指南：runes、组件边界与状态组织](./svelte/technical-guide.md)
+- [Svelte 高频问题：响应式、组件通信与模板陷阱排错清单](./svelte/common-questions.md)
+- [Svelte 性能优化指南：更新粒度、懒加载与列表性能](./svelte/performance-optimization.md)
 - [Node.js 模块系统、ESM/CommonJS 与 monorepo 工程边界](./nodejs/module-system-esm-commonjs-and-monorepo-boundaries.md)
 - [Node.js 运行时、事件循环与性能排障](./nodejs/runtime-event-loop-and-performance-troubleshooting.md)
 - [Node.js 高并发解决方案实践](./nodejs/high-concurrency-solution-practice.md)
@@ -120,6 +146,9 @@
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段
+- `react/`：React 专题总览、React 技术指南、高频问题与性能优化
+- `vue/`：Vue 专题总览、Vue 技术指南、高频问题、性能优化与生态工具
+- `svelte/`：Svelte 专题总览、Svelte 技术指南、高频问题与性能优化
 - `nodejs/`：Node.js 服务端专题总览、模块系统与 monorepo 边界、运行时与性能排障、高并发治理、缓存与热点 Key、Redis 工程实践、限流与过载保护、HTTP Client 与下游依赖治理、Webhook / 回调 / 签名校验、秒杀 / 抢券系统实践、幂等与一致性实践、测试工程化、配置与可观测性、监控告警与压测演练、Feature Flag 与运行时开关治理、Secrets / 密钥 / 凭证轮换、数据库实践、队列与 Worker、导出与大结果集实践、Web 服务实践、NestJS 工程实践
 - `rust/`：学习路径、所有权、生命周期、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API 错误响应 / 响应体设计、API Versioning / 兼容 / 弃用治理、过滤 / 排序 / 分页、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、消息队列 / 事件驱动、通知 / 邮件 / 短信 / Push、文件上传 / 对象存储 / S3、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、多租户 / 数据隔离、审计日志 / 操作记录、Webhook / 回调 / 签名校验、WebSocket / SSE、metrics / OpenTelemetry、测试替身 / 依赖隔离、trait、集合、智能指针、错误处理、Cargo、测试、Axum、SQLx、服务模板、Tracing、性能分析、配置关闭、项目骨架、部署发布、Serde、宏、unsafe/FFI 与能力自检
 
@@ -152,5 +181,8 @@
 - `ai/`：Agent、LLM 应用、RAG、工作流
 - `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：Go 语言进阶、并发、性能、工程实践、源码精读
+- `react/`：React 组件思维、状态建模、副作用边界、高频问题与性能优化
+- `vue/`：Vue 组件思维、组合式 API、响应式系统、组件通信、性能优化与 Vite / Pinia / 请求层生态工具
+- `svelte/`：Svelte runes、组件边界、snippet、组件通信与性能优化
 - `nodejs/`：Node.js 服务端模块系统、ESM/CommonJS、monorepo、运行时、事件循环、性能排障、高并发治理、缓存与热点 Key、Redis 工程实践、限流与过载保护、HTTP Client 与下游依赖治理、Webhook / 回调 / 签名校验、秒杀 / 抢券系统实践、幂等与一致性实践、测试工程化、配置治理、日志、Tracing、监控告警、压测演练、Feature Flag / 运行时开关 / 灰度治理、Secrets / 密钥 / 凭证轮换、数据库、事务、队列与 Worker、导出与大结果集、Web 服务实践、NestJS 实践
 - `rust/`：Rust 语言基础、所有权模型、borrow checker 排障、DTO / 领域模型 / 存储模型分层、输入校验 / 边界建模、crate 选型、CLI 工具实践、配置管理、workspace 实践、HTTP client / 外部 API、后台任务 / worker、定时任务 / 调度 / Leader Election、缓存 / Redis、限流 / 超时 / 负载保护、API Versioning / 兼容 / 弃用治理、搜索 / 索引 / 检索、软删除 / 恢复 / 删除语义、批处理 / 回填 / 历史数据修复、事务 / 锁 / 并发更新、数据库迁移 / Schema 演进、幂等 / 状态机 / Outbox、通知 / 邮件 / 短信 / Push、认证 / 授权 / 请求上下文、Secrets / 密钥 / 凭证轮换、数据脱敏 / 隐私字段 / 日志安全、Feature Flag / 运行时开关 / 灰度治理、审计日志 / 操作记录、导出 / 报表 / 大结果集、数据归档 / 保留策略 / 冷热分层、WebSocket / SSE、metrics / OpenTelemetry、错误处理、工程化、并发与 async、性能分析与服务实践
