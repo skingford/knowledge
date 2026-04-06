@@ -1,0 +1,758 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 2200" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="capGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="idGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+    <linearGradient id="idemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="lockGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="txGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+    <linearGradient id="consistGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a18cd1"/>
+      <stop offset="100%" style="stop-color:#fbc2eb"/>
+    </linearGradient>
+    <linearGradient id="storageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffecd2"/>
+      <stop offset="100%" style="stop-color:#fcb69f"/>
+    </linearGradient>
+    <linearGradient id="raftGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a1c4fd"/>
+      <stop offset="100%" style="stop-color:#c2e9fb"/>
+    </linearGradient>
+    <linearGradient id="prodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4fc79"/>
+      <stop offset="100%" style="stop-color:#96e6a1"/>
+    </linearGradient>
+    <linearGradient id="decisionGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd89b"/>
+      <stop offset="100%" style="stop-color:#19547b"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3498db"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="2200" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title -->
+  <rect x="30" y="20" width="1340" height="70" rx="12" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="700" y="65" text-anchor="middle" fill="white" font-size="28" font-weight="bold">分布式系统设计全景架构图</text>
+
+  <!-- ═══════════ Section 1: Core Challenges (CAP) ═══════════ -->
+  <rect x="30" y="110" width="1340" height="170" rx="10" fill="white" stroke="#667eea" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="110" width="1340" height="38" rx="10" fill="url(#capGrad)"/>
+  <rect x="30" y="130" width="1340" height="18" fill="url(#capGrad)"/>
+  <text x="700" y="137" text-anchor="middle" fill="white" font-size="16" font-weight="bold">一、分布式系统核心矛盾 — CAP 与 FLP</text>
+
+  <!-- CAP Triangle -->
+  <polygon points="200,190 100,260 300,260" fill="none" stroke="#667eea" stroke-width="2"/>
+  <circle cx="200" cy="185" r="18" fill="#667eea"/><text x="200" y="190" text-anchor="middle" fill="white" font-size="11" font-weight="bold">C</text>
+  <circle cx="95" cy="265" r="18" fill="#764ba2"/><text x="95" y="270" text-anchor="middle" fill="white" font-size="11" font-weight="bold">A</text>
+  <circle cx="305" cy="265" r="18" fill="#5b4a9e"/><text x="305" y="270" text-anchor="middle" fill="white" font-size="11" font-weight="bold">P</text>
+  <text x="200" y="240" text-anchor="middle" fill="#555" font-size="10">P 几乎不可放弃</text>
+
+  <!-- Core Problems -->
+  <g transform="translate(420, 160)">
+    <rect width="200" height="40" rx="6" fill="#eef2ff" stroke="#667eea" stroke-width="1"/>
+    <text x="100" y="25" text-anchor="middle" fill="#4338ca" font-size="12" font-weight="bold">四大核心问题</text>
+  </g>
+  <g transform="translate(420, 210)">
+    <rect width="90" height="30" rx="5" fill="#f0f4ff" stroke="#818cf8" stroke-width="1"/>
+    <text x="45" y="20" text-anchor="middle" fill="#4338ca" font-size="11">唯一性</text>
+  </g>
+  <g transform="translate(525, 210)">
+    <rect width="90" height="30" rx="5" fill="#f0f4ff" stroke="#818cf8" stroke-width="1"/>
+    <text x="45" y="20" text-anchor="middle" fill="#4338ca" font-size="11">幂等</text>
+  </g>
+  <g transform="translate(420, 248)">
+    <rect width="90" height="30" rx="5" fill="#f0f4ff" stroke="#818cf8" stroke-width="1"/>
+    <text x="45" y="20" text-anchor="middle" fill="#4338ca" font-size="11">互斥</text>
+  </g>
+  <g transform="translate(525, 248)">
+    <rect width="90" height="30" rx="5" fill="#f0f4ff" stroke="#818cf8" stroke-width="1"/>
+    <text x="45" y="20" text-anchor="middle" fill="#4338ca" font-size="11">事务</text>
+  </g>
+
+  <!-- FLP & Paxos -->
+  <g transform="translate(700, 160)">
+    <rect width="280" height="105" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1"/>
+    <text x="140" y="22" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="bold">FLP 不可能定理</text>
+    <text x="140" y="42" text-anchor="middle" fill="#6b7280" font-size="10">异步网络 + 1节点崩溃 → 无法同时保证</text>
+    <text x="140" y="58" text-anchor="middle" fill="#6b7280" font-size="10">Safety (不会决定错) + Liveness (最终能决定)</text>
+    <line x1="20" y1="68" x2="260" y2="68" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="140" y="85" text-anchor="middle" fill="#7c3aed" font-size="11" font-weight="bold">Paxos: Prepare/Promise → Accept/Accepted</text>
+    <text x="140" y="100" text-anchor="middle" fill="#6b7280" font-size="10">多数派 + 提案号 → 共识基础</text>
+  </g>
+
+  <!-- Engineering Solutions -->
+  <g transform="translate(1040, 160)">
+    <rect width="300" height="105" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1"/>
+    <text x="150" y="22" text-anchor="middle" fill="#16a34a" font-size="12" font-weight="bold">工程选择策略</text>
+    <text x="150" y="45" text-anchor="middle" fill="#6b7280" font-size="10">用户入口 / 高可用链路 → 偏 A (BASE)</text>
+    <text x="150" y="63" text-anchor="middle" fill="#6b7280" font-size="10">核心账务 / 状态收口 → 偏 C (强一致)</text>
+    <line x1="20" y1="73" x2="280" y2="73" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="150" y="92" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="bold">关键词: ID · 幂等 · 状态机 · 锁 · 补偿 · 对账</text>
+  </g>
+
+  <!-- ═══════════ Section 2: ID + Idempotency + Lock ═══════════ -->
+  <rect x="30" y="300" width="440" height="270" rx="10" fill="white" stroke="#f5576c" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="300" width="440" height="35" rx="10" fill="url(#idGrad)"/>
+  <rect x="30" y="318" width="440" height="17" fill="url(#idGrad)"/>
+  <text x="250" y="325" text-anchor="middle" fill="white" font-size="14" font-weight="bold">二、分布式 ID 生成</text>
+
+  <!-- Snowflake -->
+  <g transform="translate(50, 345)">
+    <rect width="400" height="35" rx="4" fill="#fff5f5" stroke="#f87171" stroke-width="1"/>
+    <text x="10" y="14" fill="#dc2626" font-size="10" font-weight="bold">Snowflake</text>
+    <rect x="10" y="18" width="30" height="12" rx="2" fill="#fecaca"/><text x="25" y="28" text-anchor="middle" fill="#991b1b" font-size="7">1bit</text>
+    <rect x="45" y="18" width="120" height="12" rx="2" fill="#fca5a5"/><text x="105" y="28" text-anchor="middle" fill="#991b1b" font-size="7">41bit 时间戳</text>
+    <rect x="170" y="18" width="80" height="12" rx="2" fill="#f87171"/><text x="210" y="28" text-anchor="middle" fill="white" font-size="7">10bit 机器ID</text>
+    <rect x="255" y="18" width="70" height="12" rx="2" fill="#ef4444"/><text x="290" y="28" text-anchor="middle" fill="white" font-size="7">12bit 序列号</text>
+    <text x="340" y="28" fill="#6b7280" font-size="8">4096/ms/节点</text>
+  </g>
+
+  <!-- Clock Backward -->
+  <g transform="translate(50, 390)">
+    <rect width="190" height="55" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">时钟回拨防护</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">小回拨 ≤5ms → 等待</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">大回拨 → 熔断 + 告警</text>
+    <text x="10" y="52" fill="#6b7280" font-size="9">NTP/Chrony 平滑校时</text>
+  </g>
+
+  <!-- DB Segment -->
+  <g transform="translate(260, 390)">
+    <rect width="190" height="55" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">数据库号段模式</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">批量预取号段</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">双Buffer异步预加载</text>
+    <text x="10" y="52" fill="#6b7280" font-size="9">Leaf-Segment</text>
+  </g>
+
+  <!-- UUID/ULID -->
+  <g transform="translate(50, 455)">
+    <rect width="130" height="40" rx="6" fill="#fff1f2" stroke="#fb7185" stroke-width="1"/>
+    <text x="65" y="16" text-anchor="middle" fill="#e11d48" font-size="10" font-weight="bold">UUID v4</text>
+    <text x="65" y="30" text-anchor="middle" fill="#6b7280" font-size="9">随机无序</text>
+  </g>
+  <g transform="translate(195, 455)">
+    <rect width="130" height="40" rx="6" fill="#fff1f2" stroke="#fb7185" stroke-width="1"/>
+    <text x="65" y="16" text-anchor="middle" fill="#e11d48" font-size="10" font-weight="bold">ULID</text>
+    <text x="65" y="30" text-anchor="middle" fill="#6b7280" font-size="9">时间前缀+随机</text>
+  </g>
+  <g transform="translate(340, 455)">
+    <rect width="110" height="40" rx="6" fill="#fff1f2" stroke="#fb7185" stroke-width="1"/>
+    <text x="55" y="16" text-anchor="middle" fill="#e11d48" font-size="10" font-weight="bold">选型建议</text>
+    <text x="55" y="30" text-anchor="middle" fill="#6b7280" font-size="8">有序→Snowflake</text>
+  </g>
+
+  <!-- ═══════════ Section 2b: Idempotency ═══════════ -->
+  <rect x="490" y="300" width="440" height="270" rx="10" fill="white" stroke="#4facfe" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="490" y="300" width="440" height="35" rx="10" fill="url(#idemGrad)"/>
+  <rect x="490" y="318" width="440" height="17" fill="url(#idemGrad)"/>
+  <text x="710" y="325" text-anchor="middle" fill="white" font-size="14" font-weight="bold">幂等性设计</text>
+
+  <g transform="translate(510, 345)">
+    <rect width="190" height="65" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="bold">Token 机制</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">1. 申请 idempotent_token</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">2. Redis SET NX + TTL</text>
+    <text x="10" y="54" fill="#6b7280" font-size="9">3. 原子消费后执行业务</text>
+  </g>
+  <g transform="translate(720, 345)">
+    <rect width="190" height="65" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="bold">唯一索引去重</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">UNIQUE INDEX</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">DuplicateKey → 已存在</text>
+    <text x="10" y="54" fill="#6b7280" font-size="9">订单号/支付流水号</text>
+  </g>
+  <g transform="translate(510, 420)">
+    <rect width="190" height="65" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="bold">状态机防重</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">UPDATE ... WHERE status=X</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">affected_rows=0 → 已处理</text>
+    <text x="10" y="54" fill="#6b7280" font-size="9">支付回调/退款/审批</text>
+  </g>
+  <g transform="translate(720, 420)">
+    <rect width="190" height="65" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="95" y="16" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="bold">消费幂等</text>
+    <text x="10" y="30" fill="#6b7280" font-size="9">message_id / biz_id 去重</text>
+    <text x="10" y="42" fill="#6b7280" font-size="9">消费前检查 → 消费后标记</text>
+    <text x="10" y="54" fill="#6b7280" font-size="9">MQ 至少一次投递兜底</text>
+  </g>
+
+  <!-- Idempotency Layers -->
+  <g transform="translate(510, 497)">
+    <rect width="400" height="60" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+    <text x="200" y="16" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="bold">分层幂等防护</text>
+    <rect x="10" y="22" width="88" height="28" rx="4" fill="#bfdbfe"/><text x="54" y="40" text-anchor="middle" fill="#1e40af" font-size="9">网关层</text>
+    <rect x="108" y="22" width="88" height="28" rx="4" fill="#93c5fd"/><text x="152" y="40" text-anchor="middle" fill="#1e3a8a" font-size="9">服务层</text>
+    <rect x="206" y="22" width="88" height="28" rx="4" fill="#60a5fa"/><text x="250" y="40" text-anchor="middle" fill="white" font-size="9">存储层</text>
+    <rect x="304" y="22" width="86" height="28" rx="4" fill="#3b82f6"/><text x="347" y="40" text-anchor="middle" fill="white" font-size="9">消息层</text>
+  </g>
+
+  <!-- ═══════════ Section 2c: Distributed Lock ═══════════ -->
+  <rect x="950" y="300" width="420" height="270" rx="10" fill="white" stroke="#43e97b" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="950" y="300" width="420" height="35" rx="10" fill="url(#lockGrad)"/>
+  <rect x="950" y="318" width="420" height="17" fill="url(#lockGrad)"/>
+  <text x="1160" y="325" text-anchor="middle" fill="white" font-size="14" font-weight="bold">分布式锁 &amp; 一致性哈希</text>
+
+  <!-- Redis Lock -->
+  <g transform="translate(970, 345)">
+    <rect width="185" height="80" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="92" y="16" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="bold">Redis 锁</text>
+    <text x="10" y="32" fill="#4b5563" font-size="9">SET NX PX 30000</text>
+    <text x="10" y="44" fill="#4b5563" font-size="9">Lua 原子释放</text>
+    <text x="10" y="56" fill="#dc2626" font-size="9" font-weight="bold">风险: GC STW → 脑裂</text>
+    <text x="10" y="68" fill="#16a34a" font-size="9">→ Fencing Token 收底</text>
+  </g>
+
+  <!-- ZK Lock -->
+  <g transform="translate(1175, 345)">
+    <rect width="175" height="80" rx="6" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="87" y="16" text-anchor="middle" fill="#16a34a" font-size="10" font-weight="bold">ZooKeeper 锁</text>
+    <text x="10" y="32" fill="#4b5563" font-size="9">临时顺序节点</text>
+    <text x="10" y="44" fill="#4b5563" font-size="9">天然公平锁</text>
+    <text x="10" y="56" fill="#4b5563" font-size="9">会话断开自动删除</text>
+    <text x="10" y="68" fill="#6b7280" font-size="9">强一致 / etcd 同理</text>
+  </g>
+
+  <!-- Fencing Token -->
+  <g transform="translate(970, 435)">
+    <rect width="185" height="55" rx="6" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+    <text x="92" y="16" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">Fencing Token</text>
+    <text x="10" y="32" fill="#6b7280" font-size="9">获锁 → 递增 token</text>
+    <text x="10" y="44" fill="#6b7280" font-size="9">存储层校验 token 递增</text>
+  </g>
+
+  <!-- Consistent Hash -->
+  <g transform="translate(1175, 435)">
+    <rect width="175" height="55" rx="6" fill="#ecfdf5" stroke="#34d399" stroke-width="1"/>
+    <text x="87" y="16" text-anchor="middle" fill="#059669" font-size="10" font-weight="bold">一致性哈希</text>
+    <text x="10" y="32" fill="#6b7280" font-size="9">虚节点 150~200 标配</text>
+    <text x="10" y="44" fill="#6b7280" font-size="9">热点Key → 打散/本地缓存</text>
+  </g>
+
+  <!-- Lock selection -->
+  <g transform="translate(970, 500)">
+    <rect width="380" height="55" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+    <text x="190" y="16" text-anchor="middle" fill="#047857" font-size="10" font-weight="bold">选型原则</text>
+    <text x="190" y="34" text-anchor="middle" fill="#4b5563" font-size="9">能不用锁就不用锁 → 状态机/条件更新优先</text>
+    <text x="190" y="48" text-anchor="middle" fill="#4b5563" font-size="9">轻量互斥→Redis | 强语义→ZK/etcd | 资金级→DB条件更新</text>
+  </g>
+
+  <!-- ═══════════ Section 3: Distributed Transactions ═══════════ -->
+  <rect x="30" y="590" width="1340" height="400" rx="10" fill="white" stroke="#fa709a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="590" width="1340" height="38" rx="10" fill="url(#txGrad)"/>
+  <rect x="30" y="610" width="1340" height="18" fill="url(#txGrad)"/>
+  <text x="700" y="617" text-anchor="middle" fill="white" font-size="16" font-weight="bold">三、分布式事务方案全景</text>
+
+  <!-- 2PC -->
+  <g transform="translate(50, 640)">
+    <rect width="200" height="140" rx="8" fill="#fff5f7" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" fill="#db2777" font-size="12" font-weight="bold">2PC / XA</text>
+    <line x1="10" y1="28" x2="190" y2="28" stroke="#fce7f3" stroke-width="1"/>
+    <!-- 2PC Flow -->
+    <rect x="15" y="35" width="50" height="20" rx="3" fill="#fce7f3"/><text x="40" y="49" text-anchor="middle" fill="#be185d" font-size="8">协调者</text>
+    <rect x="80" y="35" width="50" height="20" rx="3" fill="#fce7f3"/><text x="105" y="49" text-anchor="middle" fill="#be185d" font-size="8">参与A</text>
+    <rect x="145" y="35" width="50" height="20" rx="3" fill="#fce7f3"/><text x="170" y="49" text-anchor="middle" fill="#be185d" font-size="8">参与B</text>
+    <line x1="40" y1="55" x2="105" y2="65" stroke="#f472b6" stroke-width="1" marker-end="url(#arrowRed)"/>
+    <line x1="40" y1="55" x2="170" y2="65" stroke="#f472b6" stroke-width="1" marker-end="url(#arrowRed)"/>
+    <text x="100" y="75" text-anchor="middle" fill="#9ca3af" font-size="8">Prepare → Vote → Commit</text>
+    <text x="100" y="95" text-anchor="middle" fill="#6b7280" font-size="9">强一致 | 低性能</text>
+    <text x="100" y="108" text-anchor="middle" fill="#6b7280" font-size="9">协调者单点风险</text>
+    <text x="100" y="121" text-anchor="middle" fill="#6b7280" font-size="9">参与方少 + 链路短</text>
+    <text x="100" y="134" text-anchor="middle" fill="#9ca3af" font-size="8">保守方案</text>
+  </g>
+
+  <!-- TCC -->
+  <g transform="translate(270, 640)">
+    <rect width="250" height="140" rx="8" fill="#fff5f7" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="125" y="20" text-anchor="middle" fill="#db2777" font-size="12" font-weight="bold">TCC (Try-Confirm-Cancel)</text>
+    <line x1="10" y1="28" x2="240" y2="28" stroke="#fce7f3" stroke-width="1"/>
+    <!-- TCC Steps -->
+    <rect x="15" y="35" width="60" height="24" rx="4" fill="#fecdd3"/><text x="45" y="51" text-anchor="middle" fill="#9f1239" font-size="9" font-weight="bold">Try</text>
+    <rect x="95" y="35" width="60" height="24" rx="4" fill="#fb7185"/><text x="125" y="51" text-anchor="middle" fill="white" font-size="9" font-weight="bold">Confirm</text>
+    <rect x="175" y="35" width="60" height="24" rx="4" fill="#e11d48"/><text x="205" y="51" text-anchor="middle" fill="white" font-size="9" font-weight="bold">Cancel</text>
+    <line x1="75" y1="47" x2="95" y2="47" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <line x1="155" y1="47" x2="175" y2="47" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <text x="125" y="78" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="bold">三大异常:</text>
+    <text x="125" y="92" text-anchor="middle" fill="#6b7280" font-size="9">空回滚 · 悬挂 · 幂等</text>
+    <text x="125" y="106" text-anchor="middle" fill="#6b7280" font-size="9">→ tx_record 状态表兜底</text>
+    <text x="125" y="120" text-anchor="middle" fill="#6b7280" font-size="9">资金/库存/支付冻结</text>
+    <text x="125" y="134" text-anchor="middle" fill="#9ca3af" font-size="8">强业务一致 | 高复杂度</text>
+  </g>
+
+  <!-- Saga -->
+  <g transform="translate(540, 640)">
+    <rect width="250" height="140" rx="8" fill="#fff5f7" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="125" y="20" text-anchor="middle" fill="#db2777" font-size="12" font-weight="bold">Saga</text>
+    <line x1="10" y1="28" x2="240" y2="28" stroke="#fce7f3" stroke-width="1"/>
+    <!-- Saga Flow -->
+    <rect x="10" y="36" width="35" height="18" rx="3" fill="#fecdd3"/><text x="27" y="49" text-anchor="middle" fill="#9f1239" font-size="7">T1</text>
+    <rect x="52" y="36" width="35" height="18" rx="3" fill="#fda4af"/><text x="69" y="49" text-anchor="middle" fill="#9f1239" font-size="7">T2</text>
+    <rect x="94" y="36" width="35" height="18" rx="3" fill="#fb7185"/><text x="111" y="49" text-anchor="middle" fill="white" font-size="7">T3</text>
+    <rect x="136" y="36" width="35" height="18" rx="3" fill="#f43f5e"/><text x="153" y="49" text-anchor="middle" fill="white" font-size="7">T4</text>
+    <text x="182" y="49" fill="#dc2626" font-size="10">✗</text>
+    <!-- Compensate -->
+    <rect x="10" y="58" width="35" height="18" rx="3" fill="#dbeafe"/><text x="27" y="71" text-anchor="middle" fill="#1e40af" font-size="7">C1</text>
+    <rect x="52" y="58" width="35" height="18" rx="3" fill="#93c5fd"/><text x="69" y="71" text-anchor="middle" fill="#1e40af" font-size="7">C2</text>
+    <rect x="94" y="58" width="35" height="18" rx="3" fill="#60a5fa"/><text x="111" y="71" text-anchor="middle" fill="white" font-size="7">C3</text>
+    <path d="M170,49 L190,53 L170,58" fill="none" stroke="#dc2626" stroke-width="1.2"/>
+    <text x="125" y="90" text-anchor="middle" fill="#6b7280" font-size="9">编排式(Orchestration)中央驱动</text>
+    <text x="125" y="104" text-anchor="middle" fill="#6b7280" font-size="9">协同式(Choreography)事件驱动</text>
+    <text x="125" y="118" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="bold">补偿失败→人工兜底队列</text>
+    <text x="125" y="134" text-anchor="middle" fill="#9ca3af" font-size="8">最终一致 | 长流程编排</text>
+  </g>
+
+  <!-- Outbox -->
+  <g transform="translate(810, 640)">
+    <rect width="250" height="140" rx="8" fill="#fff5f7" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="125" y="20" text-anchor="middle" fill="#db2777" font-size="12" font-weight="bold">本地消息表 / Outbox</text>
+    <line x1="10" y1="28" x2="240" y2="28" stroke="#fce7f3" stroke-width="1"/>
+    <!-- Outbox Flow -->
+    <rect x="15" y="36" width="60" height="20" rx="3" fill="#fce7f3"/><text x="45" y="50" text-anchor="middle" fill="#be185d" font-size="8">业务表</text>
+    <rect x="85" y="36" width="70" height="20" rx="3" fill="#fce7f3"/><text x="120" y="50" text-anchor="middle" fill="#be185d" font-size="8">outbox表</text>
+    <rect x="15" y="32" width="145" height="28" rx="5" fill="none" stroke="#f472b6" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="87" y="72" text-anchor="middle" fill="#9ca3af" font-size="8">同一本地事务</text>
+    <text x="210" y="50" fill="#6b7280" font-size="8">扫表</text>
+    <rect x="170" y="36" width="60" height="20" rx="3" fill="#fda4af"/><text x="200" y="50" text-anchor="middle" fill="#9f1239" font-size="8">→ MQ</text>
+    <text x="125" y="88" text-anchor="middle" fill="#16a34a" font-size="9" font-weight="bold">升级: CDC (Debezium)</text>
+    <text x="125" y="102" text-anchor="middle" fill="#6b7280" font-size="9">业务DB → CDC → Kafka → 下游</text>
+    <text x="125" y="118" text-anchor="middle" fill="#6b7280" font-size="9">at-least-once + 幂等消费</text>
+    <text x="125" y="134" text-anchor="middle" fill="#9ca3af" font-size="8">最终一致 | 异步解耦</text>
+  </g>
+
+  <!-- Transaction Message -->
+  <g transform="translate(1080, 640)">
+    <rect width="270" height="140" rx="8" fill="#fff5f7" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="135" y="20" text-anchor="middle" fill="#db2777" font-size="12" font-weight="bold">事务消息 (RocketMQ)</text>
+    <line x1="10" y1="28" x2="260" y2="28" stroke="#fce7f3" stroke-width="1"/>
+    <text x="135" y="46" text-anchor="middle" fill="#6b7280" font-size="9">1. Half Message → Broker</text>
+    <text x="135" y="60" text-anchor="middle" fill="#6b7280" font-size="9">2. 执行本地事务</text>
+    <text x="135" y="74" text-anchor="middle" fill="#6b7280" font-size="9">3. Commit / Rollback</text>
+    <text x="135" y="88" text-anchor="middle" fill="#6b7280" font-size="9">4. Broker 回查事务状态</text>
+    <line x1="20" y1="96" x2="250" y2="96" stroke="#fce7f3" stroke-width="1"/>
+    <text x="135" y="112" text-anchor="middle" fill="#6b7280" font-size="9">中间状态由 Broker 管理</text>
+    <text x="135" y="134" text-anchor="middle" fill="#9ca3af" font-size="8">最终一致 | 已有成熟MQ时优选</text>
+  </g>
+
+  <!-- Event Sourcing -->
+  <g transform="translate(50, 795)">
+    <rect width="330" height="80" rx="8" fill="#fdf4ff" stroke="#d946ef" stroke-width="1.5"/>
+    <text x="165" y="18" text-anchor="middle" fill="#a21caf" font-size="11" font-weight="bold">Event Sourcing + CQRS</text>
+    <text x="165" y="35" text-anchor="middle" fill="#6b7280" font-size="9">状态 = 事件序列的投影 | 回滚 = 追加补偿事件</text>
+    <rect x="15" y="42" width="50" height="16" rx="3" fill="#f5d0fe"/><text x="40" y="54" text-anchor="middle" fill="#86198f" font-size="7">Created</text>
+    <rect x="72" y="42" width="50" height="16" rx="3" fill="#e879f9"/><text x="97" y="54" text-anchor="middle" fill="white" font-size="7">Paid</text>
+    <rect x="129" y="42" width="55" height="16" rx="3" fill="#d946ef"/><text x="156" y="54" text-anchor="middle" fill="white" font-size="7">Shipped</text>
+    <rect x="191" y="42" width="55" height="16" rx="3" fill="#c026d3"/><text x="218" y="54" text-anchor="middle" fill="white" font-size="7">Cancelled</text>
+    <text x="165" y="74" text-anchor="middle" fill="#6b7280" font-size="9">Command → EventStore | Query → Projection</text>
+  </g>
+
+  <!-- Comparison Table -->
+  <g transform="translate(400, 795)">
+    <rect width="960" height="80" rx="8" fill="#fef9ff" stroke="#e879f9" stroke-width="1"/>
+    <text x="480" y="18" text-anchor="middle" fill="#a21caf" font-size="11" font-weight="bold">方案选型速查</text>
+    <text x="480" y="35" text-anchor="middle" fill="#6b7280" font-size="9">单库单服务→本地事务 | 资金库存→TCC | 长流程→Saga | 异步→事务消息/Outbox | 2PC→强一致收益 &gt; 阻塞成本</text>
+    <rect x="15" y="42" width="140" height="30" rx="5" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1"/>
+    <text x="85" y="60" text-anchor="middle" fill="#be185d" font-size="9" font-weight="bold">最好的分布式事务</text>
+    <rect x="170" y="42" width="220" height="30" rx="5" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="280" y="60" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">= 不需要分布式事务</text>
+    <text x="620" y="60" text-anchor="middle" fill="#6b7280" font-size="9">先通过领域拆分把强一致需求收敛到单服务内</text>
+  </g>
+
+  <!-- ═══════════ Section 4: Consistency Models ═══════════ -->
+  <rect x="30" y="1010" width="660" height="220" rx="10" fill="white" stroke="#a18cd1" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="1010" width="660" height="35" rx="10" fill="url(#consistGrad)"/>
+  <rect x="30" y="1028" width="660" height="17" fill="url(#consistGrad)"/>
+  <text x="360" y="1035" text-anchor="middle" fill="white" font-size="14" font-weight="bold">四、一致性模型全景 (强→弱)</text>
+
+  <!-- Consistency spectrum -->
+  <g transform="translate(50, 1055)">
+    <!-- Bar -->
+    <rect x="0" y="0" width="620" height="30" rx="5" fill="none" stroke="#c084fc" stroke-width="1"/>
+    <rect x="0" y="0" width="124" height="30" rx="5" fill="#7c3aed"/>
+    <rect x="124" y="0" width="124" height="30" fill="#8b5cf6"/>
+    <rect x="248" y="0" width="124" height="30" fill="#a78bfa"/>
+    <rect x="372" y="0" width="124" height="30" fill="#c4b5fd"/>
+    <rect x="496" y="0" width="124" height="30" rx="5" fill="#ddd6fe"/>
+    <text x="62" y="20" text-anchor="middle" fill="white" font-size="9" font-weight="bold">线性一致性</text>
+    <text x="186" y="20" text-anchor="middle" fill="white" font-size="9" font-weight="bold">顺序一致性</text>
+    <text x="310" y="20" text-anchor="middle" fill="white" font-size="9" font-weight="bold">因果一致性</text>
+    <text x="434" y="20" text-anchor="middle" fill="#4c1d95" font-size="9" font-weight="bold">读己之写</text>
+    <text x="558" y="20" text-anchor="middle" fill="#4c1d95" font-size="9" font-weight="bold">最终一致性</text>
+
+    <!-- Labels -->
+    <text x="62" y="48" text-anchor="middle" fill="#6b7280" font-size="8">全局实时顺序</text>
+    <text x="62" y="58" text-anchor="middle" fill="#6b7280" font-size="8">延迟高</text>
+    <text x="186" y="48" text-anchor="middle" fill="#6b7280" font-size="8">同一顺序</text>
+    <text x="186" y="58" text-anchor="middle" fill="#6b7280" font-size="8">不要求实时</text>
+    <text x="310" y="48" text-anchor="middle" fill="#6b7280" font-size="8">因果顺序保持</text>
+    <text x="310" y="58" text-anchor="middle" fill="#6b7280" font-size="8">社交/协作</text>
+    <text x="434" y="48" text-anchor="middle" fill="#6b7280" font-size="8">会话保证</text>
+    <text x="434" y="58" text-anchor="middle" fill="#6b7280" font-size="8">用户体验底线</text>
+    <text x="558" y="48" text-anchor="middle" fill="#6b7280" font-size="8">短暂不一致</text>
+    <text x="558" y="58" text-anchor="middle" fill="#6b7280" font-size="8">补偿+对账收口</text>
+  </g>
+
+  <!-- TrueTime & HLC -->
+  <g transform="translate(50, 1125)">
+    <rect width="300" height="90" rx="6" fill="#faf5ff" stroke="#a78bfa" stroke-width="1"/>
+    <text x="150" y="16" text-anchor="middle" fill="#6d28d9" font-size="10" font-weight="bold">TrueTime (Spanner)</text>
+    <text x="150" y="32" fill="#6b7280" font-size="9" text-anchor="middle">TT.now() = [earliest, latest]</text>
+    <text x="150" y="46" fill="#6b7280" font-size="9" text-anchor="middle">commit wait: 等到 earliest &gt; s</text>
+    <text x="150" y="60" fill="#6b7280" font-size="9" text-anchor="middle">GPS + 原子钟 → 外部一致性</text>
+    <line x1="15" y1="68" x2="285" y2="68" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="150" y="82" fill="#6d28d9" font-size="9" text-anchor="middle" font-weight="bold">无硬件 → HLC (混合逻辑时钟)</text>
+  </g>
+
+  <!-- Vector Clock -->
+  <g transform="translate(370, 1125)">
+    <rect width="300" height="90" rx="6" fill="#faf5ff" stroke="#a78bfa" stroke-width="1"/>
+    <text x="150" y="16" text-anchor="middle" fill="#6d28d9" font-size="10" font-weight="bold">向量时钟 &amp; CRDT</text>
+    <text x="150" y="32" fill="#6b7280" font-size="9" text-anchor="middle">{A:3, B:2} vs {A:4, B:1} → 并发冲突</text>
+    <text x="150" y="46" fill="#6b7280" font-size="9" text-anchor="middle">LWW | 客户端合并 | CRDT</text>
+    <line x1="15" y1="54" x2="285" y2="54" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="150" y="68" fill="#6b7280" font-size="9" text-anchor="middle">G-Counter: 每节点只增自己</text>
+    <text x="150" y="82" fill="#6b7280" font-size="9" text-anchor="middle">合并=逐节点取max, 无需协调</text>
+  </g>
+
+  <!-- ═══════════ Section 5: Storage & DB ═══════════ -->
+  <rect x="710" y="1010" width="660" height="220" rx="10" fill="white" stroke="#fcb69f" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="710" y="1010" width="660" height="35" rx="10" fill="url(#storageGrad)"/>
+  <rect x="710" y="1028" width="660" height="17" fill="url(#storageGrad)"/>
+  <text x="1040" y="1035" text-anchor="middle" fill="#9a3412" font-size="14" font-weight="bold">五、存储引擎与数据库内核</text>
+
+  <!-- LSM-Tree -->
+  <g transform="translate(730, 1055)">
+    <rect width="300" height="80" rx="6" fill="#fff7ed" stroke="#fb923c" stroke-width="1"/>
+    <text x="150" y="16" text-anchor="middle" fill="#c2410c" font-size="10" font-weight="bold">LSM-Tree</text>
+    <text x="150" y="32" fill="#6b7280" font-size="9" text-anchor="middle">Write→WAL→MemTable→SSTable→Compaction</text>
+    <text x="150" y="46" fill="#6b7280" font-size="9" text-anchor="middle">顺序写 | 不可变文件 | Bloom Filter</text>
+    <rect x="15" y="54" width="80" height="18" rx="3" fill="#fed7aa"/><text x="55" y="67" text-anchor="middle" fill="#9a3412" font-size="8">Size-Tiered</text>
+    <rect x="105" y="54" width="80" height="18" rx="3" fill="#fdba74"/><text x="145" y="67" text-anchor="middle" fill="#9a3412" font-size="8">Leveled</text>
+    <rect x="195" y="54" width="80" height="18" rx="3" fill="#fb923c"/><text x="235" y="67" text-anchor="middle" fill="white" font-size="8">FIFO</text>
+  </g>
+
+  <!-- MVCC -->
+  <g transform="translate(1050, 1055)">
+    <rect width="300" height="80" rx="6" fill="#fff7ed" stroke="#fb923c" stroke-width="1"/>
+    <text x="150" y="16" text-anchor="middle" fill="#c2410c" font-size="10" font-weight="bold">MVCC</text>
+    <text x="150" y="32" fill="#6b7280" font-size="9" text-anchor="middle">单机: xmin/xmax + 快照隔离</text>
+    <text x="150" y="46" fill="#6b7280" font-size="9" text-anchor="middle">分布式: key@ts → 多版本 + GC</text>
+    <text x="150" y="60" fill="#6b7280" font-size="9" text-anchor="middle">Percolator: Primary Key 协调</text>
+    <text x="150" y="74" fill="#6b7280" font-size="9" text-anchor="middle">Prewrite → Commit → 崩溃恢复</text>
+  </g>
+
+  <!-- Deadlock -->
+  <g transform="translate(730, 1145)">
+    <rect width="620" height="70" rx="6" fill="#fff7ed" stroke="#fdba74" stroke-width="1"/>
+    <text x="310" y="16" text-anchor="middle" fill="#c2410c" font-size="10" font-weight="bold">分布式死锁检测</text>
+    <rect x="15" y="25" width="180" height="35" rx="4" fill="#fed7aa"/>
+    <text x="105" y="40" text-anchor="middle" fill="#9a3412" font-size="9">超时回滚 (最简单)</text>
+    <text x="105" y="53" text-anchor="middle" fill="#78350f" font-size="8">可能误杀正常慢事务</text>
+    <rect x="210" y="25" width="200" height="35" rx="4" fill="#fdba74"/>
+    <text x="310" y="40" text-anchor="middle" fill="#9a3412" font-size="9">全局 wait-for graph</text>
+    <text x="310" y="53" text-anchor="middle" fill="#78350f" font-size="8">中心协调 + 找环</text>
+    <rect x="425" y="25" width="180" height="35" rx="4" fill="#fb923c"/>
+    <text x="515" y="40" text-anchor="middle" fill="white" font-size="9">边缘检测</text>
+    <text x="515" y="53" text-anchor="middle" fill="#fff7ed" font-size="8">分布式探测 无单中心</text>
+  </g>
+
+  <!-- ═══════════ Section 6: Raft ═══════════ -->
+  <rect x="30" y="1250" width="1340" height="250" rx="10" fill="white" stroke="#a1c4fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="1250" width="1340" height="38" rx="10" fill="url(#raftGrad)"/>
+  <rect x="30" y="1270" width="1340" height="18" fill="url(#raftGrad)"/>
+  <text x="700" y="1277" text-anchor="middle" fill="#1e3a8a" font-size="16" font-weight="bold">六、Raft 协议深入</text>
+
+  <!-- Leader Election -->
+  <g transform="translate(50, 1300)">
+    <rect width="300" height="185" rx="8" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="150" y="18" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="bold">Leader 选举</text>
+    <!-- State Machine -->
+    <circle cx="60" cy="55" r="22" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="60" y="59" text-anchor="middle" fill="#1e40af" font-size="8" font-weight="bold">Follower</text>
+    <circle cx="160" cy="55" r="22" fill="#93c5fd" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="160" y="59" text-anchor="middle" fill="#1e3a8a" font-size="8" font-weight="bold">Candidate</text>
+    <circle cx="260" cy="55" r="22" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+    <text x="260" y="59" text-anchor="middle" fill="white" font-size="8" font-weight="bold">Leader</text>
+    <line x1="82" y1="55" x2="138" y2="55" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <line x1="182" y1="55" x2="238" y2="55" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <text x="110" y="48" fill="#6b7280" font-size="7">timeout</text>
+    <text x="210" y="48" fill="#6b7280" font-size="7">多数票</text>
+    <!-- Return arrow -->
+    <path d="M260,77 C260,110 60,110 60,77" fill="none" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowRed)"/>
+    <text x="160" y="105" text-anchor="middle" fill="#ef4444" font-size="7">更高 term</text>
+    <text x="150" y="128" text-anchor="middle" fill="#6b7280" font-size="9">随机 election timeout 150~300ms</text>
+    <text x="150" y="142" text-anchor="middle" fill="#6b7280" font-size="9">避免 Split Vote</text>
+    <text x="150" y="158" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="bold">适用: etcd / TiKV / Consul</text>
+    <text x="150" y="172" text-anchor="middle" fill="#6b7280" font-size="9">配置元数据 | 集群状态 | 控制面</text>
+  </g>
+
+  <!-- Log Replication -->
+  <g transform="translate(370, 1300)">
+    <rect width="300" height="185" rx="8" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="150" y="18" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="bold">日志复制</text>
+    <text x="150" y="38" fill="#6b7280" font-size="9" text-anchor="middle">Leader append → replicate → majority ack</text>
+    <text x="150" y="52" fill="#6b7280" font-size="9" text-anchor="middle">→ commit → apply → reply</text>
+    <!-- Log visualization -->
+    <rect x="20" y="60" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="32" y="73" text-anchor="middle" fill="#166534" font-size="7">1</text>
+    <rect x="48" y="60" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="60" y="73" text-anchor="middle" fill="#166534" font-size="7">2</text>
+    <rect x="76" y="60" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="88" y="73" text-anchor="middle" fill="#166534" font-size="7">3</text>
+    <rect x="104" y="60" width="25" height="18" rx="2" fill="#86efac"/><text x="116" y="73" text-anchor="middle" fill="#166534" font-size="7">4</text>
+    <rect x="132" y="60" width="25" height="18" rx="2" fill="#4ade80"/><text x="144" y="73" text-anchor="middle" fill="white" font-size="7">5</text>
+    <text x="175" y="73" fill="#6b7280" font-size="8">← Leader</text>
+    <rect x="20" y="82" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="32" y="95" text-anchor="middle" fill="#166534" font-size="7">1</text>
+    <rect x="48" y="82" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="60" y="95" text-anchor="middle" fill="#166534" font-size="7">2</text>
+    <rect x="76" y="82" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="88" y="95" text-anchor="middle" fill="#166534" font-size="7">3</text>
+    <text x="120" y="95" fill="#6b7280" font-size="8">← Follower A</text>
+    <rect x="20" y="104" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="32" y="117" text-anchor="middle" fill="#166534" font-size="7">1</text>
+    <rect x="48" y="104" width="25" height="18" rx="2" fill="#bbf7d0"/><text x="60" y="117" text-anchor="middle" fill="#166534" font-size="7">2</text>
+    <rect x="76" y="104" width="25" height="18" rx="2" fill="#fecaca"/><text x="88" y="117" text-anchor="middle" fill="#991b1b" font-size="7">x</text>
+    <rect x="104" y="104" width="25" height="18" rx="2" fill="#fecaca"/><text x="116" y="117" text-anchor="middle" fill="#991b1b" font-size="7">y</text>
+    <text x="150" y="117" fill="#ef4444" font-size="8">← 脏日志</text>
+    <text x="150" y="140" text-anchor="middle" fill="#6b7280" font-size="9">nextIndex[] 回退找共同前缀</text>
+    <text x="150" y="155" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="bold">已 committed 日志不会被覆盖</text>
+    <text x="150" y="170" text-anchor="middle" fill="#6b7280" font-size="9">从分叉点强制用 Leader 日志覆盖</text>
+  </g>
+
+  <!-- Network Partition -->
+  <g transform="translate(690, 1300)">
+    <rect width="300" height="185" rx="8" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="150" y="18" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="bold">网络分区与脑裂</text>
+    <!-- Partition visualization -->
+    <rect x="15" y="30" width="120" height="55" rx="5" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="75" y="45" text-anchor="middle" fill="#dc2626" font-size="8" font-weight="bold">分区 A (少数派)</text>
+    <text x="75" y="58" text-anchor="middle" fill="#6b7280" font-size="8">旧Leader + 1 Follower</text>
+    <text x="75" y="72" text-anchor="middle" fill="#ef4444" font-size="8">无法 commit</text>
+    <rect x="160" y="30" width="120" height="55" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+    <text x="220" y="45" text-anchor="middle" fill="#16a34a" font-size="8" font-weight="bold">分区 B (多数派)</text>
+    <text x="220" y="58" text-anchor="middle" fill="#6b7280" font-size="8">3 节点</text>
+    <text x="220" y="72" text-anchor="middle" fill="#16a34a" font-size="8">选出新 Leader</text>
+    <line x1="135" y1="45" x2="160" y2="45" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="148" y="90" text-anchor="middle" fill="#ef4444" font-size="16">⚡</text>
+    <text x="150" y="110" text-anchor="middle" fill="#6b7280" font-size="9">恢复后: 旧Leader收到更高term</text>
+    <text x="150" y="124" text-anchor="middle" fill="#6b7280" font-size="9">退回 Follower, 未提交日志被覆盖</text>
+    <line x1="15" y1="134" x2="285" y2="134" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="150" y="150" text-anchor="middle" fill="#1d4ed8" font-size="10" font-weight="bold">ReadIndex 线性一致读</text>
+    <text x="150" y="165" text-anchor="middle" fill="#6b7280" font-size="9">心跳确认 → 等 applyIndex ≥ commitIndex</text>
+    <text x="150" y="178" text-anchor="middle" fill="#6b7280" font-size="9">Leader本地读 ≠ 线性一致读</text>
+  </g>
+
+  <!-- Raft vs Business TX -->
+  <g transform="translate(1010, 1300)">
+    <rect width="340" height="185" rx="8" fill="#eff6ff" stroke="#60a5fa" stroke-width="1"/>
+    <text x="170" y="18" text-anchor="middle" fill="#1d4ed8" font-size="11" font-weight="bold">Raft 定位 vs 业务事务</text>
+    <line x1="170" y1="30" x2="170" y2="120" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="85" y="45" text-anchor="middle" fill="#2563eb" font-size="10" font-weight="bold">Raft 解决</text>
+    <text x="85" y="62" text-anchor="middle" fill="#6b7280" font-size="9">副本状态复制</text>
+    <text x="85" y="76" text-anchor="middle" fill="#6b7280" font-size="9">多数派共识</text>
+    <text x="85" y="90" text-anchor="middle" fill="#6b7280" font-size="9">配置中心</text>
+    <text x="85" y="104" text-anchor="middle" fill="#6b7280" font-size="9">元数据管理</text>
+    <text x="85" y="118" text-anchor="middle" fill="#6b7280" font-size="9">锁服务本身</text>
+    <text x="255" y="45" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">TCC/Saga 解决</text>
+    <text x="255" y="62" text-anchor="middle" fill="#6b7280" font-size="9">业务跨服务一致性</text>
+    <text x="255" y="76" text-anchor="middle" fill="#6b7280" font-size="9">订单事务</text>
+    <text x="255" y="90" text-anchor="middle" fill="#6b7280" font-size="9">支付补偿</text>
+    <text x="255" y="104" text-anchor="middle" fill="#6b7280" font-size="9">库存冻结编排</text>
+    <text x="255" y="118" text-anchor="middle" fill="#6b7280" font-size="9">长流程编排</text>
+    <line x1="15" y1="130" x2="325" y2="130" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="170" y="148" text-anchor="middle" fill="#dc2626" font-size="10" font-weight="bold">不要用 Raft 替代业务事务</text>
+    <text x="170" y="165" text-anchor="middle" fill="#6b7280" font-size="9">Raft → 基础设施层共识</text>
+    <text x="170" y="178" text-anchor="middle" fill="#6b7280" font-size="9">TCC/Saga → 业务应用层编排</text>
+  </g>
+
+  <!-- ═══════════ Section 7: Production Patterns ═══════════ -->
+  <rect x="30" y="1520" width="1340" height="180" rx="10" fill="white" stroke="#96e6a1" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="1520" width="1340" height="38" rx="10" fill="url(#prodGrad)"/>
+  <rect x="30" y="1540" width="1340" height="18" fill="url(#prodGrad)"/>
+  <text x="700" y="1547" text-anchor="middle" fill="#166534" font-size="16" font-weight="bold">七、生产级架构模式与实践</text>
+
+  <!-- 6 Pillars -->
+  <g transform="translate(50, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">分层幂等</text>
+    <text x="100" y="34" text-anchor="middle" fill="#6b7280" font-size="9">网关: X-Idempotency-Key</text>
+    <text x="100" y="48" text-anchor="middle" fill="#6b7280" font-size="9">服务: 状态机+唯一键</text>
+    <text x="100" y="62" text-anchor="middle" fill="#6b7280" font-size="9">存储: INSERT IGNORE</text>
+    <text x="100" y="76" text-anchor="middle" fill="#6b7280" font-size="9">消息: 消费记录表</text>
+    <line x1="15" y1="84" x2="185" y2="84" stroke="#dcfce7" stroke-width="1"/>
+    <text x="100" y="100" text-anchor="middle" fill="#15803d" font-size="9" font-weight="bold">永远不要只押单一点</text>
+  </g>
+
+  <g transform="translate(270, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">全链路可观测</text>
+    <text x="100" y="36" text-anchor="middle" fill="#6b7280" font-size="9">TraceID + SpanID + TxID</text>
+    <text x="100" y="52" text-anchor="middle" fill="#6b7280" font-size="9">正向成功率</text>
+    <text x="100" y="66" text-anchor="middle" fill="#6b7280" font-size="9">补偿触发率</text>
+    <text x="100" y="80" text-anchor="middle" fill="#6b7280" font-size="9">空回滚/悬挂发生率</text>
+    <text x="100" y="94" text-anchor="middle" fill="#6b7280" font-size="9">人工队列积压量</text>
+    <text x="100" y="108" text-anchor="middle" fill="#15803d" font-size="9" font-weight="bold">没指标=问题已存在但没人知</text>
+  </g>
+
+  <g transform="translate(490, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">补偿优于回滚</text>
+    <text x="100" y="36" text-anchor="middle" fill="#6b7280" font-size="9">跨服务动作对外可见后</text>
+    <text x="100" y="50" text-anchor="middle" fill="#6b7280" font-size="9">很难完全回到"未发生"</text>
+    <line x1="15" y1="58" x2="185" y2="58" stroke="#dcfce7" stroke-width="1"/>
+    <text x="100" y="72" text-anchor="middle" fill="#6b7280" font-size="9">先问: 怎么补回来</text>
+    <text x="100" y="86" text-anchor="middle" fill="#6b7280" font-size="9">再问: 补偿失败怎么重试</text>
+    <text x="100" y="100" text-anchor="middle" fill="#6b7280" font-size="9">最后: 谁来接管</text>
+  </g>
+
+  <g transform="translate(710, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">人工兜底</text>
+    <text x="100" y="36" text-anchor="middle" fill="#6b7280" font-size="9">自动重试 N 次</text>
+    <text x="100" y="50" text-anchor="middle" fill="#6b7280" font-size="9">→ 死信队列</text>
+    <text x="100" y="64" text-anchor="middle" fill="#6b7280" font-size="9">→ 人工审核队列</text>
+    <line x1="15" y1="72" x2="185" y2="72" stroke="#dcfce7" stroke-width="1"/>
+    <text x="100" y="88" text-anchor="middle" fill="#dc2626" font-size="9" font-weight="bold">最大风险: 失败了没人知道</text>
+    <text x="100" y="102" text-anchor="middle" fill="#dc2626" font-size="9">卡住了没有收口动作</text>
+  </g>
+
+  <g transform="translate(930, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">对账是最终保险丝</text>
+    <text x="100" y="36" text-anchor="middle" fill="#6b7280" font-size="9">账务对账</text>
+    <text x="100" y="50" text-anchor="middle" fill="#6b7280" font-size="9">库存对账</text>
+    <text x="100" y="64" text-anchor="middle" fill="#6b7280" font-size="9">订单 vs 支付结果</text>
+    <line x1="15" y1="72" x2="185" y2="72" stroke="#dcfce7" stroke-width="1"/>
+    <text x="100" y="88" text-anchor="middle" fill="#6b7280" font-size="9">极端故障/漏消息</text>
+    <text x="100" y="102" text-anchor="middle" fill="#6b7280" font-size="9">人工误操作/边界条件</text>
+  </g>
+
+  <g transform="translate(1150, 1570)">
+    <rect width="200" height="115" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1"/>
+    <text x="100" y="18" text-anchor="middle" fill="#15803d" font-size="10" font-weight="bold">混沌工程</text>
+    <text x="100" y="36" text-anchor="middle" fill="#6b7280" font-size="9">网络延迟/丢包</text>
+    <text x="100" y="50" text-anchor="middle" fill="#6b7280" font-size="9">节点宕机/时钟漂移</text>
+    <text x="100" y="64" text-anchor="middle" fill="#6b7280" font-size="9">磁盘满/GC停顿</text>
+    <line x1="15" y1="72" x2="185" y2="72" stroke="#dcfce7" stroke-width="1"/>
+    <text x="100" y="88" text-anchor="middle" fill="#15803d" font-size="9" font-weight="bold">Jepsen 一致性验证</text>
+    <text x="100" y="102" text-anchor="middle" fill="#6b7280" font-size="9">主动制造故障 → 验证语义</text>
+  </g>
+
+  <!-- ═══════════ Section 8: Decision Tree ═══════════ -->
+  <rect x="30" y="1720" width="1340" height="460" rx="10" fill="white" stroke="#ffd89b" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="30" y="1720" width="1340" height="38" rx="10" fill="url(#decisionGrad)"/>
+  <rect x="30" y="1740" width="1340" height="18" fill="url(#decisionGrad)"/>
+  <text x="700" y="1747" text-anchor="middle" fill="white" font-size="16" font-weight="bold">八、系统设计决策树与回答框架</text>
+
+  <!-- Decision Tree -->
+  <!-- Root -->
+  <rect x="530" y="1775" width="200" height="35" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="630" y="1798" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">需要跨服务写入？</text>
+
+  <!-- No branch -->
+  <line x1="530" y1="1792" x2="350" y2="1792" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <text x="440" y="1786" fill="#16a34a" font-size="10" font-weight="bold">否</text>
+  <rect x="180" y="1778" width="170" height="30" rx="6" fill="#d1fae5" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="265" y="1798" text-anchor="middle" fill="#166534" font-size="11" font-weight="bold">单服务本地事务</text>
+
+  <!-- Yes branch -->
+  <line x1="630" y1="1810" x2="630" y2="1835" stroke="#f59e0b" stroke-width="2"/>
+  <text x="642" y="1828" fill="#92400e" font-size="10" font-weight="bold">是</text>
+
+  <!-- Can redesign? -->
+  <rect x="500" y="1835" width="260" height="35" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="630" y="1858" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">能否重新设计避免跨服务？</text>
+
+  <!-- Can redesign - Yes -->
+  <line x1="500" y1="1852" x2="350" y2="1852" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <text x="425" y="1846" fill="#16a34a" font-size="10" font-weight="bold">能</text>
+  <rect x="130" y="1838" width="220" height="30" rx="6" fill="#d1fae5" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="240" y="1858" text-anchor="middle" fill="#166534" font-size="11" font-weight="bold">合并服务 / 重新划分领域</text>
+
+  <!-- Can't redesign -->
+  <line x1="630" y1="1870" x2="630" y2="1900" stroke="#f59e0b" stroke-width="2"/>
+  <text x="642" y="1890" fill="#92400e" font-size="10" font-weight="bold">不能</text>
+
+  <!-- Must strong consistency? -->
+  <rect x="480" y="1900" width="300" height="35" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="630" y="1923" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">是否必须强业务一致？</text>
+
+  <!-- Strong - Yes -->
+  <line x1="480" y1="1917" x2="350" y2="1917" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <text x="415" y="1911" fill="#dc2626" font-size="10" font-weight="bold">是</text>
+  <rect x="200" y="1902" width="150" height="30" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="275" y="1922" text-anchor="middle" fill="#991b1b" font-size="12" font-weight="bold">优先 TCC</text>
+
+  <!-- Not strong -->
+  <line x1="630" y1="1935" x2="630" y2="1965" stroke="#f59e0b" stroke-width="2"/>
+  <text x="642" y="1955" fill="#92400e" font-size="10" font-weight="bold">否</text>
+
+  <!-- Sync or Async? -->
+  <rect x="440" y="1965" width="380" height="35" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="630" y="1988" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">同步长流程 还是 异步传播？</text>
+
+  <!-- Three options -->
+  <line x1="520" y1="2000" x2="300" y2="2040" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <text x="370" y="2015" fill="#1d4ed8" font-size="10" font-weight="bold">同步长流程</text>
+  <rect x="170" y="2030" width="180" height="35" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="260" y="2053" text-anchor="middle" fill="#1e40af" font-size="12" font-weight="bold">Saga 编排</text>
+
+  <line x1="630" y1="2000" x2="630" y2="2040" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="642" y="2020" fill="#6d28d9" font-size="10" font-weight="bold">异步解耦</text>
+  <rect x="530" y="2040" width="200" height="35" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="630" y="2063" text-anchor="middle" fill="#5b21b6" font-size="12" font-weight="bold">事务消息 / Outbox</text>
+
+  <line x1="740" y1="2000" x2="960" y2="2040" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowGray)"/>
+  <text x="870" y="2015" fill="#92400e" font-size="10" font-weight="bold">简单通知</text>
+  <rect x="880" y="2030" width="180" height="35" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="970" y="2053" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">本地消息表</text>
+
+  <!-- Answer Framework -->
+  <g transform="translate(50, 2090)">
+    <rect width="1300" height="75" rx="8" fill="#1e293b" filter="url(#shadow)"/>
+    <text x="650" y="22" text-anchor="middle" fill="#fbbf24" font-size="13" font-weight="bold">系统设计六步回答框架</text>
+    <rect x="15" y="35" width="190" height="28" rx="5" fill="#334155"/>
+    <text x="110" y="53" text-anchor="middle" fill="#fbbf24" font-size="10">1. 定义一致性等级</text>
+    <rect x="220" y="35" width="190" height="28" rx="5" fill="#334155"/>
+    <text x="315" y="53" text-anchor="middle" fill="#38bdf8" font-size="10">2. 定义全局业务主键</text>
+    <rect x="425" y="35" width="190" height="28" rx="5" fill="#334155"/>
+    <text x="520" y="53" text-anchor="middle" fill="#4ade80" font-size="10">3. 定义幂等屏障</text>
+    <rect x="630" y="35" width="190" height="28" rx="5" fill="#334155"/>
+    <text x="725" y="53" text-anchor="middle" fill="#f472b6" font-size="10">4. 定义互斥手段</text>
+    <rect x="835" y="35" width="190" height="28" rx="5" fill="#334155"/>
+    <text x="930" y="53" text-anchor="middle" fill="#c084fc" font-size="10">5. 选择事务模型</text>
+    <rect x="1040" y="35" width="245" height="28" rx="5" fill="#334155"/>
+    <text x="1162" y="53" text-anchor="middle" fill="#fb923c" font-size="10">6. 补上恢复闭环</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="700" y="2190" text-anchor="middle" fill="#9ca3af" font-size="11">分布式系统设计全景架构图 — 基于《分布式系统设计详解》</text>
+</svg>

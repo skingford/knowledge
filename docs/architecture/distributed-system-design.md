@@ -33,6 +33,14 @@ description: 从 CAP、Paxos、时钟回拨、幂等、TCC、事务消息到 Tru
 - [八、系统设计时的回答框架与决策树](#八系统设计时的回答框架与决策树)
 - [相关阅读](#相关阅读)
 
+<script setup>
+import InlineSvg from '@docs-components/InlineSvg.vue'
+</script>
+
+## 架构全景图
+
+<InlineSvg src="/architecture/distributed-system-design-diagram.svg" alt="分布式系统设计全景架构图" />
+
 ## 一、先看分布式系统真正难在哪里
 
 分布式系统真正难的，通常不是“某个组件怎么用”，而是下面这些现实同时存在：
