@@ -3,6 +3,7 @@ import type { SectionConfig } from './types'
 import { aiSection } from './ai'
 import { architectureSection } from './architecture'
 import { networkSection } from './network'
+import { algorithmSection } from './algorithm'
 import { golangSection } from './golang'
 import { pythonSection } from './python'
 import { reactSection } from './react'
@@ -27,6 +28,7 @@ const sections: SectionConfig[] = [
   aiSection,
   architectureSection,
   networkSection,
+  algorithmSection,
   golangSection,
   rustSection,
   pythonSection,
@@ -73,6 +75,7 @@ const homeTrackDescriptions: Record<string, string> = {
   ai: '从 Agent 模式、Tool Calling 到 RAG 与 workflow，把概念、设计和可落地实现串成完整路径。',
   architecture: '围绕系统设计、高并发与分布式治理，构建能复用到真实业务的判断框架与清单。',
   network: '从分层模型、传输层到 HTTP、DNS、CDN 和负载均衡，把网络知识整理成适合工程实践的主线。',
+  algorithm: '从分布式共识（Raft / Paxos）到一致性哈希、限流与经典数据结构，把工程高频算法讲透原理和选型。',
   golang: '覆盖语言机制、并发、性能与工程实践，把 Go 进阶学习从点状资料整理成面。',
   python: '从语法、函数、对象模型到 typing、asyncio 与工程化，把 Python 学习主线整理成一套清晰入口。',
   react: '以 React 为主线，围绕组件拆分、状态建模、Effect 边界、高频问题和性能优化建立工程判断。',

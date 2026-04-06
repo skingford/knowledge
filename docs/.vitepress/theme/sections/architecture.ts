@@ -10,7 +10,7 @@ export const architectureSection: SectionConfig = {
     eyebrow: 'Architecture',
     title: '架构方向',
     intro:
-      '围绕系统设计、高并发、分布式事务与治理方法，把架构学习整理成适合长期复用的框架、清单和路线。',
+      '围绕系统设计、高并发、分布式设计与治理方法，把架构学习整理成适合长期复用的框架、清单和路线。',
     primary: { title: '学习路线', href: '/architecture/architect-learning-roadmap', description: '先搭主线。' },
     secondary: { title: '能力自检', href: '/architecture/architect-interview-prep-checklist', description: '再用清单校验。' },
     scope: [
@@ -34,6 +34,8 @@ export const architectureSection: SectionConfig = {
       { title: 'Go + EMQX 长连接平台', href: '/architecture/go-emqx-million-connection-platform-design', description: '以 EMQX 5.x 为连接层核心，Go 微服务为业务层，覆盖 IM、IoT 和通用长连接平台的完整架构设计。' },
       { title: '高并发清单', href: '/architecture/high-concurrency-system-checklist', description: '把常见高并发设计问题拆成一组可检查项。' },
       { title: '高并发系统设计核心要点', href: '/architecture/architecture', description: '按流量承载、业务正确性、高可用保障和分布式基础设施四层，系统梳理高并发系统设计的核心抓手。' },
+      { title: '分布式系统设计', href: '/architecture/distributed-system-design', description: '从 CAP、Paxos、事务补偿到存储内核与一致性模型，建立一张完整的分布式系统设计地图。' },
+      { title: '电商交易平台架构', href: '/architecture/ecommerce-transaction-platform-production-architecture', description: '面向千万 DAU 和四个 9 目标，串起多活、交易链路、数据层高可用、大促保障与发布治理。' },
       { title: '一致性总览', href: '/architecture/transaction-system-consistency-overview', description: '把订单、库存、支付、延时任务、Outbox 与补偿主线收成一张统一的交易一致性地图。' },
       { title: '超时与时间轮', href: '/architecture/order-timeout-cancellation-and-timing-wheel', description: '从 30 分钟未支付自动取消切入，串起延时消息、时间轮、状态机幂等与补偿兜底。' },
       { title: '订单状态机', href: '/architecture/order-state-machine-design', description: '围绕支付、取消、退款等链路，讲清状态机设计、条件更新、幂等与并发竞争。' },
@@ -65,6 +67,8 @@ export const architectureSection: SectionConfig = {
       'Go + EMQX 长连接平台',
       '高并发清单',
       '高并发系统设计核心要点',
+      '分布式系统设计',
+      '电商交易平台架构',
       '一致性总览',
       '超时与时间轮',
       '订单状态机',
@@ -104,13 +108,15 @@ export const architectureSection: SectionConfig = {
         { text: '长连接网关', link: '/architecture/go-million-connection-gateway-design' },
         { text: 'EMQX 平台', link: '/architecture/go-emqx-million-connection-platform-design' },
         { text: '高并发清单', link: '/architecture/high-concurrency-system-checklist' },
-        { text: '高并发要点', link: '/architecture/architecture' },
+        { text: '高并发设计', link: '/architecture/architecture' },
+        { text: '分布式设计', link: '/architecture/distributed-system-design' },
       ],
     },
     {
       text: '交易一致',
       items: [
         { text: '一致性总览', link: '/architecture/transaction-system-consistency-overview' },
+        { text: '交易平台架构', link: '/architecture/ecommerce-transaction-platform-production-architecture' },
         { text: '超时与时间轮', link: '/architecture/order-timeout-cancellation-and-timing-wheel' },
         { text: '订单状态机', link: '/architecture/order-state-machine-design' },
         { text: '延时任务对比', link: '/architecture/delayed-task-solution-comparison' },

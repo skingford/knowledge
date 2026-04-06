@@ -151,6 +151,7 @@ export default defineConfig({
           navItem('ai'),
           navItem('architecture'),
           navItem('network'),
+          navItem('algorithm'),
         ],
       },
       {

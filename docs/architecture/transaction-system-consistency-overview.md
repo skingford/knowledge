@@ -262,6 +262,7 @@ flowchart TD
 
 | 问题类型 | 最核心的问题 | 优先看哪篇 |
 | --- | --- | --- |
+| 交易平台全景 | 多活、限流、订单、库存、支付和发布治理怎么串成一套生产方案 | [电商交易平台生产级架构深度设计](/architecture/ecommerce-transaction-platform-production-architecture) |
 | 订单状态流转 | 怎么防止状态被乱改、回退、并发覆盖 | [订单状态机设计实战](/architecture/order-state-machine-design) |
 | 订单超时关闭 | 延时任务怎么可靠触发、丢了怎么办 | [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel) |
 | 延时方案选型 | MQ、Redis、时间轮分别适合什么 | [延时任务方案对比](/architecture/delayed-task-solution-comparison) |
@@ -274,19 +275,21 @@ flowchart TD
 
 如果你想把这条线系统补起来，建议按下面顺序读：
 
-1. 先看 [订单状态机设计实战](/architecture/order-state-machine-design)
+1. 先看 [电商交易平台生产级架构深度设计](/architecture/ecommerce-transaction-platform-production-architecture)
+   - 先把多活、限流、订单、库存、支付、数据层和发布治理放进同一张全景图
+2. 再看 [订单状态机设计实战](/architecture/order-state-machine-design)
    - 先把“本地状态怎么合法流转”搞清楚
-2. 再看 [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
+3. 再看 [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
    - 理解延时任务和订单状态机怎么配合
-3. 然后看 [延时任务方案对比](/architecture/delayed-task-solution-comparison)
+4. 然后看 [延时任务方案对比](/architecture/delayed-task-solution-comparison)
    - 把 RocketMQ、RabbitMQ、Redis ZSet、时间轮的边界区分清楚
-4. 再看 [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
+5. 再看 [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
    - 把“本地事实怎么可靠发给下游”讲清楚
-5. 再看 [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design)
+6. 再看 [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design)
    - 把订单、库存和补偿收口到交易主链路里
-6. 再看 [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
+7. 再看 [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
    - 把热点活动里的限流、排队、背压和降级策略串进高并发主链路
-7. 最后看 [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+8. 最后看 [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
    - 把外部支付结果、主动查询和对账补齐
 
 按这个顺序读，比较容易形成一个从本地一致性到分布式一致性的完整闭环。
@@ -374,6 +377,7 @@ flowchart TD
 
 ## 相关阅读
 
+- [电商交易平台生产级架构深度设计](/architecture/ecommerce-transaction-platform-production-architecture)
 - [订单状态机设计实战](/architecture/order-state-machine-design)
 - [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
 - [延时任务方案对比](/architecture/delayed-task-solution-comparison)

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: false
-description: 架构方向学习入口，覆盖系统设计路线、书单、自检清单、高并发与分布式事务专题。
+description: 架构方向学习入口，覆盖系统设计路线、书单、自检清单、高并发、分布式设计与交易一致性专题。
 search: false
 aside: false
 outline: false
@@ -46,11 +46,13 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 - [图例速览](#图例速览)
 - [交易系统一致性主线](#交易系统一致性主线)
 - [高并发活动系统专题](#高并发活动系统专题)
+- [分布式基础专题](#分布式基础专题)
 - [岗位面试专题](#岗位面试专题)
 
 ## 交易系统一致性主线
 
 - [交易系统一致性设计总览](/architecture/transaction-system-consistency-overview)
+- [电商交易平台生产级架构深度设计](/architecture/ecommerce-transaction-platform-production-architecture)
 - [订单状态机设计实战](/architecture/order-state-machine-design)
 - [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
 - [延时任务方案对比](/architecture/delayed-task-solution-comparison)
@@ -72,6 +74,11 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 - [秒杀系统监控、告警与应急响应设计](/architecture/seckill-monitoring-alerting-and-incident-response)
 - [抢券系统设计专题：与秒杀系统的异同](/architecture/coupon-claim-system-design-and-comparison)
 - [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+
+## 分布式基础专题
+
+- [分布式系统设计详解](/architecture/distributed-system-design)
+- [分布式事务方案对比](/architecture/distributed-transaction-comparison)
 
 ## 长连接与 IM 系统
 
