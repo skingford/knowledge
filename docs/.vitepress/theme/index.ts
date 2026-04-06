@@ -32,6 +32,7 @@ const asyncGlobalComponents = {
   GoPerformanceDiagram: () => import('@docs-components/GoPerformanceDiagram.vue'),
   GoMicroserviceDiagram: () => import('@docs-components/GoMicroserviceDiagram.vue'),
   GoHighConcurrencySystemDesignDiagram: () => import('@docs-components/GoHighConcurrencySystemDesignDiagram.vue'),
+  HighConcurrencyOverviewDiagram: () => import('@docs-components/HighConcurrencyOverviewDiagram.vue'),
   GoAdvancedTopicDiagram: () => import('@docs-components/GoAdvancedTopicDiagram.vue'),
   GoSecurityDiagram: () => import('@docs-components/GoSecurityDiagram.vue'),
   GoCloudNativeDiagram: () => import('@docs-components/GoCloudNativeDiagram.vue'),
