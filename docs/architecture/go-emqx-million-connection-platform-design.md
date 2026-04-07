@@ -16,6 +16,16 @@ vocabulary:
   - exhook
 ---
 
+<script setup lang="ts">
+import EmqxPlatformDecisionDiagram from '@docs-components/EmqxPlatformDecisionDiagram.vue'
+import EmqxPlatformOverviewDiagram from '@docs-components/EmqxPlatformOverviewDiagram.vue'
+import EmqxInternalArchDiagram from '@docs-components/EmqxInternalArchDiagram.vue'
+import EmqxMriaDiagram from '@docs-components/EmqxMriaDiagram.vue'
+import EmqxImMessageFlowDiagram from '@docs-components/EmqxImMessageFlowDiagram.vue'
+import EmqxIotDataPipelineDiagram from '@docs-components/EmqxIotDataPipelineDiagram.vue'
+import EmqxAuthChainDiagram from '@docs-components/EmqxAuthChainDiagram.vue'
+</script>
+
 # Go + EMQX 百万长连接平台架构设计
 
 ## 适合人群
@@ -53,9 +63,36 @@ vocabulary:
 - [参考资源](#参考资源)
 - [高频问题](#高频问题)
 
+## 官方文档直达
+
+<div class="section-landing__docs section-landing__grid">
+  <a
+    class="section-landing__card"
+    href="https://docs.emqx.com/zh/emqx/latest/"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <p><Badge type="tip" text="推荐" /></p>
+    <h3>EMQX 官方文档（中文） ↗</h3>
+    <p>直接查看 EMQX 最新中文文档，适合查配置、认证鉴权、Rule Engine、Data Integration、Management API 和集群部署细节。</p>
+  </a>
+  <a
+    class="section-landing__card"
+    href="https://github.com/emqx/emqx"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <p><Badge type="info" text="源码" /></p>
+    <h3>EMQX GitHub ↗</h3>
+    <p>直接查看源码仓库、Issue、Release 和官方实现细节，适合追 ExHook、集群能力、版本变化和运维问题排查。</p>
+  </a>
+</div>
+
 ---
 
 ## 方案定位：自研网关 vs EMQX 平台
+
+<EmqxPlatformDecisionDiagram />
 
 | 维度 | 自研网关（Go + epoll） | EMQX 平台（Go + EMQX） |
 |---|---|---|
@@ -77,63 +114,7 @@ vocabulary:
 
 ## 系统架构总览
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                            Client Layer                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
-│  │ Mobile   │  │ Web      │  │ IoT      │  │ Desktop  │               │
-│  │ App      │  │ Browser  │  │ Device   │  │ Client   │               │
-│  │ (MQTT)   │  │ (WS/WSS) │  │ (MQTT)   │  │ (MQTT)   │               │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘               │
-└───────┼──────────────┼──────────────┼──────────────┼────────────────────┘
-        │              │              │              │
-        ▼              ▼              ▼              ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     Load Balancer (L4 TCP/TLS)                          │
-│                     HAProxy / NLB / MetalLB                             │
-└──────────────────────────────┬──────────────────────────────────────────┘
-                               │
-        ┌──────────────────────┼──────────────────────┐
-        ▼                      ▼                      ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  EMQX Core 1  │──│  EMQX Core 2  │──│  EMQX Core 3  │  ← Full Mesh
-│  (Mria ACID)  │  │  (Mria ACID)  │  │  (Mria ACID)  │
-└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
-        │ async RLOG       │ async RLOG       │ async RLOG
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  Replicant 1  │  │  Replicant 2  │  │  Replicant N  │  ← Star Topology
-│  (Read-Only)  │  │  (Read-Only)  │  │  (Read-Only)  │
-└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
-        │                  │                  │
-        └──────────────────┼──────────────────┘
-                           │
-        ┌──────────────────┼──────────────────────────────┐
-        │                  │                              │
-        ▼                  ▼                              ▼
-┌───────────────┐  ┌───────────────┐              ┌───────────────┐
-│  Rule Engine  │  │ ExHook(gRPC)  │              │  WebHook      │
-│  SQL Filter   │  │               │              │  HTTP POST    │
-└───────┬───────┘  └───────┬───────┘              └───────┬───────┘
-        │                  │                              │
-        ▼                  ▼                              ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                     Go Microservices Layer                        │
-│  ┌─────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
-│  │ API     │  │ ExHook   │  │ Consumer │  │ Push Service     │  │
-│  │ Server  │  │ Server   │  │ Service  │  │ (REST API/Paho)  │  │
-│  └────┬────┘  └────┬─────┘  └────┬─────┘  └────────┬─────────┘  │
-└───────┼─────────────┼─────────────┼─────────────────┼────────────┘
-        │             │             │                 │
-        ▼             ▼             ▼                 ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                     Infrastructure Layer                         │
-│  ┌───────┐  ┌───────┐  ┌────────┐  ┌────────────┐  ┌─────────┐ │
-│  │ Kafka │  │ Redis │  │ MySQL/ │  │ ClickHouse │  │ Prome-  │ │
-│  │       │  │       │  │ PG     │  │ /InfluxDB  │  │ theus   │ │
-│  └───────┘  └───────┘  └────────┘  └────────────┘  └─────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-```
+<EmqxPlatformOverviewDiagram />
 
 **核心设计原则：EMQX 只做连接和消息，Go 只做业务。**
 
@@ -154,22 +135,7 @@ EMQX 基于 Erlang/OTP 构建，天然适合海量并发连接：
 
 ### 4 层内部架构
 
-```
-┌──────────────────────────────────────────┐
-│  Connection Layer                        │
-│  TCP/TLS/WebSocket 接入，MQTT 报文编解码    │
-├──────────────────────────────────────────┤
-│  Session Layer                           │
-│  PUBLISH/SUBSCRIBE 处理，QoS 状态机        │
-├──────────────────────────────────────────┤
-│  PubSub Layer                            │
-│  本地订阅分发，Subscription Table 匹配      │
-├──────────────────────────────────────────┤
-│  Router Layer                            │
-│  集群级 Topic Trie + Route Table          │
-│  跨节点消息转发                            │
-└──────────────────────────────────────────┘
-```
+<EmqxInternalArchDiagram />
 
 | 层级 | 职责 | 关键数据结构 |
 |---|---|---|
@@ -186,17 +152,7 @@ EMQX 5.0 引入 Mria 数据库，替代 Erlang 原生的 Mnesia：
 - **解决**：Mria 采用 Mesh + Star 混合拓扑，数据分为 RLOG Shards 并行复制
 - **原理**：EMQ 团队 fork 了 OTP，优化了 Mnesia 事务日志捕获，消除重复写入
 
-```
-Mnesia (旧):                    Mria (新):
-
-  N1 ──── N2                      Core1 ── Core2 ── Core3
-  │ \  / │                          │         │        │
-  │  \/  │     →                    ▼         ▼        ▼
-  │  /\  │                      Replicant1  Rep2 ... RepN
-  │ /  \ │                      (async RLOG replication)
-  N3 ──── N4
-  (N² full mesh)                (Mesh + Star hybrid)
-```
+<EmqxMriaDiagram />
 
 ---
 
@@ -242,6 +198,8 @@ Replicant 节点（3~6 台）：
 ---
 
 ## Go 与 EMQX 的四种集成模式
+
+> 建议先过一遍 [EMQX 官方文档（中文）](https://docs.emqx.com/zh/emqx/latest/)，尤其是认证、授权、Rule Engine、Data Integration 和 Management API 相关章节，再回来看下面四种集成模式会更顺手。
 
 ### 模式一：Paho MQTT Client
 
@@ -436,30 +394,7 @@ im/{userId}/sync           → 多端同步（已读/撤回/删除同步）
 
 #### 消息流转
 
-```
-发送私聊消息：
-  Sender App
-    │ MQTT PUBLISH → im/{receiverId}/inbox
-    ▼
-  EMQX
-    ├─→ Receiver 在线 → 直接投递（QoS 1 保证至少一次）
-    │
-    ├─→ Rule Engine
-    │     SELECT * FROM "im/+/inbox"
-    │     Action 1: Kafka Sink → topic: im-messages（持久化）
-    │     Action 2: Redis Sink → HSET user:{receiverId}:unread（未读计数）
-    │
-    └─→ ExHook on_message_publish
-          → Go 服务检查黑名单、敏感词过滤
-          → 返回 allow / deny
-
-离线消息处理：
-  Kafka Consumer (Go)
-    │ 消费 im-messages topic
-    ├─→ 写入 MySQL/PG（消息持久化）
-    ├─→ 检查 Receiver 是否离线
-    └─→ 离线 → 调用 APNs/FCM 推送
-```
+<EmqxImMessageFlowDiagram />
 
 #### 群聊广播
 
@@ -504,30 +439,7 @@ sys/device/disconnected         → 系统主题：设备离线通知（EMQX 内
 
 #### 数据上报链路
 
-```
-IoT Device
-  │ MQTT PUBLISH → device/{deviceId}/telemetry
-  │ QoS 1, payload: {"temp": 25.3, "humidity": 60, "ts": 1711756800}
-  ▼
-EMQX Rule Engine:
-  SELECT
-    clientid as device_id,
-    payload.temp as temperature,
-    payload.humidity as humidity,
-    payload.ts as timestamp
-  FROM "device/+/telemetry"
-
-  Action 1: ClickHouse Sink → 时序数据存储
-    INSERT INTO device_telemetry(device_id, temperature, humidity, timestamp)
-    VALUES (${device_id}, ${temperature}, ${humidity}, ${timestamp})
-
-  Action 2: Redis Sink → 设备最新状态缓存
-    HSET device:${device_id}:latest temp ${temperature} humidity ${humidity}
-
-  Action 3: Kafka Sink（温度告警）
-    WHERE temperature > 50
-    → topic: device-alerts
-```
+<EmqxIotDataPipelineDiagram />
 
 #### 指令下发
 
@@ -637,32 +549,7 @@ Web 前端连接示例（MQTT.js）：
 
 ### 认证链设计
 
-```
-EMQX 支持认证链，按顺序执行，命中即停止：
-
-┌─────────────────┐
-│ 1. X.509 证书    │ ← TLS 握手时自动执行，优先级最高
-│    (IoT 设备)    │
-└────────┬────────┘
-         │ 未匹配
-         ▼
-┌─────────────────┐
-│ 2. JWT Token    │ ← 验证签名 + 过期时间 + claims
-│    (Mobile/Web) │    支持 JWKS 自动轮换
-└────────┬────────┘
-         │ 未匹配
-         ▼
-┌─────────────────┐
-│ 3. Redis 查询    │ ← HGET mqtt_user:{username} password_hash
-│    (缓存层)      │    高性能，适合高并发认证
-└────────┬────────┘
-         │ 未匹配
-         ▼
-┌─────────────────┐
-│ 4. MySQL/PG 查询 │ ← SELECT password_hash FROM mqtt_users WHERE username = ?
-│    (持久化层)    │    Redis 未命中时兜底
-└─────────────────┘
-```
+<EmqxAuthChainDiagram />
 
 ### ACL 鉴权规则
 
@@ -1694,7 +1581,7 @@ EMQX 官方 Grafana Dashboard:
 
 | 资源 | 说明 |
 |---|---|
-| [EMQX 官方文档](https://docs.emqx.com/en/emqx/latest/) | 最权威的配置和 API 参考 |
+| [EMQX 官方文档（中文）](https://docs.emqx.com/zh/emqx/latest/) | 最权威的配置和 API 参考，可直接跳转访问 |
 | [EMQX GitHub](https://github.com/emqx/emqx) | 源码和 Issue 追踪 |
 | [EMQX 100M 连接博客](https://www.emqx.com/en/blog/how-emqx-5-0-achieves-100-million-mqtt-connections) | 1 亿连接基准测试详解 |
 | [EMQX 5M 单节点](https://www.emqx.com/en/blog/emqx-single-node-supports-5m-connections) | 单节点性能基准 |
