@@ -263,13 +263,33 @@ const categories: Category[] = [
         fallback: "🧠",
         url: "https://skills.sh/",
       },
+      {
+        name: "Tessl",
+        desc: "Agent skills 与 context 的注册表与包管理平台",
+        domain: "tessl.io",
+        fallback: "🧩",
+        url: "https://tessl.io/",
+      },
+      {
+        name: "Minimalist Entrepreneur Skills",
+        desc: "基于《The Minimalist Entrepreneur》的 Claude Code skills 集",
+        domain: "github.com",
+        fallback: "📘",
+        url: "https://github.com/slavingia/skills",
+      },
     ],
   },
   {
     title: "GitHub Workflow",
     emoji: "🧭",
     sites: [
-      // Workflow
+      {
+        name: "Everything Claude Code",
+        desc: "Claude Code 组合技",
+        domain: "github.com",
+        fallback: "📦",
+        url: "https://github.com/affaan-m/everything-claude-code",
+      },
       {
         name: "ccg-workflow",
         desc: "多模型协作开发工作流",
@@ -314,6 +334,13 @@ const categories: Category[] = [
         url: "https://github.com/Yeachan-Heo/oh-my-claudecode",
       },
       {
+        name: "gstack",
+        desc: "Claude Code 虚拟工程团队工作流",
+        domain: "github.com",
+        fallback: "🏗️",
+        url: "https://github.com/garrytan/gstack",
+      },
+      {
         name: "Superpowers",
         desc: "编码 Agent 技能框架",
         domain: "github.com",
@@ -349,11 +376,11 @@ const categories: Category[] = [
         url: "https://github.com/luongnv89/claude-howto",
       },
       {
-        name: "Everything Claude Code",
-        desc: "Claude Code 资源聚合",
+        name: "AgentGuide",
+        desc: "AI Agent 开发学习指南",
         domain: "github.com",
-        fallback: "📦",
-        url: "https://github.com/affaan-m/everything-claude-code",
+        fallback: "🗺️",
+        url: "https://github.com/adongwanai/AgentGuide",
       },
     ],
   },
