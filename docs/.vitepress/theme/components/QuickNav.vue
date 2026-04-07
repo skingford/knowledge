@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import QuickNavCategoryIcon from "./QuickNavCategoryIcon.vue";
 import { ref, onMounted, onUnmounted } from "vue";
 
 interface Site {
@@ -10,9 +11,21 @@ interface Site {
   lightBg?: boolean;
 }
 
+type CategoryIconName =
+  | "talk"
+  | "code"
+  | "research"
+  | "skill"
+  | "workflow"
+  | "guide"
+  | "design"
+  | "audio"
+  | "tools"
+  | "ranking";
+
 interface Category {
   title: string;
-  emoji: string;
+  icon: CategoryIconName;
   sites: Site[];
 }
 
@@ -109,7 +122,7 @@ onUnmounted(() => {
 const categories: Category[] = [
   {
     title: "AI Talk",
-    emoji: "🤖",
+    icon: "talk",
     sites: [
       {
         name: "Claude",
@@ -164,7 +177,7 @@ const categories: Category[] = [
   },
   {
     title: "AI 编程工具",
-    emoji: "💻",
+    icon: "code",
     sites: [
       {
         name: "Claude Code",
@@ -219,7 +232,7 @@ const categories: Category[] = [
   },
   {
     title: "AI 研究工具",
-    emoji: "🔍",
+    icon: "research",
     sites: [
       {
         name: "NotebookLM",
@@ -254,7 +267,7 @@ const categories: Category[] = [
   },
   {
     title: "AI Skill",
-    emoji: "🧠",
+    icon: "skill",
     sites: [
       {
         name: "skills.sh",
@@ -281,7 +294,7 @@ const categories: Category[] = [
   },
   {
     title: "GitHub Workflow",
-    emoji: "🧭",
+    icon: "workflow",
     sites: [
       {
         name: "Everything Claude Code",
@@ -359,7 +372,7 @@ const categories: Category[] = [
   },
   {
     title: "GitHub Guide",
-    emoji: "📘",
+    icon: "guide",
     sites: [
       {
         name: "Learn Claude Code",
@@ -382,11 +395,18 @@ const categories: Category[] = [
         fallback: "🗺️",
         url: "https://github.com/adongwanai/AgentGuide",
       },
+      {
+        name: "Awesome System Design Resources",
+        desc: "系统设计学习与面试资源集合",
+        domain: "github.com",
+        fallback: "🏛️",
+        url: "https://github.com/ashishps1/awesome-system-design-resources",
+      },
     ],
   },
   {
     title: "AI 设计",
-    emoji: "🎨",
+    icon: "design",
     sites: [
       {
         name: "Stitch",
@@ -394,6 +414,13 @@ const categories: Category[] = [
         domain: "stitch.withgoogle.com",
         fallback: "🪡",
         url: "https://stitch.withgoogle.com/",
+      },
+      {
+        name: "awesome-design-md",
+        desc: "DESIGN.md 设计系统仓库集合，适合让 AI Agent 对齐站点风格",
+        domain: "github.com",
+        fallback: "🧾",
+        url: "https://github.com/VoltAgent/awesome-design-md",
       },
       {
         name: "Figma",
@@ -434,7 +461,7 @@ const categories: Category[] = [
   },
   {
     title: "AI 音频",
-    emoji: "🎵",
+    icon: "audio",
     sites: [
       {
         name: "Seedance 2.0",
@@ -468,7 +495,7 @@ const categories: Category[] = [
   },
   {
     title: "开发者工具",
-    emoji: "🛠️",
+    icon: "tools",
     sites: [
       {
         name: "GitHub",
@@ -509,7 +536,7 @@ const categories: Category[] = [
   },
   {
     title: "网站排行",
-    emoji: "📈",
+    icon: "ranking",
     sites: [
       {
         name: "OpenRouter Rankings",
@@ -554,8 +581,10 @@ const categories: Category[] = [
         class="nav-category"
       >
         <h2 class="cat-title">
-          <span class="cat-emoji">{{ cat.emoji }}</span>
-          {{ cat.title }}
+          <span class="cat-icon" aria-hidden="true">
+            <QuickNavCategoryIcon :name="cat.icon" />
+          </span>
+          <span class="cat-title-text">{{ cat.title }}</span>
         </h2>
         <div class="sites-grid">
           <a
@@ -594,8 +623,10 @@ const categories: Category[] = [
           href="javascript:void(0)"
           @click="scrollToCategory(cat.title)"
         >
-          <span class="side-nav-emoji">{{ cat.emoji }}</span>
-          <span>{{ cat.title }}</span>
+          <span class="side-nav-icon" aria-hidden="true">
+            <QuickNavCategoryIcon :name="cat.icon" />
+          </span>
+          <span class="side-nav-label">{{ cat.title }}</span>
         </a>
       </div>
     </nav>
@@ -623,20 +654,48 @@ const categories: Category[] = [
 .cat-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 18px;
   font-weight: 600;
   color: var(--vp-c-text-1);
   margin: 0 0 16px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--vp-c-divider);
   border-top: none;
   letter-spacing: -0.01em;
 }
 
-.cat-emoji {
-  font-size: 20px;
-  line-height: 1;
+.cat-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #c46849;
+  border-radius: 12px;
+  border: 1px solid rgba(196, 104, 73, 0.18);
+  background:
+    linear-gradient(145deg, rgba(196, 104, 73, 0.16), rgba(196, 104, 73, 0.05)),
+    color-mix(in srgb, var(--vp-c-bg-elv) 92%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.cat-icon :deep(svg) {
+  width: 19px;
+  height: 19px;
+}
+
+.dark .cat-icon {
+  border-color: rgba(196, 104, 73, 0.24);
+  background:
+    linear-gradient(145deg, rgba(196, 104, 73, 0.18), rgba(196, 104, 73, 0.04)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.cat-title-text {
+  line-height: 1.2;
 }
 
 .sites-grid {
@@ -664,6 +723,12 @@ const categories: Category[] = [
   transform: translateY(-2px);
   border-color: #c46849;
   box-shadow: 0 4px 24px rgba(196, 104, 73, 0.1);
+}
+
+.site-card:focus-visible,
+.side-nav-item:focus-visible {
+  outline: 2px solid rgba(196, 104, 73, 0.45);
+  outline-offset: 3px;
 }
 
 .dark .site-card {
@@ -738,7 +803,7 @@ const categories: Category[] = [
 .side-nav {
   position: sticky;
   top: 80px;
-  width: 160px;
+  width: 176px;
   flex-shrink: 0;
   padding-top: 16px;
 }
@@ -746,7 +811,7 @@ const categories: Category[] = [
 .side-nav-inner {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   border-left: 1px solid var(--vp-c-divider);
   padding-left: 12px;
 }
@@ -764,8 +829,8 @@ const categories: Category[] = [
 .side-nav-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 8px;
+  gap: 8px;
+  padding: 6px 8px;
   font-size: 13px;
   color: var(--vp-c-text-2);
   text-decoration: none;
@@ -785,9 +850,53 @@ const categories: Category[] = [
   background: rgba(196, 104, 73, 0.08);
 }
 
-.side-nav-emoji {
-  font-size: 14px;
-  line-height: 1;
+.side-nav-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: color-mix(in srgb, var(--vp-c-text-2) 72%, #c46849);
+  border: 1px solid color-mix(in srgb, var(--vp-c-divider) 72%, rgba(196, 104, 73, 0.12));
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 86%, transparent);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.side-nav-icon :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.side-nav-item:hover .side-nav-icon {
+  color: #c46849;
+  border-color: rgba(196, 104, 73, 0.2);
+  background:
+    linear-gradient(145deg, rgba(196, 104, 73, 0.14), rgba(196, 104, 73, 0.04)),
+    color-mix(in srgb, var(--vp-c-bg-elv) 90%, transparent);
+  transform: translateY(-1px);
+}
+
+.side-nav-item.active .side-nav-icon {
+  color: #c46849;
+  border-color: rgba(196, 104, 73, 0.24);
+  background:
+    linear-gradient(145deg, rgba(196, 104, 73, 0.16), rgba(196, 104, 73, 0.05)),
+    color-mix(in srgb, var(--vp-c-bg-elv) 92%, transparent);
+}
+
+.dark .side-nav-icon {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.side-nav-label {
+  line-height: 1.3;
 }
 
 @media (max-width: 960px) {
