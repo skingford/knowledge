@@ -439,5 +439,5 @@ flowchart TD
 
 - [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
 - [订单状态机设计实战](/architecture/order-state-machine-design)
-- [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+- [高并发系统设计核心要点](/architecture/architecture)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)

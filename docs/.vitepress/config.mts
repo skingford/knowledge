@@ -49,6 +49,7 @@ export default defineConfig({
     'golang/legacy/golang-recommended-resources.md': 'golang/golang-recommended-resources.md',
     'golang/guide/legacy/09-runtime-source.md': 'golang/guide/09-runtime-source.md',
     'architecture/high-concurrency-system-design-core-points.md': 'architecture/architecture.md',
+    'architecture/high-concurrency-system-checklist.md': 'architecture/architecture.md',
   },
   lastUpdated: true,
   appearance: true,
@@ -96,6 +97,10 @@ export default defineConfig({
     theme: {
       light: 'github-light',
       dark: 'github-dark',
+    },
+    languageAlias: {
+      just: 'makefile',
+      justfile: 'makefile',
     },
     config(md) {
       const defaultHtmlBlock =

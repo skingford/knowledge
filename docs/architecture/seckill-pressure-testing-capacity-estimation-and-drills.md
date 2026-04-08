@@ -488,5 +488,5 @@ flowchart TD
 - [活动复盘模板与容量回归手册](/architecture/activity-postmortem-and-capacity-regression-playbook)
 - [秒杀系统监控、告警与应急响应设计](/architecture/seckill-monitoring-alerting-and-incident-response)
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
-- [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+- [高并发系统设计核心要点](/architecture/architecture)
 - [高并发支付系统专题整理](/architecture/case-studies/high-concurrency-payment-system-practice-notes)

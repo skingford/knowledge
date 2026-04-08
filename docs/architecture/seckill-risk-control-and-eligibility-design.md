@@ -448,5 +448,5 @@ flowchart TD
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
 - [秒杀系统库存设计专题](/architecture/seckill-system-inventory-design)
 - [秒杀结果查询、排队态与用户体验设计](/architecture/seckill-result-query-and-queueing-ux-design)
-- [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+- [高并发系统设计核心要点](/architecture/architecture)
 - [Redis 高并发、集群与锁](/redis/high-concurrency-cluster-locks)

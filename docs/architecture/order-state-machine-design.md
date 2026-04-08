@@ -402,4 +402,4 @@ CREATE TABLE orders (
 - [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
 - [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)
-- [高并发系统设计清单](/architecture/high-concurrency-system-checklist)
+- [高并发系统设计核心要点](/architecture/architecture)

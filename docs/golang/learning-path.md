@@ -79,7 +79,7 @@ search: false
 | 想把并发讲清楚 | `guide/03-concurrency` → `guide/03-advanced-concurrency-patterns` → `runtime-scheduler` |
 | 想找成熟好用的 Go 第三方库 | `excellent-open-source` → 对应场景专题页 |
 | 想补数据库接入与连接池 | `guide/06-database-cache` → `guide/06-database-sql-and-connection` → `source-reading/database-sql` |
-| 想系统理解 Go 高并发设计 | `guide/08-microservices-distributed` → `guide/08-go-high-concurrency-system-design` → `architecture/high-concurrency-system-checklist` |
+| 想系统理解 Go 高并发设计 | `guide/08-microservices-distributed` → `guide/08-go-high-concurrency-system-design` → `architecture/architecture` |
 | 想提升排障能力 | `guide/07-performance-troubleshooting` → `pprof-troubleshooting-guide` → `runtime-trace` |
 | 想补设计、安全、容器化和工具链 | `guide/10-advanced-topics` → 对应 `10-*` 专题页 |
 | 想准备能力自检/面试 | `go-top-30-interview-questions` → `go-interview-code-snippets` → 对应 guide 专题 |
