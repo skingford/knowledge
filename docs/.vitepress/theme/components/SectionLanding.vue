@@ -41,7 +41,13 @@ defineProps<{
       </div>
 
       <div class="section-landing__panel">
-        <p class="section-landing__panel-label">收纳范围</p>
+        <div class="section-landing__panel-head">
+          <div class="section-landing__panel-copy">
+            <p class="section-landing__panel-label">收纳范围</p>
+            <p class="section-landing__panel-intro">先抓主线，再按薄弱项进入对应专题。</p>
+          </div>
+          <p class="section-landing__panel-meta">{{ scope.length }} 个主题</p>
+        </div>
         <ul class="section-landing__scope">
           <li v-for="item in scope" :key="item">{{ item }}</li>
         </ul>

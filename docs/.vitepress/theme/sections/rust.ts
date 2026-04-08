@@ -246,7 +246,7 @@ export const rustSection: SectionConfig = {
         { text: '方向概览', link: '/rust/' },
         { text: '学习路径', link: '/rust/learning-path' },
         { text: '必备知识', link: '/rust/essential-knowledge' },
-        { text: '后端路线', link: '/rust/rust-backend-learning-roadmap' },
+        { text: '开发路线', link: '/rust/rust-backend-learning-roadmap' },
         { text: '能力自检', link: '/rust/interview-prep' },
         { text: '问题清单', link: '/rust/essential-questions' },
         { text: '代码片段', link: '/rust/interview-code-snippets' },

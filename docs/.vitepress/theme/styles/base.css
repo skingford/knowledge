@@ -56,7 +56,8 @@ body {
   .claude-home__button:hover,
   .claude-home__track:hover,
   .claude-home__highlight:hover,
-  .section-landing__card:hover {
+  .section-landing__card:hover,
+  .section-landing__scope li:hover {
     transform: none;
   }
 }
