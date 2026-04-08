@@ -12,7 +12,7 @@ export const rustSection: SectionConfig = {
     intro:
       '从所有权模型、类型系统与错误处理，到 Cargo 工程化、测试和并发 async，把 Rust 入门到能写出可靠代码的必备知识串成一条清晰路径。',
     primary: { title: 'Rust 学习路径', href: '/rust/learning-path', description: '先按阶段看整体主线。' },
-    secondary: { title: 'Rust 必备知识总览', href: '/rust/essential-knowledge', description: '再建立整体知识地图。' },
+    secondary: { title: 'Rust 后端路线', href: '/rust/rust-backend-learning-roadmap', description: '如果目标是 API 服务，直接走后端主线。' },
     scope: [
       '所有权与借用',
       'Borrow Checker 排障',
@@ -89,6 +89,7 @@ export const rustSection: SectionConfig = {
     docs: [
       { title: 'Rust 学习路径与资料导航', href: '/rust/learning-path', description: '把 Rust 核心主题按阶段串成一条学习主线。' },
       { title: 'Rust 必备知识总览', href: '/rust/essential-knowledge', description: '先建立 Rust 的主线认知，明确先学什么、后学什么。' },
+      { title: 'Rust 后端开发路线图', href: '/rust/rust-backend-learning-roadmap', description: '按 Rust 基础、tokio、axum、sqlx、工程化与部署整理一条能尽快写出 API 服务的后端主线。' },
       { title: 'Rust 能力自检与面试准备导航', href: '/rust/interview-prep', description: '把问题清单、学习主线和专题回查入口收敛到一页。' },
       { title: 'Rust 必备问题清单', href: '/rust/essential-questions', description: '按由浅入深整理 30 个最常用来检验理解深度的问题。' },
       { title: 'Rust 能力自检高频题示例代码片段', href: '/rust/interview-code-snippets', description: '用最小、可讲解、可手写的代码片段把所有权、迭代器、错误处理和 async 高频题落下来。' },
@@ -164,6 +165,7 @@ export const rustSection: SectionConfig = {
     order: [
       'Rust 学习路径与资料导航',
       'Rust 必备知识总览',
+      'Rust 后端开发路线图',
       'Rust 能力自检与面试准备导航',
       'Rust 必备问题清单',
       'Rust 能力自检高频题示例代码片段',
@@ -244,6 +246,7 @@ export const rustSection: SectionConfig = {
         { text: '方向概览', link: '/rust/' },
         { text: '学习路径', link: '/rust/learning-path' },
         { text: '必备知识', link: '/rust/essential-knowledge' },
+        { text: '后端路线', link: '/rust/rust-backend-learning-roadmap' },
         { text: '能力自检', link: '/rust/interview-prep' },
         { text: '问题清单', link: '/rust/essential-questions' },
         { text: '代码片段', link: '/rust/interview-code-snippets' },
@@ -287,6 +290,7 @@ export const rustSection: SectionConfig = {
       text: '服务数据库',
       collapsed: true,
       items: [
+        { text: '后端路线', link: '/rust/rust-backend-learning-roadmap' },
         { text: 'Axum 服务', link: '/rust/axum-web-service-practice' },
         { text: '限流保护', link: '/rust/rate-limit-timeout-and-overload-protection-practice' },
         { text: '错误响应', link: '/rust/api-error-and-response-design-practice' },

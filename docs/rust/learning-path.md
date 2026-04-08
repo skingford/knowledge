@@ -15,8 +15,17 @@ search: false
 - 想系统学一遍：按“阶段学习路径”从上往下推进
 - 想补单点薄弱项：直接跳到对应专题页
 - 想尽快进入工程实践：优先看错误处理、项目组织、Tokio 和测试
+- 想直接走“能写 API 服务”的主线：先看 [Rust 后端开发路线图](./rust-backend-learning-roadmap.md)
 - 想确认自己是否已经过了入门门槛：先看总览页里的自检题
 - 想做面试或阶段复盘：直接走自检导航和问题清单
+
+## 如果你的目标是 Rust 后端
+
+如果你的目标非常明确，就是想尽快把 Rust 用在 API 服务、异步任务、网关或微服务上，建议先单独看：
+
+- [Rust 后端开发路线图](./rust-backend-learning-roadmap.md)
+
+这页会把 `tokio`、`axum`、`sqlx`、工程化、部署和练手项目串成一条更聚焦服务开发的路线，适合作为“按项目能力推进”的主线入口。
 
 ## 阶段学习路径
 
@@ -200,6 +209,7 @@ search: false
 | 想补 DTO、领域模型和数据库模型分层 | `dto-domain-and-persistence-model-practice` |
 | 想补输入校验、错误映射和领域不变量 | `validation-and-input-boundaries-practice` |
 | 想补依赖治理和 crate 选型 | `crate-selection-and-boundaries` |
+| 想尽快上手 Rust 后端开发 | `rust-backend-learning-roadmap` |
 | 想做一个完整的 Rust 命令行工具 | `cli-tool-practice` |
 | 想补默认值、文件、环境变量和命令行的配置合并 | `configuration-management-practice` |
 | 想把单 crate 升级成多 crate 项目 | `workspace-and-monorepo-practice` |
