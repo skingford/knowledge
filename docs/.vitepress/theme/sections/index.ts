@@ -27,6 +27,7 @@ import { frontendEcosystemSection } from './frontend-ecosystem'
 export const sections: SectionConfig[] = [
   aiSection,
   architectureSection,
+  opsSection,
   networkSection,
   algorithmSection,
   golangSection,
@@ -45,7 +46,6 @@ export const sections: SectionConfig[] = [
   nginxSection,
   k8sSection,
   postgresqlSection,
-  opsSection,
   gitSection,
   toolsSection,
 ]

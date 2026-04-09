@@ -157,6 +157,7 @@ export default defineConfig({
           navItem('architecture'),
           navItem('network'),
           navItem('algorithm'),
+          navItem('ops'),
         ],
       },
       {
@@ -172,7 +173,7 @@ export default defineConfig({
       },
       {
         text: '基础设施',
-        items: [navItem('docker'), navItem('nginx'), navItem('k8s'), navItem('ops'), navItem('git')],
+        items: [navItem('docker'), navItem('nginx'), navItem('k8s'), navItem('git')],
       },
       {
         text: '工具',
