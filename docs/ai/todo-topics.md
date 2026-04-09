@@ -13,6 +13,9 @@ search: false
 - ~~Prompt Injection 与权限边界~~ → [Day 6: 评测与安全](./roadmap/day6-eval-safety.md)
 - ~~结构化输出最佳实践~~ → [Day 2: 学会调用 LLM API](./roadmap/day2-llm-api.md)
 - ~~工作流型 Agent 实战案例~~ → [Day 7: 完整项目](./roadmap/day7-full-project.md)
+- ~~Prompt Engineering 实践要点~~ → [Prompt Engineering 实践指南](./prompt-engineering.md)
+- ~~Context Engineering 实践要点~~ → [Context Engineering 实践指南](./context-engineering.md)
+- ~~Harness Engineering 实践要点~~ → [Harness Engineering 实践指南](./harness-engineering.md)
 
 ## 优先级高
 
@@ -39,7 +42,6 @@ search: false
 
 以下主题已在现有文档中有基础覆盖，可在此基础上扩展为独立专题：
 
-- Prompt Engineering 实践要点 → [Agent 学习综合指南](./agent-learning-guide.md)
 - Eval 评测基本方法 → [Agent 学习综合指南](./agent-learning-guide.md) + [Day 6 详解](./roadmap/day6-eval-safety.md)
 - Tool Calling 设计 → [Tool Calling 设计清单](./tool-calling-design-checklist.md) + [Day 3 详解](./roadmap/day3-tool-calling.md)
 - RAG 基础 → [RAG 基础与工作流](./rag-basics-and-workflow.md) + [Day 5 详解](./roadmap/day5-rag-memory.md)

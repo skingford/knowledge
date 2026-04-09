@@ -24,6 +24,9 @@ export const aiSection: SectionConfig = {
     docs: [
       { title: 'LLM Agent 必学知识地图', href: '/ai/knowledge-map', description: '先搭整体认知框架，明确主题之间的关系。' },
       { title: 'Agent 学习综合指南', href: '/ai/agent-learning-guide', description: '用一篇长文把核心概念、资料和实践建议串起来。' },
+      { title: 'Prompt Engineering 实践指南', href: '/ai/prompt-engineering', description: '聚焦提示词设计、格式约束、Few-shot 与工程化管理。' },
+      { title: 'Context Engineering 实践指南', href: '/ai/context-engineering', description: '聚焦上下文选择、排序、摘要、记忆与动态组装。' },
+      { title: 'Harness Engineering 实践指南', href: '/ai/harness-engineering', description: '聚焦 Agent 运行时、状态、权限、重试、观测与回放。' },
       { title: '7 天 Agent 学习路线', href: '/ai/agent-learning-roadmap', description: '适合短周期起步，先把路径跑通。' },
       { title: 'Tool Calling 设计清单', href: '/ai/tool-calling-design-checklist', description: '关注接口设计、容错和运行边界。' },
       { title: 'RAG 基础与工作流', href: '/ai/rag-basics-and-workflow', description: '把检索、切分、召回和生成串成一个可理解的流程。' },
@@ -32,6 +35,9 @@ export const aiSection: SectionConfig = {
     order: [
       'LLM Agent 必学知识地图',
       'Agent 学习综合指南',
+      'Prompt Engineering 实践指南',
+      'Context Engineering 实践指南',
+      'Harness Engineering 实践指南',
       '7 天 Agent 学习路线',
       'Tool Calling 设计清单',
       'RAG 基础与工作流',
@@ -43,6 +49,9 @@ export const aiSection: SectionConfig = {
       items: [
         { text: '方向概览', link: '/ai/' },
         { text: '综合指南', link: '/ai/agent-learning-guide' },
+        { text: 'Prompt 指南', link: '/ai/prompt-engineering' },
+        { text: 'Context 指南', link: '/ai/context-engineering' },
+        { text: 'Harness 指南', link: '/ai/harness-engineering' },
         { text: '七天路线', link: '/ai/agent-learning-roadmap' },
         { text: 'Tool 清单', link: '/ai/tool-calling-design-checklist' },
         { text: 'RAG 基础', link: '/ai/rag-basics-and-workflow' },
