@@ -346,6 +346,275 @@
   font-weight: 700;
 }
 
+/* `layout: page` 页面的正文不在 `.vp-doc` 下，需要单独补齐 prose 样式。 */
+.claude-home-page .VPPage > div > div {
+  --landing-prose-width: 1040px;
+  --landing-prose-gutter: 40px;
+}
+
+.claude-home-page .VPPage > div > div > :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  ul,
+  ol,
+  table,
+  blockquote,
+  details,
+  div[class*='language-'],
+  img,
+  video,
+  iframe,
+  hr
+) {
+  box-sizing: border-box;
+  width: min(calc(100% - var(--landing-prose-gutter)), var(--landing-prose-width));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+  outline: none;
+  font-family: var(--site-serif);
+  color: var(--vp-c-text-1);
+}
+
+.claude-home-page .VPPage > div > div > h1 {
+  margin-top: 8px;
+  font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.claude-home-page .VPPage > div > div > h2 {
+  margin-top: 40px;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--vp-c-divider);
+  padding-top: 20px;
+  font-size: 1.35rem;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.claude-home-page .VPPage > div > div > h3 {
+  margin-top: 32px;
+  margin-bottom: 0;
+  font-size: 1.1rem;
+  line-height: 1.42;
+  letter-spacing: 0;
+  font-weight: 650;
+}
+
+.claude-home-page .VPPage > div > div > h4,
+.claude-home-page .VPPage > div > div > h5,
+.claude-home-page .VPPage > div > div > h6 {
+  margin-top: 24px;
+  margin-bottom: 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  font-weight: 650;
+}
+
+.claude-home-page .VPPage > div > div > h4 {
+  font-size: 1rem;
+}
+
+.claude-home-page .VPPage > div > div > h5,
+.claude-home-page .VPPage > div > div > h6 {
+  font-size: 0.95rem;
+}
+
+.claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) .header-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-left: -0.87em;
+  font-weight: 500;
+  user-select: none;
+  opacity: 0;
+  text-decoration: none;
+  transition:
+    color 0.25s,
+    opacity 0.25s;
+}
+
+.claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) .header-anchor::before {
+  content: var(--vp-header-anchor-symbol);
+}
+
+.claude-home-page .VPPage > div > div > h2 .header-anchor {
+  top: 20px;
+}
+
+.claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6):hover .header-anchor,
+.claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) .header-anchor:focus {
+  opacity: 1;
+}
+
+.claude-home-page .VPPage > div > div > p,
+.claude-home-page .VPPage > div > div > :is(ul, ol) li,
+.claude-home-page .VPPage > div > div > blockquote > p {
+  font-size: 1rem;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: var(--vp-c-text-2);
+}
+
+.claude-home-page .VPPage > div > div > p {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.claude-home-page .VPPage > div > div > :is(ul, ol) {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-left: 1.25rem;
+}
+
+.claude-home-page .VPPage > div > div > ul {
+  list-style: disc;
+}
+
+.claude-home-page .VPPage > div > div > ol {
+  list-style: decimal;
+}
+
+.claude-home-page .VPPage > div > div > :is(ul, ol) > li::marker {
+  color: var(--vp-c-brand-2);
+}
+
+.claude-home-page .VPPage > div > div > :is(ul, ol) li + li {
+  margin-top: 8px;
+}
+
+.claude-home-page .VPPage > div > div > :is(ul, ol) li > :is(ul, ol) {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.claude-home-page .VPPage > div > div > blockquote {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border-left: 3px solid rgba(212, 111, 77, 0.4);
+  border-radius: 0 18px 18px 0;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 76%, transparent);
+  color: var(--vp-c-text-2);
+}
+
+.claude-home-page .VPPage > div > div > blockquote > p {
+  margin: 0;
+}
+
+.claude-home-page .VPPage > div > div > table {
+  display: block;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.claude-home-page .VPPage > div > div > table tr {
+  background-color: var(--vp-c-bg);
+  border-top: 1px solid var(--vp-c-divider);
+  transition: background-color 0.5s;
+}
+
+.claude-home-page .VPPage > div > div > table tr:nth-child(2n) {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.claude-home-page .VPPage > div > div > table :is(th, td) {
+  border: 1px solid var(--vp-c-divider);
+  padding: 8px 16px;
+}
+
+.claude-home-page .VPPage > div > div > table th {
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+  background-color: var(--vp-c-bg-soft);
+}
+
+.claude-home-page .VPPage > div > div > table td {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-2);
+}
+
+.claude-home-page .VPPage > div > div > :is(img, video, iframe) {
+  max-width: 100%;
+  height: auto;
+}
+
+.claude-home-page .VPPage > div > div > :not(.section-landing):not(.overview-landing):not(.claude-home) a {
+  font-weight: 500;
+  color: var(--vp-c-brand-1);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition:
+    color 0.25s,
+    opacity 0.25s;
+}
+
+.claude-home-page .VPPage > div > div > :not(.section-landing):not(.overview-landing):not(.claude-home) a:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.claude-home-page .VPPage > div > div > :not(.section-landing):not(.overview-landing):not(.claude-home) strong {
+  color: var(--vp-c-text-1);
+  font-weight: 600;
+}
+
+.claude-home-page .VPPage > div > div > :not(.section-landing):not(.overview-landing):not(.claude-home) :not(pre) > code {
+  padding: 0.22rem 0.45rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 84%, transparent);
+  color: var(--vp-c-brand-2);
+}
+
+.claude-home-page .VPPage > div > div > div[class*='language-'] {
+  border: 1px solid var(--site-panel-border);
+  border-radius: 24px;
+  background: #f0ebe1 !important;
+  box-shadow: var(--site-shadow);
+}
+
+.claude-home-page .VPPage > div > div > div[class*='language-'] :is(pre, code) {
+  background: transparent !important;
+}
+
+.claude-home-page .VPPage > div > div > div[class*='language-'] code {
+  font-size: 0.92rem;
+}
+
+.claude-home-page .VPPage > div > div > hr {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border: none;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.dark .claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) {
+  color: #fbf2e8;
+}
+
+.dark .claude-home-page .VPPage > div > div > div[class*='language-'] {
+  background: rgba(27, 23, 20, 0.96) !important;
+}
+
 @media (max-width: 1180px) {
   .section-landing__scope {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -367,6 +636,10 @@
   .overview-landing__section,
   .section-landing__order {
     width: 100%;
+  }
+
+  .claude-home-page .VPPage > div > div {
+    --landing-prose-gutter: 32px;
   }
 }
 
@@ -413,5 +686,15 @@
 
   .section-landing__panel-meta {
     margin-top: 0;
+  }
+
+  .claude-home-page .VPPage > div > div {
+    --landing-prose-gutter: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .claude-home-page .VPPage > div > div {
+    --landing-prose-gutter: 24px;
   }
 }

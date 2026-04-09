@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { withBase } from 'vitepress'
+import { computed, ref, watch } from 'vue'
+import { useData, useRoute, withBase } from 'vitepress'
 
 const storageKey = 'knowledge:wechat-qr-notice:dismiss-until'
 const isVisible = ref(false)
+const route = useRoute()
+const { frontmatter } = useData()
 
 const qrImage = computed(() => withBase('/wechat-official-account-qr.jpg'))
+const isNoticeEnabled = computed(() => frontmatter.value?.wechatQrNotice !== false)
 
 function getEndOfDayTimestamp() {
   const now = new Date()
@@ -50,13 +53,20 @@ function shouldShowNotice() {
   return false
 }
 
-onMounted(() => {
+function syncVisibility() {
   if (typeof window === 'undefined') {
     return
   }
 
+  if (!isNoticeEnabled.value) {
+    isVisible.value = false
+    return
+  }
+
   isVisible.value = shouldShowNotice()
-})
+}
+
+watch([() => route.path, isNoticeEnabled], syncVisibility, { immediate: true })
 </script>
 
 <template>
@@ -97,8 +107,6 @@ onMounted(() => {
                 height="320"
               >
             </figure>
-
-        
 
             <div class="wechat-qr-notice__actions">
               <button

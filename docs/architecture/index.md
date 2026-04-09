@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: doc
 title: false
 description: 架构方向学习入口，覆盖系统设计路线、书单、自检清单、高并发、分布式设计与交易一致性专题。
 search: false
