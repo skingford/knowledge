@@ -11,6 +11,7 @@ import Mermaid from '@docs-components/Mermaid.vue'
 import WechatQrNotice from '@docs-components/WechatQrNotice.vue'
 import DocAfterSlot from '@docs-components/DocAfterSlot.vue'
 import SvgPreview from '@docs-components/SvgPreview.vue'
+import JdAccessGate from '@docs-components/JdAccessGate.vue'
 
 const staticGlobalComponents = {
   QuickNav,
@@ -95,13 +96,15 @@ const asyncGlobalComponents = {
 const theme: Theme = {
   extends: DefaultTheme,
   Layout() {
-    return h('div', null, [
-      h(DefaultTheme.Layout, null, {
-        'doc-after': () => h(DocAfterSlot),
-      }),
-      h(SvgPreview),
-      h(WechatQrNotice),
-    ])
+    return h(JdAccessGate, null, {
+      default: () => h('div', null, [
+        h(DefaultTheme.Layout, null, {
+          'doc-after': () => h(DocAfterSlot),
+        }),
+        h(SvgPreview),
+        h(WechatQrNotice),
+      ]),
+    })
   },
   enhanceApp({ app }) {
     enhanceAppWithTabs(app)

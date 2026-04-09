@@ -9,6 +9,19 @@ import { quickNavLink, sections } from './theme/content-data'
 const siteUrl = 'https://skingford.github.io/knowledge/'
 const siteBase = process.env.VITEPRESS_BASE || (process.env.GITHUB_ACTIONS === 'true' ? '/knowledge/' : '/')
 const voidHtmlTagPattern = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)(\s[^<>]*?)?\s*(\/?)>/gi
+const hiddenRouteBase = 'jd/'
+
+const hiddenSidebar = {
+  '/jd/': [
+    {
+      text: 'JD 模块',
+      items: [
+        { text: '模块首页', link: '/jd/' },
+        { text: '高级 Golang 开发工程师 / 架构师', link: '/jd/senior-golang-architect-overseas' },
+      ],
+    },
+  ],
+}
 
 function normalizeVoidHtmlTags(html: string) {
   return html.replace(voidHtmlTagPattern, (_, tagName: string, attrs = '', selfClosing = '') => {
@@ -20,11 +33,14 @@ function normalizeVoidHtmlTags(html: string) {
   })
 }
 
-const sidebar = Object.fromEntries(
-  [...sections]
-    .sort((a, b) => b.base.length - a.base.length)
-    .map((section) => [section.base, section.sidebar]),
-)
+const sidebar = {
+  ...Object.fromEntries(
+    [...sections]
+      .sort((a, b) => b.base.length - a.base.length)
+      .map((section) => [section.base, section.sidebar]),
+  ),
+  ...hiddenSidebar,
+}
 
 const sectionsByKey = Object.fromEntries(
   sections.map((s) => [s.key, s]),
@@ -55,6 +71,9 @@ export default defineConfig({
   appearance: true,
   sitemap: {
     hostname: siteUrl,
+    transformItems(items) {
+      return items.filter((item) => item.url !== hiddenRouteBase && !item.url.startsWith(hiddenRouteBase))
+    },
   },
   router: {
     prefetchLinks: false,
