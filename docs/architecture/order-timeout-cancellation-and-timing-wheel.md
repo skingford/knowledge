@@ -559,7 +559,7 @@ func (s *OrderService) CancelExpiredOrder(ctx context.Context, orderID string) e
 
 ## 相关阅读
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [延时任务方案对比](/architecture/delayed-task-solution-comparison)
 - [订单状态机设计实战](/architecture/order-state-machine-design)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)

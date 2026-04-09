@@ -535,5 +535,5 @@ flowchart TD
 - [秒杀系统压测脚本、容量估算与演练方法论](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
 - [秒杀结果查询、排队态与用户体验设计](/architecture/seckill-result-query-and-queueing-ux-design)
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [高并发支付系统专题整理](/architecture/case-studies/high-concurrency-payment-system-practice-notes)

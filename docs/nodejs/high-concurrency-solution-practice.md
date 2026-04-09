@@ -462,7 +462,7 @@ Node.js 高并发要稳，数据层至少要解决 4 件事。
 
 如果你想把一致性、状态机和高并发系统设计清单放回更大视角里看，继续看：
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [交易系统一致性总览](../architecture/transaction-system-consistency-overview.md)
 
 ## 异步削峰：让系统从硬抗变成可排队

@@ -40,6 +40,7 @@
 ### 想从路线开始
 
 - [架构师学习路线](./architecture/architect-learning-roadmap.md)
+- [架构设计方法与评审清单](./architecture/architecture-design-method-and-review-checklist.md)
 - [Agent 学习综合指南](./ai/agent-learning-guide.md)
 - [Docker 专题](./docker/index.md)
 - [Docker 容器生命周期与运行模型](./docker/container-lifecycle-and-runtime.md)
@@ -142,7 +143,7 @@
 
 ## 当前规模
 
-- `architecture/`：路线、分阶段书单、能力自检清单、分布式与高并发专题、案例实战
+- `architecture/`：路线、分阶段书单、方法论与评审清单、分布式与高并发专题、案例实战
 - `ai/`：学习地图、路线、资料清单、Tool Calling、RAG
 - `docker/`：容器基础、镜像构建、镜像仓库 / Harbor、容器生命周期、网络、存储、Compose、单机部署、发布治理、安全、排障与能力自检
 - `golang/`：专题导航、学习主线、源码精读、能力自检资料、题库与代码片段

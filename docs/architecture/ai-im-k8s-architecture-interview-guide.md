@@ -1892,7 +1892,7 @@ WHERE id = 1
 - Redis 高并发、集群与锁：[../redis/high-concurrency-cluster-locks.md](../redis/high-concurrency-cluster-locks.md)
 - MySQL 高频问题整理：[../mysql/high-frequency-questions.md](../mysql/high-frequency-questions.md)
 - 分布式事务方案对比：[./distributed-transaction-comparison.md](./distributed-transaction-comparison.md)
-- 高并发系统设计核心要点：[高并发系统设计核心要点](/architecture/architecture)
+- 高并发系统设计核心要点：[高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - Tool Calling 设计清单：[../ai/tool-calling-design-checklist.md](../ai/tool-calling-design-checklist.md)
 - Agent 学习综合指南：[../ai/agent-learning-guide.md](../ai/agent-learning-guide.md)
 - K8s 自动扩缩容与容量控制：[../k8s/autoscaling-and-capacity-control-chain.md](../k8s/autoscaling-and-capacity-control-chain.md)

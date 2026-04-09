@@ -23,9 +23,9 @@ export const kafkaSection: SectionConfig = {
         '消息队列 47 讲章节精读',
       ],
       docs: [
-        { title: '核心概念', href: '/kafka/core-concepts', description: 'Producer/Consumer/Broker、Topic/Partition、Consumer Group、高可用机制与性能原理。' },
-        { title: '支付实战', href: '/kafka/payment-practice', description: 'TCC+Kafka、本地消息表、Offset 补偿、全链路闭环、延迟队列与生产治理。' },
-        { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '消息不丢失、顺序性、积压处理、重试与死信、幂等与事务、英语术语速查。' },
+        { title: '核心概念', href: '/kafka/core-concepts', description: '覆盖 Producer、Consumer、Broker、Partition、Group 与高可用原理。' },
+        { title: '支付实战', href: '/kafka/payment-practice', description: '围绕 TCC、本地消息表、Offset 补偿、延迟队列与生产治理展开。' },
+        { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '梳理不丢失、顺序性、积压、重试、死信、幂等与事务。' },
       ],
       order: [
         '核心概念',

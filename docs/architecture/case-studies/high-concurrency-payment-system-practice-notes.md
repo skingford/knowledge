@@ -102,7 +102,7 @@ vocabulary:
 
 ### 对应资料导航
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)
 - [架构师学习路线](/architecture/architect-learning-roadmap)
 - [Go 微服务可观测性与稳定性专题](/golang/guide/08-observability-resilience)
@@ -880,7 +880,7 @@ func (a *AccountService) Cancel(ctx context.Context, orderID string, amount int6
 
 ### 对应资料导航
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [database/sql：连接池与事务](/golang/guide/source-reading/database-sql)
 - [database/sql：高级事务与批量插入](/golang/guide/source-reading/database-sql-advanced)
 
@@ -1217,7 +1217,7 @@ ADD UNIQUE KEY uk_pay_req (merchant_id, order_id, pay_action);
 
 ### 对应资料导航
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [go-redis：客户端与分布式锁](/golang/guide/source-reading/go-redis)
 - [net/http 限流与熔断](/golang/guide/source-reading/net-http-ratelimit)
 
@@ -1562,7 +1562,7 @@ CREATE TABLE payment_flow (
 
 ## 延伸阅读导航
 
-- [高并发系统设计核心要点](/architecture/architecture)
+- [高并发系统设计核心要点](/architecture/high-concurrency-system-design-core-points)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)
 - [架构师学习路线](/architecture/architect-learning-roadmap)
 - [架构能力自检准备清单](/architecture/architect-interview-prep-checklist)
