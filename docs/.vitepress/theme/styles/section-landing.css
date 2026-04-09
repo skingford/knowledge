@@ -177,11 +177,11 @@
 }
 
 .section-landing__timeline li {
-  padding: 12px 0;
+  padding: 10px 0;
   border-top: 1px solid var(--vp-c-divider);
   font-size: 0.9rem;
   color: var(--vp-c-text-2);
-  line-height: 1.7;
+  line-height: 1.64;
 }
 
 .section-landing__scope li {
@@ -256,13 +256,13 @@
 .section-landing__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 18px;
 }
 
 .section-landing__card {
   display: block;
-  min-height: 180px;
-  padding: 30px 34px;
+  min-height: 168px;
+  padding: 28px 32px;
   border-radius: 24px;
   text-decoration: none;
   transition:
@@ -281,7 +281,7 @@
   margin: 0;
   font-family: var(--site-serif);
   font-size: 1.15rem;
-  line-height: 1.24;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   font-weight: 700;
   color: var(--vp-c-text-1);
@@ -290,9 +290,9 @@
 .section-landing__card p {
   position: relative;
   z-index: 1;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   font-size: 0.88rem;
-  line-height: 1.72;
+  line-height: 1.68;
   letter-spacing: 0.01em;
   color: var(--vp-c-text-2);
 }
@@ -376,7 +376,7 @@
 
   .section-landing__card {
     border-radius: 20px;
-    padding: 24px 28px;
+    padding: 22px 24px;
   }
 
   .section-landing__actions .claude-home__button {
