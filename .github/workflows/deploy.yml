@@ -17,6 +17,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HAS_PAGES_ADMIN_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN != '' }}
     outputs:
       pages_enabled: ${{ steps.pages_check.outputs.enabled }}
     steps:
@@ -50,18 +52,16 @@ jobs:
             exit 0
           fi
 
-          if [ "${status}" != "404" ]; then
-            echo "Unexpected GitHub Pages API status: ${status}" >&2
-            cat /tmp/pages.json >&2 || true
-            exit 1
-          fi
+          echo "Unexpected GitHub Pages API status: ${status}" >&2
+          cat /tmp/pages.json >&2 || true
+          exit 1
 
       - name: Configure GitHub Pages
-        if: steps.pages_probe.outputs.enabled == 'true' || secrets.PAGES_ADMIN_TOKEN != ''
+        if: steps.pages_probe.outputs.enabled == 'true' || env.HAS_PAGES_ADMIN_TOKEN == 'true'
         uses: actions/configure-pages@v5
         with:
           token: ${{ secrets.PAGES_ADMIN_TOKEN != '' && secrets.PAGES_ADMIN_TOKEN || github.token }}
-          enablement: ${{ secrets.PAGES_ADMIN_TOKEN != '' }}
+          enablement: ${{ env.HAS_PAGES_ADMIN_TOKEN == 'true' }}
 
       - name: Verify GitHub Pages is enabled
         id: pages_check
