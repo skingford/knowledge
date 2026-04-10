@@ -102,14 +102,20 @@ watch(() => route.path, syncAccess, { immediate: true })
 
   <div v-else-if="isUnlocked" class="jd-access-gate__unlocked">
     <div class="jd-access-gate__toolbar">
-      <span class="jd-access-gate__badge">JD 模块</span>
-      <button
-        type="button"
-        class="jd-access-gate__lock-button"
-        @click="lock"
-      >
-        退出访问
-      </button>
+      <div class="jd-access-gate__toolbar-inner">
+        <span class="jd-access-gate__badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>
+          JD 模块
+        </span>
+        <button
+          type="button"
+          class="jd-access-gate__lock-button"
+          @click="lock"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+          退出
+        </button>
+      </div>
     </div>
     <slot />
   </div>
@@ -279,41 +285,51 @@ watch(() => route.path, syncAccess, { immediate: true })
 
 .jd-access-gate__toolbar {
   position: sticky;
-  top: 76px;
-  z-index: 10;
+  top: 64px;
+  z-index: 20;
+  padding: 0 24px;
+  background: color-mix(in srgb, var(--vp-c-bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.jd-access-gate__toolbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  width: min(100%, 1180px);
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 12px 20px 0;
-  pointer-events: none;
-}
-
-.jd-access-gate__badge,
-.jd-access-gate__lock-button {
-  pointer-events: auto;
+  height: 40px;
 }
 
 .jd-access-gate__badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--vp-c-text-1);
-  background: color-mix(in srgb, var(--vp-c-bg) 82%, transparent);
-  border: 1px solid var(--vp-c-divider);
-  backdrop-filter: blur(10px);
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
 }
 
 .jd-access-gate__lock-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.jd-access-gate__lock-button:hover {
   color: var(--vp-c-text-1);
-  background: color-mix(in srgb, var(--vp-c-bg) 82%, transparent);
-  border: 1px solid var(--vp-c-divider);
-  backdrop-filter: blur(10px);
+  background: var(--vp-c-bg-soft);
 }
 
 @media (max-width: 640px) {
@@ -324,7 +340,7 @@ watch(() => route.path, syncAccess, { immediate: true })
 
   .jd-access-gate__toolbar {
     top: 64px;
-    padding: 10px 16px 0;
+    padding: 0 16px;
   }
 }
 </style>

@@ -17,7 +17,7 @@ const hiddenSidebar = {
       text: 'JD 模块',
       items: [
         { text: '模块首页', link: '/jd/' },
-        { text: '高级 Golang 开发工程师 / 架构师', link: '/jd/senior-golang-architect-overseas' },
+        { text: 'Go 架构师', link: '/jd/senior-golang-architect-overseas' },
       ],
     },
   ],
