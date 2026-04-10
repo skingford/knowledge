@@ -7,7 +7,6 @@ import QuickNav from '@docs-components/QuickNav.vue'
 import ClaudeHome from '@docs-components/ClaudeHome.vue'
 import SectionLanding from '@docs-components/SectionLanding.vue'
 import OverviewLanding from '@docs-components/OverviewLanding.vue'
-import Mermaid from '@docs-components/Mermaid.vue'
 import WechatQrNotice from '@docs-components/WechatQrNotice.vue'
 import DocAfterSlot from '@docs-components/DocAfterSlot.vue'
 import SvgPreview from '@docs-components/SvgPreview.vue'
@@ -18,7 +17,6 @@ const staticGlobalComponents = {
   ClaudeHome,
   SectionLanding,
   OverviewLanding,
-  Mermaid,
 }
 
 const asyncGlobalComponents = {

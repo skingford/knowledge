@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import { MermaidMarkdown } from 'vitepress-plugin-mermaid'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import * as vueCompilerSfc from 'vue/compiler-sfc'
 import { localSearchOptions } from './config/search'
@@ -94,7 +93,7 @@ export default defineConfig({
     }
 
     // Skip preloading heavy vendor chunks — they are lazy-loaded only on pages that use them.
-    if (/vendor-(?:mermaid|katex)/.test(link)) {
+    if (/vendor-katex/.test(link)) {
       return false
     }
 
@@ -135,7 +134,6 @@ export default defineConfig({
       md.renderer.rules.html_inline = (tokens, idx, options, env, self) => normalizeVoidHtmlTags(
         defaultHtmlInline(tokens, idx, options, env, self),
       )
-      MermaidMarkdown(md, {})
       md.use(tabsMarkdownPlugin)
     },
   },
