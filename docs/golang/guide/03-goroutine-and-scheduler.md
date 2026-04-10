@@ -114,7 +114,7 @@ func main() {
 - **main 退出即终止**：`main` 函数结束时所有 Goroutine 被直接杀掉，不要依赖 `time.Sleep` 做同步，应使用 `sync.WaitGroup` 或 Channel。
 - **何时使用**：I/O 等待（网络、磁盘）、并行计算、后台任务。不适合做纯 CPU 密集且无法分割的单一计算。
 
-> Goroutine 之间的通信依赖 Channel（通道），详见 [Channel 与 Select](./03-channel-and-select)。
+> Goroutine 之间的通信依赖 Channel（通道），详见 [Channel 与 Select](./03-channel-select-context)。
 
 ---
 
