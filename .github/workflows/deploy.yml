@@ -17,10 +17,67 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages_check.outputs.enabled }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          token: ${{ secrets.PAGES_ADMIN_TOKEN != '' && secrets.PAGES_ADMIN_TOKEN || github.token }}
+          enablement: ${{ secrets.PAGES_ADMIN_TOKEN != '' }}
+
+      - name: Verify GitHub Pages is enabled
+        id: pages_check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}/pages"
+          status="$(curl -sS -o /tmp/pages.json -w '%{http_code}' \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "${api}")"
+
+          if [ "${status}" = "200" ]; then
+            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            echo "GitHub Pages is enabled."
+            exit 0
+          fi
+
+          if [ "${status}" != "404" ]; then
+            echo "Unexpected GitHub Pages API status: ${status}" >&2
+            cat /tmp/pages.json >&2 || true
+            exit 1
+          fi
+
+          echo "enabled=false" >> "${GITHUB_OUTPUT}"
+
+          {
+            echo "## GitHub Pages is not enabled"
+            echo
+            echo "The docs build completed, but deploy was skipped because the repository Pages site does not exist yet."
+            echo
+            echo "Choose one of these fixes:"
+            echo
+            echo "1. Manually enable GitHub Pages in \`Settings -> Pages\` and set \`Source\` to \`GitHub Actions\`."
+            echo "2. Add a repository secret named \`PAGES_ADMIN_TOKEN\` so \`actions/configure-pages@v5\` can auto-enable Pages on first run."
+            echo
+            echo "\`PAGES_ADMIN_TOKEN\` must be a fine-grained PAT with:"
+            echo
+            echo "- \`Pages: write\`"
+            echo "- \`Administration: write\`"
+            echo
+            echo "Or a classic PAT with \`repo\` scope."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          echo "GitHub Pages is not enabled for ${GITHUB_REPOSITORY}. Build will continue, but deploy will be skipped." >&2
 
       - uses: actions/setup-node@v4
         with:
@@ -33,11 +90,13 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.pages_check.outputs.enabled == 'true'
         with:
           path: docs/.vitepress/dist
 
   deploy:
+    if: needs.build.outputs.pages_enabled == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
