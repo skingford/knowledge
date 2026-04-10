@@ -45,7 +45,7 @@ body:has(#VPNavScreen) {
 
 .VPNavBarTitle .title {
   font-family: var(--site-serif);
-  font-weight: 650;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 
@@ -65,11 +65,11 @@ body:has(#VPNavScreen) {
 
 .VPButton {
   min-width: 128px;
-  border-radius: 999px !important;
+  border-radius: 12px !important;
   padding: 0 20px !important;
   font-weight: 600 !important;
   letter-spacing: 0.01em;
-  box-shadow: none !important;
+  box-shadow: 0px 0px 0px 1px var(--site-border-warm) !important;
 }
 
 .VPButton.medium {
@@ -95,7 +95,7 @@ body:has(#VPNavScreen) {
   font-size: clamp(1.75rem, 3.2vw, 2.4rem);
   line-height: 1.16;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -105,14 +105,14 @@ body:has(#VPNavScreen) {
   padding-top: 20px;
   font-size: 1.35rem;
   letter-spacing: -0.01em;
-  font-weight: 700;
+  font-weight: 500;
   text-wrap: balance;
 }
 
 .vp-doc h3 {
   font-size: 1.1rem;
   letter-spacing: 0;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .vp-doc p,
@@ -254,8 +254,8 @@ body:has(#VPNavScreen) {
 
 .vp-doc div[class*='language-'] {
   border: 1px solid var(--site-panel-border);
-  border-radius: 24px;
-  background: #f0ebe1 !important;
+  border-radius: 12px;
+  background: #f0eee6 !important;
   box-shadow: var(--site-shadow);
 }
 
@@ -270,13 +270,13 @@ body:has(#VPNavScreen) {
 }
 
 .dark .vp-doc div[class*='language-'] {
-  background: rgba(27, 23, 20, 0.96) !important;
+  background: #1e1e1c !important;
 }
 
 .vp-doc blockquote {
   border-left: 3px solid rgba(212, 111, 77, 0.4);
   background: color-mix(in srgb, var(--vp-c-bg-elv) 76%, transparent);
-  border-radius: 0 18px 18px 0;
+  border-radius: 0 12px 12px 0;
 }
 
 .VPDocAsideOutline .content,
@@ -303,7 +303,7 @@ body:has(#VPNavScreen) {
     border-radius: 20px !important;
     border: 1px solid var(--site-panel-border) !important;
     background-color: var(--vp-c-bg-soft) !important;
-    background-image: linear-gradient(160deg, rgba(212, 111, 77, 0.05) 0%, transparent 50%) !important;
+    background-image: none !important;
     box-shadow: var(--site-shadow) !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
@@ -318,7 +318,7 @@ body:has(#VPNavScreen) {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--vp-c-brand-1), var(--vp-c-brand-3));
+    background: var(--vp-c-brand-1);
     border-radius: 20px 20px 0 0;
     z-index: 1;
   }
@@ -331,7 +331,7 @@ body:has(#VPNavScreen) {
     right: 0;
     width: 160px;
     height: 160px;
-    background: radial-gradient(circle at top right, rgba(212, 111, 77, 0.1), transparent 70%);
+    background: transparent;
     pointer-events: none;
     z-index: 0;
   }
@@ -404,7 +404,7 @@ body:has(#VPNavScreen) {
 .VPSidebarItem.level-1.is-active > .item .link > .text,
 .VPDocOutlineItem.active > .outline-link {
   color: var(--vp-c-text-1) !important;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .VPFooter {
@@ -459,7 +459,7 @@ body:has(#VPNavScreen) {
 .dark .claude-home__track-title,
 .dark .claude-home__highlight-title,
 .dark .section-landing__card h3 {
-  color: #fbf2e8;
+  color: #faf9f5;
 }
 
 @media (max-width: 768px) {

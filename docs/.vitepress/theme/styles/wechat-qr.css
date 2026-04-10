@@ -20,17 +20,13 @@
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 26%, white 18%);
   border-radius: 28px;
-  background:
-    radial-gradient(circle at top right, rgba(212, 111, 77, 0.18), transparent 34%),
-    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(250, 243, 234, 0.96));
-  box-shadow: 0 30px 90px rgba(39, 29, 21, 0.22);
+  background: #faf9f5;
+  box-shadow: var(--site-shadow-whisper);
 }
 
 .dark .wechat-qr-notice__panel {
-  background:
-    radial-gradient(circle at top right, rgba(240, 141, 104, 0.2), transparent 32%),
-    linear-gradient(180deg, rgba(34, 28, 25, 0.98), rgba(24, 20, 18, 0.96));
-  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.45);
+  background: #30302e;
+  box-shadow: var(--site-shadow-whisper);
 }
 
 .wechat-qr-notice__header {
@@ -39,7 +35,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 18px 18px 16px;
-  background: linear-gradient(135deg, var(--vp-c-brand-1), #b95a3a);
+  background: var(--vp-c-brand-1);
   color: #fffaf4;
 }
 
@@ -160,7 +156,7 @@
 .wechat-qr-notice__action--primary {
   background: var(--vp-c-brand-1);
   color: #fffaf4;
-  box-shadow: 0 16px 34px rgba(212, 111, 77, 0.24);
+  box-shadow: 0px 0px 0px 1px var(--vp-c-brand-1);
 }
 
 .wechat-qr-notice__action--primary:hover {

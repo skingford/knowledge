@@ -59,19 +59,6 @@
   max-width: 38rem;
 }
 
-.section-landing__copy::before,
-.overview-landing__copy::before,
-.section-landing__panel::before,
-.section-landing__card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at top right, rgba(212, 111, 77, 0.12), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.06), transparent 24%);
-}
-
 .section-landing__eyebrow {
   position: relative;
   z-index: 1;
@@ -93,7 +80,7 @@
   font-size: clamp(2.1rem, 5.4vw, 3.25rem);
   line-height: 1.04;
   letter-spacing: -0.026em;
-  font-weight: 680;
+  font-weight: 500;
   color: var(--vp-c-text-1);
   text-wrap: balance;
 }
@@ -265,7 +252,7 @@
   justify-content: flex-start;
   min-height: 160px;
   padding: 26px 28px;
-  border-radius: 24px;
+  border-radius: 12px;
   text-decoration: none;
   transition:
     transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
@@ -288,7 +275,7 @@
   font-size: 1.15rem;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--vp-c-text-1);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -389,7 +376,7 @@
   font-size: clamp(1.75rem, 3.2vw, 2.4rem);
   line-height: 1.16;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -401,7 +388,7 @@
   font-size: 1.35rem;
   line-height: 1.24;
   letter-spacing: -0.01em;
-  font-weight: 700;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -411,7 +398,7 @@
   font-size: 1.1rem;
   line-height: 1.42;
   letter-spacing: 0;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .claude-home-page .VPPage > div > div > h4,
@@ -421,7 +408,7 @@
   margin-bottom: 0;
   line-height: 1.5;
   letter-spacing: -0.01em;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .claude-home-page .VPPage > div > div > h4 {
@@ -505,7 +492,7 @@
   margin-top: 16px;
   margin-bottom: 16px;
   border-left: 3px solid rgba(212, 111, 77, 0.4);
-  border-radius: 0 18px 18px 0;
+  border-radius: 0 12px 12px 0;
   padding: 16px 18px;
   background: color-mix(in srgb, var(--vp-c-bg-elv) 76%, transparent);
   color: var(--vp-c-text-2);
@@ -587,8 +574,8 @@
 
 .claude-home-page .VPPage > div > div > div[class*='language-'] {
   border: 1px solid var(--site-panel-border);
-  border-radius: 24px;
-  background: #f0ebe1 !important;
+  border-radius: 12px;
+  background: #f0eee6 !important;
   box-shadow: var(--site-shadow);
 }
 
@@ -608,11 +595,11 @@
 }
 
 .dark .claude-home-page .VPPage > div > div > :is(h1, h2, h3, h4, h5, h6) {
-  color: #fbf2e8;
+  color: #faf9f5;
 }
 
 .dark .claude-home-page .VPPage > div > div > div[class*='language-'] {
-  background: rgba(27, 23, 20, 0.96) !important;
+  background: #1e1e1c !important;
 }
 
 @media (max-width: 1180px) {
@@ -652,7 +639,7 @@
   .section-landing__copy,
   .overview-landing__copy,
   .section-landing__panel {
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 24px 28px;
   }
 
@@ -662,7 +649,7 @@
   }
 
   .section-landing__card {
-    border-radius: 20px;
+    border-radius: 8px;
     min-height: 152px;
     padding: 20px 22px;
   }
