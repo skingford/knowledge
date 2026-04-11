@@ -9,7 +9,9 @@ const docsViteConfig: UserConfig = {
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('katex')) return 'vendor-katex'
+          if (id.includes('node_modules') && (id.includes('/vue/') || id.includes('/@vue/'))) {
+            return 'framework'
+          }
         },
       },
     },

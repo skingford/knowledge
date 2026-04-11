@@ -92,11 +92,6 @@ export default defineConfig({
       return false
     }
 
-    // Skip preloading heavy vendor chunks — they are lazy-loaded only on pages that use them.
-    if (/vendor-katex/.test(link)) {
-      return false
-    }
-
     return link.endsWith('.css') || link.endsWith('.woff2') || /\/assets\/(?:app|chunks\/(?:theme|framework))\./.test(link)
   },
 
@@ -215,7 +210,10 @@ export default defineConfig({
 
     search: {
       provider: 'local',
-      options: localSearchOptions,
+      options: {
+        ...localSearchOptions,
+        exclude: (relativePath: string) => relativePath.startsWith('jd/'),
+      },
     },
 
     outline: {

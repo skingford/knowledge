@@ -2,12 +2,13 @@ import type { DefaultTheme } from 'vitepress'
 
 const headingRegex = /<h(\d*).*?>(.*?<a.*? href="#.*?".*?>.*?<\/a>)<\/h\1>/gi
 const headingContentRegex = /(.*?)<a.*? href="#(.*?)".*?>.*?<\/a>/i
-const maxSectionTextLength = 400
+const maxSectionTextLength = 200
 const maxIndexedHeadingDepth = 1
 const searchNoisePatterns = [
   /<svg\b[\s\S]*?<\/svg>/gi,
   /<pre\b[\s\S]*?<\/pre>/gi,
   /<style\b[\s\S]*?<\/style>/gi,
+  /<table\b[\s\S]*?<\/table>/gi,
 ]
 
 function clearHtmlTags(value: string) {
