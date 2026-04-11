@@ -15,6 +15,7 @@ import SpinningDiagram from './go-scheduler/SpinningDiagram.vue'
 import StackGrowthDiagram from './go-scheduler/StackGrowthDiagram.vue'
 import GoexitDiagram from './go-scheduler/GoexitDiagram.vue'
 import PBlockingScenariosDiagram from './go-scheduler/PBlockingScenariosDiagram.vue'
+import SysmonWorkflowDiagram from './go-scheduler/SysmonWorkflowDiagram.vue'
 
 type DiagramKind =
   | 'thread-vs-goroutine'
@@ -30,6 +31,7 @@ type DiagramKind =
   | 'stack-growth'
   | 'goexit'
   | 'p-blocking-scenarios'
+  | 'sysmon-workflow'
 
 const props = defineProps<{
   kind: DiagramKind
@@ -49,6 +51,7 @@ const diagramByKind: Record<DiagramKind, { component: Component; maxWidth: strin
   'stack-growth': { component: StackGrowthDiagram, maxWidth: '680px' },
   goexit: { component: GoexitDiagram, maxWidth: '680px' },
   'p-blocking-scenarios': { component: PBlockingScenariosDiagram, maxWidth: '760px' },
+  'sysmon-workflow': { component: SysmonWorkflowDiagram, maxWidth: '760px' },
 }
 
 const currentDiagram = computed(() => diagramByKind[props.kind])
