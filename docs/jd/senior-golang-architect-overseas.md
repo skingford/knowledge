@@ -204,11 +204,11 @@ function onLeave(el, done) {
 
 **深挖点（高频追问）：**
 
-- `sysmon` 如何发现阻塞、辅助抢占和调度回收
+- [`sysmon`](/golang/guide/03-goroutine-and-scheduler#_4-sysmon-幕后的-厂长) 如何发现阻塞、辅助抢占和调度回收
 - Go 1.14+ 基于信号的异步抢占调度机制
 - 高并发网络 I/O 下 `netpoller` 与调度器的协作
 
-其中 `sysmon` 可以理解为不绑定 `P` 的巡检线程，负责超时抢占、`syscall` handoff、`netpoll` 唤醒和保底 `GC`：
+其中 [`sysmon`](/golang/guide/03-goroutine-and-scheduler#_4-sysmon-幕后的-厂长) 可以理解为不绑定 `P` 的巡检线程，负责超时抢占、观察并推动 `syscall` handoff、`netpoll` 唤醒和保底 `GC`：
 
 <GoSchedulerDiagram kind="sysmon-workflow" />
 
