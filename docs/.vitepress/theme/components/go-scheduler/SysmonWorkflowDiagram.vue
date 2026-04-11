@@ -17,7 +17,7 @@
 
     <rect x="10" y="10" width="740" height="500" rx="14" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.5" />
     <text x="380" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">sysmon 运行时时序图</text>
-    <text x="380" y="48" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">特殊 M，不绑定 P；时间从上到下推进，负责巡检并触发 runtime 机制</text>
+    <text x="380" y="48" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">特殊 M，不绑定 P；对正在运行的用户态 G，sysmon 只能促成抢占，不能直接拆 P</text>
 
     <rect x="30" y="64" width="110" height="40" rx="10" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.5" />
     <text x="85" y="88" text-anchor="middle" font-size="13" font-weight="700" fill="var(--d-rv-b-text)">sysmon</text>
@@ -57,9 +57,9 @@
     <rect x="22" y="228" width="706" height="86" rx="10" fill="var(--d-bg)" opacity="0.55" />
     <text x="30" y="248" font-size="11" font-weight="700" fill="var(--d-text-sub)">② syscall handoff</text>
     <line x1="85" y1="270" x2="365" y2="270" stroke="var(--d-arrow)" stroke-width="1.6" marker-end="url(#sysmon-seq-arrow)" />
-    <text x="225" y="262" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">发现 M 长时间卡在 syscall</text>
+    <text x="225" y="262" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">观察 syscall 态持续过久</text>
     <line x1="365" y1="294" x2="225" y2="294" stroke="var(--d-rv-c-text)" stroke-width="1.8" marker-end="url(#sysmon-seq-warn)" />
-    <text x="295" y="286" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">handoff: 剥离 P 给 idle/new M，继续跑别的 G</text>
+    <text x="295" y="286" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">P 在 syscall / retake 路径中被其他 M 接手，不是直接从运行中 M 上硬拆</text>
 
     <rect x="22" y="330" width="706" height="74" rx="10" fill="var(--d-bg)" opacity="0.55" />
     <text x="30" y="350" font-size="11" font-weight="700" fill="var(--d-text-sub)">③ netpoll 唤醒</text>
