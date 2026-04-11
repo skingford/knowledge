@@ -52,3 +52,5 @@ AGENTS.md
 .roomodes
 .aider.conf.yml
 .aiderignore
+
+scripts/
