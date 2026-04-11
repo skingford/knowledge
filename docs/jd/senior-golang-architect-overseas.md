@@ -195,9 +195,12 @@ function onLeave(el, done) {
 
 **P 阻塞场景：**
 
-- 系统调用 `syscall` 阻塞：`P` 会与 `M` 解绑，寻找空闲 `M` 或新建 `M`
-- 通道操作、锁等待：`G` 阻塞但 `P` 继续执行其他 `G`
-- 垃圾回收 STW 阶段
+<GoSchedulerDiagram kind="p-blocking-scenarios" />
+
+- `G` 阻塞（`channel` / `mutex` / `select`）：阻塞的是当前 `G`，`M + P` 会继续调度其他 `G`，所以 `P` 本身不阻塞
+- `syscall` 阻塞：`M` 进入系统调用后被阻塞，runtime 会尝试把 `P` 从该 `M` 上剥离，交给其他空闲 `M`；因此 `P` 通常不阻塞
+- 长时间 CPU 计算或死循环：某个 `G` 长时间占用 `M` 且持有 `P`，导致该 `P` 的本地队列无法及时消费；现象上最像 “`P` 阻塞”，本质上更接近抢占不及时或 goroutine 长时间独占执行
+- 垃圾回收 `STW`：所有 `P` 都会被 stop，这是 runtime 主动发起的全局暂停，不是单个 `P` 的异常阻塞
 
 **深挖点（高频追问）：**
 
