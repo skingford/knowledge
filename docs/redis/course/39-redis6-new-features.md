@@ -51,7 +51,7 @@ Redis 官方在今年 5 月份正式推出了 6.0 版本，这个版本中有很
 
 等到 IO 线程解析完请求，主线程还是会以单线程的方式执行这些命令操作。下面这张图显示了刚才介绍的这三个阶段，你可以看下，加深理解。
 
-![原文配图 1](https://static001.geekbang.org/resource/image/58/cd/5817b7e2085e7c00e63534a07c4182cd.jpg)
+<RedisCourseFigure kind="redis6-multithreaded-io" />
 
 **阶段四：IO 线程回写 Socket 和主线程清空全局队列**
 
@@ -61,7 +61,7 @@ Redis 官方在今年 5 月份正式推出了 6.0 版本，这个版本中有很
 
 我也画了一张图，展示了这个阶段主线程和 IO 线程的操作，你可以看下。
 
-![原文配图 2](https://static001.geekbang.org/resource/image/2e/1b/2e1f3a5bafc43880e935aaa4796d131b.jpg)
+<RedisCourseFigure kind="redis6-io-read-phase" />
 
 了解了 Redis 主线程和多线程的协作方式，我们该怎么启用多线程呢？在 Redis 6.0 中，多线程机制默认是关闭的，如果需要使用多线程功能，需要在 redis.conf 中完成两个设置。
 
@@ -144,7 +144,7 @@ ACL SETUSER normaluser on > abc
 
 **另外，6.0 版本还支持以用户为粒度设置命令操作的访问权限**。我把具体操作列在了下表中，你可以看下，其中，加号（+）和减号（-）就分别表示给用户赋予或撤销命令的调用权限。
 
-![原文配图 3](https://static001.geekbang.org/resource/image/d1/c8/d1bd6891934cfa879ee080de1c5455c8.jpg)
+<RedisCourseFigure kind="redis6-acl-users" />
 
 为了便于你理解，我给你举个例子。假设我们要设置用户 normaluser 只能调用 Hash 类型的命令操作，而不能调用 String 类型的命令操作，我们可以执行如下命令：
 
@@ -176,7 +176,7 @@ Redis 6.0 实现了 RESP 3 通信协议，而之前都是使用的 RESP 2。在 
 
 这节课，我向你介绍了 Redis 6.0 的新特性，我把这些新特性总结在了一张表里，你可以再回顾巩固下。
 
-![原文配图 4](https://static001.geekbang.org/resource/image/21/f0/2155c01bf3129d5d58fcb98aefd402f0.jpg)
+<RedisCourseFigure kind="redis6-client-cache" />
 
 最后，我也再给你一个小建议：因为 Redis 6.0 是刚刚推出的，新的功能特性还需要在实际应用中进行部署和验证，所以，如果你想试用 Redis 6.0，可以尝试先在非核心业务上使用 Redis 6.0，一方面可以验证新特性带来的性能或功能优势，另一方面，也可以避免因为新特性不稳定而导致核心业务受到影响。
 

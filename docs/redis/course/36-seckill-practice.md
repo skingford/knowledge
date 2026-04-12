@@ -78,7 +78,7 @@ description: "极客时间《Redis 核心技术与实战》36. Redis支撑秒杀
 
 下图显示了在秒杀场景中需要 Redis 参与的两个环节：
 
-![原文配图 1](https://static001.geekbang.org/resource/image/7c/1b/7c3e5def912d7c8c45bca00f955d751b.jpg)
+<RedisCourseFigure kind="seckill-redis-flow" />
 
 了解需求后，我们使用 Redis 来支撑秒杀场景的方法就比较清晰了。接下来，我向你介绍两种方法。
 
