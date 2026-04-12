@@ -45,6 +45,7 @@ description: "极客时间《Redis 核心技术与实战》31. 事务机制：Re
 
 下面的代码就显示了使用 MULTI 和 EXEC 执行一个事务的过程，你可以看下。
 
+::: details 点击展开 `MULTI` / `EXEC` 事务示例
 ```bash
 #开启事务
 127.0.0.1:6379> MULTI
@@ -60,6 +61,7 @@ QUEUED
 1) (integer)4
 2) (integer)9
 ```
+:::
 
 我们假设 a:stock、b:stock 两个键的初始值是 5 和 10。在 MULTI 命令后执行的两个 DECR 命令，是把 a:stock、b:stock 两个键的值分别减 1，它们执行后的返回结果都是 QUEUED，这就表示，这些操作都被暂存到了命令队列，还没有实际执行。等到执行了 EXEC 命令后，可以看到返回了 4、9，这就表明，两个 DECR 命令已经成功地执行了。
 
@@ -79,6 +81,7 @@ QUEUED
 
 我们来看一个因为事务操作入队时发生错误，而导致事务失败的小例子。
 
+::: details 点击展开命令入队报错示例
 ```bash
 #开启事务
 127.0.0.1:6379> MULTI
@@ -93,6 +96,7 @@ QUEUED
 127.0.0.1:6379> EXEC
 (error) EXECABORT Transaction discarded because of previous errors.
 ```
+:::
 
 在这个例子中，事务里包含了一个 Redis 本身就不支持的 PUT 命令，所以，在 PUT 命令入队时，Redis 就报错了。虽然，事务里还有一个正确的 DECR 命令，但是，在最后执行 EXEC 命令后，整个事务被放弃执行了。
 
@@ -102,6 +106,7 @@ QUEUED
 
 举个小例子。事务中的 LPOP 命令对 String 类型数据进行操作，入队时没有报错，但是，在 EXEC 执行时报错了。LPOP 命令本身没有执行成功，但是事务中的 DECR 命令却成功执行了。
 
+::: details 点击展开执行时报错示例
 ```bash
 #开启事务
 127.0.0.1:6379> MULTI
@@ -117,6 +122,7 @@ QUEUED
 1) (error) WRONGTYPE Operation against a key holding the wrong kind of value
 2) (integer)8
 ```
+:::
 
 看到这里，你可能有个疑问，传统数据库（例如 MySQL）在执行事务时，会提供回滚机制，当事务执行发生错误时，事务中的所有操作都会撤销，已经修改的数据也会被恢复到事务执行前的状态，那么，在刚才的例子中，如果命令实际执行时报错了，是不是可以用回滚机制恢复原来的数据呢？
 
@@ -124,6 +130,7 @@ QUEUED
 
 DISCARD 命令具体怎么用呢？我们来看下下面的代码。
 
+::: details 点击展开 `DISCARD` 放弃事务示例
 ```bash
 #读取a:stock的值4
 127.0.0.1:6379> GET a:stock
@@ -141,6 +148,7 @@ OK
 127.0.0.1:6379> GET a:stock
 "4"
 ```
+:::
 
 这个例子中，a:stock 键的值一开始为 4，然后，我们执行一个事务，想对 a:stock 的值减 1。但是，在事务的最后，我们执行的是 DISCARD 命令，所以事务就被放弃了。我们再次查看 a:stock 的值，会发现仍然为 4。
 
