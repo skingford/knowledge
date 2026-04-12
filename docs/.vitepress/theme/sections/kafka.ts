@@ -14,6 +14,7 @@ export const kafkaSection: SectionConfig = {
       primary: { title: '专题总览', href: '/kafka/', description: '从总览页开始，按主题查阅。' },
       secondary: { title: '核心概念', href: '/kafka/core-concepts', description: '从 Producer/Broker/Consumer 开始。' },
       scope: [
+        'Kafka 4.2 官方介绍与事件流概念',
         'Producer/Consumer/Broker',
         'Topic/Partition/Offset',
         'Consumer Group 与 Rebalance',
@@ -23,11 +24,13 @@ export const kafkaSection: SectionConfig = {
         '消息队列 47 讲章节精读',
       ],
       docs: [
+        { title: 'Kafka 4.2 官方介绍', href: '/kafka/official-v42-introduction', description: '基于官方文档整理，涵盖事件流、Kafka 架构、核心术语与五大 API。' },
         { title: '核心概念', href: '/kafka/core-concepts', description: '覆盖 Producer、Consumer、Broker、Partition、Group 与高可用原理。' },
         { title: '支付实战', href: '/kafka/payment-practice', description: '围绕 TCC、本地消息表、Offset 补偿、延迟队列与生产治理展开。' },
         { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '梳理不丢失、顺序性、积压、重试、死信、幂等与事务。' },
       ],
       order: [
+        'Kafka 4.2 官方介绍',
         '核心概念',
         '支付实战',
         '深入追问与词汇',
@@ -38,6 +41,7 @@ export const kafkaSection: SectionConfig = {
         text: '核心入口',
         items: [
           { text: '专题总览', link: '/kafka/' },
+          { text: 'Kafka 4.2 官方介绍', link: '/kafka/official-v42-introduction' },
           { text: '核心概念', link: '/kafka/core-concepts' },
           { text: '支付实战', link: '/kafka/payment-practice' },
           { text: '追问词汇', link: '/kafka/interview-questions' },
