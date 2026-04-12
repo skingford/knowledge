@@ -21,7 +21,7 @@ description: "极客时间《Redis 核心技术与实战》34. 第23~33讲课后
 
 我把这两类缓存的优劣势汇总在一张表中，如下所示：
 
-![原文配图 1](https://static001.geekbang.org/resource/image/84/51/84ed48ebccd3443f29cba150b5c1a951.jpg)
+<RedisCourseFigure kind="qa2-practice-summary" />
 
 ### 第 24 讲
 

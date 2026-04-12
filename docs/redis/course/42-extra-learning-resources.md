@@ -71,7 +71,7 @@ description: "极客时间《Redis 核心技术与实战》加餐（一）：经
 
 我用一张图片，展示一下 Redis 的关键机制和操作系统、分布式系统的对应知识点。
 
-![原文配图 1](https://static001.geekbang.org/resource/image/a0/2c/a0f558fbf9105817744ee2c44230c62c.jpg)
+<RedisCourseFigure kind="extra-source-code-map" />
 
 AOF 日志的刷盘时机和操作系统的 fsync 机制、高速页缓存的刷回有关，而网络框架跟 epoll 有关，RDB 生成和 AOF 重写与 fork、写时复制有关（我在前面第 3、4、5 讲上讲过它们的关联）。
 
