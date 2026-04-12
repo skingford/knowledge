@@ -234,6 +234,18 @@ func getUserWithBloom(ctx context.Context, rdb *redis.Client, db *sql.DB, userID
 
 <GoDataCacheDiagram kind="cache-penetration" />
 
+布隆过滤器在缓存穿透里的价值，不是“替代缓存”，而是**在回源数据库之前先做一次极便宜的存在性判断**：
+
+- 如果判定“不存在”，那就一定不存在，可以直接拦截请求
+- 如果判定“可能存在”，再继续走缓存和数据库查询链路
+- 代价是会有少量假阳性，但不会出现假阴性
+
+<GoDataCacheDiagram kind="cache-penetration-bloom" />
+
+再往工程化一点看，缓存穿透通常不是非此即彼，而是**先用空值缓存兜住普通 miss，再按无效流量规模决定是否前置布隆过滤器**：
+
+<GoDataCacheDiagram kind="cache-penetration-compare" />
+
 ### 缓存击穿
 
 **定义**：某个热点 key 过期的瞬间，大量并发请求同时打到数据库。

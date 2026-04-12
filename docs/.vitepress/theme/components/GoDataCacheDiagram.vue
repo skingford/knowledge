@@ -14,6 +14,8 @@ type DiagramKind =
   | 'redis-watch-tx'
   | 'redis-pubsub'
   | 'cache-penetration'
+  | 'cache-penetration-bloom'
+  | 'cache-penetration-compare'
   | 'cache-breakdown'
   | 'cache-avalanche'
   | 'cache-aside'
@@ -39,6 +41,8 @@ const maxWidthByKind: Record<DiagramKind, string> = {
   'redis-watch-tx': '760px',
   'redis-pubsub': '760px',
   'cache-penetration': '760px',
+  'cache-penetration-bloom': '760px',
+  'cache-penetration-compare': '760px',
   'cache-breakdown': '760px',
   'cache-avalanche': '760px',
   'cache-aside': '760px',
@@ -427,6 +431,184 @@ const maxWidth = computed(() => maxWidthByKind[props.kind])
       <text x="674" y="168" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">缓存失去价值</text>
 
       <text x="380" y="214" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">空值缓存简单直接但占内存；布隆过滤器能挡住大部分无效流量，但会有少量“误判为可能存在”的假阳性</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cache-penetration-bloom'"
+      viewBox="0 0 760 320"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="布隆过滤器用于缓存穿透防护图"
+      role="img"
+    >
+      <defs>
+        <marker id="cache-penetration-bloom-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="var(--d-arrow)" />
+        </marker>
+        <marker id="cache-penetration-bloom-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="var(--d-rv-a-border)" />
+        </marker>
+        <marker id="cache-penetration-bloom-warn" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="var(--d-warn-border)" />
+        </marker>
+      </defs>
+
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">布隆过滤器的价值，是在回源 DB 前先用极低成本判断“这个 key 值不值得继续查”</text>
+
+      <rect x="26" y="42" width="708" height="104" rx="12" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.3" />
+      <text x="50" y="64" font-size="11" font-weight="700" fill="var(--d-text-sub)">写入 / 建表路径</text>
+
+      <rect x="42" y="78" width="96" height="42" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="90" y="103" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">user:42</text>
+
+      <line x1="138" y1="99" x2="196" y2="99" stroke="var(--d-arrow)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-arrow)" />
+
+      <rect x="206" y="54" width="88" height="24" rx="6" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.1" />
+      <text x="250" y="70" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Hash H1</text>
+      <rect x="206" y="87" width="88" height="24" rx="6" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.1" />
+      <text x="250" y="103" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Hash H2</text>
+      <rect x="206" y="120" width="88" height="24" rx="6" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.1" />
+      <text x="250" y="136" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">Hash H3</text>
+
+      <line x1="294" y1="66" x2="358" y2="66" stroke="var(--d-rv-a-border)" stroke-width="1.3" marker-end="url(#cache-penetration-bloom-green)" />
+      <line x1="294" y1="99" x2="396" y2="99" stroke="var(--d-rv-a-border)" stroke-width="1.3" marker-end="url(#cache-penetration-bloom-green)" />
+      <line x1="294" y1="132" x2="510" y2="132" stroke="var(--d-rv-a-border)" stroke-width="1.3" marker-end="url(#cache-penetration-bloom-green)" />
+
+      <text x="560" y="60" text-anchor="middle" font-size="10" font-weight="700" fill="var(--d-text)">Bit Array</text>
+      <g transform="translate(382 76)">
+        <rect x="0" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="14" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="32" y="0" width="28" height="26" rx="4" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+        <text x="46" y="17" text-anchor="middle" font-size="9" font-weight="700" fill="var(--d-rv-c-text)">1</text>
+        <rect x="64" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="78" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="96" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="110" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="128" y="0" width="28" height="26" rx="4" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+        <text x="142" y="17" text-anchor="middle" font-size="9" font-weight="700" fill="var(--d-rv-c-text)">1</text>
+        <rect x="160" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="174" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="192" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="206" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="224" y="0" width="28" height="26" rx="4" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+        <text x="238" y="17" text-anchor="middle" font-size="9" font-weight="700" fill="var(--d-rv-c-text)">1</text>
+        <rect x="256" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="270" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <rect x="288" y="0" width="28" height="26" rx="4" fill="var(--d-bg)" stroke="var(--d-border)" stroke-width="1" />
+        <text x="302" y="17" text-anchor="middle" font-size="9" fill="var(--d-text-muted)">0</text>
+        <text x="46" y="-6" text-anchor="middle" font-size="8" fill="var(--d-rv-c-text)">1</text>
+        <text x="142" y="-6" text-anchor="middle" font-size="8" fill="var(--d-rv-c-text)">4</text>
+        <text x="238" y="-6" text-anchor="middle" font-size="8" fill="var(--d-rv-c-text)">7</text>
+      </g>
+
+      <text x="560" y="122" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">写入时只置位，不保存原始值</text>
+
+      <rect x="26" y="164" width="708" height="128" rx="12" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.3" />
+      <text x="50" y="186" font-size="11" font-weight="700" fill="var(--d-text-sub)">查询路径</text>
+
+      <rect x="42" y="206" width="106" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="95" y="226" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">请求 key</text>
+      <text x="95" y="242" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">user:99</text>
+
+      <line x1="148" y1="228" x2="228" y2="228" stroke="var(--d-arrow)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-arrow)" />
+
+      <rect x="228" y="206" width="128" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="292" y="226" text-anchor="middle" font-size="10" fill="var(--d-rv-a-text)">布隆过滤器</text>
+      <text x="292" y="242" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">检查对应 bit 位</text>
+
+      <line x1="356" y1="228" x2="454" y2="198" stroke="var(--d-warn-border)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-warn)" />
+      <line x1="356" y1="228" x2="454" y2="258" stroke="var(--d-rv-a-border)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-green)" />
+
+      <rect x="454" y="176" width="124" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="516" y="196" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">任一 bit = 0</text>
+      <text x="516" y="212" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">一定不存在</text>
+
+      <rect x="454" y="236" width="124" height="44" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="516" y="256" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">所有 bit = 1</text>
+      <text x="516" y="272" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">可能存在</text>
+
+      <line x1="578" y1="198" x2="706" y2="198" stroke="var(--d-warn-border)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-warn)" />
+      <line x1="578" y1="258" x2="706" y2="258" stroke="var(--d-rv-a-border)" stroke-width="1.4" marker-end="url(#cache-penetration-bloom-green)" />
+
+      <rect x="606" y="176" width="118" height="44" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="665" y="196" text-anchor="middle" font-size="9" fill="var(--d-text)">直接拦截</text>
+      <text x="665" y="212" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">不访问 Redis / DB</text>
+
+      <rect x="606" y="236" width="118" height="44" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="665" y="256" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">继续正常链路</text>
+      <text x="665" y="272" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">缓存 miss 后再查 DB</text>
+
+      <text x="380" y="308" text-anchor="middle" font-size="10" fill="var(--d-text-muted)">关键结论：Bloom Filter 不会把真实存在的数据误杀，但会把少量不存在的数据误判成“可能存在”，因此它适合做前置过滤，不适合替代缓存或数据库</text>
+    </svg>
+
+    <svg
+      v-else-if="kind === 'cache-penetration-compare'"
+      viewBox="0 0 760 330"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="缓存穿透防护方案对比图"
+      role="img"
+    >
+      <text x="380" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--d-text)">防缓存穿透时，空值缓存解决“简单可落地”，布隆过滤器解决“海量无效 key 的入口过滤”</text>
+
+      <rect x="26" y="46" width="336" height="234" rx="12" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.3" />
+      <text x="54" y="68" font-size="12" font-weight="700" fill="var(--d-text)">方案 A：缓存空值</text>
+      <text x="54" y="86" font-size="9" fill="var(--d-text-sub)">适合不存在 key 规模不大，先用最直接的 cache-aside 兜住回源</text>
+
+      <rect x="46" y="104" width="84" height="36" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="88" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-b-text)">缓存 miss</text>
+      <line x1="130" y1="122" x2="170" y2="122" stroke="var(--d-rv-b-border)" stroke-width="1.4" />
+      <rect x="170" y="104" width="84" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="212" y="126" text-anchor="middle" font-size="9" fill="var(--d-text)">DB 不存在</text>
+      <line x1="254" y1="122" x2="294" y2="122" stroke="var(--d-blue-border)" stroke-width="1.4" />
+      <rect x="294" y="104" width="48" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="318" y="126" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">写空值</text>
+
+      <rect x="46" y="156" width="136" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="114" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">下次命中空结果</text>
+      <text x="114" y="192" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">直接返回 nil</text>
+
+      <rect x="196" y="156" width="146" height="48" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="269" y="176" text-anchor="middle" font-size="9" fill="var(--d-text)">短 TTL 控制内存</text>
+      <text x="269" y="192" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">防止空值长期堆积</text>
+
+      <rect x="46" y="220" width="136" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="114" y="240" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">优点：实现最简单</text>
+      <text x="114" y="256" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">改造现有链路最小</text>
+
+      <rect x="196" y="220" width="146" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="269" y="240" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">代价：无效 key 很多时</text>
+      <text x="269" y="256" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">会持续占 Redis 内存</text>
+
+      <rect x="398" y="46" width="336" height="234" rx="12" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="1.3" />
+      <text x="426" y="68" font-size="12" font-weight="700" fill="var(--d-text)">方案 B：布隆过滤器</text>
+      <text x="426" y="86" font-size="9" fill="var(--d-text-sub)">适合海量随机 key 或恶意请求，先在入口挡掉大部分无效流量</text>
+
+      <rect x="418" y="104" width="84" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="460" y="126" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">请求 key</text>
+      <line x1="502" y1="122" x2="542" y2="122" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <rect x="542" y="104" width="92" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="588" y="126" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">BF.EXISTS</text>
+      <line x1="634" y1="122" x2="674" y2="122" stroke="var(--d-rv-a-border)" stroke-width="1.4" />
+      <rect x="674" y="104" width="40" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="694" y="126" text-anchor="middle" font-size="9" fill="var(--d-text)">判定</text>
+
+      <rect x="418" y="156" width="136" height="48" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="486" y="176" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">任一 bit = 0</text>
+      <text x="486" y="192" text-anchor="middle" font-size="9" fill="var(--d-rv-c-text)">一定不存在，直接拦截</text>
+
+      <rect x="568" y="156" width="146" height="48" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="641" y="176" text-anchor="middle" font-size="9" fill="var(--d-text)">所有 bit = 1</text>
+      <text x="641" y="192" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">可能存在，继续缓存/DB</text>
+
+      <rect x="418" y="220" width="136" height="42" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="486" y="240" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">优点：内存效率高</text>
+      <text x="486" y="256" text-anchor="middle" font-size="9" fill="var(--d-rv-a-text)">更能扛恶意流量</text>
+
+      <rect x="568" y="220" width="146" height="42" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="641" y="240" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">代价：有假阳性</text>
+      <text x="641" y="256" text-anchor="middle" font-size="9" fill="var(--d-warn-text)">还要维护初始化与增量写入</text>
+
+      <rect x="26" y="292" width="708" height="24" rx="12" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.1" />
+      <text x="380" y="308" text-anchor="middle" font-size="10" fill="var(--d-rv-b-text)">实践建议：先做参数校验和空值缓存；当无效 key 规模很大、攻击性强或内存敏感时，再把 Bloom Filter 前置到入口层，二者可以叠加</text>
     </svg>
 
     <svg

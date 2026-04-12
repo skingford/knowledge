@@ -255,7 +255,7 @@ body:has(#VPNavScreen) {
 .vp-doc div[class*='language-'] {
   border: 1px solid var(--site-panel-border);
   border-radius: 12px;
-  background: #f0eee6 !important;
+  background: var(--vp-c-bg-alt) !important;
   box-shadow: var(--site-shadow);
 }
 
@@ -270,7 +270,7 @@ body:has(#VPNavScreen) {
 }
 
 .dark .vp-doc div[class*='language-'] {
-  background: #1e1e1c !important;
+  background: var(--vp-c-bg-alt) !important;
 }
 
 .vp-doc blockquote {
