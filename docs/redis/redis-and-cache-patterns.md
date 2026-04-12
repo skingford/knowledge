@@ -15,6 +15,8 @@ head:
 
 ### 基础操作
 
+::: details 点击展开基础操作示例
+
 ```go
 package main
 
@@ -90,9 +92,13 @@ func main() {
 }
 ```
 
+:::
+
 <GoDataCacheDiagram kind="redis-client-types" />
 
 ### Pipeline 批量操作
+
+::: details 点击展开 Pipeline 示例
 
 ```go
 // Pipeline 将多个命令打包发送，减少网络往返
@@ -126,9 +132,13 @@ func getUsersBatch(ctx context.Context, rdb *redis.Client, userIDs []int64) (map
 }
 ```
 
+:::
+
 <GoDataCacheDiagram kind="redis-pipeline" />
 
 ### Pub/Sub 发布订阅
+
+::: details 点击展开 Pub/Sub 示例
 
 ```go
 func startSubscriber(ctx context.Context, rdb *redis.Client) {
@@ -151,6 +161,8 @@ func publishMessage(ctx context.Context, rdb *redis.Client) error {
 }
 ```
 
+:::
+
 <GoDataCacheDiagram kind="redis-pubsub" />
 
 **讲解重点：**
@@ -170,6 +182,8 @@ func publishMessage(ctx context.Context, rdb *redis.Client) error {
 **定义**：查询一个数据库中根本不存在的数据，每次请求都直接打到数据库，缓存形同虚设。
 
 **典型场景**：恶意请求大量不存在的 ID。
+
+::: details 点击展开缓存穿透示例
 
 ```go
 // 解法 1：缓存空值
@@ -232,6 +246,8 @@ func getUserWithBloom(ctx context.Context, rdb *redis.Client, db *sql.DB, userID
 }
 ```
 
+:::
+
 <GoDataCacheDiagram kind="cache-penetration" />
 
 布隆过滤器在缓存穿透里的价值，不是“替代缓存”，而是**在回源数据库之前先做一次极便宜的存在性判断**：
@@ -251,6 +267,8 @@ func getUserWithBloom(ctx context.Context, rdb *redis.Client, db *sql.DB, userID
 **定义**：某个热点 key 过期的瞬间，大量并发请求同时打到数据库。
 
 **典型场景**：首页热门商品的缓存突然过期。
+
+::: details 点击展开缓存击穿示例
 
 ```go
 import "golang.org/x/sync/singleflight"
@@ -295,11 +313,15 @@ func getHotProduct(ctx context.Context, rdb *redis.Client, db *sql.DB, productID
 }
 ```
 
+:::
+
 <GoDataCacheDiagram kind="cache-breakdown" />
 
 ### 缓存雪崩
 
 **定义**：大量 key 在同一时间过期，或 Redis 整体不可用，所有请求涌向数据库。
+
+::: details 点击展开缓存雪崩示例
 
 ```go
 import "math/rand"
@@ -353,6 +375,8 @@ func (cm *CacheManager) Get(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 ```
+
+:::
 
 <GoDataCacheDiagram kind="cache-avalanche" />
 

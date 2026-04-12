@@ -64,6 +64,8 @@ Redis Cluster 一共有 16384 个 Slot，假设集群一共有 5 个实例，其
 
 比如说，我们执行 CLUSTER SLOTS 命令查看 Slot 分配情况。命令返回结果显示，Slot 0 到 Slot 4095 被分配到了实例 192.168.10.3 上，而 Slot 12288 到 Slot 16383 被分配到了实例 192.168.10.5 上。
 
+::: details 点击展开 `CLUSTER SLOTS` 示例
+
 ```bash
 127.0.0.1:6379> cluster slots
 1)1) (integer)0
@@ -75,6 +77,8 @@ Redis Cluster 一共有 16384 个 Slot，假设集群一共有 5 个实例，其
 3)1)"192.168.10.5"
 2) (integer)6379
 ```
+
+:::
 
 如果某一个实例上有太多的 Slot，我们就可以使用迁移命令把这些 Slot 迁移到其它实例上。在 Redis Cluster 中，我们可以使用 3 个命令完成 Slot 迁移。
 
@@ -90,41 +94,65 @@ Redis Cluster 一共有 16384 个 Slot，假设集群一共有 5 个实例，其
 
 第 1 步，我们先在目标实例 5 上执行下面的命令，将 Slot 300 的源实例设置为实例 3，表示要从实例 3 上迁入 Slot 300。
 
+::: details 点击展开 `CLUSTER SETSLOT ... IMPORTING` 示例
+
 ```
 CLUSTERSETSLOT300IMPORTING3
 ```
 
+:::
+
 第 2 步，在源实例 3 上，我们把 Slot 300 的目标实例设置为 5，这表示，Slot 300 要迁出到实例 5 上，如下所示：
+
+::: details 点击展开 `CLUSTER SETSLOT ... MIGRATING` 示例
 
 ```
 CLUSTERSETSLOT300MIGRATING5
 ```
 
+:::
+
 第 3 步，从 Slot 300 中获取 100 个 key。因为 Slot 中的 key 数量可能很多，所以我们需要在客户端上多次执行下面的这条命令，分批次获得并迁移 key。
+
+::: details 点击展开 `CLUSTER GETKEYSINSLOT` 示例
 
 ```
 CLUSTERGETKEYSINSLOT300100
 ```
 
+:::
+
 第 4 步，我们把刚才获取的 100 个 key 中的 key1 迁移到目标实例 5 上（IP 为 192.168.10.5），同时把要迁入的数据库设置为 0 号数据库，把迁移的超时时间设置为 timeout。我们重复执行 MIGRATE 命令，把 100 个 key 都迁移完。
+
+::: details 点击展开 `MIGRATE` 单 key 示例
 
 ```
 MIGRATE 192.168.10.5 6379 key1 0 timeout
 ```
 
+:::
+
 最后，我们重复执行第 3 和第 4 步，直到 Slot 中的所有 key 都迁移完成。
 
 从 Redis 3.0.6 开始，你也可以使用 KEYS 选项，一次迁移多个 key（key1、2、3），这样可以提升迁移效率。
+
+::: details 点击展开 `MIGRATE ... KEYS` 示例
 
 ```
 MIGRATE192.168.10.56379""0timeout KEYS key1 key2 key3
 ```
 
+:::
+
 对于 Codis 来说，我们可以执行下面的命令进行数据迁移。其中，我们把 dashboard 组件的连接地址设置为 ADDR，并且把 Slot 300 迁移到编号为 6 的 codis server group 上。
+
+::: details 点击展开 Codis 迁移示例
 
 ```
 codis-admin--dashboard=ADDR -slot-action --create --sid=300 --gid=6
 ```
+
+:::
 
 除了 bigkey 和 Slot 分配不均衡会导致数据量倾斜，还有一个导致倾斜的原因，就是使用了 Hash Tag 进行数据切片。
 

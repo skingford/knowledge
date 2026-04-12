@@ -39,7 +39,11 @@ search: false
 
 <GoSecurityDiagram kind="password-storage" />
 
-密码存储是 Web 应用最基础的安全需求。将密码以明文或简单哈希（MD5/SHA256）存储是极其危险的做法——一旦数据库泄露，攻击者可以通过彩虹表在数秒内还原明文密码。正确的做法是使用专为密码设计的自适应哈希算法（bcrypt、argon2），它们内置盐值和可调节的计算成本，能有效抵御暴力破解。
+::: danger 警告
+将密码以明文或简单哈希（MD5/SHA256）存储是极其危险的做法——一旦数据库泄露，攻击者可以通过彩虹表在数秒内还原明文密码。
+:::
+
+密码存储是 Web 应用最基础的安全需求。正确的做法是使用专为密码设计的自适应哈希算法（bcrypt、argon2），它们内置盐值和可调节的计算成本，能有效抵御暴力破解。
 
 ### bcrypt 哈希与验证
 
@@ -98,11 +102,11 @@ func main() {
 	password := "123456"
 
 	// MD5：速度极快，GPU 每秒可算数十亿次，极易被彩虹表破解
-	md5Hash := md5.Sum([]byte(password))
+	md5Hash := md5.Sum([]byte(password)) // [!code error]
 	fmt.Printf("MD5:    %x\n", md5Hash)
 
 	// SHA256：速度同样极快，没有盐值，同一密码总是产生相同哈希
-	sha256Hash := sha256.Sum256([]byte(password))
+	sha256Hash := sha256.Sum256([]byte(password)) // [!code error]
 	fmt.Printf("SHA256: %x\n", sha256Hash)
 
 	// 问题1: 没有盐值 —— 相同密码产生相同哈希，容易被彩虹表攻击
@@ -212,7 +216,7 @@ import (
 )
 
 // 密钥（生产环境应从 Secret Manager 获取，不要硬编码）
-var jwtSecret = []byte("your-256-bit-secret-key-change-in-production")
+var jwtSecret = []byte("your-256-bit-secret-key-change-in-production") // [!code error]
 
 // CustomClaims 自定义 Claims 结构
 type CustomClaims struct {
@@ -257,7 +261,7 @@ func GenerateRefreshToken(userID int64) (string, error) {
 func ParseToken(tokenString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// 验证签名算法，防止算法替换攻击
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok { // [!code highlight]
 			return nil, fmt.Errorf("不支持的签名算法: %v", token.Header["alg"])
 		}
 		return jwtSecret, nil
@@ -418,7 +422,11 @@ func main() {
 
 <GoSecurityDiagram kind="tls-mtls" />
 
-所有生产环境的 HTTP 服务都必须启用 TLS 加密。Go 标准库内置了完整的 TLS 支持，无需依赖 Nginx 等反向代理即可直接提供 HTTPS 服务。正确的 TLS 配置需要禁用过时的协议版本和弱密码套件，防止降级攻击。
+::: warning 注意
+所有生产环境的 HTTP 服务都必须启用 TLS 加密。切勿在生产环境使用 `InsecureSkipVerify: true` 跳过证书验证，最低版本应设置为 TLS 1.2。
+:::
+
+Go 标准库内置了完整的 TLS 支持，无需依赖 Nginx 等反向代理即可直接提供 HTTPS 服务。正确的 TLS 配置需要禁用过时的协议版本和弱密码套件，防止降级攻击。
 
 ### HTTPS 服务器配置
 
@@ -441,7 +449,7 @@ func main() {
 	// TLS 安全配置
 	tlsConfig := &tls.Config{
 		// 最低 TLS 版本设置为 1.2（TLS 1.0 和 1.1 已被弃用）
-		MinVersion: tls.VersionTLS12,
+		MinVersion: tls.VersionTLS12, // [!code highlight]
 
 		// 优先使用服务端的密码套件顺序
 		PreferServerCipherSuites: true,
@@ -546,7 +554,11 @@ func main() {
 
 <GoSecurityDiagram kind="sql-injection" />
 
-SQL 注入是 Web 应用最经典的安全漏洞之一。攻击者通过在用户输入中嵌入 SQL 语句片段，篡改查询逻辑，可以窃取数据、删除表甚至获取系统权限。Go 中防护 SQL 注入的核心原则是：永远使用参数化查询，绝不拼接 SQL 字符串。
+::: danger 警告
+永远使用参数化查询，绝不拼接 SQL 字符串。SQL 注入可导致数据泄露、数据篡改、权限提升甚至远程命令执行，属于 OWASP A03 最高危级别。
+:::
+
+SQL 注入是 Web 应用最经典的安全漏洞之一。攻击者通过在用户输入中嵌入 SQL 语句片段，篡改查询逻辑，可以窃取数据、删除表甚至获取系统权限。
 
 ### 错误做法 vs 正确做法
 
@@ -572,13 +584,13 @@ func main() {
 
 	// ========== 错误做法：字符串拼接 SQL（严重漏洞！）==========
 	// 攻击者输入 admin' OR '1'='1 将绕过认证
-	query := fmt.Sprintf("SELECT id, username FROM users WHERE username = '%s'", username)
+	query := fmt.Sprintf("SELECT id, username FROM users WHERE username = '%s'", username) // [!code error]
 	fmt.Println("危险的 SQL:", query)
 	// 实际执行: SELECT id, username FROM users WHERE username = 'admin' OR '1'='1'
 	// 这会返回所有用户！
 
 	// ========== 正确做法 1：使用占位符参数化查询 ==========
-	row := db.QueryRow("SELECT id, username FROM users WHERE username = ?", username)
+	row := db.QueryRow("SELECT id, username FROM users WHERE username = ?", username) // [!code highlight]
 	var id int
 	var name string
 	if err := row.Scan(&id, &name); err != nil {
@@ -677,6 +689,10 @@ func main() {
 
 <GoSecurityDiagram kind="xss-csp" />
 
+::: danger 警告
+在 HTML 输出场景中，严禁使用 `text/template` 代替 `html/template`，也不要使用 `template.HTML()` 强制将用户输入标记为安全来绕过自动转义。
+:::
+
 跨站脚本攻击（XSS）是指攻击者将恶意脚本注入到 Web 页面中，当其他用户浏览该页面时，脚本会在其浏览器中执行，从而窃取 Cookie、会话信息或执行恶意操作。Go 的 `html/template` 内置了自动转义机制，是防护 XSS 的第一道防线。
 
 ### html/template 自动转义 vs text/template 风险
@@ -695,7 +711,7 @@ import (
 var userInput = `<script>alert('XSS攻击！你的Cookie: '+document.cookie)</script>`
 
 // 安全模板（html/template 自动转义）
-var safeTemplate = template.Must(template.New("safe").Parse(`
+var safeTemplate = template.Must(template.New("safe").Parse(` // [!code highlight]
 <!DOCTYPE html>
 <html>
 <head><title>安全页面</title></head>
@@ -707,7 +723,7 @@ var safeTemplate = template.Must(template.New("safe").Parse(`
 `))
 
 // 危险模板（text/template 不做转义）
-var unsafeTemplate = texttemplate.Must(texttemplate.New("unsafe").Parse(`
+var unsafeTemplate = texttemplate.Must(texttemplate.New("unsafe").Parse(` // [!code error]
 <!DOCTYPE html>
 <html>
 <head><title>不安全页面</title></head>
@@ -809,6 +825,10 @@ func main() {
 ## 6. CSRF 防护
 
 <GoSecurityDiagram kind="csrf-protection" />
+
+::: warning 注意
+仅依赖 `Referer` / `Origin` 头判断请求来源是不够的（可被伪造）。如果你的 API 使用 Cookie 认证，即使是 JSON API 也需要 CSRF 防护。纯 JWT Bearer Token 认证（不使用 Cookie）的 API 天然免疫 CSRF。
+:::
 
 跨站请求伪造（CSRF）是指攻击者诱导已登录用户的浏览器向目标网站发送伪造请求，利用用户的身份执行非授权操作（如转账、修改密码）。防护的核心是在表单中嵌入服务端生成的随机 token，并在提交时验证该 token。
 
@@ -992,7 +1012,11 @@ func main() {
 
 <GoSecurityDiagram kind="input-validation" />
 
-永远不要信任来自客户端的任何输入。输入验证是安全的第一道防线，需要在服务端对所有用户输入进行格式、长度、范围和业务规则的校验。Go 社区广泛使用 `go-playground/validator` 库，支持声明式的结构体标签验证。
+::: warning 注意
+永远不要信任来自客户端的任何输入。只在前端做输入验证而后端不验证是常见的安全反模式，所有注入攻击的入口都是未经验证的用户输入。
+:::
+
+输入验证是安全的第一道防线，需要在服务端对所有用户输入进行格式、长度、范围和业务规则的校验。Go 社区广泛使用 `go-playground/validator` 库，支持声明式的结构体标签验证。
 
 ### 完整的用户注册验证
 
@@ -1153,7 +1177,11 @@ func main() {
 
 <GoSecurityDiagram kind="security-headers" />
 
-HTTP 安全头是 Web 安全的重要防线，通过指示浏览器启用或禁用特定行为，可以有效防护 XSS、点击劫持、MIME 嗅探等攻击。建议在中间件中统一设置，确保所有响应都包含安全头。
+::: tip 建议
+建议在中间件层统一设置安全头，确保覆盖所有响应。API 服务至少设置 `X-Content-Type-Options`、`X-Frame-Options`、`Strict-Transport-Security` 三个头。
+:::
+
+HTTP 安全头是 Web 安全的重要防线，通过指示浏览器启用或禁用特定行为，可以有效防护 XSS、点击劫持、MIME 嗅探等攻击。
 
 ### 安全头中间件
 
@@ -1259,7 +1287,11 @@ func main() {
 
 <GoSecurityDiagram kind="secret-lifecycle" />
 
-Secret（密钥、数据库密码、API Key 等）的管理是应用安全的基础。硬编码的 secret 一旦提交到 Git 仓库，几乎无法彻底清除——即使删除文件，历史提交中仍然存在。正确的做法是将 secret 与代码分离，通过环境变量或专用的 Secret Manager 注入。
+::: danger 警告
+硬编码的 secret 一旦提交到 Git 仓库，几乎无法彻底清除——即使删除文件，历史提交中仍然存在。严禁在代码中硬编码数据库密码或 API Key。
+:::
+
+Secret（密钥、数据库密码、API Key 等）的管理是应用安全的基础。正确的做法是将 secret 与代码分离，通过环境变量或专用的 Secret Manager 注入。
 
 ### 环境变量与 .env 文件管理
 
@@ -1440,7 +1472,11 @@ func main() {
 
 <GoSecurityDiagram kind="gosec-pipeline" />
 
-gosec 是 Go 社区最主流的静态安全分析工具，能够在编译前发现代码中的安全隐患，包括硬编码凭据、SQL 注入风险、弱加密算法、不安全的文件权限等。将 gosec 集成到 CI/CD 流水线中，可以在代码合并前自动拦截安全问题。
+::: tip 建议
+将 gosec 集成到 CI/CD 流水线中，在代码合并前自动拦截安全问题。配合 `golangci-lint`（内置 gosec 规则）可统一代码质量和安全检查。
+:::
+
+gosec 是 Go 社区最主流的静态安全分析工具，能够在编译前发现代码中的安全隐患，包括硬编码凭据、SQL 注入风险、弱加密算法、不安全的文件权限等。
 
 ### 安装和基本使用
 
@@ -1487,19 +1523,19 @@ import (
 // gosec 会检测变量名中包含 password, secret, token, key 等关键词的字符串赋值
 
 // 错误：硬编码密码（gosec 会报 G101）
-var dbPassword = "super_secret_password_123" //nolint:gosec // 仅用于示例
+var dbPassword = "super_secret_password_123" //nolint:gosec // 仅用于示例 // [!code error]
 
 // 正确：从环境变量获取
-var dbPasswordSafe = os.Getenv("DB_PASSWORD")
+var dbPasswordSafe = os.Getenv("DB_PASSWORD") // [!code highlight]
 
 // ========== G201: SQL 注入 ==========
 func unsafeQuery(db *sql.DB, username string) {
 	// 错误：字符串拼接 SQL（gosec 会报 G201）
-	query := "SELECT * FROM users WHERE username = '" + username + "'" //nolint:gosec // 仅用于示例
+	query := "SELECT * FROM users WHERE username = '" + username + "'" //nolint:gosec // 仅用于示例 // [!code error]
 	db.Query(query)                                                    //nolint:gosec
 
 	// 正确：参数化查询
-	db.Query("SELECT * FROM users WHERE username = ?", username)
+	db.Query("SELECT * FROM users WHERE username = ?", username) // [!code highlight]
 }
 
 // ========== G401: 弱加密哈希 ==========
@@ -1534,10 +1570,10 @@ func commandInjection(userInput string) {
 // ========== G301/G302: 不安全的文件权限 ==========
 func unsafeFilePerms() {
 	// 错误：0777 权限（gosec 会报 G301）
-	os.Mkdir("data", 0777) //nolint:gosec // 仅用于示例
+	os.Mkdir("data", 0777) //nolint:gosec // 仅用于示例 // [!code error]
 
 	// 正确：使用最小权限
-	os.Mkdir("data", 0750)
+	os.Mkdir("data", 0750) // [!code highlight]
 
 	// 错误：0666 文件权限（gosec 会报 G302）
 	os.WriteFile("config.txt", []byte("data"), 0666) //nolint:gosec
@@ -1636,7 +1672,11 @@ func main() {
 
 <GoSecurityDiagram kind="brute-force-protection" />
 
-速率限制是保护 API 端点免受滥用的关键机制。没有速率限制的登录接口可以被暴力破解工具在数分钟内尝试数百万个密码组合。Go 标准扩展库 `golang.org/x/time/rate` 提供了基于令牌桶算法的速率限制器，适用于大多数场景。
+::: warning 注意
+没有速率限制的登录接口可以被暴力破解工具在数分钟内尝试数百万个密码组合。应同时按用户名和 IP 双维度进行限制，仅按 IP 限制可被代理池绕过。
+:::
+
+速率限制是保护 API 端点免受滥用的关键机制。Go 标准扩展库 `golang.org/x/time/rate` 提供了基于令牌桶算法的速率限制器，适用于大多数场景。
 
 ### API 速率限制中间件
 
