@@ -88,4 +88,22 @@ export const localSearchOptions: DefaultTheme.LocalSearchOptions = {
       prefix: true,
     },
   },
+  translations: {
+    button: { buttonText: '搜索', buttonAriaLabel: '搜索' },
+    modal: {
+      displayDetails: '显示详情',
+      noResultsText: '没有找到相关结果',
+      resetButtonTitle: '清除搜索条件',
+      backButtonTitle: '返回',
+      footer: {
+        selectText: '选择',
+        selectKeyAriaLabel: '回车',
+        navigateText: '切换',
+        navigateUpKeyAriaLabel: '上箭头',
+        navigateDownKeyAriaLabel: '下箭头',
+        closeText: '关闭',
+        closeKeyAriaLabel: 'esc',
+      },
+    },
+  },
 }
