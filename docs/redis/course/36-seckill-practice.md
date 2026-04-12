@@ -95,10 +95,12 @@ description: "极客时间《Redis 核心技术与实战》36. Redis支撑秒杀
 
 在秒杀场景中，一个商品的库存对应了两个信息，分别是总库存量和已秒杀量。这种数据模型正好是一个 key（商品 ID）对应了两个属性（总库存量和已秒杀量），所以，我们可以使用一个 Hash 类型的键值对来保存库存的这两个信息，如下所示：
 
+::: details 点击展开库存 Hash 结构示例
 ```c
 key: itemID
 value: {total: N, ordered: M}
 ```
+:::
 
 其中，itemID 是商品的编号，total 是总库存量，ordered 是已秒杀量。
 
@@ -108,6 +110,7 @@ value: {total: N, ordered: M}
 
 那怎么在 Lua 脚本中实现这两个操作呢？我给你提供一段 Lua 脚本写的伪代码，它显示了这两个操作的实现。
 
+::: details 点击展开 Lua 库存扣减伪代码
 ```bash
 #获取商品库存信息
 local counts = redis.call("HMGET", KEYS[1],"total","ordered");
@@ -122,6 +125,7 @@ redis.call("HINCRBY",KEYS[1],"ordered",k)returnk;
 end
 return0
 ```
+:::
 
 有了 Lua 脚本后，我们就可以在 Redis 客户端，使用 EVAL 命令来执行这个脚本了。
 
@@ -135,6 +139,7 @@ return0
 
 你可以看下下面的伪代码，它显示了使用分布式锁来执行库存查验和扣减的过程。
 
+::: details 点击展开分布式锁扣减库存伪代码
 ```c
 //使用商品ID作为key
 key = itemID
@@ -161,6 +166,7 @@ releaseLock(key, val)
 else
 return
 ```
+:::
 
 需要提醒你的是，在使用分布式锁时，客户端需要先向 Redis 请求锁，只有请求到了锁，才能进行库存查验等操作，这样一来，客户端在争抢分布式锁时，大部分秒杀请求本身就会因为抢不到锁而被拦截。
 
