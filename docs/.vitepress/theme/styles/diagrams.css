@@ -110,12 +110,16 @@ svg.diagram-mysql-23-crash-recovery .ar5{stroke:var(--d-text-sub);stroke-width:1
   overflow-x: auto;
 }
 
-.mermaid-svg-wrapper svg {
+.mermaid-svg-wrapper svg,
+.mermaid-svg-wrapper img.mermaid-static {
   display: block;
   margin: 0 auto;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Dark mode: invert mermaid's neutral-theme hard-coded colors */
-.dark .mermaid-svg-wrapper svg {
+.dark .mermaid-svg-wrapper svg,
+.dark .mermaid-svg-wrapper img.mermaid-static {
   filter: invert(0.88) hue-rotate(180deg);
 }
