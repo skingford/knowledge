@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="fixedWinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffcdd2"/>
+      <stop offset="100%" style="stop-color:#ef9a9a"/>
+    </linearGradient>
+    <linearGradient id="slidingWinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c8e6c9"/>
+      <stop offset="100%" style="stop-color:#81c784"/>
+    </linearGradient>
+    <linearGradient id="currentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#42a5f5"/>
+      <stop offset="100%" style="stop-color:#1565c0"/>
+    </linearGradient>
+    <linearGradient id="prevGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ce93d8"/>
+      <stop offset="100%" style="stop-color:#9c27b0"/>
+    </linearGradient>
+    <linearGradient id="formulaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff8e1"/>
+      <stop offset="100%" style="stop-color:#ffecb3"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1565c0"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e53935"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="680" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title Bar -->
+  <rect x="20" y="15" width="920" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="480" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">滑动窗口计数器 Sliding Window Counter</text>
+
+  <!-- ===== TOP SECTION: Fixed Window Problem ===== -->
+  <rect x="20" y="80" width="920" height="185" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="20" y="80" width="920" height="32" rx="10" fill="#ffebee"/>
+  <rect x="20" y="100" width="920" height="12" fill="#ffebee"/>
+  <text x="480" y="101" text-anchor="middle" fill="#c62828" font-size="14" font-weight="bold">固定窗口的临界突发问题</text>
+
+  <!-- Timeline axis -->
+  <line x1="60" y1="200" x2="900" y2="200" stroke="#999" stroke-width="1.5"/>
+
+  <!-- Window 1 -->
+  <rect x="100" y="130" width="350" height="60" rx="6" fill="url(#fixedWinGrad)" opacity="0.5" stroke="#e53935" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="275" y="155" text-anchor="middle" fill="#c62828" font-size="13" font-weight="bold">窗口 1</text>
+
+  <!-- Window 2 -->
+  <rect x="450" y="130" width="350" height="60" rx="6" fill="url(#fixedWinGrad)" opacity="0.5" stroke="#e53935" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="625" y="155" text-anchor="middle" fill="#c62828" font-size="13" font-weight="bold">窗口 2</text>
+
+  <!-- Time labels -->
+  <text x="100" y="220" text-anchor="middle" fill="#666" font-size="12">0s</text>
+  <line x1="100" y1="195" x2="100" y2="205" stroke="#666" stroke-width="1.5"/>
+  <text x="450" y="220" text-anchor="middle" fill="#666" font-size="12">1s</text>
+  <line x1="450" y1="195" x2="450" y2="205" stroke="#666" stroke-width="2"/>
+  <text x="800" y="220" text-anchor="middle" fill="#666" font-size="12">2s</text>
+  <line x1="800" y1="195" x2="800" y2="205" stroke="#666" stroke-width="1.5"/>
+
+  <!-- Burst at boundary -->
+  <rect x="370" y="135" width="80" height="50" rx="4" fill="#ff5252" opacity="0.3"/>
+  <rect x="450" y="135" width="80" height="50" rx="4" fill="#ff5252" opacity="0.3"/>
+  <text x="410" y="167" text-anchor="middle" fill="white" font-size="11" font-weight="bold">100 req</text>
+  <text x="490" y="167" text-anchor="middle" fill="white" font-size="11" font-weight="bold">100 req</text>
+
+  <!-- Problem annotation -->
+  <line x1="370" y1="243" x2="530" y2="243" stroke="#e53935" stroke-width="2"/>
+  <line x1="370" y1="238" x2="370" y2="248" stroke="#e53935" stroke-width="2"/>
+  <line x1="530" y1="238" x2="530" y2="248" stroke="#e53935" stroke-width="2"/>
+  <text x="450" y="260" text-anchor="middle" fill="#e53935" font-size="12" font-weight="bold">0.2s 内通过 200 个请求 = 2 倍超限</text>
+
+  <!-- ===== BOTTOM LEFT: Sliding Window Solution ===== -->
+  <rect x="20" y="280" width="580" height="380" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="20" y="280" width="580" height="32" rx="10" fill="#e8f5e9"/>
+  <rect x="20" y="300" width="580" height="12" fill="#e8f5e9"/>
+  <text x="310" y="301" text-anchor="middle" fill="#2e7d32" font-size="14" font-weight="bold">滑动窗口计数器的解法</text>
+
+  <!-- Two fixed windows with counts -->
+  <!-- Prev window -->
+  <rect x="60" y="330" width="230" height="90" rx="8" fill="url(#prevGrad)" opacity="0.15" stroke="#9c27b0" stroke-width="1.5"/>
+  <text x="175" y="355" text-anchor="middle" fill="#7b1fa2" font-size="13" font-weight="bold">上一个窗口</text>
+  <text x="175" y="375" text-anchor="middle" fill="#7b1fa2" font-size="12">计数：84 次</text>
+  <text x="175" y="395" text-anchor="middle" fill="#9c27b0" font-size="11">counter_prev = 84</text>
+
+  <!-- Current window -->
+  <rect x="310" y="330" width="230" height="90" rx="8" fill="url(#currentGrad)" opacity="0.15" stroke="#1565c0" stroke-width="1.5"/>
+  <text x="425" y="355" text-anchor="middle" fill="#1565c0" font-size="13" font-weight="bold">当前窗口</text>
+  <text x="425" y="375" text-anchor="middle" fill="#1565c0" font-size="12">计数：36 次</text>
+  <text x="425" y="395" text-anchor="middle" fill="#1565c0" font-size="11">counter_curr = 36</text>
+
+  <!-- Timeline for sliding window -->
+  <line x1="60" y1="450" x2="560" y2="450" stroke="#999" stroke-width="1.5"/>
+  <text x="60" y="468" text-anchor="middle" fill="#666" font-size="11">0s</text>
+  <line x1="60" y1="445" x2="60" y2="455" stroke="#666" stroke-width="1.5"/>
+  <text x="290" y="468" text-anchor="middle" fill="#666" font-size="11">1s</text>
+  <line x1="290" y1="445" x2="290" y2="455" stroke="#666" stroke-width="2"/>
+  <text x="520" y="468" text-anchor="middle" fill="#666" font-size="11">2s</text>
+  <line x1="520" y1="445" x2="520" y2="455" stroke="#666" stroke-width="1.5"/>
+
+  <!-- Current position marker -->
+  <line x1="380" y1="430" x2="380" y2="460" stroke="#e53935" stroke-width="2.5"/>
+  <polygon points="380,425 374,435 386,435" fill="#e53935"/>
+  <text x="380" y="418" text-anchor="middle" fill="#e53935" font-size="11" font-weight="bold">当前时刻 1.4s</text>
+
+  <!-- Sliding window bracket -->
+  <rect x="150" y="436" width="230" height="6" rx="3" fill="url(#slidingWinGrad)" opacity="0.7"/>
+  <text x="265" y="492" text-anchor="middle" fill="#2e7d32" font-size="11">← 滑动窗口（往回看 1s）→</text>
+
+  <!-- Percentage labels -->
+  <text x="210" y="510" text-anchor="middle" fill="#7b1fa2" font-size="12">上一窗口占比</text>
+  <text x="210" y="527" text-anchor="middle" fill="#7b1fa2" font-size="13" font-weight="bold">60%</text>
+  <text x="370" y="510" text-anchor="middle" fill="#1565c0" font-size="12">当前窗口占比</text>
+  <text x="370" y="527" text-anchor="middle" fill="#1565c0" font-size="13" font-weight="bold">40%</text>
+
+  <!-- Formula box -->
+  <rect x="50" y="545" width="540" height="100" rx="8" fill="url(#formulaGrad)" stroke="#ffa000" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="320" y="572" text-anchor="middle" fill="#e65100" font-size="14" font-weight="bold">加权计算公式</text>
+  <text x="320" y="598" text-anchor="middle" fill="#333" font-size="13">有效请求数 = counter_prev x (1 - 当前窗口已过比例) + counter_curr</text>
+  <text x="320" y="622" text-anchor="middle" fill="#1565c0" font-size="14" font-weight="bold">= 84 x 60% + 36 = 50.4 + 36 = 86.4</text>
+  <text x="320" y="640" text-anchor="middle" fill="#2e7d32" font-size="12">限流阈值 100 → 86.4 &lt; 100 → 放行</text>
+
+  <!-- ===== BOTTOM RIGHT: Key Points ===== -->
+  <rect x="620" y="280" width="320" height="380" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="780" y="310" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">核心优势</text>
+
+  <!-- Point 1 -->
+  <rect x="640" y="325" width="280" height="65" rx="8" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="660" y="348" fill="#2e7d32" font-size="13" font-weight="bold">1. 解决临界突发</text>
+  <text x="660" y="368" fill="#555" font-size="12">窗口边界处的请求通过加权计算</text>
+  <text x="660" y="383" fill="#555" font-size="12">被正确合并统计，不再产生 2 倍突发</text>
+
+  <!-- Point 2 -->
+  <rect x="640" y="400" width="280" height="65" rx="8" fill="#e3f2fd" stroke="#42a5f5" stroke-width="1"/>
+  <text x="660" y="423" fill="#1565c0" font-size="13" font-weight="bold">2. 内存效率高</text>
+  <text x="660" y="443" fill="#555" font-size="12">只需 2 个计数器（当前 + 上一个窗口）</text>
+  <text x="660" y="458" fill="#555" font-size="12">远低于滑动窗口日志的逐条记录</text>
+
+  <!-- Point 3 -->
+  <rect x="640" y="475" width="280" height="65" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="1"/>
+  <text x="660" y="498" fill="#e65100" font-size="13" font-weight="bold">3. 实现简单</text>
+  <text x="660" y="518" fill="#555" font-size="12">Redis INCR + EXPIRE 即可实现</text>
+  <text x="660" y="533" fill="#555" font-size="12">分布式场景天然友好</text>
+
+  <!-- Point 4 -->
+  <rect x="640" y="550" width="280" height="65" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1"/>
+  <text x="660" y="573" fill="#6a1b9a" font-size="13" font-weight="bold">4. 精度可调</text>
+  <text x="660" y="593" fill="#555" font-size="12">子窗口越细，近似精度越高</text>
+  <text x="660" y="608" fill="#555" font-size="12">可在精度与内存之间权衡</text>
+
+  <!-- Note label -->
+  <rect x="640" y="625" width="280" height="28" rx="6" fill="#e8eaf6" stroke="#5c6bc0" stroke-width="1"/>
+  <text x="780" y="644" text-anchor="middle" fill="#283593" font-size="11" font-weight="bold">Cloudflare、Kong 等广泛采用此算法</text>
+</svg>

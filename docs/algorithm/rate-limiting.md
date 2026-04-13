@@ -34,6 +34,8 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 - [令牌桶算法](#令牌桶算法-token-bucket)
 - [漏桶 vs 令牌桶：到底选哪个](#漏桶-vs-令牌桶到底选哪个)
 - [工程落地参考](#工程落地参考)
+- [Sentinel 无锁滑动窗口（LeapArray 源码拆解）](#sentinel-无锁滑动窗口leaparray-源码拆解)
+- [多维度限流：Redis + Lua 令牌桶原子性优化](#多维度限流redis--lua-令牌桶原子性优化)
 - [高频问题](#高频问题)
 - [推荐资料](#推荐资料)
 
@@ -125,30 +127,169 @@ def is_allowed(key, limit, window_seconds):
 
 ## 滑动窗口 (Sliding Window)
 
-### 滑动窗口计数器
+滑动窗口是对固定窗口的改进，核心目的是**消除窗口边界处的突发问题**。它有两种实现方式：滑动窗口计数器（近似但高效）和滑动窗口日志（精确但耗内存）。
 
-不再按固定边界切分，而是从当前时刻往回看一个窗口的时间。
+### 滑动窗口计数器 (Sliding Window Counter)
 
-做法是把大窗口切成若干小窗口（sub-window），用加权计算来近似滑动效果：
+滑动窗口计数器是工程中**使用最广泛**的限流算法之一——Cloudflare、Kong、Sentinel 等都采用了这个思路。它在固定窗口的基础上，用加权计算来近似滑动效果，以极低的内存开销解决了临界突发问题。
+
+#### 核心思想
+
+不再只看当前窗口的计数，而是**结合上一个窗口的计数，按时间比例加权**：
+
+1. 维护两个计数器：当前窗口（counter_curr）和上一个窗口（counter_prev）
+2. 请求到达时，计算当前时刻在当前窗口中的位置比例
+3. 用加权公式估算"最近一个完整窗口"内的请求总数
+4. 如果估算值超过阈值，拒绝请求
+
+<InlineSvg src="/algorithm/sliding-window.svg" alt="滑动窗口计数器示意图" />
+
+#### 加权公式
 
 ```
-当前时刻在窗口 2 的 30% 处
-
-有效请求数 ≈ 窗口 1 计数 × 70% + 窗口 2 计数 × 100%
+有效请求数 = counter_prev × (1 - 当前窗口已过比例) + counter_curr
 ```
 
-这样大幅缓解了临界突发问题，且实现成本比完整滑动日志低。
+用一个具体例子来理解：
 
-### 滑动窗口日志
+```
+配置：窗口大小 = 1s，限流阈值 = 100 req/s
 
-更精确的做法是记录每个请求的时间戳（通常用 Redis Sorted Set），每次请求时：
+时间轴：
+|---- 窗口 1 (0s~1s) ----|---- 窗口 2 (1s~2s) ----|
+     counter_prev = 84         counter_curr = 36
+
+当前时刻：1.4s（处于窗口 2 的 40% 位置）
+
+计算：
+  当前窗口已过比例 = 0.4
+  上一窗口权重 = 1 - 0.4 = 0.6
+
+  有效请求数 = 84 × 0.6 + 36 = 50.4 + 36 = 86.4
+
+  86.4 < 100 → 放行
+```
+
+**为什么这能解决临界突发？**
+
+回到固定窗口的问题场景：窗口 1 尾部 100 个请求 + 窗口 2 头部 100 个请求。
+
+用滑动窗口计数器重新计算：
+
+```
+窗口 1 尾部 (0.9s)：counter_prev 已达 100
+窗口 2 头部 (1.05s)：counter_curr = 5
+
+有效请求数 = 100 × (1 - 0.05) + 5 = 95 + 5 = 100
+
+→ 已达阈值，后续请求被拒绝
+```
+
+窗口边界处不再有 2 倍突发的漏洞。
+
+#### 关键参数
+
+| 参数 | 含义 |
+|------|------|
+| **window** | 窗口大小（如 1 秒、1 分钟） |
+| **limit** | 窗口内允许的最大请求数 |
+
+#### 伪代码实现
+
+```python
+class SlidingWindowCounter:
+    def __init__(self, limit, window_seconds):
+        self.limit = limit
+        self.window = window_seconds
+        self.prev_count = 0       # 上一窗口计数
+        self.curr_count = 0       # 当前窗口计数
+        self.curr_window_start = 0  # 当前窗口起始时间
+
+    def allow(self):
+        now = current_timestamp()
+        window_start = now - (now % self.window)
+
+        # 窗口翻转
+        if window_start != self.curr_window_start:
+            self.prev_count = self.curr_count
+            self.curr_count = 0
+            self.curr_window_start = window_start
+
+        # 当前窗口已过比例
+        elapsed_ratio = (now - window_start) / self.window
+
+        # 加权估算
+        estimated = self.prev_count * (1 - elapsed_ratio) + self.curr_count
+
+        if estimated < self.limit:
+            self.curr_count += 1
+            return True
+        return False
+```
+
+Redis 分布式实现只需要两个 key：
+
+```python
+# Redis 实现（伪代码）
+def is_allowed(user_id, limit, window_seconds):
+    now = current_timestamp()
+    curr_window = now // window_seconds
+    prev_window = curr_window - 1
+
+    curr_key = f"rate:{user_id}:{curr_window}"
+    prev_key = f"rate:{user_id}:{prev_window}"
+
+    curr_count = int(redis.get(curr_key) or 0)
+    prev_count = int(redis.get(prev_key) or 0)
+
+    elapsed_ratio = (now % window_seconds) / window_seconds
+    estimated = prev_count * (1 - elapsed_ratio) + curr_count
+
+    if estimated < limit:
+        pipe = redis.pipeline()
+        pipe.incr(curr_key)
+        pipe.expire(curr_key, window_seconds * 2)
+        pipe.execute()
+        return True
+    return False
+```
+
+#### 优点
+
+- **解决临界突发**：加权计算消除了固定窗口边界处的 2 倍突发问题
+- **内存极低**：只需要 2 个计数器（当前窗口 + 上一个窗口），与限流阈值大小无关
+- **实现简单**：Redis INCR + EXPIRE 即可，分布式友好
+- **精度可调**：子窗口越细精度越高，可以在精度与内存之间权衡
+
+#### 缺点
+
+- **近似而非精确**：加权计算是对请求在窗口内均匀分布的假设，极端情况下仍有误差
+- **不做流量整形**：只是"计数拒绝"，不控制请求的输出节奏（和漏桶不同）
+- **窗口翻转时的竞态**：分布式环境下窗口翻转瞬间需要原子操作
+
+#### 适用场景
+
+- **API 配额限流**：如每分钟 60 次、每小时 1000 次
+- **分布式限流**：多实例共享 Redis 计数器
+- **对精度要求不极端苛刻的场景**（绝大多数业务限流）
+- 典型实现：**Cloudflare** 全球限流、**Kong** Rate Limiting 插件、**Alibaba Sentinel**
+
+### 滑动窗口日志 (Sliding Window Log)
+
+如果需要**精确**的滑动窗口，可以记录每个请求的时间戳。
+
+#### 核心思想
+
+用一个有序集合记录所有请求的到达时间。每次新请求到达时：
 
 1. 移除窗口之外的旧时间戳
 2. 计算当前窗口内的请求数
 3. 判断是否超过阈值
 
+#### 伪代码实现
+
 ```python
-# Redis Sorted Set 实现（伪代码）
+# Redis Sorted Set 实现
 def is_allowed(key, limit, window_seconds):
     now = current_timestamp_ms()
     window_start = now - window_seconds * 1000
@@ -165,9 +306,34 @@ def is_allowed(key, limit, window_seconds):
     return False
 ```
 
-**优点**：精确，无临界突发问题。
+#### 优点
 
-**缺点**：内存占用高——每个请求都要存一条记录。如果限流阈值是 10000 req/s，就要存 10000 条时间戳。
+- **绝对精确**：每个请求都有时间戳，无近似误差
+- **没有临界突发**：真正的滑动窗口，任意连续 N 秒内都不超过阈值
+
+#### 缺点
+
+- **内存占用高**：每个请求存一条时间戳。阈值 10000 req/s = 每用户 10000 条记录
+- **写放大**：每次请求都要 ZADD + ZREMRANGEBYSCORE + ZCARD，Redis 操作多
+- **不适合高阈值场景**：当限流阈值很大时，内存和计算成本线性增长
+
+#### 适用场景
+
+- **低阈值、高精度**场景：如每分钟 5 次短信验证码、每小时 10 次登录尝试
+- 对精确度要求极高的计费型限流
+
+### 滑动窗口计数器 vs 滑动窗口日志
+
+| 维度 | 滑动窗口计数器 | 滑动窗口日志 |
+|------|--------------|------------|
+| **精度** | 近似（假设均匀分布） | 精确 |
+| **内存** | O(1)——2 个计数器 | O(N)——N = 阈值 |
+| **Redis 操作** | GET + INCR | ZADD + ZREM + ZCARD |
+| **适合阈值** | 高（万级 req/s） | 低（百级以下） |
+| **实现复杂度** | 低 | 中 |
+| **典型场景** | API 限流、网关 | 短信验证码、登录限制 |
+
+> 一句话总结：大多数限流场景用**滑动窗口计数器**就够了——精度足够、内存极低、实现简单。只有需要精确到每一个请求的低阈值场景才需要滑动窗口日志。
 
 ---
 
@@ -441,6 +607,231 @@ end
 | Google Cloud Endpoints | 令牌桶 | 按 API key 限流 |
 | Envoy | 令牌桶 | 本地/全局限流 |
 
+### Sentinel 无锁滑动窗口（LeapArray 源码拆解）
+
+前面讲的滑动窗口计数器用伪代码很好理解，但到了**每秒数十万请求**的场景，一个朴素的实现会遇到两个瓶颈：
+
+1. **锁竞争**：多线程并发更新同一个计数器，加锁会成为瓶颈
+2. **内存分配**：每到新窗口就创建新对象，频繁 GC
+
+Alibaba Sentinel 的 **LeapArray** 是目前开源社区中滑动窗口最优雅的工程实现之一。它通过三个设计解决了上述问题。
+
+#### 核心设计
+
+<InlineSvg src="/algorithm/sentinel-leaparray.svg" alt="Sentinel LeapArray 无锁滑动窗口结构" />
+
+**数据结构层级**：
+
+```
+LeapArray<MetricBucket>
+  └─ AtomicReferenceArray<WindowWrap<MetricBucket>>   // 环形数组
+       └─ WindowWrap
+            ├─ windowStart: long          // 窗口起始时间
+            ├─ windowLength: long         // 窗口长度
+            └─ value: MetricBucket        // 统计数据
+                 └─ LongAdder[] counters  // 每个事件类型一个计数器
+                      ├─ PASS
+                      ├─ BLOCK
+                      ├─ EXCEPTION
+                      ├─ SUCCESS
+                      ├─ RT
+                      └─ OCCUPIED_PASS
+```
+
+**关键参数**：
+
+| 参数 | 含义 | 默认值 |
+|------|------|--------|
+| `sampleCount` | 环形数组大小（滑动窗口被分成几个桶） | 2 |
+| `intervalInMs` | 滑动窗口总时长 | 1000ms |
+| `windowLengthInMs` | 每个桶的时长 = interval / sampleCount | 500ms |
+
+#### 索引计算
+
+```java
+// 时间 → 数组索引（取模实现环形复用）
+int idx = (int)((timeMillis / windowLengthInMs) % array.length());
+
+// 时间 → 窗口起始时间（对齐到桶边界）
+long windowStart = timeMillis - timeMillis % windowLengthInMs;
+```
+
+例如 `time=1050ms, windowLength=250ms, sampleCount=4`：
+- `idx = (1050/250) % 4 = 4 % 4 = 0`
+- `windowStart = 1050 - 1050 % 250 = 1050 - 50 = 1000`
+
+#### CAS 三分支：几乎无锁的关键
+
+`currentWindow(timeMillis)` 方法的 `while(true)` 循环有三个分支：
+
+```java
+// 简化后的核心逻辑
+WindowWrap<MetricBucket> currentWindow(long timeMillis) {
+    int idx = calculateTimeIdx(timeMillis);
+    long windowStart = calculateWindowStart(timeMillis);
+
+    while (true) {
+        WindowWrap<MetricBucket> old = array.get(idx);
+
+        // 分支 1：槽位为 null → CAS 创建（纯无锁）
+        if (old == null) {
+            WindowWrap<MetricBucket> window = new WindowWrap<>(
+                windowLengthInMs, windowStart, new MetricBucket());
+            if (array.compareAndSet(idx, null, window)) {
+                return window;   // CAS 成功
+            }
+            Thread.yield();      // CAS 失败，让出 CPU 重试
+        }
+        // 分支 2：窗口时间匹配 → 直接返回（零开销热路径）
+        else if (old.windowStart() == windowStart) {
+            return old;          // 99%+ 的请求走这条路
+        }
+        // 分支 3：窗口已过期 → tryLock 重置（极少触发）
+        else if (old.windowStart() < windowStart) {
+            if (updateLock.tryLock()) {
+                try {
+                    old.resetTo(windowStart);
+                    old.value().reset();  // 清零所有 LongAdder
+                    return old;
+                } finally {
+                    updateLock.unlock();
+                }
+            }
+            Thread.yield();      // 没抢到锁，让出 CPU 重试
+        }
+    }
+}
+```
+
+**为什么几乎无锁？**
+
+| 分支 | 触发频率 | 锁 | 说明 |
+|------|---------|-----|------|
+| 分支 2：当前窗口 | **99%+** | 无 | 绝大多数请求直接返回，零开销 |
+| 分支 1：首次创建 | 极少（启动时） | CAS | 纯 CAS，无阻塞 |
+| 分支 3：窗口过期 | 极少（每 windowLength 一次） | tryLock | 非阻塞，失败 yield 重试 |
+
+再加上每个 `MetricBucket` 内部用 **LongAdder**（而不是 `AtomicLong`）做计数——LongAdder 在高并发写入时通过分段（striped cells）减少 CAS 冲突，写吞吐远高于 AtomicLong。
+
+**设计精髓总结**：
+
+> 环形数组避免 GC（对象复用）+ LongAdder 避免写竞争（分段计数）+ CAS / tryLock 避免全局锁 = 高并发下几乎无锁的滑动窗口。
+
+### 多维度限流：Redis + Lua 令牌桶原子性优化
+
+实际业务中，一个请求往往需要**同时通过多个维度的限流检查**：
+
+```
+请求到达
+  ├─ IP 限流：每个 IP 每秒 50 次
+  ├─ 用户限流：每个用户每秒 20 次
+  ├─ 接口限流：/api/order 全局每秒 1000 次
+  └─ AppID 限流：每个第三方应用每秒 100 次
+
+只要任一维度超限 → 拒绝
+```
+
+如果每个维度单独调一次 Redis，存在两个问题：
+
+1. **非原子**：检查和扣减之间可能有并发穿透
+2. **多次 RT**：4 个维度 = 4 次 Redis 调用 = 4 倍网络延迟
+
+#### Key 设计模式
+
+```
+rate:{dimension}:{identifier}
+
+示例：
+  rate:ip:203.0.113.42          → IP 维度
+  rate:user:uid_12345           → 用户维度
+  rate:api:/api/order           → 接口维度
+  rate:app:app_67890            → 第三方应用维度
+```
+
+每个 key 是一个 Hash，存储令牌桶状态：
+
+```
+HGETALL rate:user:uid_12345
+  → tokens: "18.5"
+  → last_time: "1710000000123"
+```
+
+#### 单次 Lua 调用检查多个维度
+
+核心优化：**一个 Lua 脚本同时检查所有维度**，原子执行，单次 RT。
+
+```lua
+-- 多维度令牌桶限流 Lua 脚本
+-- KEYS: 各维度的 key
+-- ARGV: rate1, burst1, rate2, burst2, ..., now
+
+local now = tonumber(ARGV[#ARGV])
+local num_dimensions = #KEYS
+
+for i = 1, num_dimensions do
+    local key = KEYS[i]
+    local rate = tonumber(ARGV[(i - 1) * 2 + 1])
+    local burst = tonumber(ARGV[(i - 1) * 2 + 2])
+
+    local data = redis.call('hmget', key, 'tokens', 'last_time')
+    local tokens = tonumber(data[1]) or burst
+    local last_time = tonumber(data[2]) or now
+
+    -- 补充令牌
+    local elapsed = (now - last_time) / 1000
+    local new_tokens = math.min(burst, tokens + elapsed * rate)
+
+    if new_tokens < 1 then
+        -- 任一维度超限 → 立即拒绝（不扣减任何维度）
+        return 0
+    end
+end
+
+-- 所有维度都通过 → 统一扣减
+for i = 1, num_dimensions do
+    local key = KEYS[i]
+    local rate = tonumber(ARGV[(i - 1) * 2 + 1])
+    local burst = tonumber(ARGV[(i - 1) * 2 + 2])
+
+    local data = redis.call('hmget', key, 'tokens', 'last_time')
+    local tokens = tonumber(data[1]) or burst
+    local last_time = tonumber(data[2]) or now
+
+    local elapsed = (now - last_time) / 1000
+    local new_tokens = math.min(burst, tokens + elapsed * rate) - 1
+
+    redis.call('hmset', key, 'tokens', new_tokens, 'last_time', now)
+    redis.call('expire', key, math.ceil(burst / rate) + 1)
+end
+
+return 1  -- 所有维度通过
+```
+
+**关键设计点**：
+
+- **先检查后扣减**：两轮循环确保要么全部通过并扣减，要么全部不扣减——避免"IP 扣了但用户没扣"的不一致
+- **单次 RT**：一个 Lua 脚本完成所有维度检查，网络开销 = 1 次往返
+- **自动过期**：每个 key 设置 `burst/rate + 1` 秒的 TTL，不活跃的限流 key 自动清除
+
+#### Pipeline vs 单脚本的取舍
+
+| 方式 | 原子性 | 网络开销 | 适用场景 |
+|------|-------|---------|---------|
+| **单 Lua 脚本多 key** | 原子（同节点） | 1 次 RT | 所有 key 在同一 Redis 节点 |
+| **Pipeline 多命令** | 非原子 | 1 次 RT（批量） | key 分布在不同节点，不需要严格原子 |
+| **逐个调用** | 非原子 | N 次 RT | 不推荐 |
+
+> **注意**：Lua 脚本要求所有 KEYS 在同一个 Redis 节点上。如果使用 Redis Cluster，需要用 Hash Tag（如 `rate:{uid_12345}:ip`）确保同一用户的所有维度 key 落在同一个 slot。
+
+#### 内存控制策略
+
+多维度限流的 key 数量可能很大（每个 IP × 每个接口 = 笛卡尔积），需要注意内存：
+
+- **TTL 必设**：不活跃的 key 及时过期（`burst/rate + buffer`）
+- **key 粒度取舍**：不是每个维度都需要最细粒度，IP 限流通常不需要按接口拆分
+- **监控 key 数量**：定期检查 `DBSIZE` 和内存用量，防止限流 key 爆炸
+- **考虑本地缓存**：高频维度（如全局接口限流）可以用本地令牌桶 + Redis 定期同步，减少 Redis 压力
+
 ---
 
 ## 高频问题
@@ -503,3 +894,5 @@ X-RateLimit-Reset: 1620000060
 - [Nginx limit_req 文档](https://nginx.org/en/docs/http/ngx_http_limit_req_module.html) - 漏桶在 Nginx 中的应用
 - [System Design - Rate Limiting (ByteByteGo)](https://bytebytego.com/courses/system-design-interview/design-a-rate-limiter) - 系统设计面试角度的限流算法讲解
 - [Stripe 的 API 限流实践](https://stripe.com/blog/rate-limiters) - Stripe 如何组合使用不同限流策略
+- [Sentinel LeapArray 源码](https://github.com/alibaba/Sentinel/blob/master/sentinel-core/src/main/java/com/alibaba/csp/sentinel/slots/statistic/base/LeapArray.java) - 无锁滑动窗口的工业级实现
+- [Cloudflare: How we built rate limiting](https://blog.cloudflare.com/counting-things-a-lot-of-different-things/) - Cloudflare 滑动窗口计数器的工程实践
