@@ -34,8 +34,10 @@ const { landing } = sections.find((section) => section.key === 'algorithm')!
 
 - [Raft 共识算法详解](./raft.md)：从 Leader Election、Log Replication 到 Safety，完整拆解 Raft 协议的设计动机与工程实现
 - [Redlock 分布式锁算法详解](./redlock.md)：从多数派租约、有效期计算到争议点，讲清 Redlock 的原理、边界与生产适用场景
+- [限流算法详解](./rate-limiting.md)：从固定窗口、滑动窗口到漏桶和令牌桶，拆解四种限流算法的原理、差异与工程选型
 
 ## 建议阅读顺序
 
 1. 先读 [Raft 共识算法详解](./raft.md)，把分布式共识的核心问题和 Raft 的解法建立起来
 2. 再读 [Redlock 分布式锁算法详解](./redlock.md)，理解 Redis 分布式锁为什么只是高可用租约，而不是强一致锁
+3. 再读 [限流算法详解](./rate-limiting.md)，搞清楚漏桶、令牌桶的本质区别和工程选型
