@@ -181,6 +181,5 @@ DNS 正常只代表：
 
 ## 延伸阅读
 
-- 想补协议细节：读 [TCP/IP、HTTP 与 HTTPS 主线](./tcp-ip-http-and-https.md)
-- 想建立全局框架：读 [网络必备知识](./essential-knowledge.md)
+- 想补协议细节和全局框架：读 [网络必备知识](./essential-knowledge.md)
 - 想知道入口链路出问题时怎么查：读 [网络排障与常用命令](./troubleshooting-and-commands.md)

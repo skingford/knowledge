@@ -223,7 +223,6 @@ NAT 主要解决地址转换，不等于完整安全策略。
 
 ## 延伸阅读
 
-- 想先补整体框架：读 [网络必备知识](./essential-knowledge.md)
-- 想补协议链路：读 [TCP/IP、HTTP 与 HTTPS 主线](./tcp-ip-http-and-https.md)
+- 想先补整体框架和协议链路：读 [网络必备知识](./essential-knowledge.md)
 - 想补入口设施链路：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
 - 想把命令和排障动作练起来：读 [网络排障与常用命令](./troubleshooting-and-commands.md)

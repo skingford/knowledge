@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="h1Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+    <linearGradient id="h2Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="h3Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="560" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title -->
+  <rect x="20" y="15" width="960" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="500" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">HTTP 版本演进对比</text>
+
+  <!-- ===== HTTP/1.1 Column ===== -->
+  <rect x="25" y="80" width="310" height="460" rx="10" fill="white" stroke="#fa709a" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="25" y="80" width="310" height="42" rx="10" fill="url(#h1Grad)"/>
+  <rect x="25" y="105" width="310" height="17" fill="url(#h1Grad)"/>
+  <text x="180" y="108" text-anchor="middle" fill="white" font-size="16" font-weight="bold">HTTP/1.1</text>
+
+  <!-- Connection diagram: serial requests -->
+  <rect x="45" y="138" width="270" height="180" rx="8" fill="#fef6f0" stroke="#fadad0" stroke-width="1"/>
+  <text x="180" y="160" text-anchor="middle" fill="#888" font-size="11">单一 TCP 连接</text>
+
+  <!-- Serial requests -->
+  <rect x="65" y="175" width="230" height="28" rx="5" fill="#fa709a" opacity="0.7"/>
+  <text x="180" y="194" text-anchor="middle" fill="white" font-size="11">请求 1 → 响应 1</text>
+
+  <rect x="65" y="210" width="230" height="28" rx="5" fill="#fa709a" opacity="0.5"/>
+  <text x="180" y="229" text-anchor="middle" fill="white" font-size="11">请求 2 → 响应 2 (等待)</text>
+
+  <rect x="65" y="245" width="230" height="28" rx="5" fill="#fa709a" opacity="0.3"/>
+  <text x="180" y="264" text-anchor="middle" fill="#333" font-size="11">请求 3 → 响应 3 (等待)</text>
+
+  <rect x="65" y="280" width="230" height="28" rx="5" fill="#ffe0e0" stroke="#fa709a" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="180" y="299" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="bold">队头阻塞!</text>
+
+  <!-- Features -->
+  <text x="180" y="345" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">关键特征</text>
+  <text x="55" y="370" fill="#666" font-size="11">- Keep-Alive 连接复用</text>
+  <text x="55" y="392" fill="#666" font-size="11">- 文本协议，易调试</text>
+  <text x="55" y="414" fill="#666" font-size="11">- 并发能力有限</text>
+
+  <rect x="55" y="435" width="250" height="30" rx="6" fill="#ffe0e0" stroke="#e74c3c" stroke-width="1"/>
+  <text x="180" y="455" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="bold">应用层队头阻塞</text>
+
+  <text x="180" y="500" text-anchor="middle" fill="#999" font-size="11">传输方式: TCP</text>
+  <text x="180" y="520" text-anchor="middle" fill="#999" font-size="11">协议格式: 文本</text>
+
+  <!-- ===== HTTP/2 Column ===== -->
+  <rect x="345" y="80" width="310" height="460" rx="10" fill="white" stroke="#4facfe" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="345" y="80" width="310" height="42" rx="10" fill="url(#h2Grad)"/>
+  <rect x="345" y="105" width="310" height="17" fill="url(#h2Grad)"/>
+  <text x="500" y="108" text-anchor="middle" fill="white" font-size="16" font-weight="bold">HTTP/2</text>
+
+  <!-- Multiplexed diagram -->
+  <rect x="365" y="138" width="270" height="180" rx="8" fill="#f0f8ff" stroke="#c0deff" stroke-width="1"/>
+  <text x="500" y="160" text-anchor="middle" fill="#888" font-size="11">单一 TCP 连接 (多路复用)</text>
+
+  <!-- Interleaved streams -->
+  <rect x="385" y="175" width="100" height="22" rx="4" fill="#4facfe" opacity="0.8"/>
+  <text x="435" y="191" text-anchor="middle" fill="white" font-size="10">Stream 1</text>
+
+  <rect x="495" y="175" width="120" height="22" rx="4" fill="#667eea" opacity="0.7"/>
+  <text x="555" y="191" text-anchor="middle" fill="white" font-size="10">Stream 2</text>
+
+  <rect x="385" y="203" width="80" height="22" rx="4" fill="#667eea" opacity="0.7"/>
+  <text x="425" y="219" text-anchor="middle" fill="white" font-size="10">Stream 2</text>
+
+  <rect x="475" y="203" width="140" height="22" rx="4" fill="#4facfe" opacity="0.8"/>
+  <text x="545" y="219" text-anchor="middle" fill="white" font-size="10">Stream 1</text>
+
+  <rect x="385" y="231" width="120" height="22" rx="4" fill="#a18cd1" opacity="0.7"/>
+  <text x="445" y="247" text-anchor="middle" fill="white" font-size="10">Stream 3</text>
+
+  <rect x="515" y="231" width="100" height="22" rx="4" fill="#4facfe" opacity="0.6"/>
+  <text x="565" y="247" text-anchor="middle" fill="white" font-size="10">Stream 1</text>
+
+  <rect x="385" y="259" width="230" height="22" rx="4" fill="#a18cd1" opacity="0.5"/>
+  <text x="500" y="275" text-anchor="middle" fill="white" font-size="10">Stream 3 ...</text>
+
+  <!-- TCP loss blocking all -->
+  <rect x="385" y="287" width="230" height="22" rx="4" fill="#ffe0e0" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="500" y="303" text-anchor="middle" fill="#e74c3c" font-size="10" font-weight="bold">TCP 丢包 → 全部阻塞!</text>
+
+  <!-- Features -->
+  <text x="500" y="345" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">关键特征</text>
+  <text x="375" y="370" fill="#666" font-size="11">- 二进制分帧 + Header 压缩</text>
+  <text x="375" y="392" fill="#666" font-size="11">- 多路复用 (Multiplexing)</text>
+  <text x="375" y="414" fill="#666" font-size="11">- Stream 优先级</text>
+
+  <rect x="375" y="435" width="250" height="30" rx="6" fill="#fff3e0" stroke="#ff9800" stroke-width="1"/>
+  <text x="500" y="455" text-anchor="middle" fill="#e65100" font-size="11" font-weight="bold">TCP 层队头阻塞仍在</text>
+
+  <text x="500" y="500" text-anchor="middle" fill="#999" font-size="11">传输方式: TCP</text>
+  <text x="500" y="520" text-anchor="middle" fill="#999" font-size="11">协议格式: 二进制</text>
+
+  <!-- ===== HTTP/3 Column ===== -->
+  <rect x="665" y="80" width="315" height="460" rx="10" fill="white" stroke="#43e97b" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="665" y="80" width="315" height="42" rx="10" fill="url(#h3Grad)"/>
+  <rect x="665" y="105" width="315" height="17" fill="url(#h3Grad)"/>
+  <text x="822" y="108" text-anchor="middle" fill="white" font-size="16" font-weight="bold">HTTP/3</text>
+
+  <!-- Independent streams diagram -->
+  <rect x="685" y="138" width="275" height="180" rx="8" fill="#f0fff5" stroke="#c0f0d0" stroke-width="1"/>
+  <text x="822" y="160" text-anchor="middle" fill="#888" font-size="11">QUIC (UDP) — 独立 Stream</text>
+
+  <!-- Independent streams, each in its own lane -->
+  <rect x="700" y="175" width="245" height="28" rx="5" fill="#43e97b" opacity="0.7"/>
+  <text x="822" y="194" text-anchor="middle" fill="white" font-size="10">Stream 1 (独立传输)</text>
+
+  <rect x="700" y="210" width="245" height="28" rx="5" fill="#38d9a9" opacity="0.7"/>
+  <text x="822" y="229" text-anchor="middle" fill="white" font-size="10">Stream 2 (独立传输)</text>
+
+  <rect x="700" y="245" width="245" height="28" rx="5" fill="#20c997" opacity="0.7"/>
+  <text x="822" y="264" text-anchor="middle" fill="white" font-size="10">Stream 3 (独立传输)</text>
+
+  <!-- Loss only affects one stream -->
+  <rect x="700" y="280" width="110" height="28" rx="5" fill="#ffe0e0" stroke="#e74c3c" stroke-width="1"/>
+  <text x="755" y="299" text-anchor="middle" fill="#e74c3c" font-size="10">Stream 2 丢包</text>
+  <rect x="820" y="280" width="125" height="28" rx="5" fill="#e6fff0" stroke="#43e97b" stroke-width="1"/>
+  <text x="882" y="299" text-anchor="middle" fill="#2d9d5c" font-size="10">1 &amp; 3 不受影响</text>
+
+  <!-- Features -->
+  <text x="822" y="345" text-anchor="middle" fill="#333" font-size="12" font-weight="bold">关键特征</text>
+  <text x="695" y="370" fill="#666" font-size="11">- 基于 QUIC (UDP 之上)</text>
+  <text x="695" y="392" fill="#666" font-size="11">- 连接迁移成本更低</text>
+  <text x="695" y="414" fill="#666" font-size="11">- 移动/弱网场景更友好</text>
+
+  <rect x="695" y="435" width="255" height="30" rx="6" fill="#e6fff0" stroke="#43e97b" stroke-width="1"/>
+  <text x="822" y="455" text-anchor="middle" fill="#2d9d5c" font-size="11" font-weight="bold">彻底解决 TCP 层队头阻塞</text>
+
+  <text x="822" y="500" text-anchor="middle" fill="#999" font-size="11">传输方式: QUIC (UDP)</text>
+  <text x="822" y="520" text-anchor="middle" fill="#999" font-size="11">协议格式: 二进制</text>
+</svg>

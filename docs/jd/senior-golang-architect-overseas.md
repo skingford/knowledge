@@ -430,7 +430,11 @@ function onLeave(el, done) {
 
 > JD 明确要求”熟悉 TCP/UDP、HTTP/HTTPS、多进程/线程、Socket 编程”，这部分不能只背概念，要能结合 Go 实现讲清原理。
 
-### 1. TCP 粘包与解决
+### 1. TCP 粘包、半包与解决
+
+> - **粘包**：多个应用层消息在接收端被合并成一个 TCP 数据段
+> - **半包**：一个消息被拆成多次接收
+> - **根因**：缓冲区 + Nagle + 分段
 
 - TCP 是流式协议，不保证消息边界
 - Nagle 算法可能合并小包
@@ -460,11 +464,9 @@ function onLeave(el, done) {
 - 多进程 vs 多线程 vs 协程的对比：Go 选择了用户态协程 + M:N 调度
 
 ::: details 推荐阅读
-- [TCP/IP, HTTP & HTTPS](/network/tcp-ip-http-and-https) — 协议基础
-- [网络必备知识](/network/essential-knowledge) — 核心概念
+- [网络必备知识](/network/essential-knowledge) — 协议基础、核心概念与高频自检题
 - [DNS, CDN & 负载均衡](/network/dns-cdn-and-load-balancing)
 - [网络排障与命令](/network/troubleshooting-and-commands)
-- [网络面试题](/network/essential-questions) — 高频考点
 - [Net: TCP/UDP 基础](/golang/guide/source-reading/net) — Go 网络标准库
 - [Net/http 实现](/golang/guide/source-reading/net-http) — HTTP 底层
 - [HTTP/2 多路复用](/golang/guide/source-reading/net-http2)
