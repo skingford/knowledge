@@ -30,10 +30,10 @@ export const kafkaSection: SectionConfig = {
         { title: '深入追问与词汇', href: '/kafka/interview-questions', description: '梳理不丢失、顺序性、积压、重试、死信、幂等与事务。' },
       ],
       order: [
-        'Kafka 4.2 官方介绍',
         '核心概念',
         '支付实战',
         '深入追问与词汇',
+        'v4.2',
       ],
     },
     sidebar: [
@@ -41,10 +41,10 @@ export const kafkaSection: SectionConfig = {
         text: '核心入口',
         items: [
           { text: '专题总览', link: '/kafka/' },
-          { text: 'Kafka 4.2 官方介绍', link: '/kafka/official-v42-introduction' },
           { text: '核心概念', link: '/kafka/core-concepts' },
           { text: '支付实战', link: '/kafka/payment-practice' },
           { text: '追问词汇', link: '/kafka/interview-questions' },
+          { text: 'v4.2', link: '/kafka/official-v42-introduction' },
         ],
       },
       {
