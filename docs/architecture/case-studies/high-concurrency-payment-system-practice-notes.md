@@ -67,7 +67,9 @@ vocabulary:
 
 结合支付语境理解时，可以这样表述：
 
-> 支付链路里最怕长事务、慢下游和超时扩散，所以 `context` 不是为了代码优雅，而是为了控制整条资金链路的超时边界；请求内任务要跟着请求一起收敛，离线任务则要显式重建自己的生命周期，避免资源泄漏和雪崩。
+::: warning 注意
+支付链路里最怕长事务、慢下游和超时扩散，所以 `context` 不是为了代码优雅，而是为了控制整条资金链路的超时边界；请求内任务要跟着请求一起收敛，离线任务则要显式重建自己的生命周期，避免资源泄漏和雪崩。
+:::
 
 ### 2. 内存与性能
 
@@ -107,7 +109,9 @@ vocabulary:
 - [架构师学习路线](/architecture/architect-learning-roadmap)
 - [Go 微服务可观测性与稳定性专题](/golang/guide/08-observability-resilience)
 
-支付系统的核心不是“吞吐高”，而是“钱不能错，系统不能死”。
+::: warning 注意
+支付系统的核心不是”吞吐高”，而是”钱不能错，系统不能死”。
+:::
 
 ### 1. 核心高可用能力
 
@@ -164,8 +168,8 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
     }
 
     // 2. 幂等检查：已终态直接返回
-    if order.Status == StatusSuccess || order.Status == StatusFailed {
-        return nil // 幂等，直接忽略
+    if order.Status == StatusSuccess || order.Status == StatusFailed { // [!code highlight]
+        return nil // 幂等，直接忽略 // [!code highlight]
     }
 
     // 3. 状态流转合法性校验
@@ -353,11 +357,12 @@ func (s *PaymentService) correctToSuccess(ctx context.Context, order *Order, res
 
 ### 3. 资金安全答题顺序
 
-凡是涉及资金修改，建议始终按这个顺序回答：
-
+::: tip 建议
+凡是涉及资金修改，始终按这个顺序回答：
 1. 先谈幂等
 2. 再谈日志与审计
 3. 最后谈离线对账和补偿
+:::
 
 ---
 
@@ -490,14 +495,16 @@ func Sign(params map[string]string, secret string) string {
 <details>
 <summary><strong>如何防御 SQL 注入？</strong></summary>
 
-> 全部使用预编译语句（`?` 占位符），严禁字符串拼接 SQL。Go 的 `database/sql` 原生支持参数绑定。
+::: danger 警告
+全部使用预编译语句（`?` 占位符），严禁字符串拼接 SQL。Go 的 `database/sql` 原生支持参数绑定。
+:::
 
 ```go
 // 正例：参数绑定
-db.Query("SELECT * FROM orders WHERE id = ?", orderID)
+db.Query("SELECT * FROM orders WHERE id = ?", orderID) // [!code ++]
 
 // 反例：字符串拼接（严禁）
-db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'")
+db.Query("SELECT * FROM orders WHERE id = '" + orderID + "'") // [!code --]
 ```
 
 </details>
@@ -978,7 +985,7 @@ func (g *Gateway) VerifyReplay(ctx context.Context, nonce string, ts int64, sign
     if abs(time.Now().Unix()-ts) > 300 {
         return ErrTimestampExpired
     }
-    ok, err := g.redis.SetNX(ctx, "replay:"+nonce, "1", 5*time.Minute).Result()
+    ok, err := g.redis.SetNX(ctx, "replay:"+nonce, "1", 5*time.Minute).Result() // [!code highlight]
     if err != nil {
         return err
     }
@@ -1298,7 +1305,9 @@ func (r *RiskService) CountUserPayments(ctx context.Context, userID string, now 
 <details>
 <summary><strong>汇损归属怎么答？</strong></summary>
 
-> 锁定汇率与实际清算汇率之间的差异产生汇损。需要明确约定：谁承担汇损？通常平台侧承担锁汇期内的波动风险，超出锁汇期的由业务方承担。汇损计入财务报表的"汇兑损益"科目。
+::: warning 注意
+锁定汇率与实际清算汇率之间的差异产生汇损。需要明确约定：谁承担汇损？通常平台侧承担锁汇期内的波动风险，超出锁汇期的由业务方承担。汇损计入财务报表的"汇兑损益"科目。
+:::
 
 </details>
 
@@ -1447,7 +1456,10 @@ CREATE TABLE payment_flow (
 - **如果面试官追问：长款和短款怎么处理？**
   先对账确认事实，再按资金方向走补账或冲正流程。长款通常要补记本地账务，短款通常要确认是否需要冲正、退款或人工核查，核心原则是先保证资金事实清楚，再推进状态修复。
 - **如果追问：掉单为什么危险？**
-  因为掉单最大的问题不是“失败了”，而是“结果不确定”。用户可能已经扣钱，但系统还显示支付中。如果处理不好，会同时伤害资金正确性和用户体验，所以一定要靠通知、轮询、对账、补偿一起收口。
+
+::: danger 警告
+掉单最大的问题不是”失败了”，而是”结果不确定”。用户可能已经扣钱，但系统还显示支付中。如果处理不好，会同时伤害资金正确性和用户体验，所以一定要靠通知、轮询、对账、补偿一起收口。
+:::
 - **如果追问：汇率锁定为什么不能只存一个金额？**
   因为跨境支付后续要做清算、结算、对账、审计和汇损分析，只存一个金额无法还原当时的业务事实。至少要保留原币种金额、目标币种金额、汇率值、汇率快照 ID 和锁定时间。
 - **如果追问：单元化和异地多活怎么结合？**
@@ -1538,4 +1550,6 @@ CREATE TABLE payment_flow (
 
 如果只能记住一句话，那就是：
 
-> 资损不能发生，状态可以延迟；流水必须可信，账务必须可追；系统必须可降级，但核心链路必须可恢复。
+::: danger 警告
+资损不能发生，状态可以延迟；流水必须可信，账务必须可追；系统必须可降级，但核心链路必须可恢复。
+:::

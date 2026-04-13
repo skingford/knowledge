@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="dnsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="tcpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="tlsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="httpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+    <linearGradient id="infraGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a18cd1"/>
+      <stop offset="100%" style="stop-color:#fbc2eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#667eea"/>
+    </marker>
+    <marker id="arrowBack" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 10 0 L 0 5 L 10 10 z" fill="#43e97b"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="480" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title -->
+  <rect x="20" y="15" width="1060" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="550" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">一次 HTTPS 请求完整链路</text>
+
+  <!-- Step labels at top -->
+  <text x="550" y="90" text-anchor="middle" fill="#888" font-size="12">https://example.com/api/orders</text>
+
+  <!-- Step 1: Browser -->
+  <rect x="30" y="110" width="100" height="80" rx="10" fill="white" stroke="#1a1a2e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="80" y="145" text-anchor="middle" fill="#1a1a2e" font-size="24">🌐</text>
+  <text x="80" y="172" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">浏览器</text>
+
+  <!-- Arrow 1 -->
+  <line x1="130" y1="150" x2="160" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="145" y="140" text-anchor="middle" fill="#999" font-size="9">①</text>
+
+  <!-- Step 2: DNS -->
+  <rect x="165" y="110" width="100" height="80" rx="10" fill="url(#dnsGrad)" filter="url(#shadow)"/>
+  <text x="215" y="147" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DNS 解析</text>
+  <text x="215" y="168" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">域名 → IP</text>
+
+  <!-- Arrow 2 -->
+  <line x1="265" y1="150" x2="295" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="280" y="140" text-anchor="middle" fill="#999" font-size="9">②</text>
+
+  <!-- Step 3: TCP -->
+  <rect x="300" y="110" width="100" height="80" rx="10" fill="url(#tcpGrad)" filter="url(#shadow)"/>
+  <text x="350" y="142" text-anchor="middle" fill="white" font-size="13" font-weight="bold">TCP</text>
+  <text x="350" y="160" text-anchor="middle" fill="white" font-size="13" font-weight="bold">三次握手</text>
+  <text x="350" y="178" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">建立连接</text>
+
+  <!-- Arrow 3 -->
+  <line x1="400" y1="150" x2="430" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="415" y="140" text-anchor="middle" fill="#999" font-size="9">③</text>
+
+  <!-- Step 4: TLS -->
+  <rect x="435" y="110" width="100" height="80" rx="10" fill="url(#tlsGrad)" filter="url(#shadow)"/>
+  <text x="485" y="142" text-anchor="middle" fill="white" font-size="13" font-weight="bold">TLS</text>
+  <text x="485" y="160" text-anchor="middle" fill="white" font-size="13" font-weight="bold">握手</text>
+  <text x="485" y="178" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">证书 + 密钥</text>
+
+  <!-- Arrow 4 -->
+  <line x1="535" y1="150" x2="565" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="550" y="140" text-anchor="middle" fill="#999" font-size="9">④</text>
+
+  <!-- Step 5: HTTP -->
+  <rect x="570" y="110" width="100" height="80" rx="10" fill="url(#httpGrad)" filter="url(#shadow)"/>
+  <text x="620" y="142" text-anchor="middle" fill="white" font-size="13" font-weight="bold">HTTP</text>
+  <text x="620" y="160" text-anchor="middle" fill="white" font-size="13" font-weight="bold">请求</text>
+  <text x="620" y="178" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">GET /api/orders</text>
+
+  <!-- Arrow 5 -->
+  <line x1="670" y1="150" x2="700" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="685" y="140" text-anchor="middle" fill="#999" font-size="9">⑤</text>
+
+  <!-- Step 6: CDN/WAF/LB -->
+  <rect x="705" y="110" width="130" height="80" rx="10" fill="url(#infraGrad)" filter="url(#shadow)"/>
+  <text x="770" y="142" text-anchor="middle" fill="white" font-size="12" font-weight="bold">CDN / WAF</text>
+  <text x="770" y="160" text-anchor="middle" fill="white" font-size="12" font-weight="bold">负载均衡</text>
+  <text x="770" y="178" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">流量分发</text>
+
+  <!-- Arrow 6 -->
+  <line x1="835" y1="150" x2="865" y2="150" stroke="#667eea" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="850" y="140" text-anchor="middle" fill="#999" font-size="9">⑥</text>
+
+  <!-- Step 7: App Server -->
+  <rect x="870" y="110" width="100" height="80" rx="10" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="920" y="142" text-anchor="middle" fill="white" font-size="13" font-weight="bold">应用服务</text>
+  <text x="920" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">处理请求</text>
+  <text x="920" y="178" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">查 DB/Cache</text>
+
+  <!-- Response arrow back -->
+  <path d="M 920 195 L 920 230 L 80 230 L 80 195" fill="none" stroke="#43e97b" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowBack)"/>
+  <text x="500" y="248" text-anchor="middle" fill="#43e97b" font-size="12" font-weight="bold">⑦ 返回响应 → 客户端决定复用连接 / 缓存内容</text>
+
+  <!-- Bottom: "接口慢"可能卡在哪 -->
+  <rect x="30" y="280" width="1040" height="185" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="30" y="280" width="1040" height="35" rx="10" fill="url(#headerGrad)"/>
+  <rect x="30" y="300" width="1040" height="15" fill="url(#headerGrad)"/>
+  <text x="550" y="304" text-anchor="middle" fill="white" font-size="14" font-weight="bold">"接口慢"可能卡在完全不同的位置</text>
+
+  <!-- Problem boxes -->
+  <rect x="50" y="330" width="130" height="50" rx="8" fill="#f0edff" stroke="#667eea" stroke-width="1"/>
+  <text x="115" y="352" text-anchor="middle" fill="#667eea" font-size="11" font-weight="bold">DNS 慢</text>
+  <text x="115" y="370" text-anchor="middle" fill="#888" font-size="10">解析耗时过长</text>
+
+  <rect x="195" y="330" width="130" height="50" rx="8" fill="#e8f7ff" stroke="#4facfe" stroke-width="1"/>
+  <text x="260" y="352" text-anchor="middle" fill="#4facfe" font-size="11" font-weight="bold">TCP 建连慢</text>
+  <text x="260" y="370" text-anchor="middle" fill="#888" font-size="10">重传多 / 超时</text>
+
+  <rect x="340" y="330" width="130" height="50" rx="8" fill="#e6fff0" stroke="#43e97b" stroke-width="1"/>
+  <text x="405" y="352" text-anchor="middle" fill="#2d9d5c" font-size="11" font-weight="bold">TLS 握手慢</text>
+  <text x="405" y="370" text-anchor="middle" fill="#888" font-size="10">证书链校验</text>
+
+  <rect x="485" y="330" width="130" height="50" rx="8" fill="#fff0f5" stroke="#f5576c" stroke-width="1"/>
+  <text x="550" y="352" text-anchor="middle" fill="#f5576c" font-size="11" font-weight="bold">HTTP 头过大</text>
+  <text x="550" y="370" text-anchor="middle" fill="#888" font-size="10">被网关拒绝</text>
+
+  <rect x="630" y="330" width="130" height="50" rx="8" fill="#fff8e6" stroke="#fa709a" stroke-width="1"/>
+  <text x="695" y="352" text-anchor="middle" fill="#e06030" font-size="11" font-weight="bold">网关转发慢</text>
+  <text x="695" y="370" text-anchor="middle" fill="#888" font-size="10">LB / Proxy 延迟</text>
+
+  <rect x="775" y="330" width="130" height="50" rx="8" fill="#f5edff" stroke="#a18cd1" stroke-width="1"/>
+  <text x="840" y="352" text-anchor="middle" fill="#7b5ea7" font-size="11" font-weight="bold">上游服务慢</text>
+  <text x="840" y="370" text-anchor="middle" fill="#888" font-size="10">业务逻辑耗时</text>
+
+  <rect x="920" y="330" width="130" height="50" rx="8" fill="#fff0e6" stroke="#fcb69f" stroke-width="1"/>
+  <text x="985" y="352" text-anchor="middle" fill="#c0603c" font-size="11" font-weight="bold">下游依赖慢</text>
+  <text x="985" y="370" text-anchor="middle" fill="#888" font-size="10">DB / Cache</text>
+
+  <!-- Insight -->
+  <text x="550" y="440" text-anchor="middle" fill="#999" font-size="12" font-style="italic">排障第一步：确定"慢"到底卡在链路的哪个环节，而不是一上来就盯着代码</text>
+</svg>

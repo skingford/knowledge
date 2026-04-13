@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="ackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="sentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="sendableGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="congGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="680" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title -->
+  <rect x="20" y="15" width="960" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="500" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">TCP 可靠传输机制</text>
+
+  <!-- ===== TOP: Sliding Window ===== -->
+  <rect x="20" y="80" width="960" height="260" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="500" y="110" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">滑动窗口</text>
+
+  <!-- Window blocks -->
+  <!-- Sent & ACKed -->
+  <rect x="50" y="135" width="180" height="55" rx="6" fill="url(#ackGrad)" opacity="0.8"/>
+  <text x="140" y="160" text-anchor="middle" fill="white" font-size="12" font-weight="bold">已发送 &amp; 已确认</text>
+  <text x="140" y="178" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="10">Sent &amp; ACKed</text>
+
+  <!-- Sent but not ACKed -->
+  <rect x="235" y="135" width="200" height="55" rx="6" fill="url(#sentGrad)" opacity="0.85"/>
+  <text x="335" y="160" text-anchor="middle" fill="white" font-size="12" font-weight="bold">已发送 &amp; 未确认</text>
+  <text x="335" y="178" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="10">Sent &amp; Unacked</text>
+
+  <!-- Sendable -->
+  <rect x="440" y="135" width="180" height="55" rx="6" fill="url(#sendableGrad)" opacity="0.8"/>
+  <text x="530" y="160" text-anchor="middle" fill="white" font-size="12" font-weight="bold">可发送</text>
+  <text x="530" y="178" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="10">Sendable</text>
+
+  <!-- Not sendable -->
+  <rect x="625" y="135" width="350" height="55" rx="6" fill="#e8e8e8" opacity="0.7"/>
+  <text x="800" y="160" text-anchor="middle" fill="#888" font-size="12" font-weight="bold">不可发送（超出窗口）</text>
+  <text x="800" y="178" text-anchor="middle" fill="#aaa" font-size="10">Not Sendable</text>
+
+  <!-- Window bracket -->
+  <line x1="235" y1="200" x2="235" y2="218" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="620" y1="200" x2="620" y2="218" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="235" y1="218" x2="620" y2="218" stroke="#e74c3c" stroke-width="2"/>
+  <text x="427" y="238" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">滑动窗口 (Window Size)</text>
+
+  <!-- Arrows showing direction -->
+  <text x="140" y="250" text-anchor="middle" fill="#aaa" font-size="11">← 窗口左边界随 ACK 右移</text>
+  <text x="800" y="250" text-anchor="middle" fill="#aaa" font-size="11">窗口右边界随发送/确认右移 →</text>
+
+  <!-- Key points -->
+  <rect x="50" y="270" width="280" height="55" rx="8" fill="#f8f9fc" stroke="#4facfe" stroke-width="1"/>
+  <text x="190" y="292" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">流量控制</text>
+  <text x="190" y="310" text-anchor="middle" fill="#888" font-size="10">接收方通过窗口告诉发送方"我还能吃多少"</text>
+
+  <rect x="350" y="270" width="300" height="55" rx="8" fill="#f8f9fc" stroke="#43e97b" stroke-width="1"/>
+  <text x="500" y="292" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">序列号 + ACK 确认 + 超时重传</text>
+  <text x="500" y="310" text-anchor="middle" fill="#888" font-size="10">把不可靠网络收敛成可靠连接</text>
+
+  <rect x="670" y="270" width="290" height="55" rx="8" fill="#f8f9fc" stroke="#667eea" stroke-width="1"/>
+  <text x="815" y="292" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">窗口大小反映</text>
+  <text x="815" y="310" text-anchor="middle" fill="#888" font-size="10">接收方处理能力 + 当前网络连接状态</text>
+
+  <!-- ===== BOTTOM: Congestion Control ===== -->
+  <rect x="20" y="355" width="960" height="310" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="500" y="385" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">拥塞控制四阶段</text>
+
+  <!-- Graph area -->
+  <!-- X axis -->
+  <line x1="80" y1="600" x2="940" y2="600" stroke="#ccc" stroke-width="1.5"/>
+  <text x="510" y="625" text-anchor="middle" fill="#888" font-size="11">时间 (RTT)</text>
+  <!-- Y axis -->
+  <line x1="80" y1="600" x2="80" y2="410" stroke="#ccc" stroke-width="1.5"/>
+  <text x="45" y="505" text-anchor="middle" fill="#888" font-size="11" transform="rotate(-90 45 505)">拥塞窗口 (cwnd)</text>
+
+  <!-- Threshold line -->
+  <line x1="80" y1="480" x2="940" y2="480" stroke="#e74c3c" stroke-width="1" stroke-dasharray="6,4"/>
+  <text x="960" y="484" text-anchor="start" fill="#e74c3c" font-size="10">ssthresh</text>
+
+  <!-- Phase 1: Slow Start (exponential) -->
+  <polyline points="80,595 130,585 180,570 230,545 280,500 330,460" fill="none" stroke="#43e97b" stroke-width="3"/>
+  <rect x="120" y="405" width="120" height="50" rx="8" fill="#e6fff0" stroke="#43e97b" stroke-width="1"/>
+  <text x="180" y="425" text-anchor="middle" fill="#2d9d5c" font-size="11" font-weight="bold">慢启动</text>
+  <text x="180" y="445" text-anchor="middle" fill="#888" font-size="10">指数增长 ↑↑</text>
+
+  <!-- Phase 2: Congestion Avoidance (linear) -->
+  <polyline points="330,460 380,455 430,450 480,445 530,440 580,435 630,430" fill="none" stroke="#4facfe" stroke-width="3"/>
+  <rect x="400" y="405" width="120" height="50" rx="8" fill="#e8f7ff" stroke="#4facfe" stroke-width="1"/>
+  <text x="460" y="425" text-anchor="middle" fill="#4facfe" font-size="11" font-weight="bold">拥塞避免</text>
+  <text x="460" y="445" text-anchor="middle" fill="#888" font-size="10">线性增长 ↑</text>
+
+  <!-- Packet loss event -->
+  <line x1="630" y1="430" x2="630" y2="510" stroke="#e74c3c" stroke-width="2.5"/>
+  <circle cx="630" cy="430" r="5" fill="#e74c3c"/>
+  <text x="630" y="420" text-anchor="middle" fill="#e74c3c" font-size="10" font-weight="bold">丢包!</text>
+
+  <!-- Phase 3: Fast Retransmit -->
+  <rect x="625" y="510" width="10" height="0" rx="2"/>
+  <text x="680" y="530" text-anchor="middle" fill="#f5576c" font-size="10" font-weight="bold">3x 重复 ACK</text>
+  <text x="680" y="545" text-anchor="middle" fill="#f5576c" font-size="10">→ 快重传</text>
+
+  <!-- Phase 4: Fast Recovery (not back to slow start) -->
+  <polyline points="630,510 680,505 730,500 780,495 830,490 880,485" fill="none" stroke="#667eea" stroke-width="3"/>
+  <rect x="720" y="405" width="140" height="50" rx="8" fill="#f0edff" stroke="#667eea" stroke-width="1"/>
+  <text x="790" y="425" text-anchor="middle" fill="#667eea" font-size="11" font-weight="bold">快恢复</text>
+  <text x="790" y="445" text-anchor="middle" fill="#888" font-size="10">直接进入拥塞避免</text>
+
+  <!-- Note -->
+  <text x="500" y="650" text-anchor="middle" fill="#999" font-size="11" font-style="italic">核心目标：网络拥堵时不能继续无节制地打满带宽</text>
+</svg>

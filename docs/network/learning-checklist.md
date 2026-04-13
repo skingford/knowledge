@@ -347,8 +347,7 @@ description: 面向 Go 后端和实战排障场景的网络学习清单，覆盖
 
 ## 15. 专题内配套阅读
 
-- 想先建立一张总地图：读 [网络必备知识](./essential-knowledge.md)
-- 想把协议主线讲顺：读 [TCP/IP、HTTP 与 HTTPS 主线](./tcp-ip-http-and-https.md)
+- 想先建立总地图和协议主线：读 [网络必备知识](./essential-knowledge.md)
 - 想补 DNS、CDN 和负载均衡：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
 - 想补 NAT、防火墙和访问边界：读 [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)
 - 想固定排障动作：读 [网络排障与常用命令](./troubleshooting-and-commands.md)

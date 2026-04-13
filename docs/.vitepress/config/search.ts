@@ -2,12 +2,13 @@ import type { DefaultTheme } from 'vitepress'
 
 const headingRegex = /<h(\d*).*?>(.*?<a.*? href="#.*?".*?>.*?<\/a>)<\/h\1>/gi
 const headingContentRegex = /(.*?)<a.*? href="#(.*?)".*?>.*?<\/a>/i
-const maxSectionTextLength = 400
+const maxSectionTextLength = 200
 const maxIndexedHeadingDepth = 1
 const searchNoisePatterns = [
   /<svg\b[\s\S]*?<\/svg>/gi,
   /<pre\b[\s\S]*?<\/pre>/gi,
   /<style\b[\s\S]*?<\/style>/gi,
+  /<table\b[\s\S]*?<\/table>/gi,
 ]
 
 function clearHtmlTags(value: string) {
@@ -85,6 +86,24 @@ export const localSearchOptions: DefaultTheme.LocalSearchOptions = {
     searchOptions: {
       fuzzy: 0.2,
       prefix: true,
+    },
+  },
+  translations: {
+    button: { buttonText: '搜索', buttonAriaLabel: '搜索' },
+    modal: {
+      displayDetails: '显示详情',
+      noResultsText: '没有找到相关结果',
+      resetButtonTitle: '清除搜索条件',
+      backButtonTitle: '返回',
+      footer: {
+        selectText: '选择',
+        selectKeyAriaLabel: '回车',
+        navigateText: '切换',
+        navigateUpKeyAriaLabel: '上箭头',
+        navigateDownKeyAriaLabel: '下箭头',
+        closeText: '关闭',
+        closeKeyAriaLabel: 'esc',
+      },
     },
   },
 }

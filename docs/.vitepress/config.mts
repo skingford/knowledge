@@ -57,8 +57,10 @@ export default defineConfig({
   titleTemplate: ':title | 学习知识库',
   description: '涵盖 AI / Agent、架构设计、网络、React、Vue、Svelte、Golang、Python、Node.js、Rust、Git、运维与工具的学习资料、路线图与专题索引',
 
+  cleanUrls: true,
   base: siteBase,
   srcExclude: ['README.md', 'TEMPLATE.md'],
+  ignoreDeadLinks: [/^https?:\/\/localhost/],
   rewrites: {
     'golang/legacy/golang-advanced-learning-guide.md': 'golang/golang-advanced-learning-guide.md',
     'golang/legacy/golang-recommended-resources.md': 'golang/golang-recommended-resources.md',
@@ -92,11 +94,6 @@ export default defineConfig({
       return false
     }
 
-    // Skip preloading heavy vendor chunks — they are lazy-loaded only on pages that use them.
-    if (/vendor-katex/.test(link)) {
-      return false
-    }
-
     return link.endsWith('.css') || link.endsWith('.woff2') || /\/assets\/(?:app|chunks\/(?:theme|framework))\./.test(link)
   },
 
@@ -106,11 +103,12 @@ export default defineConfig({
     ['meta', { property: 'og:site_name', content: '学习知识库' }],
     ['meta', { property: 'og:locale', content: 'zh_CN' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { property: 'og:image', content: `${siteUrl}og-image.svg` }],
-    ['meta', { name: 'twitter:image', content: `${siteUrl}og-image.svg` }],
+    ['meta', { property: 'og:image', content: `${siteUrl}og-image.png` }],
+    ['meta', { name: 'twitter:image', content: `${siteUrl}og-image.png` }],
   ],
 
   markdown: {
+    image: { lazyLoading: true },
     xhtmlOut: true,
     theme: {
       light: 'github-light',
@@ -156,10 +154,10 @@ export default defineConfig({
       ['meta', { property: 'og:title', content: title }],
       ['meta', { property: 'og:description', content: description }],
       ['meta', { property: 'og:url', content: canonical }],
-      ['meta', { property: 'og:image', content: `${siteUrl}og-image.svg` }],
+      ['meta', { property: 'og:image', content: `${siteUrl}og-image.png` }],
       ['meta', { name: 'twitter:title', content: title }],
       ['meta', { name: 'twitter:description', content: description }],
-      ['meta', { name: 'twitter:image', content: `${siteUrl}og-image.svg` }],
+      ['meta', { name: 'twitter:image', content: `${siteUrl}og-image.png` }],
     ]
   },
 
@@ -215,7 +213,10 @@ export default defineConfig({
 
     search: {
       provider: 'local',
-      options: localSearchOptions,
+      options: {
+        ...localSearchOptions,
+        exclude: (relativePath: string) => relativePath.startsWith('jd/'),
+      },
     },
 
     outline: {
@@ -225,6 +226,15 @@ export default defineConfig({
 
     lastUpdated: {
       text: '最后更新于',
+      formatOptions: {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      },
+    },
+
+    footer: {
+      message: 'Built with VitePress',
+      copyright: 'Copyright © 2024-present',
     },
 
     editLink: {
@@ -236,5 +246,20 @@ export default defineConfig({
       prev: '上一篇',
       next: '下一篇',
     },
+
+    externalLinkIcon: true,
+
+    notFound: {
+      title: '页面未找到',
+      quote: '看起来你访问了一个不存在的页面，它可能已被移动或删除。',
+      linkLabel: '返回首页',
+      linkText: '返回首页',
+    },
+
+    darkModeSwitchLabel: '外观',
+    lightModeSwitchTitle: '切换到浅色模式',
+    darkModeSwitchTitle: '切换到深色模式',
+    sidebarMenuLabel: '菜单',
+    returnToTopLabel: '返回顶部',
   },
 })

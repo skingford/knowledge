@@ -29,7 +29,7 @@ Gossip 协议的工作原理可以概括成两点。
 
 下图显示了两个实例间进行 PING、PONG 消息传递的情况。
 
-![原文配图 1](https://static001.geekbang.org/resource/image/5e/86/5eacfc36c4233ae7c99f80b1511yyb86.jpg)
+<RedisCourseFigure kind="cluster-gossip-overhead" />
 
 Gossip 协议可以保证在一段时间后，集群中的每一个实例都能获得其它所有实例的状态信息。
 
@@ -119,9 +119,11 @@ Redis Cluster 的实例启动后，默认会每秒从本地的实例列表中随
 
 例如，执行下面的命令后，我们可以抓取到 192.168.10.3 机器上的实例从 16379 端口发送的心跳网络包，并把网络包的内容保存到 r1.cap 文件中：
 
+::: details 点击展开 `tcpdump` 抓包示例
 ```
 tcpdump host192.168.10.3port16379-i 网卡名 -w /tmp/r1.cap
 ```
+:::
 
 通过分析网络包的数量和大小，就可以判断调整 cluster-node-timeout 值前后，心跳消息占用的带宽情况了。
 

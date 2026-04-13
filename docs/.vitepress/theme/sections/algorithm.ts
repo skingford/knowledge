@@ -27,10 +27,12 @@ export const algorithmSection: SectionConfig = {
     docs: [
       { title: 'Raft 共识算法详解', href: '/algorithm/raft', description: '从 Leader Election、Log Replication 到 Safety，完整拆解 Raft 协议。' },
       { title: 'Redlock 分布式锁算法详解', href: '/algorithm/redlock', description: '从多数派租约、有效期计算到争议点，讲清 Redlock 的原理与边界。' },
+      { title: '限流算法详解', href: '/algorithm/rate-limiting', description: '从固定窗口、滑动窗口到漏桶和令牌桶，拆解四种限流算法的原理与选型。' },
     ],
     order: [
       'Raft 共识算法详解',
       'Redlock 分布式锁算法详解',
+      '限流算法详解',
     ],
   },
   sidebar: [
@@ -50,6 +52,12 @@ export const algorithmSection: SectionConfig = {
       text: '分布式锁',
       items: [
         { text: 'Redlock 详解', link: '/algorithm/redlock' },
+      ],
+    },
+    {
+      text: '限流算法',
+      items: [
+        { text: '限流算法详解', link: '/algorithm/rate-limiting' },
       ],
     },
   ],

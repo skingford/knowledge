@@ -207,6 +207,5 @@ tcpdump -i any host example.com and port 443
 
 ## 延伸阅读
 
-- 想先建整体框架：读 [网络必备知识](./essential-knowledge.md)
-- 想把协议链路讲扎实：读 [TCP/IP、HTTP 与 HTTPS 主线](./tcp-ip-http-and-https.md)
+- 想先建整体框架和协议链路：读 [网络必备知识](./essential-knowledge.md)
 - 想补入口设施链路：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)

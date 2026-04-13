@@ -195,15 +195,22 @@ function onLeave(el, done) {
 
 **P 阻塞场景：**
 
-- 系统调用 `syscall` 阻塞：`P` 会与 `M` 解绑，寻找空闲 `M` 或新建 `M`
-- 通道操作、锁等待：`G` 阻塞但 `P` 继续执行其他 `G`
-- 垃圾回收 STW 阶段
+<GoSchedulerDiagram kind="p-blocking-scenarios" />
+
+- `G` 阻塞（`channel` / `mutex` / `select`）：阻塞的是当前 `G`，`M + P` 会继续调度其他 `G`，所以 `P` 本身不阻塞
+- `syscall` 阻塞：`M` 进入系统调用后被阻塞，runtime 会尝试把 `P` 从该 `M` 上剥离，交给其他空闲 `M`；因此 `P` 通常不阻塞
+- 长时间 CPU 计算或死循环：某个 `G` 长时间占用 `M` 且持有 `P`，导致该 `P` 的本地队列无法及时消费；现象上最像 “`P` 阻塞”，本质上更接近抢占不及时或 goroutine 长时间独占执行
+- 垃圾回收 `STW`：所有 `P` 都会被 stop，这是 runtime 主动发起的全局暂停，不是单个 `P` 的异常阻塞
 
 **深挖点（高频追问）：**
 
-- `sysmon` 如何发现阻塞、辅助抢占和调度回收
+- [`sysmon`](/golang/guide/03-goroutine-and-scheduler#_4-sysmon-幕后的-厂长) 如何发现阻塞、辅助抢占和调度回收
 - Go 1.14+ 基于信号的异步抢占调度机制
 - 高并发网络 I/O 下 `netpoller` 与调度器的协作
+
+其中 [`sysmon`](/golang/guide/03-goroutine-and-scheduler#_4-sysmon-幕后的-厂长) 可以理解为不绑定 `P` 的巡检线程，负责超时抢占、观察并推动 `syscall` handoff、`netpoll` 唤醒和保底 `GC`：
+
+<GoSchedulerDiagram kind="sysmon-workflow" />
 
 ### 2. GC 演变与调优
 
@@ -423,7 +430,11 @@ function onLeave(el, done) {
 
 > JD 明确要求”熟悉 TCP/UDP、HTTP/HTTPS、多进程/线程、Socket 编程”，这部分不能只背概念，要能结合 Go 实现讲清原理。
 
-### 1. TCP 粘包与解决
+### 1. TCP 粘包、半包与解决
+
+> - **粘包**：多个应用层消息在接收端被合并成一个 TCP 数据段
+> - **半包**：一个消息被拆成多次接收
+> - **根因**：缓冲区 + Nagle + 分段
 
 - TCP 是流式协议，不保证消息边界
 - Nagle 算法可能合并小包
@@ -453,11 +464,9 @@ function onLeave(el, done) {
 - 多进程 vs 多线程 vs 协程的对比：Go 选择了用户态协程 + M:N 调度
 
 ::: details 推荐阅读
-- [TCP/IP, HTTP & HTTPS](/network/tcp-ip-http-and-https) — 协议基础
-- [网络必备知识](/network/essential-knowledge) — 核心概念
+- [网络必备知识](/network/essential-knowledge) — 协议基础、核心概念与高频自检题
 - [DNS, CDN & 负载均衡](/network/dns-cdn-and-load-balancing)
 - [网络排障与命令](/network/troubleshooting-and-commands)
-- [网络面试题](/network/essential-questions) — 高频考点
 - [Net: TCP/UDP 基础](/golang/guide/source-reading/net) — Go 网络标准库
 - [Net/http 实现](/golang/guide/source-reading/net-http) — HTTP 底层
 - [HTTP/2 多路复用](/golang/guide/source-reading/net-http2)

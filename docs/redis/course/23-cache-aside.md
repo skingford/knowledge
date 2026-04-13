@@ -32,7 +32,7 @@ description: "极客时间《Redis 核心技术与实战》23. 旁路缓存：Re
 
 为了让你能更好地理解，我以计算机系统为例，来解释一下。下图是计算机系统中的三层存储结构，以及它们各自的常用容量和访问性能。最上面是处理器，中间是内存，最下面是磁盘。
 
-![原文配图 1](https://static001.geekbang.org/resource/image/ac/9c/ac80f6e1714f3e1e8eabcfd8da3d689c.jpg)
+<RedisCourseFigure kind="cache-storage-layers" />
 
 从图上可以看到，CPU、内存和磁盘这三层的访问速度从几十 ns 到 100ns，再到几 ms，性能的差异很大。
 
@@ -43,7 +43,7 @@ description: "极客时间《Redis 核心技术与实战》23. 旁路缓存：Re
 - CPU 里面的末级缓存，即 LLC，用来缓存内存中的数据，避免每次从内存中存取数据；
 - 内存中的高速页缓存，即 page cache，用来缓存磁盘中的数据，避免每次从磁盘中存取数据。
 
-![原文配图 2](https://static001.geekbang.org/resource/image/7d/44/7dyycf727f9396eb9788644474855a44.jpg)
+<RedisCourseFigure kind="cache-llc-pagecache" />
 
 跟内存相比，LLC 的访问速度更快，而跟磁盘相比，内存的访问是更快的。所以，我们可以看出来缓存的**第一个特征**：在一个层次化的系统中，缓存一定是一个快速子系统，数据存在缓存中时，能避免每次从慢速子系统中存取数据。对应到互联网应用来说，Redis 就是快速子系统，而数据库就是慢速子系统了。
 
@@ -66,7 +66,7 @@ description: "极客时间《Redis 核心技术与实战》23. 旁路缓存：Re
 
 我画了一张图，清晰地展示了发生缓存命中或缺失时，应用读取数据的情况，你可以看下这张图片。
 
-![原文配图 3](https://static001.geekbang.org/resource/image/6b/3d/6b0b489ec0c1c5049c8df84d77fa243d.jpg)
+<RedisCourseFigure kind="cache-hit-miss-flow" />
 
 假设我们在一个 Web 应用中，使用 Redis 作为缓存。用户请求发送给 Tomcat，Tomcat 负责处理业务逻辑。如果要访问数据，就需要从 MySQL 中读写数据。那么，我们可以把 Redis 部署在 MySQL 前端。如果访问的数据在 Redis 中，此时缓存命中，Tomcat 可以直接从 Redis 中读取数据，加速应用的访问。否则，Tomcat 就需要从慢速的数据库中读取数据了。
 
@@ -126,7 +126,7 @@ redisCache.put(cacheValue)//缓存更新
 
 我给你举个例子。假设业务应用要修改数据 A，此时，数据 A 在 Redis 中也缓存了，那么，应用会先直接在数据库里修改 A，并把 Redis 中的 A 删除。等到应用需要读取数据 A 时，会发生缓存缺失，此时，应用从数据库中读取 A，并写入 Redis，以便后续请求从缓存中直接读取，如下图所示：
 
-![原文配图 4](https://static001.geekbang.org/resource/image/46/cd/464ea24a098c87b9d292cf61a2b2fecd.jpg)
+<RedisCourseFigure kind="cache-readonly-flow" />
 
 只读缓存直接在数据库中更新数据的好处是，所有最新的数据都在数据库中，而数据库是提供数据可靠性保障的，这些数据不会有丢失的风险。当我们需要缓存图片、短视频这些用户只读的数据时，就可以使用只读缓存这个类型了。
 
@@ -150,7 +150,7 @@ redisCache.put(cacheValue)//缓存更新
 
 为了便于你理解，我也画了下面这张图，你可以看下。
 
-![原文配图 5](https://static001.geekbang.org/resource/image/00/66/009d055bb91d42c28b9316c649f87f66.jpg)
+<RedisCourseFigure kind="cache-readwrite-strategies" />
 
 关于是选择只读缓存，还是读写缓存，主要看我们对写请求是否有加速的需求。
 

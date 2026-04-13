@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 520" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="dnsGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="cdnGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb"/>
+      <stop offset="100%" style="stop-color:#f5576c"/>
+    </linearGradient>
+    <linearGradient id="wafGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+    <linearGradient id="lb4Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="lb7Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a18cd1"/>
+      <stop offset="100%" style="stop-color:#fbc2eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888"/>
+    </marker>
+    <marker id="arrowDns" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#667eea"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1050" height="520" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title -->
+  <rect x="20" y="15" width="1010" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="525" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">DNS、CDN 与负载均衡 — 线上访问链路架构</text>
+
+  <!-- ===== Main Flow ===== -->
+
+  <!-- Client -->
+  <rect x="25" y="120" width="90" height="75" rx="10" fill="white" stroke="#1a1a2e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="70" y="152" text-anchor="middle" fill="#1a1a2e" font-size="22">👤</text>
+  <text x="70" y="178" text-anchor="middle" fill="#333" font-size="11" font-weight="bold">客户端</text>
+
+  <!-- DNS query (dashed, goes up) -->
+  <path d="M 115 135 L 165 135" fill="none" stroke="#667eea" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowDns)"/>
+
+  <!-- DNS -->
+  <rect x="170" y="85" width="110" height="100" rx="10" fill="url(#dnsGrad)" filter="url(#shadow)"/>
+  <text x="225" y="120" text-anchor="middle" fill="white" font-size="14" font-weight="bold">DNS</text>
+  <text x="225" y="140" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">域名 → IP</text>
+  <text x="225" y="157" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">A / AAAA / CNAME</text>
+  <text x="225" y="174" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">TTL 缓存</text>
+
+  <!-- Arrow to CDN -->
+  <line x1="115" y1="157" x2="315" y2="157" stroke="#888" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="250" y="175" text-anchor="middle" fill="#888" font-size="9">解析后访问</text>
+
+  <!-- CDN -->
+  <rect x="320" y="110" width="120" height="95" rx="10" fill="url(#cdnGrad)" filter="url(#shadow)"/>
+  <text x="380" y="142" text-anchor="middle" fill="white" font-size="14" font-weight="bold">CDN 边缘</text>
+  <text x="380" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">静态资源缓存</text>
+  <text x="380" y="179" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">就近访问</text>
+  <text x="380" y="196" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">边缘安全防护</text>
+
+  <!-- Arrow to WAF/LB -->
+  <line x1="440" y1="157" x2="470" y2="157" stroke="#888" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="455" y="148" text-anchor="middle" fill="#888" font-size="9">回源</text>
+
+  <!-- WAF -->
+  <rect x="475" y="110" width="100" height="95" rx="10" fill="url(#wafGrad)" filter="url(#shadow)"/>
+  <text x="525" y="142" text-anchor="middle" fill="white" font-size="14" font-weight="bold">WAF</text>
+  <text x="525" y="162" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Web 防火墙</text>
+  <text x="525" y="179" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">安全过滤</text>
+
+  <!-- Arrow to L4 LB -->
+  <line x1="575" y1="157" x2="605" y2="157" stroke="#888" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L4 LB -->
+  <rect x="610" y="110" width="110" height="95" rx="10" fill="url(#lb4Grad)" filter="url(#shadow)"/>
+  <text x="665" y="140" text-anchor="middle" fill="white" font-size="13" font-weight="bold">四层 LB</text>
+  <text x="665" y="160" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">IP + 端口转发</text>
+  <text x="665" y="177" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">性能高</text>
+  <text x="665" y="194" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">不理解 HTTP</text>
+
+  <!-- Arrow to L7 LB -->
+  <line x1="720" y1="157" x2="750" y2="157" stroke="#888" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- L7 LB / Gateway -->
+  <rect x="755" y="110" width="120" height="95" rx="10" fill="url(#lb7Grad)" filter="url(#shadow)"/>
+  <text x="815" y="138" text-anchor="middle" fill="white" font-size="13" font-weight="bold">七层 LB</text>
+  <text x="815" y="155" text-anchor="middle" fill="white" font-size="13" font-weight="bold">/ Gateway</text>
+  <text x="815" y="175" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">Host/Path 路由</text>
+  <text x="815" y="192" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9">灰度 / 限流</text>
+
+  <!-- Arrows to App servers -->
+  <line x1="875" y1="140" x2="920" y2="130" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="875" y1="157" x2="920" y2="157" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="875" y1="174" x2="920" y2="184" stroke="#888" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- App Servers -->
+  <rect x="925" y="100" width="100" height="38" rx="8" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="975" y="124" text-anchor="middle" fill="white" font-size="11" font-weight="bold">App 1</text>
+  <rect x="925" y="143" width="100" height="38" rx="8" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="975" y="167" text-anchor="middle" fill="white" font-size="11" font-weight="bold">App 2</text>
+  <rect x="925" y="186" width="100" height="38" rx="8" fill="url(#appGrad)" filter="url(#shadow)"/>
+  <text x="975" y="210" text-anchor="middle" fill="white" font-size="11" font-weight="bold">App 3</text>
+
+  <!-- ===== Bottom: Key Concepts ===== -->
+  <rect x="20" y="250" width="1010" height="255" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+
+  <!-- DNS details -->
+  <rect x="35" y="265" width="310" height="110" rx="8" fill="#f0edff" stroke="#667eea" stroke-width="1"/>
+  <text x="190" y="288" text-anchor="middle" fill="#667eea" font-size="13" font-weight="bold">DNS 关键点</text>
+  <text x="50" y="310" fill="#555" font-size="11">- 缓存层次: 本地 → 系统 → 递归 → 权威</text>
+  <text x="50" y="330" fill="#555" font-size="11">- 记录类型: A / AAAA / CNAME</text>
+  <text x="50" y="350" fill="#555" font-size="11">- TTL 影响切流速度和解析压力</text>
+  <text x="50" y="370" fill="#e74c3c" font-size="10">解析成功 ≠ 服务可用</text>
+
+  <!-- CDN details -->
+  <rect x="355" y="265" width="325" height="110" rx="8" fill="#fff0f5" stroke="#f5576c" stroke-width="1"/>
+  <text x="517" y="288" text-anchor="middle" fill="#f5576c" font-size="13" font-weight="bold">CDN 关键点</text>
+  <text x="370" y="310" fill="#555" font-size="11">- 静态资源就近访问</text>
+  <text x="370" y="330" fill="#555" font-size="11">- 缓存命中 vs 回源 vs 缓存失效</text>
+  <text x="370" y="350" fill="#555" font-size="11">- 不是所有内容都适合缓存</text>
+  <text x="370" y="370" fill="#e74c3c" font-size="10">用户慢有时是 CDN 节点问题，不是源站</text>
+
+  <!-- LB details -->
+  <rect x="690" y="265" width="325" height="110" rx="8" fill="#e8f7ff" stroke="#4facfe" stroke-width="1"/>
+  <text x="852" y="288" text-anchor="middle" fill="#4facfe" font-size="13" font-weight="bold">负载均衡关键点</text>
+  <text x="705" y="310" fill="#555" font-size="11">- L4: IP+端口转发，性能高，不懂 HTTP</text>
+  <text x="705" y="330" fill="#555" font-size="11">- L7: Host/Path/Header 路由，更灵活</text>
+  <text x="705" y="350" fill="#555" font-size="11">- 健康检查 + 故障摘除</text>
+  <text x="705" y="370" fill="#4facfe" font-size="10">L7 适合 API 网关、灰度和业务路由</text>
+
+  <!-- Full chain summary -->
+  <rect x="35" y="388" width="980" height="45" rx="8" fill="#f8f9fc" stroke="#1a1a2e" stroke-width="1"/>
+  <text x="525" y="410" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">最常见的线上链路</text>
+  <text x="525" y="428" text-anchor="middle" fill="#888" font-size="12">DNS → CDN → WAF / LB → Nginx / Gateway → 应用服务</text>
+
+  <!-- Bottom note -->
+  <text x="525" y="490" text-anchor="middle" fill="#999" font-size="11" font-style="italic">域名能解析成功，不代表 IP 在监听、后端实例健康、TLS 和代理链路配置正确</text>
+</svg>

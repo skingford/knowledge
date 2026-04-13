@@ -21,7 +21,7 @@ description: "极客时间《Redis 核心技术与实战》34. 第23~33讲课后
 
 我把这两类缓存的优劣势汇总在一张表中，如下所示：
 
-![原文配图 1](https://static001.geekbang.org/resource/image/84/51/84ed48ebccd3443f29cba150b5c1a951.jpg)
+<RedisCourseFigure kind="qa2-practice-summary" />
 
 ### 第 24 讲
 
@@ -77,6 +77,7 @@ description: "极客时间《Redis 核心技术与实战》34. 第23~33讲课后
 
 问题：Redis 在执行 Lua 脚本时，是可以保证原子性的，那么，在课程里举的 Lua 脚本例子（lua.script）中，你觉得是否需要把读取客户端 ip 的访问次数，也就是 GET(ip)，以及判断访问次数是否超过 20 的判断逻辑，也加到 Lua 脚本中吗？代码如下所示：
 
+::: details 点击展开 Lua 脚本示例
 ```
 local current
 current = redis.call("incr",KEYS[1])
@@ -84,6 +85,7 @@ iftonumber(current)==1then
 redis.call("expire",KEYS[1],60)
 end
 ```
+:::
 
 答案：在这个例子中，要保证原子性的操作有三个，分别是 INCR、判断访问次数是否为 1 和设置过期时间。而对于获取 IP 以及判断访问次数是否超过 20 这两个操作来说，它们只是读操作，即使客户端有多个线程并发执行这两个操作，也不会改变任何值，所以并不需要保证原子性，我们也就不用把它们放到 Lua 脚本中了。
 
@@ -91,6 +93,7 @@ end
 
 问题：在课程里，我提到，我们可以使用 SET 命令带上 NX 和 EX/PX 选项进行加锁操作，那么，我们是否可以用下面的方式来实现加锁操作呢？
 
+::: details 点击展开 `SETNX` + `EXPIRE` 加锁示例
 ```
 // 加锁
 SETNX lock_key unique_value
@@ -98,6 +101,7 @@ EXPIRE lock_key10S
 // 业务逻辑
 DO THINGS
 ```
+:::
 
 答案：如果使用这个方法实现加锁的话，SETNX 和 EXPIRE 两个命令虽然分别完成了对锁变量进行原子判断和值设置，以及设置锁变量的过期时间的操作，但是这两个操作一起执行时，并没有保证原子性。
 
