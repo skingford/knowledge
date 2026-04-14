@@ -389,6 +389,13 @@ const categories: Category[] = [
         url: "https://github.com/luongnv89/claude-howto",
       },
       {
+        name: "claude-code-best-practice",
+        desc: "Claude Code 最佳实践与经验整理",
+        domain: "github.com",
+        fallback: "⭐",
+        url: "https://github.com/shanraisshan/claude-code-best-practice",
+      },
+      {
         name: "AgentGuide",
         desc: "AI Agent 开发学习指南",
         domain: "github.com",
