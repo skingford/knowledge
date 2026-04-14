@@ -18,3 +18,4 @@ head:
 ## 当前专题
 
 - [高级 Golang 开发工程师 / 架构师 JD](./senior-golang-architect-overseas.md)
+- [内容分发平台 高级 Golang 开发工程师 JD](./content-distribution-golang-engineer.md)
