@@ -14,6 +14,10 @@ vocabulary:
   - 3DS
 ---
 
+<script setup>
+import InlineSvg from '@docs-components/InlineSvg.vue'
+</script>
+
 # 支付交易反欺诈设计
 
 ## 适合人群
@@ -161,6 +165,8 @@ vocabulary:
 ---
 
 ## 一条推荐的反欺诈链路
+
+<InlineSvg src="/architecture/payment/fraud-detection.svg" alt="支付反欺诈全链路设计" />
 
 反欺诈不是只在"交易发起时"做判断，而是覆盖全生命周期：
 

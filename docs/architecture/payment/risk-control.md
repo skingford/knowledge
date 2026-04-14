@@ -14,6 +14,10 @@ vocabulary:
   - compliance
 ---
 
+<script setup>
+import InlineSvg from '@docs-components/InlineSvg.vue'
+</script>
+
 # 支付交易风控设计
 
 ## 适合人群
@@ -133,6 +137,8 @@ vocabulary:
 ---
 
 ## 一条推荐的风控决策链路
+
+<InlineSvg src="/architecture/payment/risk-control.svg" alt="支付风控六层决策链路" />
 
 ```
 请求进入
