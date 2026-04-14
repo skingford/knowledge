@@ -296,7 +296,7 @@ function onLeave(el, done) {
 - [sync 同步原语](/golang/guide/source-reading/sync-primitives) — Mutex/RWMutex/WaitGroup
 - [sync.Pool](/golang/guide/source-reading/sync-pool) — 对象池复用
 - [Context 传播](/golang/guide/source-reading/context) — 超时与取消
-- [逃逸分析](/golang/guide/02-escape-analysis) — 堆栈分配决策
+- [逃逸分析](/golang/guide/02-runtime-memory-lifecycle) — 堆栈分配决策
 
 **性能排障系列：**
 - [pprof 性能分析](/golang/guide/source-reading/runtime-pprof) — CPU/内存/goroutine profiling

@@ -30,7 +30,7 @@ search: false
 | Context | 取消传播 + 请求边界 | `context-usage-boundaries` + `guide/source-reading/context` |
 | WaitGroup | 正确等待方式 | `guide/03-sync-primitives` |
 | Mutex | 共享状态保护 | `guide/03-sync-primitives` |
-| 逃逸分析 | `-gcflags=-m` | `guide/02-escape-analysis` |
+| 逃逸分析 | `-gcflags=-m` | `guide/02-runtime-memory-lifecycle` |
 | `sync.Pool` | 对象复用 | `guide/07-performance-troubleshooting` |
 | Pprof | HTTP 接入 | `pprof-troubleshooting-guide` |
 | `http.Client` | 复用客户端 | `guide/04-network-stdlib` |
