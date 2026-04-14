@@ -5,9 +5,9 @@ import DiagramFrame from '@docs-components/DiagramFrame.vue'
 <template>
   <DiagramFrame max-width="880px">
     <svg
-      viewBox="0 0 860 380"
+      viewBox="0 0 860 560"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="限流与熔断"
+      aria-label="限流、熔断与降级"
       role="img"
       style="width:100%;font-family:system-ui,sans-serif"
     >
@@ -18,7 +18,9 @@ import DiagramFrame from '@docs-components/DiagramFrame.vue'
       </defs>
 
       <!-- Title -->
-      <text x="430" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">限流与熔断 · 四种策略对比</text>
+      <text x="430" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">限流、熔断与降级 · 五种策略对比</text>
+
+      <!-- ===== Row 1: 四种限流/熔断策略 ===== -->
 
       <!-- Token Bucket -->
       <rect x="30" y="48" width="186" height="170" rx="12" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.4" />
@@ -103,50 +105,85 @@ import DiagramFrame from '@docs-components/DiagramFrame.vue'
       <rect x="674" y="190" width="134" height="18" rx="9" fill="var(--d-rv-c-border)" />
       <text x="741" y="203" text-anchor="middle" font-size="8" font-weight="600" fill="#fff">适用：微服务防雪崩</text>
 
-      <!-- Integration -->
-      <text x="430" y="248" text-anchor="middle" font-size="11" font-weight="600" fill="var(--d-text)">多层限流协同</text>
+      <!-- ===== Row 2: 降级策略卡片 ===== -->
 
-      <rect x="60" y="262" width="120" height="36" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
-      <text x="120" y="285" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">客户端限频</text>
+      <!-- Degradation Card -->
+      <rect x="337" y="232" width="186" height="170" rx="12" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.4" />
+      <text x="430" y="254" text-anchor="middle" font-size="11" font-weight="700" fill="var(--d-warn-text)">降级</text>
 
-      <line x1="180" y1="280" x2="220" y2="280" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+      <!-- Priority levels visual: P0 / P1 / P2 -->
+      <rect x="362" y="266" width="50" height="28" rx="6" fill="var(--d-green)" />
+      <text x="387" y="284" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">P0</text>
 
-      <rect x="224" y="262" width="120" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
-      <text x="284" y="278" text-anchor="middle" font-size="10" fill="var(--d-text)">网关限流</text>
-      <text x="284" y="292" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">令牌桶 / 漏桶</text>
+      <rect x="418" y="266" width="50" height="28" rx="6" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1" />
+      <text x="443" y="284" text-anchor="middle" font-size="9" font-weight="700" fill="var(--d-blue)">P1</text>
 
-      <line x1="344" y1="280" x2="384" y2="280" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+      <rect x="474" y="266" width="50" height="28" rx="6" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1" />
+      <text x="499" y="284" text-anchor="middle" font-size="9" font-weight="700" fill="var(--d-rv-c-text)">P2</text>
+      <!-- X mark on P2 -->
+      <line x1="490" y1="269" x2="508" y2="291" stroke="var(--d-rv-c-text)" stroke-width="2" opacity="0.7" />
+      <line x1="508" y1="269" x2="490" y2="291" stroke="var(--d-rv-c-text)" stroke-width="2" opacity="0.7" />
 
-      <rect x="388" y="262" width="120" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
-      <text x="448" y="278" text-anchor="middle" font-size="10" fill="var(--d-text)">服务端限流</text>
-      <text x="448" y="292" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">滑动窗口 / Sentinel</text>
+      <text x="430" y="312" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">P0 绝不降级 · P1 可降级 · P2 优先降级</text>
 
-      <line x1="508" y1="280" x2="548" y2="280" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+      <text x="430" y="332" text-anchor="middle" font-size="9" fill="var(--d-text)">主动关闭非核心功能</text>
+      <text x="430" y="346" text-anchor="middle" font-size="9" fill="var(--d-text)">保护核心链路</text>
 
-      <rect x="552" y="262" width="120" height="36" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
-      <text x="612" y="278" text-anchor="middle" font-size="10" fill="var(--d-text)">熔断降级</text>
-      <text x="612" y="292" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">Resilience4j</text>
+      <text x="430" y="364" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">手动开关 · 自动触发 · 读降级 · 写降级</text>
 
-      <line x1="672" y1="280" x2="712" y2="280" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+      <rect x="363" y="374" width="134" height="18" rx="9" fill="var(--d-warn-border)" />
+      <text x="430" y="387" text-anchor="middle" font-size="8" font-weight="600" fill="#fff">适用：大促保障 / 容量不足</text>
 
-      <rect x="716" y="262" width="120" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
-      <text x="776" y="278" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">降级兜底</text>
-      <text x="776" y="292" text-anchor="middle" font-size="8" fill="var(--d-warn-text)">静态 / 缓存数据</text>
+      <!-- Connection arrows from row 1 to degradation card -->
+      <line x1="741" y1="218" x2="741" y2="310" stroke="var(--d-border)" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" />
+      <line x1="741" y1="310" x2="523" y2="310" stroke="var(--d-border)" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" marker-end="url(#hc5-arr)" />
+      <text x="660" y="306" text-anchor="middle" font-size="7" fill="var(--d-text-sub)">熔断后降级兜底</text>
+
+      <!-- ===== Integration: 多层限流协同 ===== -->
+
+      <text x="430" y="430" text-anchor="middle" font-size="11" font-weight="600" fill="var(--d-text)">多层限流协同</text>
+
+      <rect x="60" y="444" width="120" height="36" rx="8" fill="var(--d-rv-c-bg)" stroke="var(--d-rv-c-border)" stroke-width="1.2" />
+      <text x="120" y="467" text-anchor="middle" font-size="10" fill="var(--d-rv-c-text)">客户端限频</text>
+
+      <line x1="180" y1="462" x2="220" y2="462" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+
+      <rect x="224" y="444" width="120" height="36" rx="8" fill="var(--d-blue-bg)" stroke="var(--d-blue-border)" stroke-width="1.2" />
+      <text x="284" y="460" text-anchor="middle" font-size="10" fill="var(--d-text)">网关限流</text>
+      <text x="284" y="474" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">令牌桶 / 漏桶</text>
+
+      <line x1="344" y1="462" x2="384" y2="462" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+
+      <rect x="388" y="444" width="120" height="36" rx="8" fill="var(--d-rv-a-bg)" stroke="var(--d-rv-a-border)" stroke-width="1.2" />
+      <text x="448" y="460" text-anchor="middle" font-size="10" fill="var(--d-text)">服务端限流</text>
+      <text x="448" y="474" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">滑动窗口 / Sentinel</text>
+
+      <line x1="508" y1="462" x2="548" y2="462" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+
+      <rect x="552" y="444" width="120" height="36" rx="8" fill="var(--d-rv-b-bg)" stroke="var(--d-rv-b-border)" stroke-width="1.2" />
+      <text x="612" y="460" text-anchor="middle" font-size="10" fill="var(--d-text)">熔断降级</text>
+      <text x="612" y="474" text-anchor="middle" font-size="8" fill="var(--d-text-sub)">Resilience4j</text>
+
+      <line x1="672" y1="462" x2="712" y2="462" stroke="var(--d-border)" stroke-width="1.2" marker-end="url(#hc5-arr)" />
+
+      <rect x="716" y="444" width="120" height="36" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn-border)" stroke-width="1.2" />
+      <text x="776" y="460" text-anchor="middle" font-size="10" fill="var(--d-warn-text)">降级兜底</text>
+      <text x="776" y="474" text-anchor="middle" font-size="8" fill="var(--d-warn-text)">静态 / 缓存数据</text>
 
       <!-- Bottom -->
-      <text x="430" y="326" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">层层拦截：越靠前拦截成本越低 · 越靠后拦截精度越高</text>
+      <text x="430" y="508" text-anchor="middle" font-size="9" fill="var(--d-text-sub)">层层拦截：越靠前拦截成本越低 · 越靠后拦截精度越高</text>
 
       <!-- Visual traffic flow -->
-      <rect x="60" y="340" width="740" height="10" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="0.8" />
-      <rect x="60" y="340" width="740" height="10" rx="5" fill="var(--d-rv-c-bg)" opacity="0.3" />
-      <rect x="60" y="340" width="520" height="10" rx="5" fill="var(--d-blue-bg)" opacity="0.4" />
-      <rect x="60" y="340" width="320" height="10" rx="5" fill="var(--d-rv-a-bg)" opacity="0.4" />
-      <rect x="60" y="340" width="140" height="10" rx="5" fill="var(--d-green)" opacity="0.3" />
+      <rect x="60" y="522" width="740" height="10" rx="5" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-width="0.8" />
+      <rect x="60" y="522" width="740" height="10" rx="5" fill="var(--d-rv-c-bg)" opacity="0.3" />
+      <rect x="60" y="522" width="520" height="10" rx="5" fill="var(--d-blue-bg)" opacity="0.4" />
+      <rect x="60" y="522" width="320" height="10" rx="5" fill="var(--d-rv-a-bg)" opacity="0.4" />
+      <rect x="60" y="522" width="140" height="10" rx="5" fill="var(--d-green)" opacity="0.3" />
 
-      <text x="60" y="366" font-size="8" fill="var(--d-rv-c-text)">100% 请求</text>
-      <text x="240" y="366" font-size="8" fill="var(--d-rv-a-text)">~30% 过网关</text>
-      <text x="460" y="366" font-size="8" fill="var(--d-blue)">~10% 过服务限流</text>
-      <text x="680" y="366" font-size="8" fill="var(--d-green)">~1% 到 DB</text>
+      <text x="60" y="548" font-size="8" fill="var(--d-rv-c-text)">100% 请求</text>
+      <text x="240" y="548" font-size="8" fill="var(--d-rv-a-text)">~30% 过网关</text>
+      <text x="460" y="548" font-size="8" fill="var(--d-blue)">~10% 过服务限流</text>
+      <text x="680" y="548" font-size="8" fill="var(--d-green)">~1% 到 DB</text>
     </svg>
   </DiagramFrame>
 </template>

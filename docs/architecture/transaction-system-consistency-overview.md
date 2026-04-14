@@ -177,7 +177,7 @@ description: 从订单、库存、支付、延时任务、Outbox 与补偿出发
 
 对应专题：
 
-- [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+- [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)
 
 ### 6. 整体链路如何在失败后恢复
 
@@ -261,7 +261,7 @@ description: 从订单、库存、支付、延时任务、Outbox 与补偿出发
 | 写库发消息一致性 | 业务成功了消息没发出去怎么办 | [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design) |
 | 库存和订单协同 | 超卖、冻结、补偿和高并发怎么处理 | [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design) |
 | 活动洪峰治理 | 秒杀入口怎么限流、排队、背压和降级 | [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation) |
-| 支付结果收口 | 回调、查询、对账怎么统一收敛 | [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation) |
+| 支付结果收口 | 回调、查询、对账怎么统一收敛 | [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency) |
 
 ## 一个推荐的学习顺序
 
@@ -281,7 +281,7 @@ description: 从订单、库存、支付、延时任务、Outbox 与补偿出发
    - 把订单、库存和补偿收口到交易主链路里
 7. 再看 [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
    - 把热点活动里的限流、排队、背压和降级策略串进高并发主链路
-8. 最后看 [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+8. 最后看 [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)
    - 把外部支付结果、主动查询和对账补齐
 
 按这个顺序读，比较容易形成一个从本地一致性到分布式一致性的完整闭环。
@@ -377,4 +377,4 @@ description: 从订单、库存、支付、延时任务、Outbox 与补偿出发
 - [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design)
 - [秒杀系统库存设计专题](/architecture/seckill-system-inventory-design)
 - [秒杀系统限流、削峰与降级设计](/architecture/seckill-system-rate-limiting-and-degradation)
-- [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+- [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)

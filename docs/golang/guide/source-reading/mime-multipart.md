@@ -62,6 +62,7 @@ mime/multipart 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/mime/multipart/multipart.go（简化）
 type Reader struct {
@@ -83,6 +84,7 @@ func (r *Reader) NextPart() (*Part, error) {
 // Part.Read：流式读取内容，遇到 boundary 停止
 // 内部用 bufio.Reader 逐行扫描，寻找 boundary 起始标志
 ```
+:::
 
 ---
 
@@ -90,6 +92,7 @@ func (r *Reader) NextPart() (*Part, error) {
 
 ### HTTP 文件上传（服务端解析）
 
+::: details 点击展开代码：HTTP 文件上传（服务端解析）
 ```go
 // 解析 multipart/form-data 上传的文件
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -131,9 +134,11 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "上传成功")
 }
 ```
+:::
 
 ### 大文件流式上传（避免内存溢出）
 
+::: details 点击展开代码：大文件流式上传（避免内存溢出）
 ```go
 // 不用 ParseMultipartForm，直接流式处理（避免大文件全量加载到内存）
 func streamUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -181,9 +186,11 @@ func streamUploadHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "流式上传完成")
 }
 ```
+:::
 
 ### HTTP 客户端：发送 multipart 请求
 
+::: details 点击展开代码：HTTP 客户端：发送 multipart 请求
 ```go
 import (
     "bytes"
@@ -232,9 +239,11 @@ func uploadFile(url, fieldName, filePath string) error {
     return nil
 }
 ```
+:::
 
 ### 文件类型安全验证
 
+::: details 点击展开代码：文件类型安全验证
 ```go
 // 安全验证：不信任 Content-Type Header，读取魔数（magic bytes）
 var allowedMimeTypes = map[string]bool{
@@ -265,9 +274,11 @@ func validateUpload(part *multipart.Part, maxSize int64) ([]byte, string, error)
     return data, mimeType, nil
 }
 ```
+:::
 
 ### 构建 Email MIME（复杂多部分）
 
+::: details 点击展开代码：构建 Email MIME（复杂多部分）
 ```go
 // 构建 multipart/mixed 邮件（text + html + 附件）
 func buildEmailMIME(textBody, htmlBody string, attachments []string) ([]byte, string) {
@@ -312,6 +323,7 @@ func buildEmailMIME(textBody, htmlBody string, attachments []string) ([]byte, st
     return buf.Bytes(), mixedWriter.FormDataContentType()
 }
 ```
+:::
 
 ---
 

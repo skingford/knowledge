@@ -47,6 +47,7 @@ go/analysis 框架体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // analysis/analysis.go（简化）
 type Pass struct {
@@ -68,6 +69,7 @@ type Analyzer struct {
     Requires []*Analyzer
 }
 ```
+:::
 
 <GoCodegenDiagram kind="analysis-pass-flow" />
 
@@ -77,6 +79,7 @@ type Analyzer struct {
 
 ### 入门：检测 fmt.Println 使用
 
+::: details 点击展开代码：入门：检测 fmt.Println 使用
 ```go
 package main
 
@@ -129,9 +132,11 @@ func main() {
 
 // 运行：go vet -vettool=$(which nofmtprintln) ./...
 ```
+:::
 
 ### 实用：检测错误未检查（errcheck 简化版）
 
+::: details 点击展开代码：实用：检测错误未检查（errcheck 简化版）
 ```go
 var ErrCheckAnalyzer = &analysis.Analyzer{
     Name: "errcheck",
@@ -189,9 +194,11 @@ func getResults(t types.Type) []types.Type {
     return results
 }
 ```
+:::
 
 ### 进阶：检测 context.Background() 在请求处理函数中的使用
 
+::: details 点击展开代码：进阶：检测 context.Background() 在请求处理函数中的使用
 ```go
 // 规则：HTTP handler 中不应使用 context.Background()，
 // 应该用 r.Context() 传递请求上下文（携带 deadline/cancel/trace）
@@ -264,9 +271,11 @@ func isContextBackground(call *ast.CallExpr) bool {
     return ok && ident.Name == "context" && sel.Sel.Name == "Background"
 }
 ```
+:::
 
 ### 带 Fix 建议的 Analyzer（自动修复）
 
+::: details 点击展开代码：带 Fix 建议的 Analyzer（自动修复）
 ```go
 // 检测 errors.New(fmt.Sprintf(...)) 并建议改为 fmt.Errorf(...)
 var ErrorsNewFmtAnalyzer = &analysis.Analyzer{
@@ -349,9 +358,11 @@ func formatNode(fset *token.FileSet, node ast.Node) string {
     return buf.String()
 }
 ```
+:::
 
 ### 测试 Analyzer
 
+::: details 点击展开代码：测试 Analyzer
 ```go
 // analyzer_test.go
 package errorfmt_test
@@ -367,7 +378,9 @@ func TestErrorsFmtAnalyzer(t *testing.T) {
     analysistest.Run(t, testdata, ErrorsNewFmtAnalyzer, "basic")
 }
 ```
+:::
 
+::: details 点击展开代码：测试 Analyzer
 ```go
 // testdata/src/basic/basic.go
 package basic
@@ -385,11 +398,13 @@ func good() error {
     return fmt.Errorf("user %d not found", 42) // OK
 }
 ```
+:::
 
 ### 组合多个 Analyzer（生产 linter 工具）
 
 <GoCodegenDiagram kind="analyzer-pipeline" />
 
+::: details 点击展开代码：组合多个 Analyzer（生产 linter 工具）
 ```go
 // cmd/mylinter/main.go
 package main
@@ -414,6 +429,7 @@ func main() {
 // go build -o mylinter ./cmd/mylinter
 // go vet -vettool=./mylinter ./...
 ```
+:::
 
 ---
 

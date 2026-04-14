@@ -63,6 +63,7 @@ net/rpc 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/rpc/server.go（简化）
 type Server struct {
@@ -109,6 +110,7 @@ func (client *Client) Call(sm string, args, reply any) error {
     return call.Error
 }
 ```
+:::
 
 ---
 
@@ -116,6 +118,7 @@ func (client *Client) Call(sm string, args, reply any) error {
 
 ### 定义服务并注册
 
+::: details 点击展开代码：定义服务并注册
 ```go
 // 服务必须满足：导出方法、两个参数（args + *reply）、返回 error
 type MathService struct{}
@@ -144,9 +147,11 @@ func (s *MathService) hidden(args *AddArgs, reply *int) error { return nil }
 // ❌ 不符合：reply 不是指针
 func (s *MathService) Bad(args *AddArgs, reply int) error { return nil }
 ```
+:::
 
 ### 服务端启动
 
+::: details 点击展开代码：服务端启动
 ```go
 func startServer(addr string) {
     server := rpc.NewServer()
@@ -180,9 +185,11 @@ func startDefaultServer() {
     log.Fatal(http.ListenAndServe(":1234", nil))
 }
 ```
+:::
 
 ### 客户端同步调用
 
+::: details 点击展开代码：客户端同步调用
 ```go
 func syncClient(addr string) {
     client, err := rpc.Dial("tcp", addr)
@@ -205,9 +212,11 @@ func syncClient(addr string) {
     }
 }
 ```
+:::
 
 ### 客户端异步调用（批量并发）
 
+::: details 点击展开代码：客户端异步调用（批量并发）
 ```go
 func asyncClient(addr string) {
     client, _ := rpc.Dial("tcp", addr)
@@ -239,9 +248,11 @@ func asyncClient(addr string) {
     }
 }
 ```
+:::
 
 ### 使用 JSON 编解码（替代 gob）
 
+::: details 点击展开代码：使用 JSON 编解码（替代 gob）
 ```go
 // net/rpc/jsonrpc 子包：使用 JSON-RPC 2.0 协议
 import "net/rpc/jsonrpc"
@@ -270,9 +281,11 @@ func jsonClient() {
 // 请求：{"method":"MathService.Add","params":[{"A":5,"B":3}],"id":1}
 // 响应：{"id":1,"result":8,"error":null}
 ```
+:::
 
 ### 连接池（生产环境）
 
+::: details 点击展开代码：连接池（生产环境）
 ```go
 // net/rpc 每次 Dial 建立新连接，生产环境需要连接池
 type RPCPool struct {
@@ -316,6 +329,7 @@ func (p *RPCPool) Put(c *rpc.Client) {
     p.clients = append(p.clients, c)
 }
 ```
+:::
 
 ---
 

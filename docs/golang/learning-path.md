@@ -20,13 +20,14 @@ search: false
 
 ### 第一阶段：语言与底层
 
-目标：补齐值语义、切片、Map、接口、反射、泛型、逃逸分析和内存模型。
+目标：补齐值语义、切片、Map、接口、反射、泛型，并把逃逸分析、GC 和内存模型串成一条运行时内存主线。
 
 - 语言基础：[语言基础深化](./guide/01-language-fundamentals.md)
 - Slice 典型坑：[Slice 的坑：append 污染原底层数组与三指切片](./guide/01-slice-append-pitfalls.md)
 - String / `[]byte` 实践：[String 与 \[\]byte：转换、构建与数据流最佳实践](./guide/01-string-byte-best-practices.md)
 - 底层原理总览：[底层原理](./guide/02-underlying-principles.md)
-- 逃逸分析：[逃逸分析、栈与堆：Go 编译器如何决定内存分配](./guide/02-escape-analysis.md)
+- 运行时内存主线：[Go 运行时内存主线：接口表示、逃逸分析、GC 与内存模型](./guide/02-runtime-memory-lifecycle.md)
+- 逃逸分析专题：[逃逸分析、栈与堆：Go 编译器如何决定内存分配](./guide/02-escape-analysis.md)
 
 ### 第二阶段：并发与调度
 
@@ -76,6 +77,7 @@ search: false
 | 你的目标 | 建议先看 |
 | --- | --- |
 | 快速建立 Go 全景认知 | `guide/01` → `guide/03` → `guide/05` |
+| 想把 Go 运行时内存主线讲顺 | `guide/02-underlying-principles` → `guide/02-runtime-memory-lifecycle` → `guide/02-escape-analysis` |
 | 想把并发讲清楚 | `guide/03-concurrency` → `guide/03-advanced-concurrency-patterns` → `runtime-scheduler` |
 | 想找成熟好用的 Go 第三方库 | `excellent-open-source` → 对应场景专题页 |
 | 想补数据库接入与连接池 | `guide/06-database-cache` → `guide/06-database-sql-and-connection` → `source-reading/database-sql` |

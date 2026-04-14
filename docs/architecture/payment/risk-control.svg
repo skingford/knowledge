@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 750" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="layer1Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd"/>
+      <stop offset="100%" style="stop-color:#bbdefb"/>
+    </linearGradient>
+    <linearGradient id="layer2Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff8e1"/>
+      <stop offset="100%" style="stop-color:#ffecb3"/>
+    </linearGradient>
+    <linearGradient id="layer3Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0"/>
+      <stop offset="100%" style="stop-color:#ffe0b2"/>
+    </linearGradient>
+    <linearGradient id="layer4Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3e5f5"/>
+      <stop offset="100%" style="stop-color:#e1bee7"/>
+    </linearGradient>
+    <linearGradient id="layer5Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0f7fa"/>
+      <stop offset="100%" style="stop-color:#b2ebf2"/>
+    </linearGradient>
+    <linearGradient id="layer6Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#eceff1"/>
+      <stop offset="100%" style="stop-color:#cfd8dc"/>
+    </linearGradient>
+    <linearGradient id="passGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="rejectGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b6b"/>
+      <stop offset="100%" style="stop-color:#ee5a24"/>
+    </linearGradient>
+    <linearGradient id="reqGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="downgradeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffa726"/>
+      <stop offset="100%" style="stop-color:#fb8c00"/>
+    </linearGradient>
+    <linearGradient id="reviewGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4fc3f7"/>
+      <stop offset="100%" style="stop-color:#0288d1"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#43e97b"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ee5a24"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#78909c"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#667eea"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="750" fill="#f8f9fc" rx="12"/>
+
+  <!-- Title Bar -->
+  <rect x="20" y="15" width="920" height="50" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="480" y="48" text-anchor="middle" fill="white" font-size="20" font-weight="bold">支付风控六层决策链路 Payment Risk Control Pipeline</text>
+
+  <!-- ===== LEFT: Flow Diagram ===== -->
+  <rect x="20" y="80" width="580" height="650" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="310" y="108" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">决策链路</text>
+
+  <!-- Request Entry -->
+  <rect x="235" y="120" width="150" height="36" rx="8" fill="url(#reqGrad)" filter="url(#shadow)"/>
+  <text x="310" y="143" text-anchor="middle" fill="white" font-size="13" font-weight="bold">交易请求进入</text>
+  <line x1="310" y1="156" x2="310" y2="175" stroke="#78909c" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+  <!-- Layer 1: 准入校验 -->
+  <rect x="180" y="178" width="260" height="52" rx="8" fill="url(#layer1Grad)" stroke="#42a5f5" stroke-width="1.5"/>
+  <text x="195" y="198" fill="#1565c0" font-size="11" font-weight="bold">① 准入校验</text>
+  <text x="195" y="216" fill="#555" font-size="10">KYC 等级 × 交易类型 × 账户状态</text>
+  <text x="195" y="228" fill="#999" font-size="9">不满足 → 直接拒绝，引导认证</text>
+  <!-- Reject arrow -->
+  <line x1="440" y1="204" x2="490" y2="204" stroke="#ee5a24" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="500" y="200" fill="#c62828" font-size="10" font-weight="bold">拒绝</text>
+  <text x="500" y="213" fill="#c62828" font-size="9">引导 KYC</text>
+  <!-- Pass arrow -->
+  <line x1="310" y1="230" x2="310" y2="248" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Layer 2: 限额限频 -->
+  <rect x="180" y="251" width="260" height="52" rx="8" fill="url(#layer2Grad)" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="195" y="271" fill="#f57f17" font-size="11" font-weight="bold">② 限额限频</text>
+  <text x="195" y="289" fill="#555" font-size="10">单笔 / 日累计 / 月累计 + 频率窗口</text>
+  <text x="195" y="301" fill="#999" font-size="9">多维度叠加：用户 × 交易类型 × 渠道</text>
+  <line x1="440" y1="277" x2="490" y2="277" stroke="#ee5a24" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="500" y="273" fill="#c62828" font-size="10" font-weight="bold">超限</text>
+  <text x="500" y="286" fill="#c62828" font-size="9">拒绝</text>
+  <line x1="310" y1="303" x2="310" y2="321" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Layer 3: 规则引擎 -->
+  <rect x="180" y="324" width="260" height="62" rx="8" fill="url(#layer3Grad)" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="195" y="344" fill="#e65100" font-size="11" font-weight="bold">③ 规则引擎</text>
+  <text x="195" y="362" fill="#555" font-size="10">多维条件组合 → 配置化管理</text>
+  <text x="195" y="376" fill="#555" font-size="10">支持灰度 / shadow mode / 秒级回滚</text>
+  <text x="195" y="384" fill="#999" font-size="9">输出：通过 / 拒绝 / 降级 / 转人工</text>
+  <!-- Multi-outcome arrows -->
+  <line x1="440" y1="340" x2="490" y2="340" stroke="#ee5a24" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="500" y="336" fill="#c62828" font-size="10" font-weight="bold">拒绝</text>
+  <line x1="440" y1="360" x2="490" y2="360" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="500" y="356" fill="#e65100" font-size="10" font-weight="bold">降级</text>
+  <text x="500" y="369" fill="#e65100" font-size="9">加验证</text>
+  <line x1="440" y1="380" x2="490" y2="380" stroke="#0288d1" stroke-width="1.5"/>
+  <text x="500" y="384" fill="#0277bd" font-size="10" font-weight="bold">转人工</text>
+  <line x1="310" y1="386" x2="310" y2="404" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Layer 4: 模型评分 -->
+  <rect x="180" y="407" width="260" height="52" rx="8" fill="url(#layer4Grad)" stroke="#ab47bc" stroke-width="1.5"/>
+  <text x="195" y="427" fill="#6a1b9a" font-size="11" font-weight="bold">④ 模型评分</text>
+  <text x="195" y="445" fill="#555" font-size="10">实时特征 + 离线模型 → 风险分 0~100</text>
+  <text x="195" y="457" fill="#999" font-size="9">与规则协同：规则兜底，模型补精度</text>
+  <line x1="440" y1="433" x2="490" y2="433" stroke="#78909c" stroke-width="1.5" stroke-dasharray="4"/>
+  <text x="500" y="429" fill="#546e7a" font-size="10">风险分</text>
+  <text x="500" y="442" fill="#546e7a" font-size="9">决定后续</text>
+  <line x1="310" y1="459" x2="310" y2="477" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Layer 5: 人工审核 -->
+  <rect x="180" y="480" width="260" height="52" rx="8" fill="url(#layer5Grad)" stroke="#00acc1" stroke-width="1.5"/>
+  <text x="195" y="500" fill="#006064" font-size="11" font-weight="bold">⑤ 人工审核</text>
+  <text x="195" y="518" fill="#555" font-size="10">高风险交易拦截 → 人工复核</text>
+  <text x="195" y="530" fill="#999" font-size="9">SLA ≤ 2h，超时有默认策略</text>
+  <line x1="440" y1="506" x2="490" y2="506" stroke="#0288d1" stroke-width="1.5"/>
+  <text x="500" y="502" fill="#0277bd" font-size="10" font-weight="bold">审核队列</text>
+  <text x="500" y="515" fill="#0277bd" font-size="9">SLA 管控</text>
+  <line x1="310" y1="532" x2="310" y2="550" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Layer 6: 黑白名单 -->
+  <rect x="180" y="553" width="260" height="52" rx="8" fill="url(#layer6Grad)" stroke="#90a4ae" stroke-width="1.5"/>
+  <text x="195" y="573" fill="#37474f" font-size="11" font-weight="bold">⑥ 黑白名单兜底</text>
+  <text x="195" y="591" fill="#555" font-size="10">黑名单 → 直接拦截</text>
+  <text x="195" y="603" fill="#555" font-size="10">白名单 → 跳过部分检查</text>
+  <line x1="440" y1="579" x2="490" y2="579" stroke="#ee5a24" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="500" y="575" fill="#c62828" font-size="10" font-weight="bold">黑名单</text>
+  <text x="500" y="588" fill="#c62828" font-size="9">直接拦截</text>
+  <line x1="310" y1="605" x2="310" y2="625" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Final Decision -->
+  <rect x="210" y="628" width="200" height="40" rx="10" fill="url(#passGrad)" filter="url(#shadow)"/>
+  <text x="310" y="653" text-anchor="middle" fill="white" font-size="14" font-weight="bold">决策结果输出</text>
+
+  <!-- Decision results legend -->
+  <rect x="145" y="678" width="70" height="22" rx="6" fill="url(#passGrad)"/>
+  <text x="180" y="693" text-anchor="middle" fill="white" font-size="10" font-weight="bold">通过</text>
+  <rect x="225" y="678" width="70" height="22" rx="6" fill="url(#rejectGrad)"/>
+  <text x="260" y="693" text-anchor="middle" fill="white" font-size="10" font-weight="bold">拒绝</text>
+  <rect x="305" y="678" width="70" height="22" rx="6" fill="url(#downgradeGrad)"/>
+  <text x="340" y="693" text-anchor="middle" fill="white" font-size="10" font-weight="bold">降级</text>
+  <rect x="385" y="678" width="70" height="22" rx="6" fill="url(#reviewGrad)"/>
+  <text x="420" y="693" text-anchor="middle" fill="white" font-size="10" font-weight="bold">人工</text>
+
+  <!-- ===== RIGHT: Key Points ===== -->
+  <rect x="620" y="80" width="320" height="650" rx="10" fill="white" stroke="#e0e0e0" stroke-width="1" filter="url(#shadow)"/>
+  <text x="780" y="108" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">核心要点</text>
+
+  <!-- Point 1: Dimensions -->
+  <rect x="640" y="125" width="280" height="100" rx="8" fill="#e3f2fd" stroke="#42a5f5" stroke-width="1"/>
+  <text x="660" y="148" fill="#1565c0" font-size="13" font-weight="bold">风控判断四维度</text>
+  <text x="660" y="170" fill="#555" font-size="11">• 账户：KYC 等级、信用分、历史</text>
+  <text x="660" y="188" fill="#555" font-size="11">• 交易：金额、频率、收款方</text>
+  <text x="660" y="206" fill="#555" font-size="11">• 设备：指纹、IP、地理位置</text>
+  <text x="660" y="222" fill="#555" font-size="11">• 业务：交易类型、商户类别、渠道</text>
+
+  <!-- Point 2: Rule Engine -->
+  <rect x="640" y="240" width="280" height="90" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="1"/>
+  <text x="660" y="263" fill="#e65100" font-size="13" font-weight="bold">规则引擎关键能力</text>
+  <text x="660" y="285" fill="#555" font-size="11">• 配置化管理，变更不需发版</text>
+  <text x="660" y="303" fill="#555" font-size="11">• Shadow mode 灰度验证</text>
+  <text x="660" y="321" fill="#555" font-size="11">• 版本管理 + 秒级回滚</text>
+
+  <!-- Point 3: KYC/AML -->
+  <rect x="640" y="345" width="280" height="80" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1"/>
+  <text x="660" y="368" fill="#6a1b9a" font-size="13" font-weight="bold">KYC / AML 合规</text>
+  <text x="660" y="390" fill="#555" font-size="11">• KYC 分级决定限额上限</text>
+  <text x="660" y="408" fill="#555" font-size="11">• 大额交易 + 可疑模式需上报</text>
+  <text x="660" y="420" fill="#999" font-size="10">合规是硬约束，不可被风险偏好覆盖</text>
+
+  <!-- Point 4: Metrics -->
+  <rect x="640" y="440" width="280" height="110" rx="8" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1"/>
+  <text x="660" y="463" fill="#2e7d32" font-size="13" font-weight="bold">效果度量指标</text>
+  <text x="660" y="488" fill="#555" font-size="11">• 拦截率：0.1% ~ 1%</text>
+  <text x="660" y="506" fill="#555" font-size="11">• 误杀率：&lt; 5%</text>
+  <text x="660" y="524" fill="#555" font-size="11">• 漏杀率：&lt; 0.01%</text>
+  <text x="660" y="542" fill="#555" font-size="11">• 资损率：&lt; 0.001%</text>
+
+  <!-- Point 5: vs -->
+  <rect x="640" y="565" width="280" height="80" rx="8" fill="#fce4ec" stroke="#ef5350" stroke-width="1"/>
+  <text x="660" y="588" fill="#c62828" font-size="13" font-weight="bold">风控 vs 反欺诈</text>
+  <text x="660" y="610" fill="#555" font-size="11">• 风控：规则驱动、合规导向</text>
+  <text x="660" y="628" fill="#555" font-size="11">• 反欺诈：对抗驱动、数据驱动</text>
+  <text x="660" y="640" fill="#999" font-size="10">风控回答"是否合规"，反欺诈回答"是否在骗钱"</text>
+
+  <!-- Bottom tip -->
+  <rect x="640" y="660" width="280" height="55" rx="8" fill="#fff8e1" stroke="#ffc107" stroke-width="1"/>
+  <text x="660" y="683" fill="#f57f17" font-size="12" font-weight="bold">建议优先落地</text>
+  <text x="660" y="703" fill="#555" font-size="11">准入 + 限额 + 规则引擎 → 覆盖 80%</text>
+</svg>

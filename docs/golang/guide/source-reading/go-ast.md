@@ -62,6 +62,7 @@ Go AST 工具链
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // go/token：位置信息
 type FileSet struct {
@@ -84,6 +85,7 @@ type Expr interface { Node; exprNode() } // 表达式
 type Stmt interface { Node; stmtNode() } // 语句
 type Decl interface { Node; declNode() } // 声明
 ```
+:::
 
 ---
 
@@ -91,6 +93,7 @@ type Decl interface { Node; declNode() } // 声明
 
 ### 解析 Go 文件并打印 AST
 
+::: details 点击展开代码：解析 Go 文件并打印 AST
 ```go
 import (
     "go/parser"
@@ -123,9 +126,11 @@ func main() {
     ast.Print(fset, f)
 }
 ```
+:::
 
 ### 提取所有函数名
 
+::: details 点击展开代码：提取所有函数名
 ```go
 // ast.Inspect：深度优先遍历，返回 false 停止对该子树的遍历
 func extractFunctions(src string) []string {
@@ -142,9 +147,11 @@ func extractFunctions(src string) []string {
     return functions
 }
 ```
+:::
 
 ### 静态分析：检测 error 未处理
 
+::: details 点击展开代码：静态分析：检测 error 未处理
 ```go
 // 检测函数调用结果中 error 未被检查的情况
 func checkErrorHandling(src string) []string {
@@ -178,11 +185,13 @@ func checkErrorHandling(src string) []string {
     return warnings
 }
 ```
+:::
 
 ### 代码生成：自动生成 String() 方法
 
 <GoCodegenDiagram kind="ast-pipeline" />
 
+::: details 点击展开代码：代码生成：自动生成 String() 方法
 ```go
 // 解析结构体，自动生成 String() 方法
 func generateStringer(src string) string {
@@ -228,9 +237,11 @@ func generateStringer(src string) string {
 //           return fmt.Sprintf("User{Name=%v, Age=%v}", s.Name, s.Age)
 //       }
 ```
+:::
 
 ### 遍历整个目录的 Go 包
 
+::: details 点击展开代码：遍历整个目录的 Go 包
 ```go
 // 解析整个目录的所有 Go 文件
 func analyzePackage(dir string) {
@@ -261,9 +272,11 @@ func analyzePackage(dir string) {
     }
 }
 ```
+:::
 
 ### ast.Walk vs ast.Inspect
 
+::: details 点击展开代码：ast.Walk vs ast.Inspect
 ```go
 // ast.Visitor 接口：更灵活的遍历控制
 type FuncCollector struct {
@@ -289,9 +302,11 @@ func collectFunctions(f *ast.File) []*ast.FuncDecl {
 // ast.Inspect 是 ast.Walk 的简化版本（回调函数形式）
 // ast.Walk 用 Visitor 接口，可在进入/退出节点时做不同处理
 ```
+:::
 
 ### 读取注释（文档生成）
 
+::: details 点击展开代码：读取注释（文档生成）
 ```go
 // 提取带有特定注释标记的函数（类似 go generate 的标记机制）
 func extractDocFunctions(src string) {
@@ -313,6 +328,7 @@ func extractDocFunctions(src string) {
     }
 }
 ```
+:::
 
 ---
 

@@ -55,6 +55,7 @@ crypto/ecdsa 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/ecdsa/ecdsa.go（简化）
 
@@ -84,6 +85,7 @@ func VerifyASN1(pub *PublicKey, hash, sig []byte) bool {
     // 仅验证签名数学正确性，不验证证书链
 }
 ```
+:::
 
 ---
 
@@ -91,6 +93,7 @@ func VerifyASN1(pub *PublicKey, hash, sig []byte) bool {
 
 ### 基础：密钥生成与签名验证
 
+::: details 点击展开代码：基础：密钥生成与签名验证
 ```go
 import (
     "crypto/ecdsa"
@@ -128,9 +131,11 @@ func basicECDSA() {
     fmt.Printf("篡改后: %v\n", ecdsa.VerifyASN1(publicKey, hash2[:], sig)) // false
 }
 ```
+:::
 
 ### 密钥序列化与反序列化
 
+::: details 点击展开代码：密钥序列化与反序列化
 ```go
 import (
     "crypto/x509"
@@ -186,9 +191,11 @@ func loadPublicKey(path string) (*ecdsa.PublicKey, error) {
     return pub.(*ecdsa.PublicKey), nil
 }
 ```
+:::
 
 ### JWT ES256（ECDSA P-256 签名）
 
+::: details 点击展开代码：JWT ES256（ECDSA P-256 签名）
 ```go
 import (
     "crypto/ecdsa"
@@ -264,9 +271,11 @@ func verifyES256JWT(token string, pub *ecdsa.PublicKey) (*JWTClaims, error) {
     return &claims, nil
 }
 ```
+:::
 
 ### ECDH 密钥交换（派生共享密钥）
 
+::: details 点击展开代码：ECDH 密钥交换（派生共享密钥）
 ```go
 import "crypto/ecdh"
 
@@ -296,6 +305,7 @@ func ecdhKeyExchange() {
     io.ReadFull(hkdf, aesKey)
 }
 ```
+:::
 
 ---
 

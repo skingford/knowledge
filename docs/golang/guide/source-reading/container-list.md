@@ -63,6 +63,7 @@ container/list 结构全景
 
 ## 一、核心实现（哨兵节点设计）
 
+::: details 点击展开代码：一、核心实现（哨兵节点设计）
 ```go
 // src/container/list/list.go
 type Element struct {
@@ -115,6 +116,7 @@ func (l *List) MoveToFront(e *Element) {
     l.move(e, &l.root)
 }
 ```
+:::
 
 ---
 
@@ -122,6 +124,7 @@ func (l *List) MoveToFront(e *Element) {
 
 ### 基础操作
 
+::: details 点击展开代码：基础操作
 ```go
 l := list.New()
 
@@ -148,9 +151,11 @@ fmt.Println(l.Len()) // 3
 // 移动
 l.MoveToFront(e1) // 将 1 移到头部
 ```
+:::
 
 ### LRU 缓存（经典双向链表 + map）
 
+::: details 点击展开代码：LRU 缓存（经典双向链表 + map）
 ```go
 // LRU Cache：O(1) Get 和 Put
 type LRUCache struct {
@@ -207,9 +212,11 @@ func (c *LRUCache) Put(key, value int) {
     }
 }
 ```
+:::
 
 ### 用作任务队列（双端队列 Deque）
 
+::: details 点击展开代码：用作任务队列（双端队列 Deque）
 ```go
 type Deque[T any] struct {
     l *list.List
@@ -242,9 +249,11 @@ func (d *Deque[T]) PopBack() (T, bool) {
     return e.Value.(T), true
 }
 ```
+:::
 
 ### 有序链表（插入排序）
 
+::: details 点击展开代码：有序链表（插入排序）
 ```go
 // 维护有序链表（O(n) 插入，O(1) 头尾访问）
 func insertSorted(l *list.List, val int) {
@@ -257,9 +266,11 @@ func insertSorted(l *list.List, val int) {
     l.PushBack(val)
 }
 ```
+:::
 
 ### 合并两个链表
 
+::: details 点击展开代码：合并两个链表
 ```go
 func mergeLists(l1, l2 *list.List) *list.List {
     result := list.New()
@@ -269,11 +280,13 @@ func mergeLists(l1, l2 *list.List) *list.List {
     // 注意：l1 和 l2 操作后会被清空
 }
 ```
+:::
 
 ---
 
 ## container/ring（循环链表）
 
+::: details 点击展开代码：container/ring（循环链表）
 ```go
 // container/ring：固定大小的循环缓冲
 import "container/ring"
@@ -319,6 +332,7 @@ func (rb *RingBuffer) All() []any {
     return result
 }
 ```
+:::
 
 ---
 

@@ -1,0 +1,598 @@
+---
+title: Go 运行时内存主线
+description: 接口表示、逃逸分析、栈与堆、内存分配器、GC 与 happens-before 串成一条对象生命周期主线。
+head:
+  - - meta
+    - name: keywords
+      content: Go 接口底层,itab,eface,iface,逃逸分析,栈与堆,内存分配器,mcache,mcentral,mheap,Go GC,Go 内存模型,happens-before,gcflags,benchmem,sync.Pool
+---
+
+# Go 运行时内存主线
+
+值先有运行时表示，可能因为接口装箱、闭包或返回地址而逃逸；能留在栈上就留栈，放不下就进入堆；进入堆后的对象由分配器发放内存，再由 GC 回收；一旦跨 goroutine 共享，写入何时可见就由内存模型约束。
+
+::: tip 阅读建议
+面试或复习场景，先抓住这条链路：`接口表示 → 逃逸决策 → 栈/堆分配 → 分配器 → GC → happens-before`。
+:::
+
+## 本页内容
+
+- 1. 接口表示：itab 与动态类型
+- 2. 逃逸与栈堆：编译器如何决定分配位置
+- 3. 内存分配器：堆上怎么拿内存
+- 4. GC 回收：堆对象如何被回收
+- 5. 逃逸与 GC 抖动：两个层面的区分
+- 6. 内存模型：跨 goroutine 的可见性
+
+---
+
+## 1. 接口表示：itab 与动态类型
+
+Go 的接口在运行时有两种表示：
+
+<GoRuntimeDiagram kind="interface-itab" />
+
+- **eface**（empty interface `interface{}`）：只有两个字段 `_type` 和 `data`
+- **iface**（非空接口）：有 `tab`（指向 itab）和 `data` 两个字段
+
+`itab` 结构体包含：
+
+- **inter**：接口类型描述（有哪些方法）
+- **_type**：实际值的类型描述
+- **fun[0]**：方法表（函数指针数组），存放实际类型实现接口方法的地址
+
+`itab` 在首次使用时计算并缓存在全局哈希表 `itabTable` 中，后续相同的 `(接口类型, 具体类型)` 组合直接命中缓存。
+
+接口这一层值得放在最前面，是因为很多看似普通的函数调用，经过接口装箱以后，就会影响后续的逃逸分析和分配位置判断。
+
+类型断言 `v.(T)` 的成本：如果 `T` 是具体类型，只需比较 `_type` 指针（O(1)）；如果 `T` 是接口类型，需要查找或构建 itab（首次 O(n)，缓存后 O(1)）。
+
+::: details 点击展开代码：接口表示
+```go
+package main
+
+import (
+	"fmt"
+	"unsafe"
+)
+
+type Speaker interface {
+	Speak() string
+}
+
+type Dog struct{ Name string }
+
+func (d Dog) Speak() string { return d.Name + ": Woof!" }
+
+type Cat struct{ Name string }
+
+func (c Cat) Speak() string { return c.Name + ": Meow!" }
+
+func main() {
+	// iface: 非空接口包含 itab + data
+	var s Speaker = Dog{Name: "Buddy"}
+	fmt.Println(s.Speak())
+	fmt.Printf("iface 大小: %d bytes\n", unsafe.Sizeof(s)) // 16 bytes (2 个指针)
+
+	// eface: 空接口只有 _type + data
+	var a interface{} = 42
+	fmt.Printf("eface 大小: %d bytes\n", unsafe.Sizeof(a)) // 16 bytes
+
+	// 类型断言
+	s = Cat{Name: "Kitty"}
+	if dog, ok := s.(Dog); ok {
+		fmt.Println("是 Dog:", dog.Name)
+	} else {
+		fmt.Println("不是 Dog") // 走这里
+	}
+
+	// type switch: 编译器优化为连续的类型指针比较
+	switch v := s.(type) {
+	case Dog:
+		fmt.Println("Dog:", v.Name)
+	case Cat:
+		fmt.Println("Cat:", v.Name) // 走这里
+	}
+
+	// 接口值的 nil 陷阱
+	var p *Dog = nil
+	var s2 Speaker = p
+	fmt.Println("s2 == nil:", s2 == nil) // false! 因为 itab 不为 nil
+}
+```
+:::
+
+**讲解重点：**
+
+- 在 64 位环境里，`iface` 和 `eface` 的头部通常都是 16 字节，但具体值是直接放进 data word，还是经由额外存储间接引用，取决于具体类型布局和编译器优化
+- 接口装箱会显著提高逃逸概率，但"赋值给接口"不等于"一定堆分配"；最终是否上堆，仍由逃逸分析决定
+- 接口的 nil 陷阱：一个持有 nil 指针的接口值本身不等于 nil，因为 itab/_type 字段非空；函数返回 `error` 时要直接 `return nil`，而不是返回一个类型化的 nil 指针
+- itab 缓存是全局的，相同的 `(接口, 类型)` 对只计算一次方法表；这也是接口调用虽然有一次间接跳转，但在工程里通常仍足够快的原因
+
+---
+
+## 2. 逃逸与栈堆：编译器如何决定分配位置
+
+Go 编译器在编译期通过逃逸分析（Escape Analysis）决定变量分配在栈上还是堆上。栈分配成本极低，函数返回时自动释放；堆分配则需要 GC 参与回收。所以减少逃逸 = 减少堆对象 = 减少 GC 压力。
+
+编译器关心的核心问题只有一个：**这个变量在当前函数返回之后，还可能被别的地方继续引用吗？** 会，就逃逸到堆上；不会，就尽量留在栈上。
+
+<GoRuntimeDiagram kind="escape-scenarios" />
+
+### 常见逃逸场景
+
+#### 返回局部变量指针
+
+局部变量本来属于当前函数栈帧，但如果把它的地址返回出去，那么函数结束后它还必须继续存活，编译器只能把它放到堆上。这是最直接的逃逸场景。
+
+#### 接口装箱
+
+很多人第一次看逃逸分析结果时会困惑：为什么只是 `fmt.Println(x)`，一个简单值也会"逃逸"？
+
+原因在于 `fmt.Println` 的签名是 `func Println(a ...any) (n int, err error)`，参数要先装箱成接口值。接口值会显著增加逃逸概率，尤其是在复杂调用链和泛化 API 中。
+
+#### 闭包捕获外部变量
+
+闭包如果引用了外层函数的局部变量，而闭包本身又可能在外层函数返回后继续存在，那么这些变量就不能继续留在原来的栈帧里，只能转移到堆上。
+
+#### Slice / Map 大小不可知或过大
+
+```go
+s1 := make([]int, 10)     // 小且编译期可知，可能留在栈上
+n := 10
+s2 := make([]int, n)      // 编译期不可知，更容易逃逸
+s3 := make([]int, 100000) // 太大，通常直接放堆上
+```
+
+"编译期不可知"不代表 100% 一定逃逸，但会显著增加逃逸概率。"太大"时即使生命周期不长，也可能因为栈空间成本不划算而被分配到堆上。
+
+#### 变量被发送到 Channel
+
+值一旦发送到 Channel，编译器就无法证明它只在当前栈帧内存活，通常会逃逸。
+
+### 验证命令
+
+::: details 点击展开代码：逃逸分析代码示例
+```go
+package main
+
+import "fmt"
+
+// 返回指针 -> 逃逸到堆
+func newInt(n int) *int {
+	v := n
+	return &v
+}
+
+// 不返回指针 -> 更容易留在栈上
+func addOne(n int) int {
+	v := n + 1
+	return v
+}
+
+// 接口参数增加逃逸概率
+func printValue(v interface{}) {
+	fmt.Println(v)
+}
+
+// 闭包捕获导致逃逸
+func closure() func() int {
+	x := 0
+	return func() int {
+		x++
+		return x
+	}
+}
+
+func main() {
+	p := newInt(42)
+	fmt.Println(*p)
+
+	r := addOne(10)
+	_ = r
+
+	printValue(100)
+
+	f := closure()
+	fmt.Println(f())
+}
+```
+:::
+
+查看逃逸分析结果：
+
+```bash
+go build -gcflags="-m" main.go      # 简要结果
+go build -gcflags="-m -m" main.go   # 详细原因链
+go tool compile -m main.go          # 单文件场景
+```
+
+输出里常见这些关键词：
+
+- `moved to heap` — 变量被放到堆上
+- `escapes to heap` — 值沿调用链分析后最终逃逸
+- `does not escape` — 编译器确认可以安全留在栈上
+
+### 排查与取舍
+
+不是所有 `escapes to heap` 都值得优化。更合理的排查顺序是：
+
+1. **先用 pprof 或 benchmark 找到分配热点**
+2. **再结合 `-gcflags="-m -m"` 看是不是意外逃逸**
+3. **最后再决定是否为了减少几个堆对象去改代码结构**
+
+```bash
+go test -bench=. -benchmem
+```
+
+重点关注 `B/op`（每次操作分配的字节数）和 `allocs/op`（每次操作的分配次数）。改掉一处逃逸，通常会直接反映在这两个指标上。
+
+减少逃逸的常用手段：避免不必要的指针返回、用具体类型代替接口、预分配 Slice 容量、避免大结构体在逃逸路径中被频繁引用、`sync.Pool` 复用堆对象。真正该优化的，通常是高频路径、低延迟路径、GC 压力明显的地方。很多时候，代码清晰比消灭一两个堆对象更重要。
+
+### Goroutine 栈机制
+
+逃逸分析决定"去栈还是去堆"，而 goroutine 的栈本身也有动态管理机制：
+
+<GoRuntimeDiagram kind="stack-vs-heap" />
+
+<GoSchedulerDiagram kind="stack-growth" />
+
+- **初始大小**：Go 1.4+ 起初始栈大小为 **2KB**（之前是 8KB）
+- **动态增长**：函数调用时如果栈空间不够，运行时会分配一个 2 倍大小的新栈，把旧栈内容拷贝过去（连续栈，copystack）
+- **自动收缩**：GC 时如果发现栈使用量不到容量的 1/4，会缩小栈
+- **最大限制**：默认最大栈大小为 1GB（可通过 `runtime/debug.SetMaxStack` 调整）
+
+| 特性 | 栈 | 堆 |
+|------|----|----|
+| 分配速度 | 极快（移动 SP） | 较慢（需要内存分配器） |
+| 回收方式 | 函数返回自动回收 | GC 回收 |
+| 生命周期 | 函数作用域内 | 不确定 |
+| 碎片化 | 无 | 可能 |
+
+goroutine 初始栈只有 2KB，这是支持海量 goroutine 的关键（OS 线程默认栈通常是 MB 级）。栈增长采用连续栈方案（copystack），对用户透明，但深递归场景仍有拷贝成本。栈上的变量不需要 GC 管理，所以减少逃逸本质上就是在减少 GC 工作量。
+
+::: tip 先记住这一句
+这一节讨论的是"该不该进堆"，后面的分配器和 GC 讨论的是"既然已经进堆，那接下来怎么分、怎么回收"。
+:::
+
+---
+
+## 3. 内存分配器：堆上怎么拿内存
+
+一旦对象逃逸，或者因为体积、生命周期等原因不适合继续放在栈上，它就会进入 Go 的堆分配路径。Go 的内存分配器借鉴了 TCMalloc 的设计思想，用多级缓存来减少锁竞争。
+
+<GoRuntimeDiagram kind="allocator-hierarchy" />
+
+### 三级结构
+
+- **mcache**：每个 P（处理器）持有一个本地缓存，分配时无需加锁。包含各种 size class 的 `mspan` 链表
+- **mcentral**：全局的中央缓存，每个 size class 一个 mcentral。当 mcache 耗尽时从 mcentral 获取新的 mspan（需要加锁，但粒度小）
+- **mheap**：全局堆管理器，负责向操作系统申请 arena 级别的大块内存；mcentral 耗尽时再向 mheap 申请
+
+### Size Class
+
+Go 会把小对象按大小归到几十个 size class 中（具体数量会随版本演进略有变化），每个 class 对应一种固定大小的槽位。这种设计的核心目标是减少碎片，同时让分配和回收更快。
+
+### 分配策略
+
+- **Tiny 对象（< 16B 且无指针）**：使用 tiny allocator，将多个 tiny 对象合并到一个 16B 的块中，减少内存浪费
+- **小对象（16B - 32KB）**：从 mcache 对应 size class 的 mspan 中分配
+- **大对象（> 32KB）**：直接从 mheap 分配，不经过 mcache/mcentral
+
+### mspan
+
+`mspan` 是内存管理的基本单位。一个 `mspan` 是连续的若干内存页（page，8KB），会被切割成固定大小的对象槽位，再通过位图（`allocBits`）跟踪哪些槽位已分配。
+
+::: details 点击展开代码：内存分配器
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"unsafe"
+)
+
+func main() {
+	// 查看不同大小对象的实际分配大小
+	// Go 会向上取整到对应的 size class
+	sizes := []int{1, 8, 16, 24, 32, 48, 64, 128, 256, 512, 1024}
+	for _, size := range sizes {
+		s := make([]byte, size)
+		fmt.Printf("请求 %4d bytes, cap=%4d bytes\n", size, cap(s))
+	}
+
+	// tiny 对象合并演示
+	type tinyStruct struct {
+		a byte
+		b byte
+	}
+
+	var ptrs [10]*tinyStruct
+	for i := range ptrs {
+		v := new(tinyStruct)
+		ptrs[i] = v
+	}
+
+	// 打印地址，观察 tiny 对象的紧凑分配
+	for i, p := range ptrs {
+		fmt.Printf("tiny[%d] addr=%p (size=%d)\n", i, p, unsafe.Sizeof(*p))
+	}
+
+	// 大对象分配
+	big := make([]byte, 64*1024) // 64KB > 32KB，直接从 mheap 分配
+	_ = big
+
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	fmt.Printf("\nMallocs=%d, Frees=%d, HeapObjects=%d\n", m.Mallocs, m.Frees, m.HeapObjects)
+	fmt.Printf("HeapInuse=%dKB, HeapSys=%dKB\n", m.HeapInuse/1024, m.HeapSys/1024)
+}
+```
+:::
+
+**讲解重点：**
+
+- 三级缓存 `mcache → mcentral → mheap` 的核心目的是减少锁竞争：mcache 完全无锁，mcentral 按 size class 分锁，mheap 访问频率最低
+- Tiny allocator 会把多个微小无指针对象打包到同一个小块中，大幅减少分配次数和空间浪费
+- size class 以一点空间浪费换取更稳定的分配性能；请求 17 字节的对象，实际可能拿到 24 字节槽位
+- `runtime.MemStats` 是诊断内存问题的重要入口，常看的指标有 `HeapInuse`、`HeapObjects`、`Mallocs/Frees`
+
+---
+
+## 4. GC 回收：堆对象如何被回收
+
+对象一旦进入堆，生命周期就不再由函数返回直接结束，而是交给 GC 管理。Go 使用**并发三色标记清除**（Concurrent Tri-color Mark and Sweep）算法，目标是在保证正确性的同时尽量缩短 STW（Stop The World）时间。
+
+<GoRuntimeDiagram kind="gc-tricolor" />
+
+### 三色标记
+
+- **白色**：未被访问的对象，GC 结束后会被回收
+- **灰色**：已被访问但其引用的对象尚未全部扫描
+- **黑色**：已被访问且其引用的对象已全部扫描完成
+
+标记过程：从根对象（全局变量、栈上变量、寄存器）出发，将根对象标灰 → 取出灰色对象，将其引用的白色对象标灰，自身标黑 → 重复直到没有灰色对象 → 剩余白色对象即为垃圾。
+
+### 写屏障（Write Barrier）
+
+并发标记期间，用户代码（mutator）可能修改引用关系。Go 使用**混合写屏障**（Hybrid Write Barrier，Go 1.8+）：
+
+- 被覆盖的旧引用标灰（删除屏障语义）
+- 新创建的对象直接标黑（插入屏障语义）
+
+这样栈上的对象不需要重新扫描，大幅减少了 STW。
+
+### GC 阶段
+
+1. **Mark Setup（STW）**：开启写屏障，很短（通常 < 0.1ms）
+2. **Marking（并发）**：与用户代码并发执行，扫描标记所有可达对象
+3. **Mark Termination（STW）**：关闭写屏障，完成最终标记，很短
+4. **Sweeping（并发）**：回收白色对象的内存，与用户代码并发执行
+
+### GC 触发条件
+
+- 堆内存增长到上次 GC 后的 2 倍（由 `GOGC` 环境变量控制，默认 100 即 100% 增长）
+- 超过 2 分钟没有触发 GC 时，强制触发
+- 手动调用 `runtime.GC()`
+
+::: details 点击展开代码：GC 回收
+```go
+package main
+
+import (
+	"fmt"
+	"runtime"
+	"runtime/debug"
+	"time"
+)
+
+func main() {
+	// 设置 GOGC：100 表示堆增长 100% 后触发 GC
+	debug.SetGCPercent(100)
+
+	// 打印 GC 统计信息
+	printGCStats := func(label string) {
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		fmt.Printf("[%s] HeapAlloc=%dKB, NumGC=%d, PauseTotalNs=%dns\n",
+			label, m.HeapAlloc/1024, m.NumGC, m.PauseTotalNs)
+	}
+
+	printGCStats("初始")
+
+	// 分配大量内存触发 GC
+	var s [][]byte
+	for i := 0; i < 100; i++ {
+		s = append(s, make([]byte, 1024*1024)) // 每次 1MB
+	}
+	printGCStats("分配后")
+
+	// 释放引用，让 GC 回收
+	s = nil
+	runtime.GC() // 手动触发 GC
+	printGCStats("GC后")
+
+	_ = time.Now() // 防止 s 被编译器优化掉
+}
+```
+:::
+
+使用 `GODEBUG=gctrace=1` 查看 GC 详细日志：
+
+```bash
+GODEBUG=gctrace=1 go run main.go
+```
+
+输出格式：
+
+```
+gc 1 @0.012s 2%: 0.011+1.2+0.003 ms clock, 0.089+0.3/1.0/0+0.024 ms cpu, 4->4->0 MB, 5 MB goal, 8 P
+```
+
+各字段含义：`STW1时间 + 并发标记时间 + STW2时间`，`标记前堆大小 → 标记后堆大小 → 存活对象大小`。
+
+**讲解重点：**
+
+- 堆对象越多、生命周期越短，GC 的标记和清扫压力就越大，所以前面的"减少逃逸"和这里的"降低 GC 成本"本质上是一件事
+- Go GC 的 STW 时间通常在亚毫秒级（< 1ms），大部分工作与用户代码并发执行
+- `GOGC=100` 表示堆增长 100% 触发 GC；降低 GOGC 会更频繁 GC（延迟更低但吞吐降低），Go 1.19+ 可用 `debug.SetMemoryLimit` 设置内存上限
+- 减少 GC 压力的常见手段：减少短生命周期堆分配、复用对象（`sync.Pool`）、尽量让对象留在栈上、避免不必要的指针对象
+
+---
+
+## 5. 逃逸与 GC 抖动：两个层面的区分
+
+面试和排查中经常把"逃逸分析"和"GC 抖动"混为一谈，但它们发生在不同阶段，解决手段也不同：
+
+|  | 逃逸分析 | GC 抖动（GC Jitter） |
+|--|---------|---------------------|
+| **阶段** | 编译期 | 运行时 |
+| **关注点** | 变量分配在栈上还是堆上 | 堆对象回收时的 STW 停顿和 CPU 占用波动 |
+| **可见症状** | `-gcflags="-m"` 输出 `escapes to heap` | 延迟毛刺（P99 突增）、`gctrace` 显示频繁 GC 或长 STW |
+| **根因** | 编译器无法证明对象局限于当前栈帧 | 短生命周期堆对象太多、存活对象扫描量大、GOGC 设置不当 |
+| **排查工具** | `go build -gcflags="-m -m"` | `GODEBUG=gctrace=1`、`runtime/metrics`、pprof `alloc_objects` |
+| **优化方向** | 减少不必要的指针返回、接口装箱、闭包捕获 | `sync.Pool` 复用、调整 `GOGC`/`SetMemoryLimit`、减少分配频率 |
+
+它们之间的因果链是：
+
+```
+逃逸增多 → 堆对象增多 → GC 扫描量增大 → STW / 并发标记占 CPU 增加 → 延迟抖动
+```
+
+但反过来不一定成立：GC 抖动不一定是逃逸引起的。常见的非逃逸原因包括：
+
+- **存活对象过多**：即使分配速率不高，堆上长期存活的大量对象也会拉长标记时间
+- **GOGC 设置过低**：GC 触发过于频繁，每次 GC 的 CPU 开销叠加形成抖动
+- **Finalizer 过多**：`runtime.SetFinalizer` 注册的对象需要额外的处理周期
+- **大量 goroutine 的栈扫描**：GC 标记阶段需要扫描所有 goroutine 的栈，goroutine 数量过大时这一步本身就有开销
+
+**实际排查建议：**
+
+1. 先看 `gctrace` 或 `runtime/metrics` 确认是不是 GC 造成的延迟抖动
+2. 如果是，再看 `alloc_objects` pprof 找到分配热点
+3. 对热点函数跑 `-gcflags="-m -m"` 判断是否有意外逃逸
+4. 逃逸能优化就优化；不能优化（比如业务确实需要堆分配），就转向 `sync.Pool`、调 GOGC 或 `SetMemoryLimit`
+
+把它们分清楚的好处是：不会在逃逸分析层面过度优化（为了消灭几个堆对象牺牲代码可读性），也不会在 GC 抖动时只盯着逃逸看而忽略了 GOGC 调参和对象池这些更直接的手段。
+
+---
+
+## 6. 内存模型：跨 goroutine 的可见性
+
+前面几节讲的是对象如何表示、分配和回收；到了并发场景，真正需要再补上的，是"一个 goroutine 的写入什么时候对另一个 goroutine 可见"。这件事由 Go 的内存模型（Go Memory Model）定义，核心概念是 **happens-before**。
+
+<GoRuntimeDiagram kind="happens-before" />
+
+### Happens-Before 规则
+
+如果事件 A happens-before 事件 B，那么 A 的内存写入对 B 可见。以下是 Go 保证的 happens-before 关系：
+
+1. **单 goroutine 内**：按程序顺序执行
+2. **Channel**：
+   - `ch <- v` happens-before 对应的 `<-ch` 完成
+   - `close(ch)` happens-before 从 ch 接收到零值
+   - 无缓冲 Channel 的接收 happens-before 发送完成
+3. **sync.Mutex**：第 n 次 `Unlock()` happens-before 第 n+1 次 `Lock()`
+4. **sync.Once**：`once.Do(f)` 中 `f` 的执行 happens-before 任何 `Do` 调用返回
+5. **sync.WaitGroup**：`wg.Done()` happens-before 对应的 `wg.Wait()` 返回
+6. **goroutine 创建**：`go f()` 语句 happens-before `f` 开始执行
+
+### Data Race
+
+当两个 goroutine 并发访问同一个变量，且至少一个是写操作，并且没有 happens-before 关系保证顺序时，就构成 Data Race。Data Race 是未定义行为，可能导致任意结果。
+
+<GoLeakRaceDiagram kind="data-race" />
+
+::: details 点击展开代码：内存模型
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"sync/atomic"
+)
+
+func main() {
+	// 错误示例：data race
+	// 取消注释用 go run -race main.go 检测
+	/*
+		counter := 0
+		var wg sync.WaitGroup
+		for i := 0; i < 1000; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				counter++ // DATA RACE!
+			}()
+		}
+		wg.Wait()
+		fmt.Println("counter:", counter) // 结果不确定
+	*/
+
+	// 正确方式 1：Mutex
+	var mu sync.Mutex
+	counter1 := 0
+	var wg sync.WaitGroup
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			mu.Lock()
+			counter1++
+			mu.Unlock()
+		}()
+	}
+	wg.Wait()
+	fmt.Println("Mutex counter:", counter1)
+
+	// 正确方式 2：atomic
+	var counter2 int64
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			atomic.AddInt64(&counter2, 1)
+		}()
+	}
+	wg.Wait()
+	fmt.Println("Atomic counter:", counter2)
+
+	// 正确方式 3：Channel 收集结果
+	results := make(chan int, 1000)
+	for i := 0; i < 1000; i++ {
+		go func() {
+			results <- 1
+		}()
+	}
+	counter3 := 0
+	for i := 0; i < 1000; i++ {
+		counter3 += <-results
+	}
+	fmt.Println("Channel counter:", counter3)
+}
+```
+:::
+
+使用 Race Detector 检测数据竞争：
+
+```bash
+go run -race main.go
+go test -race ./...
+```
+
+**讲解重点：**
+
+- Go 内存模型讨论的是**可见性和顺序**，不是"对象到底在栈上还是堆上"；两者相关，但不是同一层问题
+- 没有 happens-before 关系时，可见性就不受保证；即使在强一致性 CPU 上，编译器和运行时也可能重排
+- `-race` 是开发和测试阶段非常值得常开的工具，它能抓到大多数 data race，但有明显性能开销，不适合生产环境
+- `sync/atomic` 适合简单共享状态；复杂状态的并发读写，优先考虑 `Mutex` 或明确的 Channel 所有权模型
+
+**进一步阅读：**
+
+- [goroutine 泄漏与 data race：定位与修复](./03-goroutine-leak-and-data-race.md)
+
+::: tip 一句话收口
+`接口表示决定运行时包装，逃逸分析决定去栈还是堆，分配器决定堆上怎么拿内存，GC 决定何时回收，内存模型决定并发下写入何时可见。`
+:::

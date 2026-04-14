@@ -55,7 +55,7 @@ PostgreSQL 专题最容易先散掉的，通常不是单个知识点，而是三
 
 - [pgx：PostgreSQL 原生驱动（源码精读）](/golang/guide/source-reading/pgx-driver)
 - [database/sql：高级事务与批量插入（源码精读）](/golang/guide/source-reading/database-sql-advanced)
-- [高并发支付系统专题整理](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
+- [高并发支付系统专题整理](/architecture/payment/high-concurrency-notes)
 - [etcd 专题](/etcd/)
 - [Redis 专题](/redis/)
 - [MySQL 专题](/mysql/)

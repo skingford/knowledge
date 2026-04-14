@@ -26,6 +26,7 @@ outline: false
 | 想找靠谱的 Go 第三方库 | [Go 优秀第三方库专题](./excellent-open-source.md) | 按并发、Web、数据访问、CLI、日志和测试分类整理 |
 | 想直接读 runtime / 标准库源码 | [Go 源码阅读学习主线](./guide/source-reading/learning-path.md) | 统一收口源码阅读路线、方法和资料 |
 | 想准备面试或做能力自检 | [Go 能力自检与面试准备导航](./interview-prep.md) | 题库、代码片段、专题回查集中在这里 |
+| 想把运行时内存主线讲顺 | [Go 运行时内存主线：接口表示、逃逸分析、GC 与内存模型](./guide/02-runtime-memory-lifecycle.md) | 适合把接口表示、逃逸分析、栈与堆、GC 和可见性串成一条线 |
 | 想补 `database/sql` 与连接池 | [database/sql 与连接池](./guide/06-database-sql-and-connection.md) | Go 标准库数据库接入与池化配置 |
 | 想补设计、安全、容器化和代码生成 | [进阶专题](./guide/10-advanced-topics.md) | 统一收口 `10-*` 系列专题入口 |
 | 想补线上排障 | [Pprof 排障指南](./pprof-troubleshooting-guide.md) | 先从 profile 和 trace 的实操路径开始 |
@@ -34,6 +35,7 @@ outline: false
 
 ## 目录结构
 
+::: details 点击展开代码：目录结构
 ```text
 golang/
 ├── index.md                        目录总入口
@@ -50,6 +52,7 @@ golang/
 │   ├── legacy/                     旧 runtime 入口兼容页
 │   └── source-reading/             源码精读模块
 ```
+:::
 
 ## 先看哪几类文档
 
@@ -58,6 +61,7 @@ golang/
 适合系统推进的人，重点看 `guide/01` 到 `guide/10`。
 
 - [语言基础深化](./guide/01-language-fundamentals.md)
+- [Go 运行时内存主线：接口表示、逃逸分析、GC 与内存模型](./guide/02-runtime-memory-lifecycle.md)
 - [并发编程](./guide/03-concurrency.md)
 - [工程实践](./guide/05-engineering-practices.md)
 - [数据库与缓存](./guide/06-database-cache.md)

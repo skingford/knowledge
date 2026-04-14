@@ -101,6 +101,7 @@ Type 和 Value 职责分工
 
 ### 类型检查与遍历结构体
 
+::: details 点击展开代码：类型检查与遍历结构体
 ```go
 func printStruct(v any) {
     t := reflect.TypeOf(v)
@@ -141,9 +142,11 @@ type User struct {
 // field: Name, tag: name, value: Alice
 // field: Age,  tag: age,  value: 30
 ```
+:::
 
 ### 通用 setter（reflect 实现）
 
+::: details 点击展开代码：通用 setter（reflect 实现）
 ```go
 func setField(obj any, fieldName string, value any) error {
     v := reflect.ValueOf(obj)
@@ -168,9 +171,11 @@ func setField(obj any, fieldName string, value any) error {
     return nil
 }
 ```
+:::
 
 ### 函数动态调用
 
+::: details 点击展开代码：函数动态调用
 ```go
 func callFunc(fn any, args ...any) []any {
     v := reflect.ValueOf(fn)
@@ -194,6 +199,7 @@ add := func(a, b int) int { return a + b }
 result := callFunc(add, 3, 4)
 fmt.Println(result[0]) // 7
 ```
+:::
 
 ---
 

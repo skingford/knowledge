@@ -50,6 +50,7 @@ OpenTelemetry Go 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // otel/trace/span.go（简化）
 type Span interface {
@@ -65,6 +66,7 @@ type Span interface {
 // 上下文传播：Span 通过 context 在调用链中传递
 // otel.Tracer("name").Start(ctx, "operation") → 从 ctx 提取父 Span
 ```
+:::
 
 ---
 
@@ -72,6 +74,7 @@ type Span interface {
 
 ### 初始化 TracerProvider（程序入口）
 
+::: details 点击展开代码：初始化 TracerProvider（程序入口）
 ```go
 import (
     "go.opentelemetry.io/otel"
@@ -128,9 +131,11 @@ func initTracer(ctx context.Context) (func(), error) {
     }, nil
 }
 ```
+:::
 
 ### 手动创建 Span
 
+::: details 点击展开代码：手动创建 Span
 ```go
 // 获取 tracer（通常在包级别定义）
 var tracer = otel.Tracer("github.com/example/app/user")
@@ -183,9 +188,11 @@ func (s *UserService) GetUser(ctx context.Context, userID int64) (*User, error) 
     return user, nil
 }
 ```
+:::
 
 ### HTTP 服务器自动插桩
 
+::: details 点击展开代码：HTTP 服务器自动插桩
 ```go
 import (
     "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -229,6 +236,7 @@ func handleGetUser(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(user)
 }
 ```
+:::
 
 这里 `r.Context()` 的语义要特别清楚：
 
@@ -238,6 +246,7 @@ func handleGetUser(w http.ResponseWriter, r *http.Request) {
 
 ### 请求结束后的异步任务：不要继续把后台 Span 挂在请求 Span 下面
 
+::: details 点击展开代码：请求结束后的异步任务：不要继续把后台 Span 挂在请求 Span 下面
 ```go
 func handleCreateAudit(w http.ResponseWriter, r *http.Request) {
     // 在请求阶段先提取需要保留的链路关联信息
@@ -263,6 +272,7 @@ func handleCreateAudit(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusAccepted)
 }
 ```
+:::
 
 这段代码的边界是：
 
@@ -272,6 +282,7 @@ func handleCreateAudit(w http.ResponseWriter, r *http.Request) {
 
 ### gRPC 自动插桩
 
+::: details 点击展开代码：gRPC 自动插桩
 ```go
 import (
     "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -293,9 +304,11 @@ conn, _ := grpc.NewClient(target,
 // rpc.grpc.status_code = "OK"
 // net.peer.addr = "127.0.0.1:50051"
 ```
+:::
 
 ### 关联日志与 Trace
 
+::: details 点击展开代码：关联日志与 Trace
 ```go
 import "go.opentelemetry.io/otel/trace"
 
@@ -321,9 +334,11 @@ func logWithTrace(ctx context.Context, msg string, args ...any) {
 // 日志中有 trace_id → 点击跳转 Tempo 查看链路
 // Tempo 中点击 Span → 跳转 Loki 查看对应时间段日志
 ```
+:::
 
 ### 采样策略
 
+::: details 点击展开代码：采样策略
 ```go
 // 生产采样策略：根据流量动态调整
 type adaptiveSampler struct {
@@ -349,6 +364,7 @@ sampler := sdktrace.ParentBased(
     sdktrace.TraceIDRatioBased(0.1), // 根 Span 10% 采样
 )
 ```
+:::
 
 ---
 

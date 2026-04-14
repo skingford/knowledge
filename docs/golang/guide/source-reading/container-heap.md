@@ -50,6 +50,7 @@ container 包全景
 
 ## 一、heap.Interface
 
+::: details 点击展开代码：一、heap.Interface
 ```go
 // src/container/heap/heap.go
 // heap.Interface 需要实现：
@@ -64,11 +65,13 @@ type Interface interface {
 // - Min-Heap（最小堆）：return h[i] < h[j]   ← 默认
 // - Max-Heap（最大堆）：return h[i] > h[j]
 ```
+:::
 
 ---
 
 ## 二、核心算法
 
+::: details 点击展开代码：二、核心算法
 ```go
 // src/container/heap/heap.go（完整实现，约 100 行）
 
@@ -118,6 +121,7 @@ func down(h Interface, i0, n int) bool {
     return i > i0
 }
 ```
+:::
 
 ---
 
@@ -125,6 +129,7 @@ func down(h Interface, i0, n int) bool {
 
 ### 最小整数堆
 
+::: details 点击展开代码：最小整数堆
 ```go
 // 最简单的整数最小堆
 type MinHeap []int
@@ -151,9 +156,11 @@ func main() {
     fmt.Println(heap.Pop(h))        // 2
 }
 ```
+:::
 
 ### 优先队列（带优先级的任务调度）
 
+::: details 点击展开代码：优先队列（带优先级的任务调度）
 ```go
 type Task struct {
     name     string
@@ -212,9 +219,11 @@ func main() {
     // [10] 低优先级任务
 }
 ```
+:::
 
 ### 最大堆（Top-K 问题）
 
+::: details 点击展开代码：最大堆（Top-K 问题）
 ```go
 // 求数组中最大的 K 个数（用最小堆维护大小为 K 的窗口）
 func topK(nums []int, k int) []int {
@@ -258,9 +267,11 @@ func mergeKLists(lists []*ListNode) *ListNode {
     return dummy.Next
 }
 ```
+:::
 
 ### 时间轮（定时任务调度）
 
+::: details 点击展开代码：时间轮（定时任务调度）
 ```go
 // 用最小堆实现简易定时器（按触发时间排序）
 type Timer struct {
@@ -310,6 +321,7 @@ func (s *Scheduler) Run(ctx context.Context) {
     }
 }
 ```
+:::
 
 ---
 

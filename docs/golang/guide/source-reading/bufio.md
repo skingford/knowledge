@@ -42,6 +42,7 @@ bufio 包全景
 
 ## 一、bufio.Reader 结构
 
+::: details 点击展开代码：一、bufio.Reader 结构
 ```go
 // src/bufio/bufio.go
 type Reader struct {
@@ -53,6 +54,7 @@ type Reader struct {
     lastRuneSize int           // 上次读取的 rune 大小（用于 UnreadRune）
 }
 ```
+:::
 
 ```
 Reader 缓冲区状态示意
@@ -108,6 +110,7 @@ bufio.Reader.Read 三条路径
 
 ## 二、bufio.Scanner 与 SplitFunc
 
+::: details 点击展开代码：二、bufio.Scanner 与 SplitFunc
 ```go
 // src/bufio/scan.go
 type Scanner struct {
@@ -132,6 +135,7 @@ type SplitFunc func(
     err error,
 )
 ```
+:::
 
 ```
 内置 SplitFunc
@@ -147,6 +151,7 @@ type SplitFunc func(
 
 ### ScanLines 实现原理
 
+::: details 点击展开代码：ScanLines 实现原理
 ```go
 // src/bufio/scan.go
 func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -165,11 +170,13 @@ func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
     return 0, nil, nil
 }
 ```
+:::
 
 ---
 
 ## 三、bufio.Writer
 
+::: details 点击展开代码：三、bufio.Writer
 ```go
 type Writer struct {
     err error
@@ -178,6 +185,7 @@ type Writer struct {
     wr  io.Writer // 底层 Writer
 }
 ```
+:::
 
 ```
 Writer.Write 策略
@@ -208,6 +216,7 @@ Writer.Write 策略
 
 ### 逐行读取文件（Scanner 最佳实践）
 
+::: details 点击展开代码：逐行读取文件（Scanner 最佳实践）
 ```go
 func countLines(path string) (int, error) {
     f, err := os.Open(path)
@@ -229,9 +238,11 @@ func countLines(path string) (int, error) {
     return count, scanner.Err() // 注意：检查迭代错误
 }
 ```
+:::
 
 ### 自定义 SplitFunc（按逗号分割）
 
+::: details 点击展开代码：自定义 SplitFunc（按逗号分割）
 ```go
 func scanCSVFields(data []byte, atEOF bool) (advance int, token []byte, err error) {
     if atEOF && len(data) == 0 {
@@ -259,9 +270,11 @@ func parseCSVLine(line string) []string {
 
 // "Alice, 30, alice@example.com" → ["Alice", "30", "alice@example.com"]
 ```
+:::
 
 ### 自定义 SplitFunc：按固定字节边界分割
 
+::: details 点击展开代码：自定义 SplitFunc：按固定字节边界分割
 ```go
 // 场景：网络协议，每个消息以 4 字节长度头开头
 func scanLengthPrefixed(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -291,9 +304,11 @@ func readMessages(conn net.Conn) {
     }
 }
 ```
+:::
 
 ### ReadLine vs ReadString：正确选择
 
+::: details 点击展开代码：ReadLine vs ReadString：正确选择
 ```go
 // ReadLine：零拷贝，但需处理超长行（isPrefix=true 时行未读完）
 func readLargeLines(r io.Reader) {
@@ -353,9 +368,11 @@ func scanLines(r io.Reader) {
     }
 }
 ```
+:::
 
 ### 高效写入日志（Writer + Flush）
 
+::: details 点击展开代码：高效写入日志（Writer + Flush）
 ```go
 // 场景：批量写入日志文件（减少系统调用）
 type BufferedLogger struct {
@@ -395,9 +412,11 @@ func (l *BufferedLogger) StartAutoFlush(interval time.Duration) {
     }()
 }
 ```
+:::
 
 ### Peek：预读不消费（协议解析）
 
+::: details 点击展开代码：Peek：预读不消费（协议解析）
 ```go
 // 判断数据格式（JSON 或 MsgPack）而不消费数据
 func detectFormat(r io.Reader) string {
@@ -430,9 +449,11 @@ func detectBOM(r io.Reader) (io.Reader, string) {
     }
 }
 ```
+:::
 
 ### ReadWriter：双向缓冲（网络协议实现）
 
+::: details 点击展开代码：ReadWriter：双向缓冲（网络协议实现）
 ```go
 // 场景：实现简单文本协议客户端（如 Redis RESP 协议）
 type ProtocolConn struct {
@@ -464,6 +485,7 @@ func (c *ProtocolConn) ReadLine() (string, error) {
     return strings.TrimRight(line, "\r\n"), err
 }
 ```
+:::
 
 ---
 

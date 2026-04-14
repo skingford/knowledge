@@ -136,6 +136,7 @@ newobject(size) 分配流程
 
 ### sync.Pool 复用 buffer
 
+::: details 点击展开代码：sync.Pool 复用 buffer
 ```go
 var bufPool = sync.Pool{
     New: func() any {
@@ -157,11 +158,13 @@ func encode(v any) ([]byte, error) {
     return result, nil
 }
 ```
+:::
 
 ### 减少逃逸（栈分配）
 
 <GoRuntimeDiagram kind="stack-vs-heap" />
 
+::: details 点击展开代码：减少逃逸（栈分配）
 ```go
 // 逃逸到堆（慢）
 func badAlloc() *[1024]int {
@@ -178,9 +181,11 @@ func goodAlloc(buf []int) {
 // 验证逃逸
 // go build -gcflags='-m' ./...
 ```
+:::
 
 ### 内存统计
 
+::: details 点击展开代码：内存统计
 ```go
 func printMemUsage() {
     var m runtime.MemStats
@@ -192,6 +197,7 @@ func printMemUsage() {
     fmt.Printf("HeapObjects= %v\n", m.HeapObjects)        // 存活对象数
 }
 ```
+:::
 
 ---
 

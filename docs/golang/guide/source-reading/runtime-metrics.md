@@ -53,6 +53,7 @@ runtime/metrics 体系（Go 1.16+）
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/runtime/metrics/sample.go（简化）
 
@@ -76,6 +77,7 @@ func Read(samples []Sample) {
     runtime_readMetrics(&samples[0], len(samples), cap(samples))
 }
 ```
+:::
 
 <GoRuntimeDiagram kind="metrics-read-flow" />
 
@@ -85,6 +87,7 @@ func Read(samples []Sample) {
 
 ### 枚举所有可用指标
 
+::: details 点击展开代码：枚举所有可用指标
 ```go
 import "runtime/metrics"
 
@@ -103,9 +106,11 @@ func listAllMetrics() {
 // /sched/latencies:seconds                         KindFloat64Histogram
 // ...
 ```
+:::
 
 ### 基础指标采集
 
+::: details 点击展开代码：基础指标采集
 ```go
 func collectMetrics() {
     // 预定义感兴趣的指标
@@ -132,9 +137,11 @@ func collectMetrics() {
     }
 }
 ```
+:::
 
 ### 读取调度延迟直方图
 
+::: details 点击展开代码：读取调度延迟直方图
 ```go
 // GC 和调度延迟直方图：P99/P95 延迟分析
 func analyzeLatency() {
@@ -180,9 +187,11 @@ func percentile(h *metrics.Float64Histogram, p float64) float64 {
     return 0
 }
 ```
+:::
 
 ### 与 Prometheus 集成
 
+::: details 点击展开代码：与 Prometheus 集成
 ```go
 import (
     "runtime/metrics"
@@ -245,9 +254,11 @@ func (c *GoRuntimeCollector) Collect(ch chan<- prometheus.Metric) {
     }
 }
 ```
+:::
 
 ### 定期指标上报（生产监控）
 
+::: details 点击展开代码：定期指标上报（生产监控）
 ```go
 // 定期采集 runtime 指标并写入 Prometheus / StatsD
 func startMetricsReporter(ctx context.Context, interval time.Duration) {
@@ -290,6 +301,7 @@ func reportToMonitoring(samples []metrics.Sample) {
     }
 }
 ```
+:::
 
 ---
 

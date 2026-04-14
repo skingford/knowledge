@@ -114,6 +114,7 @@ CAS 语义
 
 ## 三、atomic.Value 实现
 
+::: details 点击展开代码：三、atomic.Value 实现
 ```go
 // src/sync/atomic/value.go
 type Value struct {
@@ -151,6 +152,7 @@ func (v *Value) Store(val any) {
     }
 }
 ```
+:::
 
 ```
 atomic.Value 关键约束
@@ -203,6 +205,7 @@ atomic.Value 关键约束
 
 ### 原子计数器
 
+::: details 点击展开代码：原子计数器
 ```go
 // 推荐：使用泛型类型
 type Counter struct {
@@ -220,9 +223,11 @@ go func() { hits.Inc() }()
 go func() { hits.Inc() }()
 fmt.Println(hits.Value())
 ```
+:::
 
 ### atomic.Value 热更新配置
 
+::: details 点击展开代码：atomic.Value 热更新配置
 ```go
 type Config struct {
     MaxConns int
@@ -247,9 +252,11 @@ func (s *Server) Handle() {
     _ = cfg.MaxConns
 }
 ```
+:::
 
 ### CAS 实现无锁自旋锁
 
+::: details 点击展开代码：CAS 实现无锁自旋锁
 ```go
 type SpinLock struct {
     locked atomic.Int32
@@ -265,9 +272,11 @@ func (s *SpinLock) Unlock() {
     s.locked.Store(0)
 }
 ```
+:::
 
 ### atomic.Pointer 无锁链表节点替换
 
+::: details 点击展开代码：atomic.Pointer 无锁链表节点替换
 ```go
 type Node struct {
     val  int
@@ -290,6 +299,7 @@ func (s *Stack) Push(val int) {
     }
 }
 ```
+:::
 
 ---
 

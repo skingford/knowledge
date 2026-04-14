@@ -57,6 +57,7 @@ net/netip 体系（Go 1.18+）
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/netip/netip.go（简化）
 
@@ -88,6 +89,7 @@ func (p Prefix) Contains(ip Addr) bool {
         ip.addr.shiftRight(128-bits) == pp.addr.shiftRight(128-bits)
 }
 ```
+:::
 
 ---
 
@@ -95,6 +97,7 @@ func (p Prefix) Contains(ip Addr) bool {
 
 ### 基础解析与操作
 
+::: details 点击展开代码：基础解析与操作
 ```go
 import "net/netip"
 
@@ -122,9 +125,11 @@ func basicOps() {
     fmt.Println(mapped.Unmap())    // 192.168.1.1（转为纯 IPv4）
 }
 ```
+:::
 
 ### 作为 Map Key（零分配路由表）
 
+::: details 点击展开代码：作为 Map Key（零分配路由表）
 ```go
 // ✅ Addr 可直接用作 map key（net.IP 不行）
 type RouteTable struct {
@@ -163,9 +168,11 @@ func deduplicateIPs(addrs []netip.Addr) []netip.Addr {
     return result
 }
 ```
+:::
 
 ### CIDR 操作
 
+::: details 点击展开代码：CIDR 操作
 ```go
 func cidrOps() {
     prefix, _ := netip.ParsePrefix("192.168.1.0/24")
@@ -189,9 +196,11 @@ func cidrOps() {
     }
 }
 ```
+:::
 
 ### AddrPort（地址+端口）
 
+::: details 点击展开代码：AddrPort（地址+端口）
 ```go
 // AddrPort 合并 IP 和端口（替代 net.TCPAddr 中的字符串解析）
 func addrPortOps() {
@@ -215,9 +224,11 @@ func addrPortOps() {
     fmt.Println(ap2) // 127.0.0.1:9090
 }
 ```
+:::
 
 ### 与旧 net.IP 互转
 
+::: details 点击展开代码：与旧 net.IP 互转
 ```go
 import (
     "net"
@@ -255,9 +266,11 @@ func clientIP(conn net.Conn) netip.Addr {
     return ap.Addr().Unmap() // 统一为纯 IPv4（如果是 IPv4-in-IPv6）
 }
 ```
+:::
 
 ### HTTP 请求 IP 提取
 
+::: details 点击展开代码：HTTP 请求 IP 提取
 ```go
 // 从 HTTP 请求获取真实客户端 IP（处理代理）
 func realClientIP(r *http.Request) netip.Addr {
@@ -284,6 +297,7 @@ func realClientIP(r *http.Request) netip.Addr {
     return ap.Addr().Unmap()
 }
 ```
+:::
 
 ---
 

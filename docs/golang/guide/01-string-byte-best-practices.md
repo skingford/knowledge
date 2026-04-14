@@ -55,6 +55,7 @@ search: false
 
 示例：
 
+::: details 点击展开代码：2. 底层类型与编码语义
 ```go
 package main
 
@@ -75,6 +76,7 @@ func main() {
 	}
 }
 ```
+:::
 
 结论很直接：
 
@@ -90,9 +92,11 @@ func main() {
 
 如果只是偶尔要改几个字符，数据量也不大，直接：
 
+::: details 点击展开代码：偶尔修改、数据量小：直接 []byte(s)
 ```go
 b := []byte(s)
 ```
+:::
 
 拷贝就拷贝了，成本通常很低，换来的是简单、明确和安全。不要为了省这一点拷贝，把代码搞成依赖底层内存布局的危险写法。
 
@@ -100,12 +104,14 @@ b := []byte(s)
 
 如果数据在处理中会经历多次拼接、裁剪、替换、编码或协议解析，那就应该从数据源头开始一直使用 `[]byte`，只在最终输出、日志展示、JSON 序列化或接口返回时再转一次 string：
 
+::: details 点击展开代码：频繁拼接或修改：全过程保持 []byte
 ```go
 buf := make([]byte, 0, 1024)
 buf = append(buf, 'O', 'K', ':', ' ')
 buf = append(buf, payload...)
 result := string(buf)
 ```
+:::
 
 这比“先转成 string，再转回 []byte，再转回 string”更符合 Go 的数据流设计，也更容易控制内存分配。
 
@@ -113,6 +119,7 @@ result := string(buf)
 
 如果目标就是得到一个字符串，并且过程主要是拼接文本，优先使用 `strings.Builder`：
 
+::: details 点击展开代码：高频构建字符串：优先 strings.Builder
 ```go
 package main
 
@@ -126,6 +133,7 @@ func buildLine(name string) string {
 	return b.String()
 }
 ```
+:::
 
 `strings.Builder` 的设计目标就是高效构建最终 string，比循环里用 `+` 更稳定，也比手写很多中间 string 更省分配。
 
@@ -147,6 +155,7 @@ func buildLine(name string) string {
 
 错误示例：
 
+::: details 点击展开代码：4. 如何修改中文 string
 ```go
 package main
 
@@ -159,9 +168,11 @@ func main() {
 	fmt.Println(string(b)) // 乱码或非法 UTF-8
 }
 ```
+:::
 
 ### 正确做法：转成 `[]rune` 后按字符修改
 
+::: details 点击展开代码：正确做法：转成 []rune 后按字符修改
 ```go
 package main
 
@@ -178,6 +189,7 @@ func main() {
 	fmt.Println(result) // 您好，Go
 }
 ```
+:::
 
 这里的关键是：
 
@@ -189,6 +201,7 @@ func main() {
 
 如果不是按索引逐字符修改，而是做语义化替换，直接用标准库字符串函数更简单：
 
+::: details 点击展开代码：如果只是替换某个中文子串
 ```go
 package main
 
@@ -203,6 +216,7 @@ func main() {
 	fmt.Println(s) // 你好，Go
 }
 ```
+:::
 
 也就是说：
 
@@ -215,6 +229,7 @@ func main() {
 
 修改中文之外，另一个常见坑是“截取中文”。如果直接按字节切：
 
+::: details 点击展开代码：5. 如何安全截取中文字符串
 ```go
 package main
 
@@ -225,11 +240,13 @@ func main() {
 	fmt.Println(s[:4]) // 可能截断在字符中间
 }
 ```
+:::
 
 这类写法不可靠，因为 UTF-8 的一个中文字符通常占 3 个字节，切片边界如果刚好落在字符中间，就会得到半个字符。
 
 ### 方式一：按字符数截取，用 `[]rune`
 
+::: details 点击展开代码：方式一：按字符数截取，用 []rune
 ```go
 package main
 
@@ -241,11 +258,13 @@ func main() {
 	fmt.Println(string(runes[:3])) // 你好，
 }
 ```
+:::
 
 如果你的需求是“取前 10 个字符”“截到第 N 个字符”，这是最直接、最稳妥的方案。
 
 ### 方式二：顺序扫描但不想整体转 `[]rune`，用 `utf8`
 
+::: details 点击展开代码：方式二：顺序扫描但不想整体转 []rune，用 utf8
 ```go
 package main
 
@@ -271,6 +290,7 @@ func main() {
 	fmt.Println(utf8.RuneCountInString(s))    // 5
 }
 ```
+:::
 
 这种方式适合只做统计、扫描、前缀截取，不一定要把整个字符串转成 `[]rune`。
 
@@ -329,6 +349,7 @@ func main() {
 
 例如，想高效遍历字符串中的字符但不想整体转成 `[]rune`，可以直接逐个解码：
 
+::: details 点击展开代码：7. Builder、Buffer 与 utf8 包怎么选
 ```go
 package main
 
@@ -346,6 +367,7 @@ func main() {
 	}
 }
 ```
+:::
 
 这种方式的优势是：你按需扫描，不一定要先分配整份 `[]rune`。
 
@@ -357,6 +379,7 @@ func main() {
 
 看这段代码：
 
+::: details 点击展开代码：8. for range 的“智能解码”
 ```go
 package main
 
@@ -369,15 +392,18 @@ func main() {
 	}
 }
 ```
+:::
 
 输出：
 
+::: details 点击展开代码：8. for range 的“智能解码”
 ```text
 索引: 0, 字符: G
 索引: 1, 字符: o
 索引: 2, 字符: 语
 索引: 5, 字符: 言
 ```
+:::
 
 这里最容易让人误解的是索引：
 
@@ -414,10 +440,12 @@ func main() {
 - `s[:3]` 会得到 `"Go"` 再加上 `"语"` 的第一个字节，结果是非法 UTF-8 或乱码
 - 如果你想取前 3 个字符，应该先转 `[]rune`
 
+::: details 点击展开代码：这也是为什么不能直接写 s[:3]
 ```go
 runes := []rune("Go语言")
 fmt.Println(string(runes[:3])) // Go语
 ```
+:::
 
 这是 `for range`、中文截取和 `[]rune` 必须连起来理解的典型点。
 
@@ -431,6 +459,7 @@ fmt.Println(string(runes[:3])) // Go语
 
 把 `Builder` 的核心思想简化一下，大致可以理解成下面这样：
 
+::: details 点击展开代码：9. strings.Builder 的零拷贝设计
 ```go
 type Builder struct {
 	addr *Builder
@@ -446,6 +475,7 @@ func (b *Builder) String() string {
 	return unsafe.String(unsafe.SliceData(b.buf), len(b.buf))
 }
 ```
+:::
 
 重点不在于逐行背源码，而在于理解它为什么“这样做依然安全”。
 
@@ -463,10 +493,12 @@ func (b *Builder) String() string {
 
 你无法像下面这样拿到 `Builder` 内部切片并修改前面的内容：
 
+::: details 点击展开代码：3. 为什么这不会破坏 string 的不可变性
 ```go
 // 这是做不到的，不存在这种官方暴露方式
 // b.buf[0] = 'X'
 ```
+:::
 
 对外你只能继续调用 `WriteString` / `WriteByte` 之类的方法，把新内容追加到尾部。
 
@@ -499,17 +531,21 @@ func (b *Builder) String() string {
 
 传统写法通常是：
 
+::: details 点击展开代码：1. 两种写法的差别
 ```go
 b = append(b, []byte(s)...)
 ```
+:::
 
 这能工作，但问题在于 `[]byte(s)` 往往需要先构造一份临时字节切片，然后这些字节再被 `append` 拷贝进目标切片。中间多了一次不必要的转换和中转。
 
 Go 还允许你直接写：
 
+::: details 点击展开代码：1. 两种写法的差别
 ```go
 b = append(b, s...)
 ```
+:::
 
 这里的 `s` 是 `string`，不是 `[]byte`，但这在 Go 里是合法的。
 
@@ -558,11 +594,13 @@ b = append(b, s...)
 
 例如：
 
+::: details 点击展开代码：len(s) 返回的是字符数吗？
 ```go
 s := "你好"
 fmt.Println(len(s))         // 6
 fmt.Println(len([]rune(s))) // 2
 ```
+:::
 
 UTF-8 下中文通常占 3 个字节，所以字符数要看 `rune` 数量，而不是 `len(string)`。
 
@@ -596,6 +634,7 @@ UTF-8 下中文通常占 3 个字节，所以字符数要看 `rune` 数量，而
 
 下面是一个可以直接放进 `_test.go` 里运行的例子：
 
+::: details 点击展开代码：12. Benchmark 示例：Builder、Buffer、加号拼接
 ```go
 package bench
 
@@ -642,12 +681,15 @@ func BenchmarkBytesBuffer(b *testing.B) {
 	}
 }
 ```
+:::
 
 运行方式：
 
+::: details 点击展开代码：12. Benchmark 示例：Builder、Buffer、加号拼接
 ```bash
 go test -bench=. -benchmem
 ```
+:::
 
 通常你会看到这样的趋势：
 

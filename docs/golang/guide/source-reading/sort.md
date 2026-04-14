@@ -84,6 +84,7 @@ pdqsort = pattern-defeating quicksort（模式消除快速排序）
 
 ### ninther 主元选择
 
+::: details 点击展开代码：ninther 主元选择
 ```go
 // src/sort/zsortinterface.go（自动生成）
 // ninther：9 点取中位数，更好的主元估计
@@ -97,6 +98,7 @@ func ninther(data Interface, a, b, c, d, e, f, g, h, i int) int {
 }
 // 对于 n >= 50 的切片使用，更准确地选出接近中位数的主元
 ```
+:::
 
 ---
 
@@ -128,6 +130,7 @@ func ninther(data Interface, a, b, c, d, e, f, g, h, i int) int {
 
 ## 三、二分查找
 
+::: details 点击展开代码：三、二分查找
 ```go
 // sort.Search：通用二分（最低层原语）
 // 返回最小 i 使 f(i) == true，要求 f 单调（false...false,true...true）
@@ -144,6 +147,7 @@ i, found := sort.Find(len(a), func(i int) int {
 // slices.BinarySearch（Go 1.21+）：最简洁
 i, found := slices.BinarySearch(sortedSlice, target)
 ```
+:::
 
 ---
 
@@ -151,6 +155,7 @@ i, found := slices.BinarySearch(sortedSlice, target)
 
 ### 实现 sort.Interface（多字段排序）
 
+::: details 点击展开代码：实现 sort.Interface（多字段排序）
 ```go
 type Employee struct {
     Name   string
@@ -172,9 +177,11 @@ func (s BySalaryThenName) Less(i, j int) bool {
 
 sort.Sort(BySalaryThenName(employees))
 ```
+:::
 
 ### slices.SortFunc（推荐，Go 1.21+）
 
+::: details 点击展开代码：slices.SortFunc（推荐，Go 1.21+）
 ```go
 import "slices"
 import "cmp"
@@ -195,9 +202,11 @@ slices.SortStableFunc(employees, func(a, b Employee) int {
     return cmp.Compare(a.Department, b.Department)
 })
 ```
+:::
 
 ### 高效查找（二分）
 
+::: details 点击展开代码：高效查找（二分）
 ```go
 // 有序切片中查找
 sorted := []int{1, 3, 5, 7, 9, 11}
@@ -214,9 +223,11 @@ if idx < len(sorted) && sorted[idx] == 7 {
 idx, found := slices.BinarySearch(sorted, 7)
 fmt.Println(idx, found) // 3 true
 ```
+:::
 
 ### sort.Slice 快速排序
 
+::: details 点击展开代码：sort.Slice 快速排序
 ```go
 // 不需要实现接口，适合一次性排序
 people := []struct{ Name string; Age int }{
@@ -228,9 +239,11 @@ sort.Slice(people, func(i, j int) bool {
 })
 // [{Bob 25} {Alice 30} {Carol 35}]
 ```
+:::
 
 ### 自定义有序集合（利用 sort.Search 实现插入）
 
+::: details 点击展开代码：自定义有序集合（利用 sort.Search 实现插入）
 ```go
 // 有序切片的有序插入（保持排序）
 func insertSorted(s []int, v int) []int {
@@ -245,6 +258,7 @@ func insertSorted(s []int, v int) []int {
 s := []int{1, 3, 5, 7}
 s = insertSorted(s, 4) // [1 3 4 5 7]
 ```
+:::
 
 ### Benchmark：sort.Sort vs sort.Slice vs slices.Sort
 

@@ -43,6 +43,7 @@ testing 包架构
 
 ## 一、testing.T 结构
 
+::: details 点击展开代码：一、testing.T 结构
 ```go
 // src/testing/testing.go（简化）
 type common struct {
@@ -73,6 +74,7 @@ type T struct {
     context    *testContext   // 控制并行度的调度器
 }
 ```
+:::
 
 ---
 
@@ -102,6 +104,7 @@ t.Run 执行流程
 
 <GoEngineeringDiagram kind="testing-run-flow" />
 
+::: details 点击展开代码：二、子测试机制（t.Run）
 ```go
 // 示例：并行子测试正确写法
 func TestParallel(t *testing.T) {
@@ -122,11 +125,13 @@ func TestParallel(t *testing.T) {
     }
 }
 ```
+:::
 
 ---
 
 ## 三、Benchmark 实现
 
+::: details 点击展开代码：三、Benchmark 实现
 ```go
 // src/testing/benchmark.go
 type B struct {
@@ -146,6 +151,7 @@ type B struct {
     memStats      MemStats      // b.ReportAllocs 用
 }
 ```
+:::
 
 ```
 Benchmark 自动调整 N 的算法
@@ -175,6 +181,7 @@ Benchmark 自动调整 N 的算法
 
 ## 四、Fuzzing（模糊测试）
 
+::: details 点击展开代码：四、Fuzzing（模糊测试）
 ```go
 // src/testing/fuzz.go
 type F struct {
@@ -185,6 +192,7 @@ type F struct {
     fuzzCalled  bool
 }
 ```
+:::
 
 ```
 Fuzz 执行模式
@@ -211,6 +219,7 @@ Fuzz 执行模式
 
 ### 表驱动测试（标准范式）
 
+::: details 点击展开代码：表驱动测试（标准范式）
 ```go
 func TestAdd(t *testing.T) {
     tests := []struct {
@@ -234,9 +243,11 @@ func TestAdd(t *testing.T) {
     }
 }
 ```
+:::
 
 ### testing.Helper()：准确定位错误行
 
+::: details 点击展开代码：testing.Helper()：准确定位错误行
 ```go
 // 辅助函数必须调用 t.Helper()，否则错误会指向辅助函数内部而非调用处
 func assertEqual(t *testing.T, got, want any) {
@@ -250,9 +261,11 @@ func TestSomething(t *testing.T) {
     assertEqual(t, compute(), 42) // 错误会指向这一行（而非 assertEqual 内部）
 }
 ```
+:::
 
 ### testing.Cleanup：自动资源清理
 
+::: details 点击展开代码：testing.Cleanup：自动资源清理
 ```go
 func TestWithDB(t *testing.T) {
     db := setupTestDB(t)
@@ -274,9 +287,11 @@ func setupTestDB(t *testing.T) *TestDB {
     return db
 }
 ```
+:::
 
 ### Golden File 测试（文本生成类测试）
 
+::: details 点击展开代码：Golden File 测试（文本生成类测试）
 ```go
 import (
     "flag"
@@ -334,9 +349,11 @@ func TestGenerateUserStruct(t *testing.T) {
 // 第一次运行：go test -run TestGenerateUserStruct -update
 // 后续运行：go test -run TestGenerateUserStruct（自动对比）
 ```
+:::
 
 ### 并行子测试（Table-Driven + Parallel + HTTP）
 
+::: details 点击展开代码：并行子测试（Table-Driven + Parallel + HTTP）
 ```go
 func TestHTTPHandler(t *testing.T) {
     tests := []struct {
@@ -383,9 +400,11 @@ func TestHTTPHandler(t *testing.T) {
     }
 }
 ```
+:::
 
 ### Benchmark 进阶技巧
 
+::: details 点击展开代码：Benchmark 进阶技巧
 ```go
 // 基础 Benchmark
 func BenchmarkJSONMarshal(b *testing.B) {
@@ -466,9 +485,11 @@ func BenchmarkConcurrentMap(b *testing.B) {
     })
 }
 ```
+:::
 
 ### Fuzz 测试
 
+::: details 点击展开代码：Fuzz 测试
 ```go
 // 测试 JSON 往返（Marshal/Unmarshal 一致性）
 func FuzzJSON(f *testing.F) {
@@ -494,9 +515,11 @@ func FuzzJSON(f *testing.F) {
     })
 }
 ```
+:::
 
 ### TestMain：全局 Setup/Teardown
 
+::: details 点击展开代码：TestMain：全局 Setup/Teardown
 ```go
 // 文件：main_test.go
 package integration_test
@@ -553,9 +576,11 @@ func TestMain(m *testing.M) {
     os.Exit(code)
 }
 ```
+:::
 
 ### t.Setenv 与 t.TempDir
 
+::: details 点击展开代码：t.Setenv 与 t.TempDir
 ```go
 func TestReadConfig(t *testing.T) {
     // t.Setenv：临时修改环境变量，测试结束后自动还原
@@ -600,9 +625,11 @@ func TestExportReport(t *testing.T) {
     }
 }
 ```
+:::
 
 ### 自定义 assert 辅助库
 
+::: details 点击展开代码：自定义 assert 辅助库
 ```go
 // 轻量断言辅助，无需引入第三方库
 func assertEqual[T comparable](t *testing.T, got, want T) {
@@ -634,9 +661,11 @@ func TestParseName(t *testing.T) {
     assertEqual(t, last, "Smith")
 }
 ```
+:::
 
 ### 使用 -cover 和 -cpuprofile
 
+::: details 点击展开代码：使用 -cover 和 -cpuprofile
 ```bash
 # 查看覆盖率
 go test ./... -cover
@@ -653,6 +682,7 @@ go tool pprof cpu.out
 go test -bench=. -memprofile=mem.out
 go tool pprof mem.out
 ```
+:::
 
 ---
 

@@ -38,6 +38,7 @@ flag 包架构
 
 ## 一、核心数据结构
 
+::: details 点击展开代码：一、核心数据结构
 ```go
 // src/flag/flag.go
 type Flag struct {
@@ -64,6 +65,7 @@ type Value interface {
     Set(string) error     // 从命令行字符串设置值
 }
 ```
+:::
 
 ---
 
@@ -109,6 +111,7 @@ flag.Parse() 完整流程
 
 ## 三、内置类型实现
 
+::: details 点击展开代码：三、内置类型实现
 ```go
 // bool flag 特殊处理（-verbose 等价于 -verbose=true）
 type boolValue bool
@@ -137,11 +140,13 @@ func (d *durationValue) Set(s string) error {
 // Duration → durationValue
 // TextVar → 实现 encoding.TextUnmarshaler 的任意类型（Go 1.19+）
 ```
+:::
 
 ---
 
 ## 四、ErrorHandling 模式
 
+::: details 点击展开代码：四、ErrorHandling 模式
 ```go
 const (
     ContinueOnError ErrorHandling = iota // 返回错误（适合库/子命令）
@@ -149,6 +154,7 @@ const (
     PanicOnError                         // panic（测试用）
 )
 ```
+:::
 
 ---
 
@@ -156,6 +162,7 @@ const (
 
 ### 基础 CLI 工具
 
+::: details 点击展开代码：基础 CLI 工具
 ```go
 package main
 
@@ -192,9 +199,11 @@ func main() {
     fmt.Println("files:", files)
 }
 ```
+:::
 
 ### 自定义 flag 类型（枚举）
 
+::: details 点击展开代码：自定义 flag 类型（枚举）
 ```go
 type logLevel int
 
@@ -235,11 +244,13 @@ var level logLevel = levelInfo
 flag.Var(&level, "level", "日志级别 (debug/info/warn/error)")
 // 使用：-level=warn
 ```
+:::
 
 ### 子命令模式（FlagSet）
 
 <GoEngineeringDiagram kind="flag-parse-flow" />
 
+::: details 点击展开代码：子命令模式（FlagSet）
 ```go
 func main() {
     if len(os.Args) < 2 {
@@ -273,9 +284,11 @@ func migrateCmd(args []string) {
     fmt.Printf("migrate from %s (dry=%v)\n", *dir, *dry)
 }
 ```
+:::
 
 ### 在测试中使用 flag
 
+::: details 点击展开代码：在测试中使用 flag
 ```go
 // flag 在 testing 包中也有使用：go test -run=TestFoo -v -count=1
 // 注意：测试中不应调用 flag.Parse()（已由测试框架完成）
@@ -298,9 +311,11 @@ func TestOutput(t *testing.T) {
 // 运行：go test -update  （更新 golden 文件）
 // 运行：go test          （对比 golden 文件）
 ```
+:::
 
 ### TextVar（Go 1.19+，对接 TextUnmarshaler）
 
+::: details 点击展开代码：TextVar（Go 1.19+，对接 TextUnmarshaler）
 ```go
 // 任何实现 encoding.TextUnmarshaler 的类型都可作为 flag
 type IPAddr net.IP
@@ -322,6 +337,7 @@ var addr IPAddr
 flag.TextVar(&addr, "addr", net.ParseIP("127.0.0.1"), "IP 地址")
 // 使用：-addr=192.168.1.1
 ```
+:::
 
 ---
 

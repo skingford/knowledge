@@ -51,6 +51,7 @@ io/fs 接口体系
 
 ## 一、核心接口定义
 
+::: details 点击展开代码：一、核心接口定义
 ```go
 // src/io/fs/fs.go
 
@@ -81,6 +82,7 @@ type DirEntry interface {
 // - 不能含 . 或 .. 组件
 // - "" 不合法，根目录用 "."
 ```
+:::
 
 ---
 
@@ -88,6 +90,7 @@ type DirEntry interface {
 
 <GoNetworkDiagram kind="walkdir-flow" />
 
+::: details 点击展开代码：二、WalkDir 实现
 ```go
 // src/io/fs/walk.go
 func WalkDir(fsys FS, root string, fn WalkDirFunc) error {
@@ -110,6 +113,7 @@ type WalkDirFunc func(path string, d DirEntry, err error) error
 // fs.SkipDir  ← 跳过当前目录（对文件则跳过剩余同级）
 // fs.SkipAll  ← 跳过全部剩余项（Go 1.20+）
 ```
+:::
 
 ---
 
@@ -117,6 +121,7 @@ type WalkDirFunc func(path string, d DirEntry, err error) error
 
 ### 统一接口：embed / os / 测试互换
 
+::: details 点击展开代码：统一接口：embed / os / 测试互换
 ```go
 // 定义接受 fs.FS 的函数（可测试、可嵌入、可真实文件系统）
 func loadConfig(fsys fs.FS) (*Config, error) {
@@ -144,9 +149,11 @@ testFS := fstest.MapFS{
 }
 cfg, _ = loadConfig(testFS)
 ```
+:::
 
 ### 遍历并过滤文件
 
+::: details 点击展开代码：遍历并过滤文件
 ```go
 func findMarkdown(fsys fs.FS) ([]string, error) {
     var files []string
@@ -178,9 +185,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### Sub：子目录视图
 
+::: details 点击展开代码：Sub：子目录视图
 ```go
 //go:embed static
 var staticFS embed.FS
@@ -196,9 +205,11 @@ http.Handle("/static/", http.StripPrefix("/static/",
     http.FileServer(http.FS(subFS)),
 ))
 ```
+:::
 
 ### 自定义 FS 实现（加密文件系统示例）
 
+::: details 点击展开代码：自定义 FS 实现（加密文件系统示例）
 ```go
 // 实现 fs.FS 包装真实文件系统，读取时解密
 type EncryptedFS struct {
@@ -241,9 +252,11 @@ func (d *decryptFile) Read(p []byte) (int, error) {
     return n, nil
 }
 ```
+:::
 
 ### fstest.MapFS 单元测试
 
+::: details 点击展开代码：fstest.MapFS 单元测试
 ```go
 func TestParseTemplates(t *testing.T) {
     // 完全内存 FS，无需 testdata 目录
@@ -268,6 +281,7 @@ func TestParseTemplates(t *testing.T) {
     // ... 继续测试模板渲染
 }
 ```
+:::
 
 ---
 

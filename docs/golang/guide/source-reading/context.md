@@ -45,6 +45,7 @@ context 包结构
 
 ## 一、Context 接口
 
+::: details 点击展开代码：一、Context 接口
 ```go
 // src/context/context.go
 type Context interface {
@@ -61,6 +62,7 @@ type Context interface {
     Value(key any) any
 }
 ```
+:::
 
 ---
 
@@ -182,10 +184,12 @@ valueCtx.Value(key) 查找链
 
 这就是为什么下面这种写法必须保留：
 
+::: details 点击展开代码：1. cancel() 必须调用
 ```go
 ctx, cancel := context.WithTimeout(parent, time.Second)
 defer cancel()
 ```
+:::
 
 如果不调用 `cancel()`：
 
@@ -225,6 +229,7 @@ defer cancel()
 
 推荐模式是定义私有类型作为 key，避免不同包之间碰撞：
 
+::: details 点击展开代码：4. WithValue 的 key 不要用普通字符串
 ```go
 type authKey struct{}
 
@@ -232,6 +237,7 @@ func WithAuthToken(ctx context.Context, token string) context.Context {
     return context.WithValue(ctx, authKey{}, token)
 }
 ```
+:::
 
 ### 5. 收到 `Done()` 后尽快返回，不要在取消分支里做重活
 
@@ -269,6 +275,7 @@ func WithAuthToken(ctx context.Context, token string) context.Context {
 
 ### 一个最容易踩坑的例子
 
+::: details 点击展开代码：一个最容易踩坑的例子
 ```go
 func MyHandler(w http.ResponseWriter, r *http.Request) {
     ctx := r.Context()
@@ -282,6 +289,7 @@ func MyHandler(w http.ResponseWriter, r *http.Request) {
     // 这里一旦 return，ctx 很快就会进入取消状态
 }
 ```
+:::
 
 上面这段代码没问题，但它准确揭示了请求上下文的边界：**Handler 返回，就是服务端请求生命周期的硬边界。**
 
@@ -312,6 +320,7 @@ func MyHandler(w http.ResponseWriter, r *http.Request) {
 
 如果你希望保留原有 `Value` 链，但不继承父请求的取消和 deadline，标准库已经给了官方方案：
 
+::: details 点击展开代码：方案 B：context.WithoutCancel()（Go 1.21+）
 ```go
 func MyHandler(w http.ResponseWriter, r *http.Request) {
     userID := UserIDFromContext(r.Context()) // 先把必要数据取出来
@@ -335,6 +344,7 @@ func MyHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusAccepted)
 }
 ```
+:::
 
 这里有 4 个关键点：
 
@@ -356,6 +366,7 @@ func MyHandler(w http.ResponseWriter, r *http.Request) {
 
 ### 基本取消
 
+::: details 点击展开代码：基本取消
 ```go
 func main() {
     ctx, cancel := context.WithCancel(context.Background())
@@ -380,9 +391,11 @@ func worker(ctx context.Context) {
     }
 }
 ```
+:::
 
 ### 超时控制
 
+::: details 点击展开代码：超时控制
 ```go
 func queryDB(ctx context.Context) error {
     // 贴近外部调用边界设置超时
@@ -402,9 +415,11 @@ func queryDB(ctx context.Context) error {
     }
 }
 ```
+:::
 
 ### 安全传值（避免 key 碰撞）
 
+::: details 点击展开代码：安全传值（避免 key 碰撞）
 ```go
 // 用私有类型作 key，防止不同包之间 key 碰撞
 type ctxKey string
@@ -420,6 +435,7 @@ func TraceID(ctx context.Context) string {
     return v
 }
 ```
+:::
 
 ---
 

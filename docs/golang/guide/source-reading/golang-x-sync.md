@@ -47,6 +47,7 @@ golang.org/x/sync 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // errgroup（简化）
 type Group struct {
@@ -115,6 +116,7 @@ func (g *Group) Do(key string, fn func() (any, error)) (any, error, bool) {
     return c.val, c.err, false // shared=false（第一个请求）
 }
 ```
+:::
 
 ---
 
@@ -122,6 +124,7 @@ func (g *Group) Do(key string, fn func() (any, error)) (any, error, bool) {
 
 ### errgroup：并行 API 聚合
 
+::: details 点击展开代码：errgroup：并行 API 聚合
 ```go
 import "golang.org/x/sync/errgroup"
 
@@ -169,11 +172,13 @@ func fetchPageData(ctx context.Context, userID int) (*PageData, error) {
     return data, nil
 }
 ```
+:::
 
 ### errgroup + SetLimit：限制并发下载
 
 <GoAdvancedConcurrencyDiagram kind="bounded-concurrency" />
 
+::: details 点击展开代码：errgroup + SetLimit：限制并发下载
 ```go
 // 批量下载文件，最多同时 5 个并发（Go 1.21+）
 func downloadFiles(ctx context.Context, urls []string, dir string) error {
@@ -202,11 +207,13 @@ func downloadFilesV2(ctx context.Context, urls []string, dir string) error {
     return g.Wait()
 }
 ```
+:::
 
 ### singleflight：防缓存击穿
 
 <GoAdvancedConcurrencyDiagram kind="singleflight" />
 
+::: details 点击展开代码：singleflight：防缓存击穿
 ```go
 import "golang.org/x/sync/singleflight"
 
@@ -256,11 +263,13 @@ func (s *UserService) UpdateUser(ctx context.Context, user *User) error {
     return nil
 }
 ```
+:::
 
 ### semaphore：限制 CPU 密集任务并发
 
 <GoAdvancedConcurrencyDiagram kind="semaphore" />
 
+::: details 点击展开代码：semaphore：限制 CPU 密集任务并发
 ```go
 import "golang.org/x/sync/semaphore"
 
@@ -303,9 +312,11 @@ func (p *ImageProcessor) ProcessWeighted(ctx context.Context, file string, sizeM
     return processLargeFile(file)
 }
 ```
+:::
 
 ### Pipeline：errgroup 实现并发 Pipeline
 
+::: details 点击展开代码：Pipeline：errgroup 实现并发 Pipeline
 ```go
 // Pipeline 模式：生产者 → 转换 → 消费者（并发流水线）
 func pipeline(ctx context.Context, inputs []string) error {
@@ -341,6 +352,7 @@ func pipeline(ctx context.Context, inputs []string) error {
     return g.Wait()
 }
 ```
+:::
 
 ---
 

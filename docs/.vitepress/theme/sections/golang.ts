@@ -245,9 +245,7 @@ export const golangSection: SectionConfig = {
           link: '/golang/guide/02-underlying-principles',
           items: [
             { text: '容器底层实现', link: '/golang/guide/02-slice-map-channel-internals' },
-            { text: '接口与逃逸', link: '/golang/guide/02-interface-escape-and-stack' },
-            { text: 'GC 与内存模型', link: '/golang/guide/02-gc-allocator-and-memory-model' },
-            { text: '逃逸分析', link: '/golang/guide/02-escape-analysis' },
+            { text: 'GC与内存', link: '/golang/guide/02-runtime-memory-lifecycle' },
             { text: '并发切片', link: '/golang/guide/02-concurrent-slice-patterns' },
           ],
         },

@@ -46,6 +46,7 @@ encoding/hex 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/encoding/hex/hex.go（简化）
 
@@ -73,6 +74,7 @@ func DecodeString(s string) ([]byte, error) {
     return dst, err
 }
 ```
+:::
 
 ---
 
@@ -80,6 +82,7 @@ func DecodeString(s string) ([]byte, error) {
 
 ### 基础编解码
 
+::: details 点击展开代码：基础编解码
 ```go
 import (
     "crypto/sha256"
@@ -118,9 +121,11 @@ func sha256Hex(data []byte) string {
 fmt.Println(sha256Hex([]byte("hello")))
 // "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
 ```
+:::
 
 ### 大写 hex（兼容某些系统要求）
 
+::: details 点击展开代码：大写 hex（兼容某些系统要求）
 ```go
 import (
     "encoding/hex"
@@ -148,9 +153,11 @@ func encodeUpperFast(dst, src []byte) {
     }
 }
 ```
+:::
 
 ### 流式 hex 编码（大文件）
 
+::: details 点击展开代码：流式 hex 编码（大文件）
 ```go
 // 场景：边读文件边生成 hex 输出（不占满内存）
 func fileToHex(srcPath, dstPath string) error {
@@ -194,9 +201,11 @@ func hexToFile(srcPath, dstPath string) error {
     return err
 }
 ```
+:::
 
 ### hex.Dump：调试二进制数据
 
+::: details 点击展开代码：hex.Dump：调试二进制数据
 ```go
 // hex.Dump 输出类似 xxd/hexdump 工具的格式
 func debugBinary() {
@@ -214,9 +223,11 @@ func dumpToLogger(data []byte) {
     dumper.Write(data)
 }
 ```
+:::
 
 ### 实际场景：Token 生成与验证
 
+::: details 点击展开代码：实际场景：Token 生成与验证
 ```go
 import (
     "crypto/rand"
@@ -251,9 +262,11 @@ func formatMAC(mac []byte) string {
         mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
 }
 ```
+:::
 
 ### 预分配版本（性能优化）
 
+::: details 点击展开代码：预分配版本（性能优化）
 ```go
 // 避免字符串分配：写入已有 buffer
 func encodeToBuffer(dst []byte, src []byte) []byte {
@@ -284,6 +297,7 @@ func encodeWithPool(src []byte) string {
     return result
 }
 ```
+:::
 
 ---
 

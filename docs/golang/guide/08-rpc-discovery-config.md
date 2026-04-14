@@ -26,6 +26,7 @@ gRPC 是 Google 开源的高性能 RPC 框架，基于 HTTP/2 和 Protobuf，广
 
 ### 1.1 Protobuf 服务定义
 
+::: details 点击展开代码：1.1 Protobuf 服务定义
 ```protobuf
 // user.proto
 syntax = "proto3";
@@ -75,9 +76,11 @@ message ChatMessage {
   int64 timestamp = 2;
 }
 ```
+:::
 
 ### 1.2 服务端实现
 
+::: details 点击展开代码：1.2 服务端实现
 ```go
 package main
 
@@ -146,9 +149,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 1.3 客户端调用
 
+::: details 点击展开代码：1.3 客户端调用
 ```go
 package main
 
@@ -203,9 +208,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 1.4 拦截器（Interceptor）
 
+::: details 点击展开代码：1.4 拦截器（Interceptor）
 ```go
 // 一元拦截器：日志 + 耗时统计
 func loggingUnaryInterceptor(
@@ -250,6 +257,7 @@ func newGRPCServer() *grpc.Server {
     )
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="grpc-request-lifecycle" />
 
@@ -267,6 +275,7 @@ Protocol Buffers（Protobuf）是 Google 的高效序列化协议，是 gRPC 的
 
 ### 2.1 Proto3 核心语法
 
+::: details 点击展开代码：2.1 Proto3 核心语法
 ```protobuf
 syntax = "proto3";
 
@@ -322,9 +331,11 @@ message WeChatPay {
   string open_id = 1;
 }
 ```
+:::
 
 ### 2.2 代码生成
 
+::: details 点击展开代码：2.2 代码生成
 ```bash
 # 安装工具
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -335,9 +346,11 @@ protoc --go_out=. --go_opt=paths=source_relative \
        --go-grpc_out=. --go-grpc_opt=paths=source_relative \
        proto/order.proto
 ```
+:::
 
 ### 2.3 在 Go 中使用生成的代码
 
+::: details 点击展开代码：2.3 在 Go 中使用生成的代码
 ```go
 package main
 
@@ -398,6 +411,7 @@ func main() {
     }
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="protobuf-codegen" />
 
@@ -432,6 +446,7 @@ func main() {
 
 ### 3.2 基于 etcd 的服务注册
 
+::: details 点击展开代码：3.2 基于 etcd 的服务注册
 ```go
 package registry
 
@@ -518,11 +533,13 @@ func (r *ServiceRegistry) Deregister(ctx context.Context, serviceName, addr stri
     return nil
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="service-registry" />
 
 ### 3.3 服务发现与 Watch
 
+::: details 点击展开代码：3.3 服务发现与 Watch
 ```go
 package registry
 
@@ -592,6 +609,7 @@ func (d *ServiceDiscovery) Watch(ctx context.Context, serviceName string) {
     }
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="service-discovery-watch" />
 
@@ -609,6 +627,7 @@ func (d *ServiceDiscovery) Watch(ctx context.Context, serviceName string) {
 
 ### 4.1 基于 etcd 的动态配置
 
+::: details 点击展开代码：4.1 基于 etcd 的动态配置
 ```go
 package config
 
@@ -727,9 +746,11 @@ func (cc *ConfigCenter) OnChange(fn func(*AppConfig)) {
     cc.onChange = append(cc.onChange, fn)
 }
 ```
+:::
 
 ### 4.2 使用示例
 
+::: details 点击展开代码：4.2 使用示例
 ```go
 func main() {
     cc, err := NewConfigCenter(
@@ -765,6 +786,7 @@ func main() {
     select {}
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="config-hot-reload" />
 

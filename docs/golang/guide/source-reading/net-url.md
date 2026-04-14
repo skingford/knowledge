@@ -41,6 +41,7 @@ net/url 包全景
 
 ## 一、URL 结构
 
+::: details 点击展开代码：一、URL 结构
 ```go
 // src/net/url/url.go
 type URL struct {
@@ -63,6 +64,7 @@ type Userinfo struct {
     passwordSet bool
 }
 ```
+:::
 
 ```
 URL 各组成部分对照
@@ -119,6 +121,7 @@ url.Parse("https://example.com/path?q=go#frag") 流程
 
 ## 三、url.Values 与 Query 编解码
 
+::: details 点击展开代码：三、url.Values 与 Query 编解码
 ```go
 // Values 本质是 map[string][]string（支持同名多值）
 type Values map[string][]string
@@ -129,6 +132,7 @@ func ParseQuery(query string) (Values, error)
 // 编码回 Query 字符串（key 排序，确定性输出）
 func (v Values) Encode() string
 ```
+:::
 
 ```
 Query 编码规则（RFC 3986 + application/x-www-form-urlencoded）
@@ -156,6 +160,7 @@ Query 编码规则（RFC 3986 + application/x-www-form-urlencoded）
 
 ## 四、URL 构建与修改
 
+::: details 点击展开代码：四、URL 构建与修改
 ```go
 // url.URL.String() 重新组装 URL
 func (u *URL) String() string {
@@ -182,6 +187,7 @@ func (u *URL) String() string {
     return buf.String()
 }
 ```
+:::
 
 ---
 
@@ -189,6 +195,7 @@ func (u *URL) String() string {
 
 ### URL 解析与访问
 
+::: details 点击展开代码：URL 解析与访问
 ```go
 u, err := url.Parse("https://alice:secret@example.com:8443/api/v1/users?page=2&limit=10#section")
 if err != nil {
@@ -208,9 +215,11 @@ fmt.Println(u.User.Username()) // alice
 pw, _ := u.User.Password()
 fmt.Println(pw)                // secret
 ```
+:::
 
 ### Query 参数操作
 
+::: details 点击展开代码：Query 参数操作
 ```go
 // 解析 Query
 u, _ := url.Parse("https://api.example.com/search?q=golang&page=1&tag=web&tag=api")
@@ -227,9 +236,11 @@ q.Del("q")
 u.RawQuery = q.Encode()        // "page=2&tag=api&tag=tutorial&tag=web"
 fmt.Println(u.String())
 ```
+:::
 
 ### URL 构建（安全拼接）
 
+::: details 点击展开代码：URL 构建（安全拼接）
 ```go
 // ❌ 字符串拼接（参数未编码，可能注入）
 baseURL := "https://api.example.com/search?q=" + userInput
@@ -252,9 +263,11 @@ func buildSearchURL(query string, page, limit int) string {
 // buildSearchURL("golang & go", 2, 20)
 // → "https://api.example.com/search?limit=20&page=2&q=golang+%26+go"
 ```
+:::
 
 ### 相对 URL 解析（ResolveReference）
 
+::: details 点击展开代码：相对 URL 解析（ResolveReference）
 ```go
 // 相对 URL 解析（浏览器导航逻辑）
 base, _ := url.Parse("https://example.com/docs/guide/")
@@ -263,9 +276,11 @@ rel, _ := url.Parse("../api/reference#section2")
 resolved := base.ResolveReference(rel)
 fmt.Println(resolved) // https://example.com/docs/api/reference#section2
 ```
+:::
 
 ### 路径规范化
 
+::: details 点击展开代码：路径规范化
 ```go
 // url.URL 自动规范化路径（处理 ./ 和 ../）
 u, _ := url.Parse("https://example.com/a/b/../c/./d")
@@ -275,9 +290,11 @@ fmt.Println(u.Path) // /a/c/d（已规范化）
 path := url.PathEscape("/user name/profile") // "%2Fuser%20name%2Fprofile"
 decoded, _ := url.PathUnescape(path)          // "/user name/profile"
 ```
+:::
 
 ### 提取并验证 URL（安全场景）
 
+::: details 点击展开代码：提取并验证 URL（安全场景）
 ```go
 // 验证用户提供的 URL（防止 SSRF）
 func validateURL(rawURL string) (*url.URL, error) {
@@ -296,6 +313,7 @@ func validateURL(rawURL string) (*url.URL, error) {
     return u, nil
 }
 ```
+:::
 
 ---
 

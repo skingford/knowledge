@@ -229,6 +229,7 @@ search: false
 
 ## 一个高频场景的推荐写法
 
+::: details 点击展开代码：一个高频场景的推荐写法
 ```go
 func AuditHandler(w http.ResponseWriter, r *http.Request) {
     userID := UserIDFromContext(r.Context())
@@ -254,6 +255,7 @@ func AuditHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusAccepted)
 }
 ```
+:::
 
 这段代码的重点不是语法，而是边界：
 

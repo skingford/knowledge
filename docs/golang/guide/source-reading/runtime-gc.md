@@ -172,6 +172,7 @@ GC 触发时机
 
 ## 五、代码示例
 
+::: details 点击展开代码：五、代码示例
 ```go
 import (
     "runtime"
@@ -195,7 +196,9 @@ func printGCStats() {
     fmt.Printf("PauseTotalNs: %d ms\n", s.PauseTotalNs/1e6)
 }
 ```
+:::
 
+::: details 点击展开代码：五、代码示例
 ```bash
 # 观测 GC 行为（不需要修改代码）
 GODEBUG=gctrace=1 go run main.go
@@ -206,6 +209,7 @@ GODEBUG=gctrace=1 go run main.go
 #   ↑      ↑          ↑              ↑
 # GC次数  时间        pause时间       堆大小变化
 ```
+:::
 
 ---
 

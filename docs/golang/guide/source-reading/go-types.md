@@ -56,6 +56,7 @@ go/types 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/go/types/checker.go（简化）
 type Checker struct {
@@ -89,6 +90,7 @@ func (conf *Config) Check(path string, fset *token.FileSet,
     return check.Files(files)
 }
 ```
+:::
 
 <GoCodegenDiagram kind="types-checker-flow" />
 
@@ -98,6 +100,7 @@ func (conf *Config) Check(path string, fset *token.FileSet,
 
 ### 基础：类型检查一个文件
 
+::: details 点击展开代码：基础：类型检查一个文件
 ```go
 import (
     "go/ast"
@@ -163,9 +166,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 遍历包的所有定义
 
+::: details 点击展开代码：遍历包的所有定义
 ```go
 // 列出包中所有函数定义
 func listFunctions(pkg *types.Package, info *types.Info) {
@@ -200,9 +205,11 @@ func findCallsTo(info *types.Info, target *types.Func) []token.Pos {
     return positions
 }
 ```
+:::
 
 ### 构建简单 linter：检测未使用的返回值错误
 
+::: details 点击展开代码：构建简单 linter：检测未使用的返回值错误
 ```go
 // 场景：检测 error 返回值被忽略的函数调用
 type ErrCheckLinter struct {
@@ -258,9 +265,11 @@ func runErrCheckLinter(src string) {
     ast.Inspect(file, linter.check)
 }
 ```
+:::
 
 ### 类型系统查询：实现类型断言检查
 
+::: details 点击展开代码：类型系统查询：实现类型断言检查
 ```go
 // 检查某个类型是否实现了某个接口
 func implementsInterface(typ types.Type, iface *types.Interface) bool {
@@ -307,11 +316,13 @@ func analyzeStruct(pkg *types.Package, typeName string) {
     }
 }
 ```
+:::
 
 ### golang.org/x/tools/go/analysis：现代分析框架
 
 <GoCodegenDiagram kind="analyzer-pipeline" />
 
+::: details 点击展开代码：golang.org/x/tools/go/analysis：现代分析框架
 ```go
 // 使用 go/analysis 框架（go vet / staticcheck 底层）
 import "golang.org/x/tools/go/analysis"
@@ -354,6 +365,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
     return nil, nil
 }
 ```
+:::
 
 ---
 

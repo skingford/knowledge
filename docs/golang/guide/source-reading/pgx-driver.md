@@ -45,6 +45,7 @@ pgx v5 体系
 
 ## 一、核心示例
 
+::: details 点击展开代码：一、核心示例
 ```go
 // pgx v5 直接使用（不经过 database/sql）
 import (
@@ -75,6 +76,7 @@ func newPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
     return pgxpool.NewWithConfig(ctx, cfg)
 }
 ```
+:::
 
 ---
 
@@ -82,6 +84,7 @@ func newPool(ctx context.Context, dsn string) (*pgxpool.Pool, error) {
 
 ### 基础查询与结果扫描
 
+::: details 点击展开代码：基础查询与结果扫描
 ```go
 // 查询单行
 func getUser(ctx context.Context, pool *pgxpool.Pool, id int64) (*User, error) {
@@ -119,9 +122,11 @@ type User struct {
     CreatedAt time.Time `db:"created_at"`
 }
 ```
+:::
 
 ### pgx.Batch：单次往返执行多条语句
 
+::: details 点击展开代码：pgx.Batch：单次往返执行多条语句
 ```go
 // 场景：创建用户同时插入审计日志（2 条 INSERT，1 次网络往返）
 func createUserWithAudit(ctx context.Context, pool *pgxpool.Pool, user User) (int64, error) {
@@ -171,9 +176,11 @@ func batchUpdateStatus(ctx context.Context, pool *pgxpool.Pool, ids []int64, sta
     return nil
 }
 ```
+:::
 
 ### CopyFrom：超高性能批量写入
 
+::: details 点击展开代码：CopyFrom：超高性能批量写入
 ```go
 // CopyFrom 使用 PostgreSQL COPY 协议（最快写入方式）
 // 性能：通常比 INSERT 快 5-10x
@@ -226,9 +233,11 @@ func streamInsert(ctx context.Context, pool *pgxpool.Pool, users []User) error {
     return err
 }
 ```
+:::
 
 ### LISTEN / NOTIFY（PostgreSQL 事件推送）
 
+::: details 点击展开代码：LISTEN / NOTIFY（PostgreSQL 事件推送）
 ```go
 // PostgreSQL LISTEN/NOTIFY：类似轻量级消息队列
 // 适合：缓存失效通知、实时事件、跨进程通信
@@ -289,9 +298,11 @@ func setupCacheInvalidation(ctx context.Context, dsn string, cache Cache) {
     }()
 }
 ```
+:::
 
 ### 事务与 Savepoint
 
+::: details 点击展开代码：事务与 Savepoint
 ```go
 // pgx 事务（类型安全，无需 defer rollback 样板）
 func transferWithTx(ctx context.Context, pool *pgxpool.Pool, from, to, amount int64) error {
@@ -343,6 +354,7 @@ func processWithSavepoint(ctx context.Context, pool *pgxpool.Pool) error {
     })
 }
 ```
+:::
 
 ---
 

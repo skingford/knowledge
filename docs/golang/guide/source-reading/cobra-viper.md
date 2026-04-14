@@ -70,6 +70,7 @@ myapp/
 
 <GoEngineeringDiagram kind="config-priority" />
 
+::: details 点击展开代码：root.go：根命令 + viper 初始化
 ```go
 // cmd/root.go
 package cmd
@@ -152,9 +153,11 @@ func initConfig() error {
     return nil
 }
 ```
+:::
 
 ### serve.go：服务启动子命令
 
+::: details 点击展开代码：serve.go：服务启动子命令
 ```go
 // cmd/serve.go
 package cmd
@@ -210,9 +213,11 @@ func runServer(ctx context.Context, cfg *ServerConfig) error {
     return nil
 }
 ```
+:::
 
 ### 配置文件结构（config.go）
 
+::: details 点击展开代码：配置文件结构（config.go）
 ```go
 // internal/config/config.go
 package config
@@ -256,7 +261,9 @@ func Load() (*Config, error) {
     return &cfg, nil
 }
 ```
+:::
 
+::: details 点击展开代码：配置文件结构（config.go）
 ```yaml
 # $HOME/.myapp.yaml（示例配置文件）
 server:
@@ -272,11 +279,13 @@ log:
   level: "info"
   format: "json"
 ```
+:::
 
 ### migrate.go：带子命令的命令组
 
 <GoEngineeringDiagram kind="cobra-viper-flow" />
 
+::: details 点击展开代码：migrate.go：带子命令的命令组
 ```go
 // cmd/migrate.go
 package cmd
@@ -327,9 +336,11 @@ func init() {
         migrateCmd.PersistentFlags().Lookup("dir"))
 }
 ```
+:::
 
 ### 交互式确认 + 进度条
 
+::: details 点击展开代码：交互式确认 + 进度条
 ```go
 // 危险操作前要求用户确认
 func confirmAction(cmd *cobra.Command, action string) error {
@@ -364,6 +375,7 @@ func init() {
     deleteCmd.Flags().Bool("force", false, "跳过确认直接执行")
 }
 ```
+:::
 
 ---
 

@@ -53,6 +53,7 @@ HTTP 请求生命周期追踪点
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/http/httptrace/trace.go
 type ClientTrace struct {
@@ -96,6 +97,7 @@ func WithClientTrace(ctx context.Context, trace *ClientTrace) context.Context {
     return context.WithValue(ctx, clientEventContextKey{}, trace)
 }
 ```
+:::
 
 ---
 
@@ -103,6 +105,7 @@ func WithClientTrace(ctx context.Context, trace *ClientTrace) context.Context {
 
 ### 基础请求诊断
 
+::: details 点击展开代码：基础请求诊断
 ```go
 import (
     "context"
@@ -170,6 +173,7 @@ func traceRequest(ctx context.Context, url string) {
     fmt.Printf("Total:   %v\n", total)
 }
 ```
+:::
 
 这里的 `ctx` 最好由调用方传入：
 
@@ -182,6 +186,7 @@ func traceRequest(ctx context.Context, url string) {
 
 <GoNetworkDiagram kind="http-client-pool" />
 
+::: details 点击展开代码：连接复用诊断（排查连接池问题）
 ```go
 type ConnectionStats struct {
     mu       sync.Mutex
@@ -235,9 +240,11 @@ for i := 0; i < 100; i++ {
 }
 stats.Report()
 ```
+:::
 
 ### 集成到 OpenTelemetry 链路追踪
 
+::: details 点击展开代码：集成到 OpenTelemetry 链路追踪
 ```go
 // 将 httptrace 事件上报到 OTel span
 func withOTelTrace(ctx context.Context, span trace.Span) context.Context {
@@ -275,9 +282,11 @@ func withOTelTrace(ctx context.Context, span trace.Span) context.Context {
     })
 }
 ```
+:::
 
 ### HTTP 客户端中间件（自动追踪）
 
+::: details 点击展开代码：HTTP 客户端中间件（自动追踪）
 ```go
 // 封装为 http.RoundTripper，对所有请求自动注入追踪
 type TracingTransport struct {
@@ -340,6 +349,7 @@ client := &http.Client{
     },
 }
 ```
+:::
 
 ---
 

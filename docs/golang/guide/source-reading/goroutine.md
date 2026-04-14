@@ -212,6 +212,7 @@ goexit 链式调用
 
 ### goroutine + context 防泄漏
 
+::: details 点击展开代码：goroutine + context 防泄漏
 ```go
 func safeGo(ctx context.Context, fn func(ctx context.Context)) {
     go func() {
@@ -240,9 +241,11 @@ func doWork() <-chan string {
     return ch
 }
 ```
+:::
 
 ### goroutine 数量监控
 
+::: details 点击展开代码：goroutine 数量监控
 ```go
 import (
     "runtime"
@@ -260,9 +263,11 @@ func monitorGoroutines(threshold int) {
     }
 }
 ```
+:::
 
 ### errgroup：goroutine 错误聚合
 
+::: details 点击展开代码：errgroup：goroutine 错误聚合
 ```go
 import "golang.org/x/sync/errgroup"
 
@@ -279,6 +284,7 @@ func parallelFetch(urls []string) error {
     return g.Wait() // 等待所有 goroutine，返回第一个错误
 }
 ```
+:::
 
 ---
 

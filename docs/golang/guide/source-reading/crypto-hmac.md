@@ -50,6 +50,7 @@ Go 哈希与 MAC 生态
 
 ## 一、hash.Hash 接口与 HMAC 实现
 
+::: details 点击展开代码：一、hash.Hash 接口与 HMAC 实现
 ```go
 // src/hash/hash.go
 type Hash interface {
@@ -96,6 +97,7 @@ func New(h func() hash.Hash, key []byte) hash.Hash {
     return hm
 }
 ```
+:::
 
 ---
 
@@ -103,6 +105,7 @@ func New(h func() hash.Hash, key []byte) hash.Hash {
 
 ### SHA256 哈希
 
+::: details 点击展开代码：SHA256 哈希
 ```go
 import (
     "crypto/sha256"
@@ -139,9 +142,11 @@ for _, chunk := range chunks {
     process(digest)
 }
 ```
+:::
 
 ### HMAC 签名与验证（API 认证）
 
+::: details 点击展开代码：HMAC 签名与验证（API 认证）
 ```go
 import (
     "crypto/hmac"
@@ -197,9 +202,11 @@ func verifyRequest(r *http.Request, body []byte) bool {
     return verify([]byte(payload), sig)
 }
 ```
+:::
 
 ### Webhook 签名验证（GitHub/Stripe 风格）
 
+::: details 点击展开代码：Webhook 签名验证（GitHub/Stripe 风格）
 ```go
 // GitHub Webhook 签名验证
 func verifyGitHubWebhook(payload []byte, signature, secret string) bool {
@@ -232,9 +239,11 @@ http.HandleFunc("/webhook", func(w http.ResponseWriter, r *http.Request) {
     // 处理 webhook...
 })
 ```
+:::
 
 ### 密码哈希（bcrypt/argon2，非 SHA）
 
+::: details 点击展开代码：密码哈希（bcrypt/argon2，非 SHA）
 ```go
 import "golang.org/x/crypto/bcrypt"
 
@@ -251,9 +260,11 @@ func checkPassword(pwd, hash string) bool {
 // ❌ 错误：用 SHA256 存密码（无加盐，可彩虹表攻击）
 // sha256.Sum256([]byte(password)) ← 危险！
 ```
+:::
 
 ### 内容完整性校验
 
+::: details 点击展开代码：内容完整性校验
 ```go
 // 文件下载完整性校验
 type VerifiedReader struct {
@@ -277,6 +288,7 @@ func (v *VerifiedReader) Read(p []byte) (int, error) {
     return n, err
 }
 ```
+:::
 
 ---
 

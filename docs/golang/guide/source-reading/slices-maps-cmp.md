@@ -51,6 +51,7 @@ Go 1.21 泛型标准库三件套
 
 <GoLanguageDiagram kind="pdqsort-flow" />
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/slices/sort.go（简化）
 // slices.Sort 使用 pdqsort（Pattern-Defeating Quicksort）
@@ -66,6 +67,7 @@ func Sort[S ~[]E, E cmp.Ordered](x S) {
 // 约束 cmp.Ordered 包含：int/uint/float/string 等所有可排序类型
 // ~[]E 表示底层类型为 []E 的任意类型（包括 type MySlice []int）
 ```
+:::
 
 ---
 
@@ -73,6 +75,7 @@ func Sort[S ~[]E, E cmp.Ordered](x S) {
 
 ### slices：类型安全排序
 
+::: details 点击展开代码：slices：类型安全排序
 ```go
 import "slices"
 
@@ -113,9 +116,11 @@ func sortExamples() {
     })
 }
 ```
+:::
 
 ### slices：查找与二分搜索
 
+::: details 点击展开代码：slices：查找与二分搜索
 ```go
 func searchExamples() {
     nums := []int{1, 3, 5, 7, 9, 11}
@@ -148,9 +153,11 @@ func searchExamples() {
     fmt.Println(idx) // 3（第一个 > 6 的元素索引）
 }
 ```
+:::
 
 ### slices：变换操作
 
+::: details 点击展开代码：slices：变换操作
 ```go
 func transformExamples() {
     // Reverse：原地反转
@@ -183,9 +190,11 @@ func transformExamples() {
     s6 = slices.Clip(s6) // cap 变为 3
 }
 ```
+:::
 
 ### maps：安全 map 操作
 
+::: details 点击展开代码：maps：安全 map 操作
 ```go
 import "maps"
 
@@ -218,9 +227,11 @@ func mapsExamples() {
     fmt.Println(m) // map[b:2 c:3]
 }
 ```
+:::
 
 ### cmp：泛型比较
 
+::: details 点击展开代码：cmp：泛型比较
 ```go
 import "cmp"
 
@@ -244,9 +255,11 @@ func cmpExamples() {
     _ = timeout
 }
 ```
+:::
 
 ### cmp.Or 惯用法（替代三元运算符）
 
+::: details 点击展开代码：cmp.Or 惯用法（替代三元运算符）
 ```go
 import "cmp"
 
@@ -271,9 +284,11 @@ if name == "" { name = defaultName }
 // 新写法：
 name = cmp.Or(userInput, defaultName)
 ```
+:::
 
 ### 实际场景：Map 转换与过滤
 
+::: details 点击展开代码：实际场景：Map 转换与过滤
 ```go
 // 按条件过滤 map（maps 包暂无 Filter，需手动）
 func filterMap[K comparable, V any](m map[K]V, fn func(K, V) bool) map[K]V {
@@ -302,9 +317,11 @@ for _, k := range sortedKeys {
     fmt.Printf("%s: %d\n", k, passed[k])
 }
 ```
+:::
 
 ### 实际场景：去重并排序
 
+::: details 点击展开代码：实际场景：去重并排序
 ```go
 // 去重（利用 Compact + Sort）
 func uniqueSorted[T cmp.Ordered](s []T) []T {
@@ -335,6 +352,7 @@ func intersection[T cmp.Ordered](a, b []T) []T {
     return slices.Compact(result) // 去掉重复的交集元素
 }
 ```
+:::
 
 ---
 

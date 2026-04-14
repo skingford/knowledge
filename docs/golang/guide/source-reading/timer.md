@@ -36,6 +36,7 @@ description: 精读 time.Timer/Ticker 与 runtime 定时器堆实现，理解定
 
 ## 一、runtime.timer 结构
 
+::: details 点击展开代码：一、runtime.timer 结构
 ```go
 // src/runtime/time.go
 type timer struct {
@@ -54,6 +55,7 @@ type timer struct {
     isSending atomic.Int32 // 发送中标记（处理 Stop/Reset 竞争）
 }
 ```
+:::
 
 ---
 
@@ -182,6 +184,7 @@ type timer struct {
 
 ### 带超时的操作
 
+::: details 点击展开代码：带超时的操作
 ```go
 func withTimeout(d time.Duration, fn func() error) error {
     done := make(chan error, 1)
@@ -198,9 +201,11 @@ func withTimeout(d time.Duration, fn func() error) error {
     }
 }
 ```
+:::
 
 ### 心跳 Ticker
 
+::: details 点击展开代码：心跳 Ticker
 ```go
 func heartbeat(ctx context.Context, interval time.Duration, fn func()) {
     ticker := time.NewTicker(interval)
@@ -216,9 +221,11 @@ func heartbeat(ctx context.Context, interval time.Duration, fn func()) {
     }
 }
 ```
+:::
 
 ### time.AfterFunc（无 channel 模式）
 
+::: details 点击展开代码：time.AfterFunc（无 channel 模式）
 ```go
 // AfterFunc 在 d 后在新 goroutine 中执行 f
 // 不占用 channel，适合纯回调场景
@@ -229,9 +236,11 @@ t := time.AfterFunc(5*time.Second, func() {
 // 取消
 t.Stop()
 ```
+:::
 
 ### 限速器（基于 time.Tick）
 
+::: details 点击展开代码：限速器（基于 time.Tick）
 ```go
 func rateLimited(rps int, tasks []func()) {
     limiter := time.Tick(time.Second / time.Duration(rps))
@@ -242,6 +251,7 @@ func rateLimited(rps int, tasks []func()) {
 }
 // 注意：time.Tick 不可 Stop，生产建议用 time.NewTicker
 ```
+:::
 
 ---
 

@@ -41,6 +41,7 @@ search: false
 
 Go 语言没有函数默认参数和方法重载，当结构体字段很多时，构造函数的参数列表会变得冗长且难以维护。Functional Options 模式通过将每个可选配置封装为一个函数，让调用方按需组合，既保持了 API 的简洁性，又具备良好的可扩展性——新增选项不会破坏已有调用方。
 
+::: details 点击展开代码：1. Functional Options 模式
 ```go
 package main
 
@@ -125,6 +126,7 @@ func main() {
 	fmt.Printf("定制配置: %+v\n", s2)
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -143,6 +145,7 @@ func main() {
 
 当对象的构造过程涉及多个步骤或条件分支时，Builder 模式通过链式调用逐步构建最终对象。与 Functional Options 不同，Builder 更适合构建过程本身有顺序或状态依赖的场景——例如拼接 SQL 查询、构建 HTTP 请求等。
 
+::: details 点击展开代码：2. Builder 模式
 ```go
 package main
 
@@ -242,6 +245,7 @@ func main() {
 	fmt.Println("SQL:", sql2)
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -260,6 +264,7 @@ func main() {
 
 Go 社区推崇显式依赖——通过构造函数参数把依赖"注入"进来，而不是在函数内部自行创建或访问全局变量。这样做的核心好处是让代码可测试：测试时传入 mock 实现即可，无需修改被测代码。
 
+::: details 点击展开代码：3. 依赖注入的 Go 惯用方式
 ```go
 package main
 
@@ -372,6 +377,7 @@ func main() {
 	fmt.Printf("查询到用户: %+v\n", user)
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -394,6 +400,7 @@ func main() {
 
 Go Web 应用中最常见的分层方式：Handler 负责 HTTP 协议解析和响应格式化，Service 负责业务逻辑，Repository 负责数据持久化。每层只依赖下一层的接口，实现层间解耦。
 
+::: details 点击展开代码：4. Repository / Service / Handler 分层模式
 ```go
 package main
 
@@ -610,6 +617,7 @@ func main() {
 	// http.ListenAndServe(":8080", nil)
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -632,6 +640,7 @@ func main() {
 
 Strategy 模式将一组可互换的算法封装在各自的结构体中，通过统一接口在运行时切换。Go 中通常用接口实现 Strategy，也可以直接用函数类型实现更轻量的版本。
 
+::: details 点击展开代码：5. Strategy 模式
 ```go
 package main
 
@@ -736,6 +745,7 @@ func main() {
 	})
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -754,6 +764,7 @@ func main() {
 
 Singleton 确保一个类型在整个程序生命周期中只有一个实例。Go 中使用 `sync.Once` 实现线程安全的懒加载单例，这是最推荐的方式。
 
+::: details 点击展开代码：6. Singleton 模式
 ```go
 package main
 
@@ -823,6 +834,7 @@ func main() {
 //     // 初始化逻辑
 // }
 ```
+:::
 
 ### 讲解重点
 
@@ -844,6 +856,7 @@ func main() {
 
 Table-Driven Tests 是 Go 测试的标准模式。把测试用例组织成一个结构体切片，用 `for range` 遍历执行，配合 `t.Run()` 创建子测试。这种方式让添加新用例变得极其简单——只需新增一行数据。
 
+::: details 点击展开代码：7. Table-Driven Tests 模式
 ```go
 package main
 
@@ -957,6 +970,7 @@ func main() {
 	fmt.Printf("Divide(10, 0) err=%v\n", err)
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -976,6 +990,7 @@ func main() {
 
 Go 1.23 引入了 range over func 特性，允许对自定义函数进行 `for range` 迭代。标准库新增的 `iter` 包定义了 `iter.Seq[V]` 和 `iter.Seq2[K, V]` 两种迭代器类型，让自定义集合可以像内置类型一样使用 `for range`。
 
+::: details 点击展开代码：8. Iterator 模式 (Go 1.23+)
 ```go
 package main
 
@@ -1091,6 +1106,7 @@ func main() {
 	fmt.Println()
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -1113,6 +1129,7 @@ func main() {
 
 中间件模式通过函数包装，在不修改原始逻辑的前提下增加横切关注点（如日志、认证、限流）。这是 Go Web 框架的核心设计思想，也是函数式编程思想在 Go 中的典型应用。
 
+::: details 点击展开代码：9. 中间件 / 装饰器模式
 ```go
 package main
 
@@ -1248,6 +1265,7 @@ func main() {
 	}
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -1269,6 +1287,7 @@ func main() {
 
 Go 1.13 引入的 `errors.Is` 和 `errors.As` 是判断错误的标准方式，取代了传统的字符串比较和类型断言。正确使用 sentinel error 和自定义错误类型，是编写健壮 Go 程序的关键。
 
+::: details 点击展开代码：10. 错误哨兵与自定义错误类型
 ```go
 package main
 
@@ -1390,6 +1409,7 @@ func main() {
 	}
 }
 ```
+:::
 
 ### 讲解重点
 

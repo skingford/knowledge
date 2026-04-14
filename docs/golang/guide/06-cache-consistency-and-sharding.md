@@ -15,6 +15,7 @@ head:
 
 ### Cache Aside Pattern（旁路缓存，最常用）
 
+::: details 点击展开代码：Cache Aside Pattern（旁路缓存，最常用）
 ```go
 // 读流程：先查缓存 -> 缓存未命中则查数据库 -> 回填缓存
 func getUser(ctx context.Context, rdb *redis.Client, db *sql.DB, userID int64) (*User, error) {
@@ -66,11 +67,13 @@ func updateUser(ctx context.Context, rdb *redis.Client, db *sql.DB, user *User) 
 	return nil
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="cache-aside" />
 
 ### 延迟双删：进一步降低不一致窗口
 
+::: details 点击展开代码：延迟双删：进一步降低不一致窗口
 ```go
 func updateUserWithDoubleDelete(ctx context.Context, rdb *redis.Client, db *sql.DB, user *User) error {
 	key := fmt.Sprintf("user:%d", user.ID)
@@ -102,11 +105,13 @@ func updateUserWithDoubleDelete(ctx context.Context, rdb *redis.Client, db *sql.
 	return nil
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="double-delete" />
 
 ### 基于消息队列的最终一致性
 
+::: details 点击展开代码：基于消息队列的最终一致性
 ```go
 // 通过监听数据库 binlog 或业务事件来异步更新缓存
 // 这是大规模系统中最可靠的方案
@@ -147,6 +152,7 @@ type DBChangeEvent struct {
 	Data       map[string]interface{}
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="mq-invalidation" />
 
@@ -164,6 +170,7 @@ type DBChangeEvent struct {
 
 ### 分片路由策略
 
+::: details 点击展开代码：分片路由策略
 ```go
 package sharding
 
@@ -221,11 +228,13 @@ func (sr *ShardRouter) ConsistentHashRoute(key string) (db *sql.DB, tableName st
 	return sr.dbs[dbIndex], fmt.Sprintf("orders_%04d", tableIndex)
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="sharding-route" />
 
 ### 分布式 ID 生成
 
+::: details 点击展开代码：分布式 ID 生成
 ```go
 package idgen
 
@@ -289,11 +298,13 @@ func (s *Snowflake) ParseTime(id int64) time.Time {
 	return time.UnixMilli(ms)
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="snowflake-id" />
 
 ### 跨分片查询
 
+::: details 点击展开代码：跨分片查询
 ```go
 package sharding
 
@@ -393,6 +404,7 @@ func (sr *ShardRouter) QueryByUserID(ctx context.Context, userID int64) ([]Order
 	return orders, rows.Err()
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="cross-shard-query" />
 

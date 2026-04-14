@@ -61,6 +61,7 @@ crypto/cipher 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/cipher/gcm.go（简化）
 // GCM = Galois/Counter Mode：CTR 模式加密 + GHASH 认证
@@ -99,6 +100,7 @@ func (g *gcm) Open(dst, nonce, ciphertext, data []byte) ([]byte, error) {
     return ret, nil
 }
 ```
+:::
 
 <GoSecurityDiagram kind="aead-seal-open" />
 
@@ -108,6 +110,7 @@ func (g *gcm) Open(dst, nonce, ciphertext, data []byte) ([]byte, error) {
 
 ### AES-256-GCM：推荐的对称加密方案
 
+::: details 点击展开代码：AES-256-GCM：推荐的对称加密方案
 ```go
 import (
     "crypto/aes"
@@ -178,9 +181,11 @@ func main() {
     fmt.Println(string(plaintext)) // hello, world
 }
 ```
+:::
 
 ### AEAD 关联数据（AAD）：HTTP 头认证
 
+::: details 点击展开代码：AEAD 关联数据（AAD）：HTTP 头认证
 ```go
 // 场景：加密响应 body，但 Content-Type 不加密只认证
 // 任何对 aad 的篡改都会导致解密失败（完整性保护）
@@ -207,9 +212,11 @@ func decryptWithAAD(key, ciphertext, additionalData []byte) ([]byte, error) {
     return gcm.Open(nil, nonce, ciphertext, additionalData)
 }
 ```
+:::
 
 ### ChaCha20-Poly1305：移动端/嵌入式推荐
 
+::: details 点击展开代码：ChaCha20-Poly1305：移动端/嵌入式推荐
 ```go
 import "golang.org/x/crypto/chacha20poly1305"
 
@@ -242,9 +249,11 @@ func encryptXChaCha(key, plaintext []byte) ([]byte, error) {
     return aead.Seal(nonce, nonce, plaintext, nil), nil
 }
 ```
+:::
 
 ### AES-CTR：大文件流式加密
 
+::: details 点击展开代码：AES-CTR：大文件流式加密
 ```go
 // AES-256-CTR：流式加密大文件（不需要一次性加载到内存）
 // ⚠️ CTR 模式本身不提供完整性认证，需要额外 HMAC
@@ -288,9 +297,11 @@ func decryptStream(key []byte, src io.Reader, dst io.Writer) error {
     return err
 }
 ```
+:::
 
 ### 密钥派生：从密码生成安全密钥
 
+::: details 点击展开代码：密钥派生：从密码生成安全密钥
 ```go
 import "golang.org/x/crypto/argon2"
 
@@ -325,6 +336,7 @@ func encryptWithPassword(password string, plaintext []byte) ([]byte, error) {
     return result, nil
 }
 ```
+:::
 
 ---
 

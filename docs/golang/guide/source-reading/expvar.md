@@ -50,6 +50,7 @@ expvar 全景
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/expvar/expvar.go
 // 全局变量注册表（有序 map）
@@ -91,6 +92,7 @@ func expvarHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "\n}\n")
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="expvar-http-flow" />
 
@@ -100,6 +102,7 @@ func expvarHandler(w http.ResponseWriter, r *http.Request) {
 
 ### 基础指标注册
 
+::: details 点击展开代码：基础指标注册
 ```go
 package main
 
@@ -151,9 +154,11 @@ func main() {
     http.ListenAndServe(":8080", nil)
 }
 ```
+:::
 
 ### Map 类型（分类统计）
 
+::: details 点击展开代码：Map 类型（分类统计）
 ```go
 // 按路径统计请求数
 var httpRequests = expvar.NewMap("http_requests")
@@ -170,9 +175,11 @@ func trackRequest(path string, statusCode int) {
 // /debug/vars 输出:
 // "http_requests": {"/api/users": 42, "/api/orders": 18, "5xx_errors": 2}
 ```
+:::
 
 ### 自定义 Var 实现
 
+::: details 点击展开代码：自定义 Var 实现
 ```go
 // 实现 expvar.Var 接口
 type HealthStatus struct {
@@ -206,9 +213,11 @@ func init() {
 // /debug/vars 输出:
 // "health": {"database":true,"kafka":false,"redis":true}
 ```
+:::
 
 ### 与 Prometheus 结合（生产级监控）
 
+::: details 点击展开代码：与 Prometheus 结合（生产级监控）
 ```go
 // expvar 适合轻量级内部调试；生产环境推荐 Prometheus
 // 可以用 expvar 数据桥接到 Prometheus
@@ -250,11 +259,13 @@ func main() {
     http.ListenAndServe(":8080", nil)
 }
 ```
+:::
 
 ### 读取 /debug/vars 数据
 
 <GoEngineeringDiagram kind="expvar-http-flow" />
 
+::: details 点击展开代码：读取 /debug/vars 数据
 ```go
 // 从 expvar 端点读取数据（用于监控脚本）
 func fetchExpvars(addr string) (map[string]json.RawMessage, error) {
@@ -274,6 +285,7 @@ var memStats runtime.MemStats
 json.Unmarshal(vars["memstats"], &memStats)
 fmt.Printf("堆内存: %d MB\n", memStats.HeapAlloc/1024/1024)
 ```
+:::
 
 ---
 

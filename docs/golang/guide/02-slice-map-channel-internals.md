@@ -29,6 +29,7 @@ Slice 在 Go 运行时对应的结构体是 `reflect.SliceHeader`（实际是 `r
 
 <GoInternalsDiagram kind="slice-shared-array" />
 
+::: details 点击展开代码：1. Slice 底层结构与扩容机制
 ```go
 package main
 
@@ -55,6 +56,7 @@ func main() {
 	fmt.Println("a after append b:", a) // a[3] 被覆盖为 100
 }
 ```
+:::
 
 **讲解重点：**
 
@@ -88,6 +90,7 @@ Go 的 map 底层结构是 `runtime.hmap`，核心字段：
 
 <GoInternalsDiagram kind="map-grow" />
 
+::: details 点击展开代码：2. Map 底层实现原理
 ```go
 package main
 
@@ -129,6 +132,7 @@ func main() {
 	}
 }
 ```
+:::
 
 **讲解重点：**
 
@@ -157,6 +161,7 @@ Channel 在运行时对应 `runtime.hchan` 结构体，核心字段：
 
 <GoInternalsDiagram kind="channel-hchan" />
 
+::: details 点击展开代码：3. Channel 底层实现
 ```go
 package main
 
@@ -195,6 +200,7 @@ func main() {
 	}
 }
 ```
+:::
 
 **讲解重点：**
 

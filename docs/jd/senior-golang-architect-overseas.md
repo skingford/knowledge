@@ -296,7 +296,7 @@ function onLeave(el, done) {
 - [sync 同步原语](/golang/guide/source-reading/sync-primitives) — Mutex/RWMutex/WaitGroup
 - [sync.Pool](/golang/guide/source-reading/sync-pool) — 对象池复用
 - [Context 传播](/golang/guide/source-reading/context) — 超时与取消
-- [逃逸分析](/golang/guide/02-escape-analysis) — 堆栈分配决策
+- [逃逸分析](/golang/guide/02-runtime-memory-lifecycle) — 堆栈分配决策
 
 **性能排障系列：**
 - [pprof 性能分析](/golang/guide/source-reading/runtime-pprof) — CPU/内存/goroutine profiling
@@ -498,6 +498,15 @@ function onLeave(el, done) {
 
 > 海外服务的稳定性不只是 Uptime。要重点看可观测性和长尾延迟，通过链路追踪、跨地域指标拆分和调用链分析，定位 Region 之间调用引入的抖动和尾延迟问题。
 
+**国内与海外治理差异：**
+
+| 维度 | 国内治理重点 | 海外治理额外关注点 |
+|------|--------------|--------------------|
+| 网络 | 解决运营商互联、CDN 覆盖 | 跨海延迟、QUIC 协议、DCDN 加速 |
+| 部署 | 同城双活、异地多活 | 全球单元化、数据驻留合规性 |
+| 合规 | 备案、等级保护 | GDPR / CCPA、数据出境审计 |
+| 响应 | 驻场支持、快速止损 | 时差覆盖、第三方服务（GAFA）依赖 |
+
 ### 2. 降级、熔断、限流
 
 **限流：** 令牌桶 / 漏桶，`golang.org/x/time/rate` 或 Redis + Lua
@@ -565,10 +574,10 @@ function onLeave(el, done) {
 - [百万连接网关设计](/architecture/go-million-connection-gateway-design)
 - [分布式事务对比](/architecture/distributed-transaction-comparison)
 - [Outbox 模式](/architecture/outbox-pattern-design)
-- [支付回调幂等与补偿](/architecture/payment-callback-idempotency-and-compensation)
+- [支付回调幂等与补偿](/architecture/payment/callback-idempotency)
 - [秒杀系统库存设计](/architecture/seckill-system-inventory-design)
 - [秒杀限流与降级](/architecture/seckill-system-rate-limiting-and-degradation)
-- [高并发支付实践](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
+- [高并发支付实践](/architecture/payment/high-concurrency-notes)
 - [全球健身 App 架构](/architecture/case-studies/global-fitness-app-architecture-and-management-guide)
 - [架构师面试清单](/architecture/architect-interview-prep-checklist)
 - [Observability & Resilience](/golang/guide/08-observability-resilience)
@@ -680,7 +689,7 @@ function onLeave(el, done) {
 - **验证方式**：先 POC → 压测 → 灰度验证 → 正式引入
 
 ::: details 推荐阅读
-- [高并发支付实践](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
+- [高并发支付实践](/architecture/payment/high-concurrency-notes)
 - [全球健身 App 架构与管理](/architecture/case-studies/global-fitness-app-architecture-and-management-guide)
 - [电商交易平台生产架构](/architecture/ecommerce-transaction-platform-production-architecture)
 - [秒杀压测与容量估算](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)

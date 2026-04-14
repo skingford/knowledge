@@ -62,6 +62,7 @@ net/http Server 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/http/server.go（简化）
 
@@ -91,6 +92,7 @@ func (c *conn) serve(ctx context.Context) {
     }
 }
 ```
+:::
 
 ---
 
@@ -100,6 +102,7 @@ func (c *conn) serve(ctx context.Context) {
 
 <GoNetworkDiagram kind="graceful-shutdown" />
 
+::: details 点击展开代码：生产级 Server 配置
 ```go
 import (
     "context"
@@ -150,6 +153,7 @@ func startServer(handler http.Handler) error {
     return nil
 }
 ```
+:::
 
 这里的 `context.Background()` 也是**刻意为之**：
 
@@ -170,6 +174,7 @@ func startServer(handler http.Handler) error {
 - 请求内的 DB / Redis / RPC / HTTP 下游调用，应继续透传 `r.Context()`
 - 需要在请求结束后继续执行的离线任务，不应直接复用 `r.Context()`
 
+::: details 点击展开代码：请求 Context 生命周期：请求一结束就会取消
 ```go
 func getOrder(w http.ResponseWriter, r *http.Request) {
     ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
@@ -184,6 +189,7 @@ func getOrder(w http.ResponseWriter, r *http.Request) {
     _ = json.NewEncoder(w).Encode(order)
 }
 ```
+:::
 
 如果你要在请求结束后继续写审计日志、异步补偿或发通知，应该改用 `context.WithoutCancel(r.Context())`（Go 1.21+）或 `context.Background()` 重建任务边界，并重新设置独立超时。
 
@@ -191,6 +197,7 @@ func getOrder(w http.ResponseWriter, r *http.Request) {
 
 <GoNetworkDiagram kind="middleware-chain" />
 
+::: details 点击展开代码：Middleware 链：洋葱模型
 ```go
 // Middleware 类型定义：接收 Handler 返回 Handler
 type Middleware func(http.Handler) http.Handler
@@ -283,9 +290,11 @@ func buildRouter() http.Handler {
     )
 }
 ```
+:::
 
 ### Server-Sent Events（SSE）：服务器推送
 
+::: details 点击展开代码：Server-Sent Events（SSE）：服务器推送
 ```go
 // SSE：无需 WebSocket，HTTP 单向推送（实时日志/进度/通知）
 func sseHandler(w http.ResponseWriter, r *http.Request) {
@@ -332,9 +341,11 @@ func writeSSEEvent(w http.Flusher, rw http.ResponseWriter,
     w.Flush()
 }
 ```
+:::
 
 ### WebSocket 连接劫持
 
+::: details 点击展开代码：WebSocket 连接劫持
 ```go
 // Hijack：从 HTTP 升级为 WebSocket（或其他协议）
 func upgradeToWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -361,9 +372,11 @@ func upgradeToWebSocket(w http.ResponseWriter, r *http.Request) {
     handleWebSocketConn(conn, bufrw)
 }
 ```
+:::
 
 ### 连接状态监控
 
+::: details 点击展开代码：连接状态监控
 ```go
 // ConnState 钩子：追踪活跃连接数
 type connectionTracker struct {
@@ -405,6 +418,7 @@ func newTrackedServer(handler http.Handler) *http.Server {
     return srv
 }
 ```
+:::
 
 ---
 

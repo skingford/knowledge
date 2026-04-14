@@ -54,6 +54,7 @@ unicode/utf8 体系
 
 <GoLanguageDiagram kind="utf8-decode" />
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/unicode/utf8/utf8.go（简化）
 
@@ -86,6 +87,7 @@ func DecodeRune(p []byte) (r rune, size int) {
     // ... 3、4 字节类似
 }
 ```
+:::
 
 ---
 
@@ -93,6 +95,7 @@ func DecodeRune(p []byte) (r rune, size int) {
 
 ### 字符串遍历：字节 vs rune
 
+::: details 点击展开代码：字符串遍历：字节 vs rune
 ```go
 import "unicode/utf8"
 
@@ -121,9 +124,11 @@ func compareIteration() {
     }
 }
 ```
+:::
 
 ### 字符串截断（保证不截断多字节字符）
 
+::: details 点击展开代码：字符串截断（保证不截断多字节字符）
 ```go
 // 按字符数截断（不按字节数）
 func truncateByRune(s string, maxRunes int) string {
@@ -157,9 +162,11 @@ func truncateByByte(s string, maxBytes int) string {
 fmt.Println(truncateByRune("Hello世界", 7))   // "Hello世"
 fmt.Println(truncateByByte("Hello世界", 8))   // "Hello世"（世=3字节，8字节边界）
 ```
+:::
 
 ### UTF-8 校验与修复
 
+::: details 点击展开代码：UTF-8 校验与修复
 ```go
 // 校验输入是否合法 UTF-8（防止乱码写入数据库）
 func validateUTF8(s string) error {
@@ -194,9 +201,11 @@ func cleanUTF8(s string) string {
     return strings.ToValidUTF8(s, "?") // 非法字节替换为 "?"
 }
 ```
+:::
 
 ### 字符级操作
 
+::: details 点击展开代码：字符级操作
 ```go
 // 反转字符串（正确处理多字节字符）
 func reverseString(s string) string {
@@ -234,9 +243,11 @@ func buildString(runes []rune) string {
     return sb.String()
 }
 ```
+:::
 
 ### 编码转换（GBK → UTF-8）
 
+::: details 点击展开代码：编码转换（GBK → UTF-8）
 ```go
 import "golang.org/x/text/encoding/simplifiedchinese"
 
@@ -265,9 +276,11 @@ func readGBKFile(path string) (string, error) {
     return string(utf8Data), nil
 }
 ```
+:::
 
 ### 处理包含零宽字符的用户名（安全场景）
 
+::: details 点击展开代码：处理包含零宽字符的用户名（安全场景）
 ```go
 import "unicode"
 
@@ -294,6 +307,7 @@ func isPrintable(s string) bool {
     return true
 }
 ```
+:::
 
 ---
 

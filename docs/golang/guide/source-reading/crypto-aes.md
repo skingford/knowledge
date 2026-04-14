@@ -86,6 +86,7 @@ AES-GCM 加密流程
 
 ### AES-GCM 基础加解密
 
+::: details 点击展开代码：AES-GCM 基础加解密
 ```go
 import (
     "crypto/aes"
@@ -142,9 +143,11 @@ func decrypt(key, ciphertext []byte) ([]byte, error) {
     return gcm.Open(nil, nonce, ciphertext, nil)
 }
 ```
+:::
 
 ### 密钥派生（从密码生成密钥）
 
+::: details 点击展开代码：密钥派生（从密码生成密钥）
 ```go
 import (
     "crypto/sha256"
@@ -190,9 +193,11 @@ func encryptWithPassword(password string, plaintext []byte) ([]byte, error) {
     return append(salt, ciphertext...), nil
 }
 ```
+:::
 
 ### 带关联数据（绑定上下文防重放）
 
+::: details 点击展开代码：带关联数据（绑定上下文防重放）
 ```go
 // 关联数据（Additional Data）：不加密但参与认证
 // 常用于绑定用户 ID、过期时间等元数据
@@ -230,9 +235,11 @@ func openToken(key, ciphertext []byte, userID int64, expires time.Time) ([]byte,
     return gcm.Open(nil, nonce, ct, ad)
 }
 ```
+:::
 
 ### 文件加密
 
+::: details 点击展开代码：文件加密
 ```go
 func encryptFile(key []byte, src, dst string) error {
     in, _ := os.Open(src)
@@ -255,9 +262,11 @@ func encryptFile(key []byte, src, dst string) error {
     return nil
 }
 ```
+:::
 
 ### 安全随机密钥生成
 
+::: details 点击展开代码：安全随机密钥生成
 ```go
 // 生成 AES-256 密钥（32 字节）
 func generateAESKey() ([]byte, error) {
@@ -271,6 +280,7 @@ func generateAESKey() ([]byte, error) {
 // - 生产：AWS KMS / GCP KMS / HashiCorp Vault
 // - 密钥轮换：每个加密值携带密钥版本号
 ```
+:::
 
 ---
 

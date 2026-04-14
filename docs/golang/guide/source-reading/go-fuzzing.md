@@ -53,6 +53,7 @@ Go Fuzzing 体系
 
 <GoEngineeringDiagram kind="fuzz-lifecycle" />
 
+::: details 点击展开代码：一、基础：第一个 Fuzz 测试
 ```go
 // fuzz_test.go
 package mypackage
@@ -94,7 +95,9 @@ func FuzzReverse(f *testing.F) {
     })
 }
 ```
+:::
 
+::: details 点击展开代码：一、基础：第一个 Fuzz 测试
 ```bash
 # 单元测试模式（仅用种子语料库，不生成新输入）
 go test -run FuzzReverse
@@ -111,6 +114,7 @@ go test -fuzz=FuzzReverse -parallel=4
 # 仅运行保存的语料库（CI 模式）
 go test -run=FuzzReverse/testdata
 ```
+:::
 
 ---
 
@@ -118,6 +122,7 @@ go test -run=FuzzReverse/testdata
 
 ### 解析器 Fuzz：URL / JSON 解析安全
 
+::: details 点击展开代码：解析器 Fuzz：URL / JSON 解析安全
 ```go
 // 场景：确保自定义解析器在任意输入下不 panic
 func FuzzParseMyProtocol(f *testing.F) {
@@ -175,9 +180,11 @@ func FuzzParseURL(f *testing.F) {
     })
 }
 ```
+:::
 
 ### JSON 编解码 Fuzz（往返测试）
 
+::: details 点击展开代码：JSON 编解码 Fuzz（往返测试）
 ```go
 type User struct {
     Name  string `json:"name"`
@@ -220,9 +227,11 @@ func FuzzJSONRoundtrip(f *testing.F) {
     })
 }
 ```
+:::
 
 ### 多参数 Fuzz + 自定义断言
 
+::: details 点击展开代码：多参数 Fuzz + 自定义断言
 ```go
 // 场景：验证加密函数的正确性
 func FuzzEncryptDecrypt(f *testing.F) {
@@ -256,11 +265,13 @@ func FuzzEncryptDecrypt(f *testing.F) {
     })
 }
 ```
+:::
 
 ### 语料库管理最佳实践
 
 <GoEngineeringDiagram kind="fuzz-lifecycle" />
 
+::: details 点击展开代码：语料库管理最佳实践
 ```go
 // 1. 提交有价值的种子到 testdata/fuzz/
 // 手动创建种子文件格式：
@@ -280,6 +291,7 @@ func FuzzEncryptDecrypt(f *testing.F) {
 // 5. 发现失败用例后调试
 // go test -run=FuzzXxx/testdata/fuzz/FuzzXxx/a1b2c3 -v
 ```
+:::
 
 ---
 

@@ -54,6 +54,7 @@ WebSocket 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // WebSocket 升级核心（gorilla/websocket 简化）
 // 验证 Origin、设置读写限制、完成 HTTP 101 握手
@@ -68,6 +69,7 @@ var upgrader = websocket.Upgrader{
     },
 }
 ```
+:::
 
 ---
 
@@ -75,6 +77,7 @@ var upgrader = websocket.Upgrader{
 
 ### 基础 Echo 服务器
 
+::: details 点击展开代码：基础 Echo 服务器
 ```go
 import (
     "github.com/gorilla/websocket"
@@ -111,9 +114,11 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 ```
+:::
 
 ### 广播 Hub（聊天室核心）
 
+::: details 点击展开代码：广播 Hub（聊天室核心）
 ```go
 // 广播 Hub：用 channel 替代锁，避免并发写同一 conn
 type Client struct {
@@ -253,9 +258,11 @@ func serveWS(hub *Hub, w http.ResponseWriter, r *http.Request) {
     go client.readPump()
 }
 ```
+:::
 
 ### 结构化消息（JSON 协议）
 
+::: details 点击展开代码：结构化消息（JSON 协议）
 ```go
 // 定义消息协议
 type WSMessage struct {
@@ -317,9 +324,11 @@ func mustMarshal(v any) json.RawMessage {
     return b
 }
 ```
+:::
 
 ### 房间系统（多频道广播）
 
+::: details 点击展开代码：房间系统（多频道广播）
 ```go
 // 支持多个聊天室的 Hub
 type RoomHub struct {
@@ -371,6 +380,7 @@ func (h *RoomHub) Broadcast(roomID string, msg []byte) {
     })
 }
 ```
+:::
 
 ---
 

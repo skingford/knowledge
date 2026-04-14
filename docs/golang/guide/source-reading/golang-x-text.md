@@ -51,6 +51,7 @@ golang.org/x/text 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // transform 包核心接口
 type Transformer interface {
@@ -68,6 +69,7 @@ chain := transform.Chain(
     norm.NFC,                           // 规范化
 )
 ```
+:::
 
 ---
 
@@ -75,6 +77,7 @@ chain := transform.Chain(
 
 ### 字符集转换：GBK/Big5 ↔ UTF-8
 
+::: details 点击展开代码：字符集转换：GBK/Big5 ↔ UTF-8
 ```go
 import (
     "golang.org/x/text/encoding/simplifiedchinese"
@@ -117,9 +120,11 @@ func big5ToUTF8(r io.Reader) io.Reader {
     return transform.NewReader(r, traditionalchinese.Big5.NewDecoder())
 }
 ```
+:::
 
 ### Unicode 规范化：NFC/NFKC
 
+::: details 点击展开代码：Unicode 规范化：NFC/NFKC
 ```go
 import "golang.org/x/text/unicode/norm"
 
@@ -154,9 +159,11 @@ func unicodeNormDemo() {
     fmt.Println(normalizeForSearch(fullWidth)) // ABC123（半角）
 }
 ```
+:::
 
 ### 语言标签与 Accept-Language 协商
 
+::: details 点击展开代码：语言标签与 Accept-Language 协商
 ```go
 import (
     "golang.org/x/text/language"
@@ -214,9 +221,11 @@ func parseLanguageTags() {
     fmt.Println(canonical) // zh-Hans-CN
 }
 ```
+:::
 
 ### 语言感知排序（中文按拼音排序）
 
+::: details 点击展开代码：语言感知排序（中文按拼音排序）
 ```go
 import (
     "golang.org/x/text/collate"
@@ -248,9 +257,11 @@ func main() {
     fmt.Println(english) // [apple Banana Cherry]
 }
 ```
+:::
 
 ### 自动检测文件编码
 
+::: details 点击展开代码：自动检测文件编码
 ```go
 import "golang.org/x/text/encoding/charmap"
 
@@ -300,9 +311,11 @@ func processLargeGBKFile(path string) error {
     return scanner.Err()
 }
 ```
+:::
 
 ### 文本清洗：去除控制字符与规范化空格
 
+::: details 点击展开代码：文本清洗：去除控制字符与规范化空格
 ```go
 import (
     "golang.org/x/text/transform"
@@ -338,6 +351,7 @@ func normalizeSpaces(s string) string {
     return result
 }
 ```
+:::
 
 ---
 

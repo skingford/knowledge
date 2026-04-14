@@ -78,6 +78,7 @@ struct 标签差异速查
 
 ### 基础编解码
 
+::: details 点击展开代码：基础编解码
 ```go
 type Person struct {
     XMLName xml.Name `xml:"person"`           // 根元素名
@@ -111,9 +112,11 @@ var p2 Person
 xml.Unmarshal([]byte(xmlStr), &p2)
 fmt.Println(p2.Name, p2.ID) // Bob 2
 ```
+:::
 
 ### XML 属性处理
 
+::: details 点击展开代码：XML 属性处理
 ```go
 type Config struct {
     XMLName xml.Name `xml:"config"`
@@ -131,11 +134,13 @@ type Config struct {
 //   <database host="localhost" port="5432">mydb</database>
 // </config>
 ```
+:::
 
 ### 流式解析大 XML 文件（Token 流）
 
 <GoNetworkDiagram kind="xml-token-stream" />
 
+::: details 点击展开代码：流式解析大 XML 文件（Token 流）
 ```go
 // 不需要将整个 XML 加载到内存
 func parseProducts(r io.Reader) ([]Product, error) {
@@ -184,9 +189,11 @@ func parseProducts(r io.Reader) ([]Product, error) {
     return products, nil
 }
 ```
+:::
 
 ### 流式解码（Decode 方法）
 
+::: details 点击展开代码：流式解码（Decode 方法）
 ```go
 // 比 Token 更高级：自动映射到结构体
 func streamDecode(r io.Reader) error {
@@ -216,9 +223,11 @@ func streamDecode(r io.Reader) error {
     }
 }
 ```
+:::
 
 ### 命名空间
 
+::: details 点击展开代码：命名空间
 ```go
 type SOAPEnvelope struct {
     XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope/ Envelope"`
@@ -234,9 +243,11 @@ env := SOAPEnvelope{}
 data, _ := xml.MarshalIndent(env, "", "  ")
 // <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">...</Envelope>
 ```
+:::
 
 ### 实现 Marshaler/Unmarshaler 接口
 
+::: details 点击展开代码：实现 Marshaler/Unmarshaler 接口
 ```go
 // 自定义编码（实现 xml.Marshaler）
 type Duration time.Duration
@@ -259,6 +270,7 @@ func (d *Duration) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error 
     return nil
 }
 ```
+:::
 
 ---
 

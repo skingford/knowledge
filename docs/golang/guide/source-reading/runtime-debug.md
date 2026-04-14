@@ -45,6 +45,7 @@ runtime/debug 功能全景
 
 ## 一、核心 API 实现
 
+::: details 点击展开代码：一、核心 API 实现
 ```go
 // src/runtime/debug/stack.go
 func Stack() []byte {
@@ -73,6 +74,7 @@ func SetGCPercent(percent int) int {
 // 0 表示无限制，math.MaxInt64 也表示无限制
 func SetMemoryLimit(limit int64) int64
 ```
+:::
 
 <GoRuntimeDiagram kind="stack-capture-flow" />
 
@@ -112,6 +114,7 @@ GC 触发条件（GOGC + GOMEMLIMIT）
 
 <GoRuntimeDiagram kind="stack-capture-flow" />
 
+::: details 点击展开代码：Panic 恢复 + 栈追踪
 ```go
 // 标准 panic 恢复模式（含完整栈追踪）
 func safeHandler(next http.Handler) http.Handler {
@@ -150,9 +153,11 @@ func catchPanic(fn func()) (err error) {
     return nil
 }
 ```
+:::
 
 ### GC 统计监控
 
+::: details 点击展开代码：GC 统计监控
 ```go
 func monitorGC(ctx context.Context, interval time.Duration) {
     ticker := time.NewTicker(interval)
@@ -186,9 +191,11 @@ func printMemStats() {
     fmt.Printf("PauseTotalNs: %v ms\n", m.PauseTotalNs/1e6)
 }
 ```
+:::
 
 ### 内存限制（容器部署）
 
+::: details 点击展开代码：内存限制（容器部署）
 ```go
 func init() {
     // 读取容器内存限制（cgroup v2）
@@ -213,11 +220,13 @@ func readCgroupMemLimit() int64 {
     return limit
 }
 ```
+:::
 
 ### 读取构建信息（Go 1.18+）
 
 <GoEngineeringDiagram kind="buildinfo-read-flow" />
 
+::: details 点击展开代码：读取构建信息（Go 1.18+）
 ```go
 func printBuildInfo() {
     info, ok := debug.ReadBuildInfo()
@@ -256,9 +265,11 @@ func printBuildInfo() {
 //   vcs.revision = abc123def456
 //   vcs.time = 2026-03-12T10:00:00Z
 ```
+:::
 
 ### 强制 GC + 内存归还（内存密集型任务后）
 
+::: details 点击展开代码：强制 GC + 内存归还（内存密集型任务后）
 ```go
 func processLargeDataset(data [][]byte) {
     // 处理大量数据
@@ -274,9 +285,11 @@ func processLargeDataset(data [][]byte) {
     debug.FreeOSMemory()  // 将空闲 span 归还 OS（适合内存峰值后）
 }
 ```
+:::
 
 ### 自定义崩溃处理（Go 1.23+）
 
+::: details 点击展开代码：自定义崩溃处理（Go 1.23+）
 ```go
 func init() {
     // 崩溃日志写入文件（而非 stderr）
@@ -287,6 +300,7 @@ func init() {
     }
 }
 ```
+:::
 
 ---
 

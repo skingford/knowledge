@@ -45,6 +45,7 @@ embed 包架构
 
 ## 一、embed.FS 内部结构
 
+::: details 点击展开代码：一、embed.FS 内部结构
 ```go
 // src/embed/embed.go
 type FS struct {
@@ -59,6 +60,7 @@ type file struct {
     hash [16]byte // MD5 摘要（用于 io/fs 接口的 hash 方法）
 }
 ```
+:::
 
 ```
 embed.FS 的数据存储原理
@@ -128,6 +130,7 @@ embed.FS 的数据存储原理
 
 <GoNetworkDiagram kind="fs-abstraction" />
 
+::: details 点击展开代码：三、fs.FS 接口体系
 ```go
 // src/io/fs/fs.go
 type FS interface {
@@ -153,6 +156,7 @@ type DirEntry interface {
     Info() (FileInfo, error) // 按需获取完整信息（懒加载）
 }
 ```
+:::
 
 ---
 
@@ -160,6 +164,7 @@ type DirEntry interface {
 
 ### 嵌入单个文件
 
+::: details 点击展开代码：嵌入单个文件
 ```go
 package main
 
@@ -179,9 +184,11 @@ func main() {
     // defaultConfig 直接可用，无需 os.ReadFile
 }
 ```
+:::
 
 ### 嵌入完整 Web 静态资源
 
+::: details 点击展开代码：嵌入完整 Web 静态资源
 ```go
 package main
 
@@ -202,9 +209,11 @@ func main() {
     http.ListenAndServe(":8080", nil)
 }
 ```
+:::
 
 ### 嵌入 HTML 模板
 
+::: details 点击展开代码：嵌入 HTML 模板
 ```go
 //go:embed templates
 var tmplFS embed.FS
@@ -217,9 +226,11 @@ func renderPage(w http.ResponseWriter, data any) error {
     return templates.ExecuteTemplate(w, "index.html", data)
 }
 ```
+:::
 
 ### 遍历嵌入目录
 
+::: details 点击展开代码：遍历嵌入目录
 ```go
 //go:embed migrations
 var migrationsFS embed.FS
@@ -243,9 +254,11 @@ func loadMigrations() ([]Migration, error) {
     return migrations, err
 }
 ```
+:::
 
 ### 开发/生产模式切换（build tag）
 
+::: details 点击展开代码：开发/生产模式切换（build tag）
 ```go
 // embed_prod.go（生产：嵌入静态文件）
 //go:build !dev
@@ -262,7 +275,9 @@ func getFS() fs.FS {
     return sub
 }
 ```
+:::
 
+::: details 点击展开代码：开发/生产模式切换（build tag）
 ```go
 // embed_dev.go（开发：从磁盘读取，支持热更新）
 //go:build dev
@@ -275,6 +290,7 @@ func getFS() fs.FS {
     return os.DirFS("./dist") // 直接读磁盘
 }
 ```
+:::
 
 ---
 

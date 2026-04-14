@@ -51,6 +51,7 @@ net/http/httptest 两大工具
 
 ## 一、ResponseRecorder 实现
 
+::: details 点击展开代码：一、ResponseRecorder 实现
 ```go
 // src/net/http/httptest/recorder.go
 type ResponseRecorder struct {
@@ -96,6 +97,7 @@ func (rw *ResponseRecorder) Result() *http.Response {
     return res
 }
 ```
+:::
 
 ---
 
@@ -103,6 +105,7 @@ func (rw *ResponseRecorder) Result() *http.Response {
 
 ### Handler 单元测试（ResponseRecorder）
 
+::: details 点击展开代码：Handler 单元测试（ResponseRecorder）
 ```go
 // 被测 handler
 func helloHandler(w http.ResponseWriter, r *http.Request) {
@@ -147,9 +150,11 @@ func TestHelloHandler(t *testing.T) {
     }
 }
 ```
+:::
 
 ### 测试 JSON API handler
 
+::: details 点击展开代码：测试 JSON API handler
 ```go
 type CreateUserRequest struct {
     Name  string `json:"name"`
@@ -198,9 +203,11 @@ func TestCreateUserHandler(t *testing.T) {
     }
 }
 ```
+:::
 
 ### 测试中间件
 
+::: details 点击展开代码：测试中间件
 ```go
 // 被测中间件：JWT 鉴权
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -242,9 +249,11 @@ func TestAuthMiddleware(t *testing.T) {
     })
 }
 ```
+:::
 
 ### 集成测试（httptest.Server）
 
+::: details 点击展开代码：集成测试（httptest.Server）
 ```go
 func TestHTTPIntegration(t *testing.T) {
     // 启动真实 HTTP 服务器
@@ -269,9 +278,11 @@ func TestHTTPIntegration(t *testing.T) {
     }
 }
 ```
+:::
 
 ### TLS 集成测试
 
+::: details 点击展开代码：TLS 集成测试
 ```go
 func TestTLSServer(t *testing.T) {
     srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -291,9 +302,11 @@ func TestTLSServer(t *testing.T) {
     }
 }
 ```
+:::
 
 ### 测试外部 HTTP 依赖（Mock 服务）
 
+::: details 点击展开代码：测试外部 HTTP 依赖（Mock 服务）
 ```go
 // 模拟第三方 API
 func TestFetchUser(t *testing.T) {
@@ -320,6 +333,7 @@ func TestFetchUser(t *testing.T) {
     }
 }
 ```
+:::
 
 ---
 

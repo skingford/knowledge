@@ -153,6 +153,7 @@ Unmarshal(data, v) 流程
 
 ### 基本用法
 
+::: details 点击展开代码：基本用法
 ```go
 type Order struct {
     ID     int64   `json:"id"`
@@ -170,11 +171,13 @@ data, _ := json.Marshal(o)
 var o2 Order
 _ = json.Unmarshal(data, &o2)
 ```
+:::
 
 ### 流式处理（大文件场景）
 
 <GoNetworkDiagram kind="json-stream-decoder" />
 
+::: details 点击展开代码：流式处理（大文件场景）
 ```go
 // 流式编码：直接写 ResponseWriter，无需全量 buffer
 func writeJSON(w http.ResponseWriter, v any) {
@@ -194,9 +197,11 @@ func processJSONLines(r io.Reader) {
     }
 }
 ```
+:::
 
 ### 自定义序列化
 
+::: details 点击展开代码：自定义序列化
 ```go
 type Time struct{ time.Time }
 
@@ -216,9 +221,11 @@ func (t *Time) UnmarshalJSON(data []byte) error {
     return err
 }
 ```
+:::
 
 ### RawMessage：延迟/按需解码
 
+::: details 点击展开代码：RawMessage：延迟/按需解码
 ```go
 type Response struct {
     Code int             `json:"code"`
@@ -232,6 +239,7 @@ json.Unmarshal(body, &resp)
 var user User
 json.Unmarshal(resp.Data, &user)
 ```
+:::
 
 ---
 

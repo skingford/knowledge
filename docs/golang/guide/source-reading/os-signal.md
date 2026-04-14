@@ -50,6 +50,7 @@ os/signal 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/os/signal/signal.go（简化）
 
@@ -91,6 +92,7 @@ func process(sig os.Signal) {
     }
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="signal-notify-flow" />
 
@@ -102,6 +104,7 @@ func process(sig os.Signal) {
 
 <GoNetworkDiagram kind="graceful-shutdown" />
 
+::: details 点击展开代码：优雅关闭 HTTP 服务器
 ```go
 import (
     "context"
@@ -147,9 +150,11 @@ func gracefulServer() {
     log.Println("服务已关闭")
 }
 ```
+:::
 
 ### SIGHUP 触发配置热重载
 
+::: details 点击展开代码：SIGHUP 触发配置热重载
 ```go
 type Config struct {
     mu      sync.RWMutex
@@ -191,9 +196,11 @@ func watchConfig(cfg *Config, path string) {
 
 // 触发：kill -HUP <pid>
 ```
+:::
 
 ### 多信号处理（完整生产模板）
 
+::: details 点击展开代码：多信号处理（完整生产模板）
 ```go
 func runWithSignals(ctx context.Context, server *http.Server) error {
     // 启动服务
@@ -244,9 +251,11 @@ func runWithSignals(ctx context.Context, server *http.Server) error {
     }
 }
 ```
+:::
 
 ### K8s Pod 终止流程（最佳实践）
 
+::: details 点击展开代码：K8s Pod 终止流程（最佳实践）
 ```go
 // K8s 终止流程：
 // 1. Pod 状态 → Terminating
@@ -284,9 +293,11 @@ func k8sGracefulShutdown(server *http.Server) {
     server.Shutdown(ctx)
 }
 ```
+:::
 
 ### 忽略 SIGPIPE（网络服务常用）
 
+::: details 点击展开代码：忽略 SIGPIPE（网络服务常用）
 ```go
 func init() {
     // 网络服务中，客户端断开连接时会产生 SIGPIPE
@@ -294,6 +305,7 @@ func init() {
     signal.Ignore(syscall.SIGPIPE)
 }
 ```
+:::
 
 ---
 

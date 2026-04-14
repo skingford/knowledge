@@ -45,6 +45,7 @@ strings / bytes 包结构对比
 
 ### 结构与原理
 
+::: details 点击展开代码：结构与原理
 ```go
 // src/strings/builder.go
 type Builder struct {
@@ -73,6 +74,7 @@ func (b *Builder) Grow(n int) {
     }
 }
 ```
+:::
 
 ```
 Builder 内存增长策略（继承自 slice append）
@@ -154,6 +156,7 @@ Buffer vs Builder：
 
 ### strings 包
 
+::: details 点击展开代码：strings 包
 ```go
 // 判断
 strings.Contains("seafood", "foo")        // true
@@ -192,6 +195,7 @@ strings.Repeat("na", 3)                  // "nanana"
 strings.Title("hello world")             // "Hello World"（Deprecated，用 golang.org/x/text）
 strings.NewReplacer("a", "A", "b", "B").Replace("abc") // "ABc"
 ```
+:::
 
 ---
 
@@ -234,6 +238,7 @@ string ↔ []byte 转换的底层机制
 
 ### strings.Builder 构建 SQL
 
+::: details 点击展开代码：strings.Builder 构建 SQL
 ```go
 func buildQuery(table string, fields []string, where map[string]any) string {
     var b strings.Builder
@@ -258,9 +263,11 @@ func buildQuery(table string, fields []string, where map[string]any) string {
     return b.String()
 }
 ```
+:::
 
 ### bytes.Buffer 协议解析
 
+::: details 点击展开代码：bytes.Buffer 协议解析
 ```go
 func parseResponse(data []byte) (headers map[string]string, body []byte) {
     buf := bytes.NewBuffer(data)
@@ -282,9 +289,11 @@ func parseResponse(data []byte) (headers map[string]string, body []byte) {
     return
 }
 ```
+:::
 
 ### strings.NewReplacer 批量替换（比多次 Replace 快）
 
+::: details 点击展开代码：strings.NewReplacer 批量替换（比多次 Replace 快）
 ```go
 // NewReplacer 内部构建替换树，O(n) 扫描一次完成所有替换
 var htmlEscaper = strings.NewReplacer(
@@ -299,9 +308,11 @@ func escapeHTML(s string) string {
     return htmlEscaper.Replace(s)
 }
 ```
+:::
 
 ### strings.Cut 简化解析
 
+::: details 点击展开代码：strings.Cut 简化解析
 ```go
 // Go 1.18+ 推荐替代 SplitN(...,2)
 func parseHostPort(addr string) (host, port string, ok bool) {
@@ -312,6 +323,7 @@ func parseHostPort(addr string) (host, port string, ok bool) {
 // "localhost:8080" → host="localhost", port="8080", ok=true
 // "localhost"      → host="localhost", port="",        ok=false
 ```
+:::
 
 ---
 

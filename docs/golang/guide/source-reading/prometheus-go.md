@@ -47,6 +47,7 @@ prometheus/client_golang 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // Counter 实现（简化）
 type counter struct {
@@ -70,6 +71,7 @@ func (c *counter) Add(v float64) {
 // Histogram 实现：写时加速（每个 bucket 独立原子计数）
 // 采集时计算累积分布（_count, _sum, _bucket{le="..."})
 ```
+:::
 
 ---
 
@@ -77,6 +79,7 @@ func (c *counter) Add(v float64) {
 
 ### 基础：四种指标类型
 
+::: details 点击展开代码：基础：四种指标类型
 ```go
 import (
     "github.com/prometheus/client_golang/prometheus"
@@ -137,9 +140,11 @@ func main() {
     http.ListenAndServe(":9090", nil)
 }
 ```
+:::
 
 ### HTTP 中间件（自动埋点）
 
+::: details 点击展开代码：HTTP 中间件（自动埋点）
 ```go
 // 在 HTTP 中间件中自动采集请求指标
 func metricsMiddleware(next http.Handler) http.Handler {
@@ -179,9 +184,11 @@ func normalizePath(path string) string {
     return re.ReplaceAllString(path, "/:id")
 }
 ```
+:::
 
 ### 自定义 Collector（批量采集）
 
+::: details 点击展开代码：自定义 Collector（批量采集）
 ```go
 // 自定义 Collector 适合从外部系统批量拉取指标
 // 例：从数据库查询各状态订单数量
@@ -268,9 +275,11 @@ func setupMetrics(db *sql.DB) {
     prometheus.MustRegister(collector)
 }
 ```
+:::
 
 ### 独立 Registry（测试/多服务实例）
 
+::: details 点击展开代码：独立 Registry（测试/多服务实例）
 ```go
 // 使用独立 Registry 避免全局状态（推荐生产）
 func newRegistry() (*prometheus.Registry, *AppMetrics) {
@@ -330,9 +339,11 @@ func TestMetrics(t *testing.T) {
     }
 }
 ```
+:::
 
 ### Go 运行时指标（开箱即用）
 
+::: details 点击展开代码：Go 运行时指标（开箱即用）
 ```go
 // collectors.NewGoCollector() 自动暴露的指标：
 // go_goroutines              - goroutine 数量
@@ -347,6 +358,7 @@ func TestMetrics(t *testing.T) {
 // rate(go_gc_duration_seconds_count[5m])        ← GC 频率
 // go_memstats_heap_inuse_bytes / 1024 / 1024    ← 堆内存 MB
 ```
+:::
 
 ---
 

@@ -50,6 +50,7 @@ html/template 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/html/template/escape.go（简化）
 
@@ -69,6 +70,7 @@ var escapeMap = map[state][]string{
     stateCSS:  {"_html_template_cssvalescaper"}, // CSS 上下文
 }
 ```
+:::
 
 ---
 
@@ -76,6 +78,7 @@ var escapeMap = map[state][]string{
 
 ### 基础：自动 XSS 防护
 
+::: details 点击展开代码：基础：自动 XSS 防护
 ```go
 import (
     "html/template"
@@ -98,9 +101,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
     tmpl.Execute(w, userInput)
 }
 ```
+:::
 
 ### 上下文感知转义演示
 
+::: details 点击展开代码：上下文感知转义演示
 ```go
 // 不同 HTML 上下文的转义策略不同
 const multiContextTmpl = `
@@ -140,9 +145,11 @@ data := struct {
 tmpl := template.Must(template.New("").Parse(multiContextTmpl))
 tmpl.Execute(os.Stdout, data)
 ```
+:::
 
 ### 模板继承（base layout + 页面填充）
 
+::: details 点击展开代码：模板继承（base layout + 页面填充）
 ```go
 // base.html：基础布局模板
 // 使用 define/block 实现继承
@@ -183,9 +190,11 @@ func renderPage(w io.Writer, users []User) error {
     return tmpl.ExecuteTemplate(w, "base", map[string]any{"Users": users})
 }
 ```
+:::
 
 ### 自定义模板函数
 
+::: details 点击展开代码：自定义模板函数
 ```go
 var funcMap = template.FuncMap{
     "formatTime": func(t time.Time) string {
@@ -212,9 +221,11 @@ const articleTmpl = `
 
 tmpl := template.Must(template.New("").Funcs(funcMap).Parse(articleTmpl))
 ```
+:::
 
 ### 从 embed 加载模板（单二进制部署）
 
+::: details 点击展开代码：从 embed 加载模板（单二进制部署）
 ```go
 //go:embed templates/*.html
 var templateFS embed.FS
@@ -236,9 +247,11 @@ func renderHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 ```
+:::
 
 ### 安全类型：标记已经过处理的内容
 
+::: details 点击展开代码：安全类型：标记已经过处理的内容
 ```go
 // template.HTML：告知引擎此内容已安全，跳过 HTML 转义
 // ⚠️ 仅在确认内容来自可信来源时使用
@@ -260,6 +273,7 @@ func renderLink(w io.Writer, trustedURL string) error {
     return tmpl.Execute(w, template.URL(trustedURL))
 }
 ```
+:::
 
 ---
 

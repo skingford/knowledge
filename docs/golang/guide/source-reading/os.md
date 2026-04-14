@@ -47,6 +47,7 @@ os 包架构分层
 
 ## 一、os.File 结构
 
+::: details 点击展开代码：一、os.File 结构
 ```go
 // src/os/file.go
 type File struct {
@@ -73,6 +74,7 @@ type FD struct {
     IsBlocking uint32  // 是否阻塞
 }
 ```
+:::
 
 ```
 File → poll.FD → netpoller 关系
@@ -130,6 +132,7 @@ os.Open / os.OpenFile 流程
 
 ## 三、FileInfo 与 os.Stat
 
+::: details 点击展开代码：三、FileInfo 与 os.Stat
 ```go
 // os.Stat 返回 fs.FileInfo 接口
 type FileInfo interface {
@@ -151,11 +154,13 @@ func getInode(path string) (uint64, error) {
     return stat.Ino, nil // inode 号
 }
 ```
+:::
 
 ---
 
 ## 四、进程操作
 
+::: details 点击展开代码：四、进程操作
 ```go
 // src/os/exec.go
 type Process struct {
@@ -175,6 +180,7 @@ type ProcessState struct {
     rusage *syscall.Rusage    // 资源使用量
 }
 ```
+:::
 
 ```
 os.StartProcess vs exec.Command
@@ -200,6 +206,7 @@ os.StartProcess vs exec.Command
 
 ### 文件读写（推荐方式）
 
+::: details 点击展开代码：文件读写（推荐方式）
 ```go
 // 读取整个文件（Go 1.16+，内部用 bytes.Buffer 或 os.File.Read）
 data, err := os.ReadFile("config.json")
@@ -216,9 +223,11 @@ func writeAtomic(path string, data []byte) error {
     return os.Rename(tmpPath, path) // Rename 在同一文件系统上是原子操作
 }
 ```
+:::
 
 ### 高效追加写入
 
+::: details 点击展开代码：高效追加写入
 ```go
 func appendLog(path, line string) error {
     f, err := os.OpenFile(path,
@@ -232,11 +241,13 @@ func appendLog(path, line string) error {
     return err
 }
 ```
+:::
 
 ### 目录遍历（Go 1.16+ WalkDir）
 
 <GoNetworkDiagram kind="walkdir-flow" />
 
+::: details 点击展开代码：目录遍历（Go 1.16+ WalkDir）
 ```go
 import "io/fs"
 
@@ -254,9 +265,11 @@ func findGoFiles(root string) ([]string, error) {
     return files, err
 }
 ```
+:::
 
 ### 进程操作
 
+::: details 点击展开代码：进程操作
 ```go
 import "os/exec"
 
@@ -291,9 +304,11 @@ func runWithTimeout(ctx context.Context, timeout time.Duration, cmd string, args
     return nil
 }
 ```
+:::
 
 ### 临时文件与目录
 
+::: details 点击展开代码：临时文件与目录
 ```go
 // 创建临时文件（用完自动清理）
 func processWithTemp(data []byte) error {
@@ -322,9 +337,11 @@ func workInTempDir(fn func(dir string) error) error {
     return fn(dir)
 }
 ```
+:::
 
 ### 文件权限与信息
 
+::: details 点击展开代码：文件权限与信息
 ```go
 // 检查文件是否存在
 func fileExists(path string) bool {
@@ -344,6 +361,7 @@ if err == nil {
         info.Size(), float64(info.Size())/1024/1024)
 }
 ```
+:::
 
 ---
 

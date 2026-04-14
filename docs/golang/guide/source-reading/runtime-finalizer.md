@@ -50,6 +50,7 @@ runtime.SetFinalizer 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/runtime/mfinal.go（简化）
 
@@ -72,6 +73,7 @@ func KeepAlive(x any) {
     // 无实际代码，纯编译器语义
 }
 ```
+:::
 
 ---
 
@@ -79,6 +81,7 @@ func KeepAlive(x any) {
 
 ### 资源泄漏检测（调试工具）
 
+::: details 点击展开代码：资源泄漏检测（调试工具）
 ```go
 import (
     "runtime"
@@ -133,9 +136,11 @@ func processFile(name string) error {
     return nil
 }
 ```
+:::
 
 ### 外部 C 资源管理
 
+::: details 点击展开代码：外部 C 资源管理
 ```go
 // #cgo 场景：管理 C 库分配的内存
 // （无法通过 Go GC 自动管理）
@@ -186,9 +191,11 @@ func (b *CBuffer) Bytes() []byte {
     return (*[1 << 30]byte)(unsafe.Pointer(b.ptr))[:b.size:b.size]
 }
 ```
+:::
 
 ### KeepAlive：防止提前终结化
 
+::: details 点击展开代码：KeepAlive：防止提前终结化
 ```go
 // 问题：编译器可能在最后一次使用 obj 后认为它不可达
 // 导致终结器过早执行（在关联的 C/OS 资源还在使用时）
@@ -218,9 +225,11 @@ func processData(data *LargeData) {
     return result
 }
 ```
+:::
 
 ### 弱引用模式（Go 1.24 前的方案）
 
+::: details 点击展开代码：弱引用模式（Go 1.24 前的方案）
 ```go
 // Go 1.23 前：用 map+WeakRef 实现弱引用
 // （Go 1.24+ 有 weak.Pointer 官方支持）
@@ -268,9 +277,11 @@ func (b *EventBus) Emit(event Event) {
     b.handlers = alive
 }
 ```
+:::
 
 ### 对象池与终结器配合
 
+::: details 点击展开代码：对象池与终结器配合
 ```go
 // 场景：对象池中检测对象是否被归还
 type PooledConn struct {
@@ -302,6 +313,7 @@ func (p *ConnPool) Put(c *PooledConn) {
     p.pool <- c.conn
 }
 ```
+:::
 
 ---
 

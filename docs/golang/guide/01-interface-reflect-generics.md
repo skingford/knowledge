@@ -15,6 +15,7 @@ Go 的接口在运行时有两种底层结构：`eface`（空接口 `interface{}
 
 <GoLanguageDiagram kind="interface-nil" />
 
+::: details 点击展开代码：7. Interface 底层原理
 ```go
 package main
 
@@ -103,6 +104,7 @@ func main() {
 	describe(Rect{W: 4, H: 5})
 }
 ```
+:::
 
 讲解重点：
 
@@ -118,6 +120,7 @@ Go 的 `reflect` 包提供运行时类型检查和值操作能力。`reflect.Typ
 
 <GoLanguageDiagram kind="reflect-settable" />
 
+::: details 点击展开代码：8. 反射 reflect
 ```go
 package main
 
@@ -205,6 +208,7 @@ func main() {
 	}
 }
 ```
+:::
 
 讲解重点：
 
@@ -220,6 +224,7 @@ Go 1.18 引入泛型，通过类型参数（type parameters）和类型约束（
 
 <GoLanguageDiagram kind="generics-constraint" />
 
+::: details 点击展开代码：9. 泛型 generics
 ```go
 package main
 
@@ -310,6 +315,7 @@ func main() {
 	fmt.Println("cmp:", cmp.Compare(3, 5)) // -1
 }
 ```
+:::
 
 讲解重点：
 
