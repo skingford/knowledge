@@ -15,6 +15,7 @@ CPU Profile 是定位"程序到底在哪儿花时间"的核心手段。Go 内置
 
 ### 命令行程序采集
 
+::: details 点击展开代码：命令行程序采集
 ```go
 package main
 
@@ -47,9 +48,11 @@ func main() {
 	hotFunction()
 }
 ```
+:::
 
 ### HTTP 服务采集
 
+::: details 点击展开代码：HTTP 服务采集
 ```go
 package main
 
@@ -65,9 +68,11 @@ func main() {
 	log.Fatal(http.ListenAndServe(":6060", nil))
 }
 ```
+:::
 
 ### 常用命令
 
+::: details 点击展开代码：常用命令
 ```bash
 # 采集 30 秒 CPU profile
 go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
@@ -80,6 +85,7 @@ go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
 # 直接生成火焰图（Go 1.22+）
 go tool pprof -http=:8080 cpu.prof
 ```
+:::
 
 <GoPerformanceDiagram kind="cpu-pprof" />
 
@@ -97,6 +103,7 @@ go tool pprof -http=:8080 cpu.prof
 
 ### 采集与分析
 
+::: details 点击展开代码：采集与分析
 ```go
 package main
 
@@ -129,9 +136,11 @@ func main() {
 	fmt.Println("total slices:", len(data))
 }
 ```
+:::
 
 ### 常用命令
 
+::: details 点击展开代码：常用命令
 ```bash
 # 查看当前在用对象（定位内存泄漏）
 go tool pprof -inuse_space mem.prof
@@ -145,6 +154,7 @@ go tool pprof http://localhost:6060/debug/pprof/heap
 # 对比两个时间点的 heap，找增长点
 go tool pprof -base heap1.prof heap2.prof
 ```
+:::
 
 <GoPerformanceDiagram kind="heap-profile" />
 
@@ -164,6 +174,7 @@ go tool pprof -base heap1.prof heap2.prof
 
 ### 采集 Trace
 
+::: details 点击展开代码：采集 Trace
 ```go
 package main
 
@@ -209,9 +220,11 @@ func main() {
 	wg.Wait()
 }
 ```
+:::
 
 ### HTTP 服务采集
 
+::: details 点击展开代码：HTTP 服务采集
 ```bash
 # 采集 5 秒的 trace
 curl -o trace.out http://localhost:6060/debug/pprof/trace?seconds=5
@@ -219,6 +232,7 @@ curl -o trace.out http://localhost:6060/debug/pprof/trace?seconds=5
 # 用浏览器打开 trace 可视化
 go tool trace trace.out
 ```
+:::
 
 <GoPerformanceDiagram kind="trace-timeline" />
 
@@ -236,6 +250,7 @@ Go 内置的 benchmark 框架是性能优化的基础工具，可以量化优化
 
 ### 基本用法
 
+::: details 点击展开代码：基本用法
 ```go
 // fib_test.go
 package main
@@ -280,9 +295,11 @@ func BenchmarkFib(b *testing.B) {
 	}
 }
 ```
+:::
 
 ### 内存分配统计
 
+::: details 点击展开代码：内存分配统计
 ```go
 func BenchmarkStringConcat(b *testing.B) {
 	b.ReportAllocs() // 报告每次操作的内存分配次数和字节数
@@ -294,9 +311,11 @@ func BenchmarkStringConcat(b *testing.B) {
 	}
 }
 ```
+:::
 
 ### 常用命令
 
+::: details 点击展开代码：常用命令
 ```bash
 # 运行所有 benchmark
 go test -bench=. -benchmem ./...
@@ -312,6 +331,7 @@ go test -bench=. -count=5 . > new.txt
 # 用 benchstat 对比（需安装：go install golang.org/x/perf/cmd/benchstat@latest）
 benchstat old.txt new.txt
 ```
+:::
 
 <GoPerformanceDiagram kind="benchmark-benchstat" />
 

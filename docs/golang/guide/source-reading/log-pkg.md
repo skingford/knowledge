@@ -48,6 +48,7 @@ log 包体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/log/log.go（简化）
 type Logger struct {
@@ -94,6 +95,7 @@ func (l *Logger) Panic(v ...any) {
     panic(s) // ← 触发 panic，defer 会执行
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="log-output-flow" />
 
@@ -103,6 +105,7 @@ func (l *Logger) Panic(v ...any) {
 
 ### 基础用法与 Flag 控制
 
+::: details 点击展开代码：基础用法与 Flag 控制
 ```go
 import "log"
 
@@ -125,9 +128,11 @@ func basics() {
     log.SetFlags(log.Ltime | log.Lmicroseconds)
 }
 ```
+:::
 
 ### 自定义 Logger（多目标输出）
 
+::: details 点击展开代码：自定义 Logger（多目标输出）
 ```go
 func setupLoggers() (*log.Logger, *log.Logger, *log.Logger) {
     // 信息日志 → 标准输出
@@ -152,9 +157,11 @@ func setupMultiWriter() *log.Logger {
     return log.New(multi, "", log.LstdFlags)
 }
 ```
+:::
 
 ### Fatal vs Panic 的使用场景
 
+::: details 点击展开代码：Fatal vs Panic 的使用场景
 ```go
 func useFatal() {
     db, err := sql.Open("postgres", dsn)
@@ -193,9 +200,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 在 HTTP 中间件中集成
 
+::: details 点击展开代码：在 HTTP 中间件中集成
 ```go
 // 请求日志中间件
 func loggingMiddleware(logger *log.Logger, next http.Handler) http.Handler {
@@ -221,11 +230,13 @@ func (lrw *loggingResponseWriter) WriteHeader(code int) {
     lrw.ResponseWriter.WriteHeader(code)
 }
 ```
+:::
 
 ### 从 log 迁移到 log/slog（Go 1.21+）
 
 <GoEngineeringDiagram kind="slog-pipeline" />
 
+::: details 点击展开代码：从 log 迁移到 log/slog（Go 1.21+）
 ```go
 // 旧代码（log）
 log.Printf("user login: id=%d name=%s", user.ID, user.Name)
@@ -247,9 +258,11 @@ func setupSlog() {
 
 // 输出：{"time":"2024-01-01T00:00:00Z","level":"INFO","msg":"user login","user_id":42,"name":"Alice"}
 ```
+:::
 
 ### 测试中捕获日志
 
+::: details 点击展开代码：测试中捕获日志
 ```go
 func TestMyFunc(t *testing.T) {
     // 将日志重定向到测试输出
@@ -263,6 +276,7 @@ func TestMyFunc(t *testing.T) {
     }
 }
 ```
+:::
 
 ---
 

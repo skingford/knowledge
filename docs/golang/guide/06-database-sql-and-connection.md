@@ -12,6 +12,7 @@ search: false
 
 ## 1. 基础用法：Open、Query、Exec、Scan
 
+::: details 点击展开代码：1. 基础用法：Open、Query、Exec、Scan
 ```go
 package main
 
@@ -88,11 +89,13 @@ func main() {
 	fmt.Printf("total users: %d\n", len(users))
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="dbsql-lifecycle" />
 
 ## 2. Prepared Statements
 
+::: details 点击展开代码：2. Prepared Statements
 ```go
 func batchInsertUsers(db *sql.DB, names []string) error {
 	// Prepare 会在数据库端预编译 SQL，适合同一语句反复执行的场景
@@ -111,6 +114,7 @@ func batchInsertUsers(db *sql.DB, names []string) error {
 	return nil
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="prepared-statement" />
 
@@ -128,6 +132,7 @@ func batchInsertUsers(db *sql.DB, names []string) error {
 
 ### 连接池参数配置
 
+::: details 点击展开代码：连接池参数配置
 ```go
 package main
 
@@ -163,9 +168,11 @@ func initDB() *sql.DB {
 	return db
 }
 ```
+:::
 
 ### 连接池监控
 
+::: details 点击展开代码：连接池监控
 ```go
 package main
 
@@ -220,6 +227,7 @@ func dbStatsHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 ```
+:::
 
 <GoDataCacheDiagram kind="sql-pool-stats" />
 

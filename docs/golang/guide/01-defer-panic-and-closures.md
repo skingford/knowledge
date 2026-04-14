@@ -15,6 +15,7 @@ head:
 
 <GoLanguageDiagram kind="defer-panic" />
 
+::: details 点击展开代码：5. defer / panic / recover
 ```go
 package main
 
@@ -75,6 +76,7 @@ func main() {
 	fmt.Println("程序继续运行")
 }
 ```
+:::
 
 讲解重点：
 
@@ -90,6 +92,7 @@ func main() {
 
 <GoLanguageDiagram kind="closure-capture" />
 
+::: details 点击展开代码：6. 函数闭包
 ```go
 package main
 
@@ -166,6 +169,7 @@ func main() {
 	double(5)
 }
 ```
+:::
 
 讲解重点：
 

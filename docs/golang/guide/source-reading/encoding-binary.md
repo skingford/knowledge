@@ -57,6 +57,7 @@ encoding/binary 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/encoding/binary/binary.go（简化）
 
@@ -89,6 +90,7 @@ func PutUvarint(buf []byte, x uint64) int {
     return i + 1
 }
 ```
+:::
 
 ---
 
@@ -96,6 +98,7 @@ func PutUvarint(buf []byte, x uint64) int {
 
 ### 直接字节序操作（推荐，零反射）
 
+::: details 点击展开代码：直接字节序操作（推荐，零反射）
 ```go
 import "encoding/binary"
 
@@ -124,9 +127,11 @@ func parseHeader(data []byte) (magic uint32, version uint16, length uint32) {
     return
 }
 ```
+:::
 
 ### 自定义协议帧解析
 
+::: details 点击展开代码：自定义协议帧解析
 ```go
 // 协议格式：[Magic:4][Version:2][Type:1][Reserved:1][Length:4][Payload:N]
 const (
@@ -188,9 +193,11 @@ func ReadFrame(r io.Reader) (header FrameHeader, payload []byte, err error) {
     return
 }
 ```
+:::
 
 ### binary.Read/Write（反射版，适合结构体）
 
+::: details 点击展开代码：binary.Read/Write（反射版，适合结构体）
 ```go
 // 结构体必须包含固定大小类型（不支持 string/slice）
 type BinaryHeader struct {
@@ -218,11 +225,13 @@ func writeBinaryHeader(w io.Writer, h *BinaryHeader) error {
 // ⚠️ binary.Read/Write 使用反射，比直接操作字节慢 3-5 倍
 // 高性能场景（>1MB/s 或紧循环）应使用直接字节操作
 ```
+:::
 
 ### Varint：变长整数（Protocol Buffers 风格）
 
 <GoNetworkDiagram kind="binary-varint" />
 
+::: details 点击展开代码：Varint：变长整数（Protocol Buffers 风格）
 ```go
 // 场景：高效存储大量整数（小数字占 1 字节，大数字占多字节）
 func encodeVarint(values []int64) []byte {
@@ -256,9 +265,11 @@ func decodeVarints(data []byte) ([]int64, error) {
 // int64(16383) → 2 字节
 // int64(-1)    → 10 字节（zigzag 后为 1 → 1 字节）
 ```
+:::
 
 ### 检测系统字节序
 
+::: details 点击展开代码：检测系统字节序
 ```go
 import (
     "encoding/binary"
@@ -284,6 +295,7 @@ func readNativeInt32(r io.Reader) (int32, error) {
     return int32(nativeByteOrder().Uint32(buf[:])), nil
 }
 ```
+:::
 
 ---
 

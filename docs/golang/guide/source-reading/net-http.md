@@ -163,6 +163,7 @@ ServeMux 匹配规则
 
 ### 生产级 HTTP 服务端
 
+::: details 点击展开代码：生产级 HTTP 服务端
 ```go
 func main() {
     mux := http.NewServeMux()
@@ -200,6 +201,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusCreated)
 }
 ```
+:::
 
 这里要注意一个很容易混淆的边界：
 
@@ -209,6 +211,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 ### 生产级 HTTP 客户端
 
+::: details 点击展开代码：生产级 HTTP 客户端
 ```go
 var httpClient = &http.Client{
     Timeout: 10 * time.Second,
@@ -239,11 +242,13 @@ func fetch(ctx context.Context, url string) ([]byte, error) {
     return io.ReadAll(io.LimitReader(resp.Body, 10<<20)) // 限制 10MB
 }
 ```
+:::
 
 ### 中间件链
 
 <GoNetworkDiagram kind="middleware-chain" />
 
+::: details 点击展开代码：中间件链
 ```go
 type Middleware func(http.Handler) http.Handler
 
@@ -264,6 +269,7 @@ func Chain(h http.Handler, middlewares ...Middleware) http.Handler {
     return h
 }
 ```
+:::
 
 ---
 

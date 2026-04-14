@@ -51,6 +51,7 @@ Go I/O 接口层次
 
 ### Reader 接口
 
+::: details 点击展开代码：Reader 接口
 ```go
 // src/io/io.go
 type Reader interface {
@@ -62,6 +63,7 @@ type Reader interface {
     Read(p []byte) (n int, err error)
 }
 ```
+:::
 
 ```
 Read 调用约定（重要！）
@@ -154,6 +156,7 @@ bufio.Reader 结构
 
 ### 复制文件
 
+::: details 点击展开代码：复制文件
 ```go
 func copyFile(dst, src string) error {
     in, err := os.Open(src)
@@ -172,9 +175,11 @@ func copyFile(dst, src string) error {
     return err
 }
 ```
+:::
 
 ### 流式处理大文件
 
+::: details 点击展开代码：流式处理大文件
 ```go
 func countLines(path string) (int, error) {
     f, err := os.Open(path)
@@ -191,9 +196,11 @@ func countLines(path string) (int, error) {
     return count, scanner.Err()
 }
 ```
+:::
 
 ### TeeReader 调试
 
+::: details 点击展开代码：TeeReader 调试
 ```go
 func debugRequest(r io.Reader) {
     var buf bytes.Buffer
@@ -205,9 +212,11 @@ func debugRequest(r io.Reader) {
     fmt.Println("copy:", buf.String()) // 与 data 相同
 }
 ```
+:::
 
 ### 实现 Writer 接口
 
+::: details 点击展开代码：实现 Writer 接口
 ```go
 // 实现 io.Writer，统计写入字节数
 type CountWriter struct {
@@ -221,6 +230,7 @@ func (cw *CountWriter) Write(p []byte) (n int, err error) {
     return
 }
 ```
+:::
 
 ---
 

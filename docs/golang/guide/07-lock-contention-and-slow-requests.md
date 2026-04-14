@@ -15,6 +15,7 @@ head:
 
 ### 开启 Mutex Profile
 
+::: details 点击展开代码：开启 Mutex Profile
 ```go
 package main
 
@@ -56,9 +57,11 @@ func main() {
 	fmt.Println("counter:", counter)
 }
 ```
+:::
 
 ### 分析锁竞争
 
+::: details 点击展开代码：分析锁竞争
 ```bash
 # 采集 mutex profile
 go tool pprof http://localhost:6060/debug/pprof/mutex
@@ -67,11 +70,13 @@ go tool pprof http://localhost:6060/debug/pprof/mutex
 # (pprof) top
 # (pprof) list funcName
 ```
+:::
 
 <GoPerformanceDiagram kind="mutex-profile" />
 
 ### 分片降低锁粒度
 
+::: details 点击展开代码：分片降低锁粒度
 ```go
 package main
 
@@ -135,6 +140,7 @@ func main() {
 	wg.Wait()
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="sharded-map" />
 
@@ -152,6 +158,7 @@ func main() {
 
 ### 请求链路追踪中间件
 
+::: details 点击展开代码：请求链路追踪中间件
 ```go
 package main
 
@@ -212,9 +219,11 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", traceMiddleware(mux)))
 }
 ```
+:::
 
 ### 分段计时工具
 
+::: details 点击展开代码：分段计时工具
 ```go
 package main
 
@@ -274,6 +283,7 @@ func main() {
 	t.Report()
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="slow-request-breakdown" />
 

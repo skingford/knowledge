@@ -56,6 +56,7 @@ net/http/cookiejar 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/http/cookiejar/jar.go（简化）
 type Jar struct {
@@ -93,6 +94,7 @@ func (j *Jar) SetCookies(u *url.URL, cookies []*http.Cookie) {
     // 存储到 j.entries[key][id]
 }
 ```
+:::
 
 ---
 
@@ -100,6 +102,7 @@ func (j *Jar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 
 ### 基础使用：带 Cookie 的 HTTP 客户端
 
+::: details 点击展开代码：基础使用：带 Cookie 的 HTTP 客户端
 ```go
 import (
     "net/http"
@@ -148,9 +151,11 @@ func loginAndRequest(loginURL, apiURL string) error {
     return nil
 }
 ```
+:::
 
 ### 手动管理 Cookie（自定义 Jar）
 
+::: details 点击展开代码：手动管理 Cookie（自定义 Jar）
 ```go
 // 查看当前 Jar 中存储的 Cookie
 func inspectCookies(jar http.CookieJar, targetURL string) {
@@ -180,9 +185,11 @@ client := &http.Client{Jar: jar}
 injectCookie(jar, "https://example.com", "session", "pre-existing-token")
 resp, _ := client.Get("https://example.com/api/profile") // 自动携带 Cookie
 ```
+:::
 
 ### Cookie 持久化（跨进程保存）
 
+::: details 点击展开代码：Cookie 持久化（跨进程保存）
 ```go
 // cookiejar 自身不提供持久化，需自己实现
 type PersistentJar struct {
@@ -239,9 +246,11 @@ func (pj *PersistentJar) Save(targetURL string) error {
     return os.WriteFile(pj.path, data, 0600)
 }
 ```
+:::
 
 ### 爬虫：多域名 Cookie 管理
 
+::: details 点击展开代码：爬虫：多域名 Cookie 管理
 ```go
 // 爬虫场景：需要维护多个网站的独立会话
 type Spider struct {
@@ -287,9 +296,11 @@ client := spider.ClientFor("example.com")
 client.Get("https://example.com/login")
 // 每个域名独立的 Cookie 存储
 ```
+:::
 
 ### Public Suffix List 的作用
 
+::: details 点击展开代码：Public Suffix List 的作用
 ```go
 // 演示：为什么需要 Public Suffix List
 func demonstratePSL() {
@@ -308,6 +319,7 @@ func demonstratePSL() {
     fmt.Println(etldPlus1) // "example.co.uk"（.co.uk 是 eTLD）
 }
 ```
+:::
 
 ---
 

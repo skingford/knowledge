@@ -82,6 +82,7 @@ myproject/
 
 ### cmd 入口示例
 
+::: details 点击展开代码：cmd 入口示例
 ```go
 // cmd/api-server/main.go
 package main
@@ -133,6 +134,7 @@ func main() {
 	slog.Info("server stopped")
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="project-layout" />
 
@@ -150,6 +152,7 @@ Go Modules 是 Go 官方的依赖管理方案，从 Go 1.16 起默认开启。
 
 ### 基础命令
 
+::: details 点击展开代码：基础命令
 ```bash
 # 初始化模块
 go mod init github.com/yourname/myproject
@@ -169,9 +172,11 @@ go mod verify
 # 查看某个依赖的所有可用版本
 go list -m -versions github.com/gin-gonic/gin
 ```
+:::
 
 ### go.mod 详解
 
+::: details 点击展开代码：go.mod 详解
 ```go
 module github.com/yourname/myproject
 
@@ -198,9 +203,11 @@ replace (
 // exclude 指令：排除有问题的版本
 exclude github.com/some/lib v1.1.0
 ```
+:::
 
 ### 私有模块配置
 
+::: details 点击展开代码：私有模块配置
 ```bash
 # 设置私有模块路径，跳过 GOPROXY 和校验
 export GOPRIVATE=github.com/yourcompany/*,gitlab.internal.com/*
@@ -211,9 +218,11 @@ export GONOSUMCHECK=github.com/yourcompany/*
 # 配置 Git 使用 SSH 拉取私有仓库
 git config --global url."git@github.com:yourcompany/".insteadOf "https://github.com/yourcompany/"
 ```
+:::
 
 ### 版本管理最佳实践
 
+::: details 点击展开代码：版本管理最佳实践
 ```go
 // 使用 go mod edit 精确控制版本
 // go mod edit -require github.com/some/lib@v1.2.3
@@ -227,6 +236,7 @@ git config --global url."git@github.com:yourcompany/".insteadOf "https://github.
 // 只升级补丁版本
 // go get -u=patch ./...
 ```
+:::
 
 <GoEngineeringDiagram kind="go-mod-lifecycle" />
 
@@ -244,6 +254,7 @@ Go 1.21 引入的 `log/slog` 是官方推荐的结构化日志库，适合生产
 
 ### slog 基础用法
 
+::: details 点击展开代码：slog 基础用法
 ```go
 package main
 
@@ -271,9 +282,11 @@ func main() {
 	// 输出: {"time":"...","level":"INFO","msg":"user login","user_id":12345,"ip":"192.168.1.1","method":"POST"}
 }
 ```
+:::
 
 ### 日志级别与动态调整
 
+::: details 点击展开代码：日志级别与动态调整
 ```go
 package main
 
@@ -303,9 +316,11 @@ func main() {
 	slog.Debug("now debug prints") // 切换后可见
 }
 ```
+:::
 
 ### Context 感知日志
 
+::: details 点击展开代码：Context 感知日志
 ```go
 package main
 
@@ -343,9 +358,11 @@ func main() {
 	// 输出包含 request_id 字段
 }
 ```
+:::
 
 ### 日志分组与子 Logger
 
+::: details 点击展开代码：日志分组与子 Logger
 ```go
 func processOrder(logger *slog.Logger, orderID string) {
 	// 创建带固定字段的子 logger
@@ -373,6 +390,7 @@ func logWithGroup() {
 	)
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="slog-pipeline" />
 
@@ -390,6 +408,7 @@ func logWithGroup() {
 
 ### 环境变量方式
 
+::: details 点击展开代码：环境变量方式
 ```go
 package main
 
@@ -432,9 +451,11 @@ func getEnvOrDefault(key, defaultVal string) string {
 	return defaultVal
 }
 ```
+:::
 
 ### Viper 配置管理
 
+::: details 点击展开代码：Viper 配置管理
 ```go
 package config
 
@@ -522,9 +543,11 @@ func validate(cfg *Config) error {
 	return nil
 }
 ```
+:::
 
 ### 配置文件示例
 
+::: details 点击展开代码：配置文件示例
 ```yaml
 # configs/config.yaml
 server:
@@ -547,6 +570,7 @@ log:
   level: "info"
   format: "json"
 ```
+:::
 
 <GoEngineeringDiagram kind="config-priority" />
 

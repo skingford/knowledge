@@ -45,6 +45,7 @@ path vs path/filepath 对比
 
 ## 一、路径规范化（Clean）
 
+::: details 点击展开代码：一、路径规范化（Clean）
 ```go
 // src/path/filepath/path.go
 // Clean 做以下处理（不访问文件系统）：
@@ -61,6 +62,7 @@ examples := [][2]string{
     {"", "."},          // 空字符串规范化为当前目录
 }
 ```
+:::
 
 ---
 
@@ -68,6 +70,7 @@ examples := [][2]string{
 
 <GoNetworkDiagram kind="walkdir-flow" />
 
+::: details 点击展开代码：二、WalkDir 实现
 ```go
 // src/path/filepath/path.go（Go 1.16+）
 func WalkDir(root string, fn fs.WalkDirFunc) error {
@@ -101,6 +104,7 @@ func walkDir(path string, d fs.DirEntry, walkDirFn fs.WalkDirFunc) error {
     return nil
 }
 ```
+:::
 
 ```
 WalkDir vs Walk 的关键区别
@@ -158,6 +162,7 @@ filepath 对符号链接的处理
 
 ### 路径操作基础
 
+::: details 点击展开代码：路径操作基础
 ```go
 // 拼接（自动处理 OS 分隔符）
 p := filepath.Join("/var", "log", "app", "server.log")
@@ -180,9 +185,11 @@ abs, _ := filepath.Abs("./config.yaml")
 rel, _ := filepath.Rel("/var/log", "/var/log/app/server.log")
 // → app/server.log
 ```
+:::
 
 ### 目录遍历（收集指定类型文件）
 
+::: details 点击展开代码：目录遍历（收集指定类型文件）
 ```go
 func findFiles(root, ext string) ([]string, error) {
     var files []string
@@ -205,9 +212,11 @@ func findFiles(root, ext string) ([]string, error) {
 // 查找所有 .go 文件（跳过 vendor 和测试）
 goFiles, _ := findFiles(".", ".go")
 ```
+:::
 
 ### Glob 匹配
 
+::: details 点击展开代码：Glob 匹配
 ```go
 // filepath.Glob：在文件系统中查找匹配的文件
 matches, err := filepath.Glob("/etc/*.conf")
@@ -220,9 +229,11 @@ matches, err := filepath.Glob("/etc/*.conf")
 matched, _ := filepath.Match("*.go", "main.go")     // true
 matched, _ = filepath.Match("src/*.go", "main.go")  // false（不跨目录）
 ```
+:::
 
 ### 跨平台路径转换
 
+::: details 点击展开代码：跨平台路径转换
 ```go
 // Unix → Windows 路径转换
 unixPath := "/home/user/config.yaml"
@@ -238,9 +249,11 @@ slashPath := filepath.ToSlash(osPath)
 fmt.Println(filepath.IsAbs("/var/log"))  // true
 fmt.Println(filepath.IsAbs("./log"))     // false
 ```
+:::
 
 ### 安全路径检查（防路径穿越）
 
+::: details 点击展开代码：安全路径检查（防路径穿越）
 ```go
 // 防止路径穿越攻击（../../../etc/passwd）
 func safePath(base, userInput string) (string, error) {
@@ -261,9 +274,11 @@ func safePath(base, userInput string) (string, error) {
 // safePath("/var/www", "../../etc/passwd")
 // → error: path traversal detected
 ```
+:::
 
 ### 临时文件清理
 
+::: details 点击展开代码：临时文件清理
 ```go
 func withTempDir(fn func(dir string) error) error {
     dir, err := os.MkdirTemp("", "work-*")
@@ -274,6 +289,7 @@ func withTempDir(fn func(dir string) error) error {
     return fn(dir)
 }
 ```
+:::
 
 ---
 

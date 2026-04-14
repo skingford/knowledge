@@ -40,6 +40,7 @@ fmt 包功能分层
 
 ## 一、核心格式化引擎
 
+::: details 点击展开代码：一、核心格式化引擎
 ```go
 // src/fmt/print.go（简化）
 type pp struct {
@@ -55,6 +56,7 @@ var ppFree = sync.Pool{
     New: func() any { return new(pp) },
 }
 ```
+:::
 
 ```
 Fprintf 执行流程
@@ -139,6 +141,7 @@ Fprintf 执行流程
 
 ### Stringer（最常用）
 
+::: details 点击展开代码：Stringer（最常用）
 ```go
 type Duration struct {
     hours, minutes, seconds int
@@ -154,9 +157,11 @@ fmt.Println(d)          // 01:30:00
 fmt.Printf("%v\n", d)  // 01:30:00
 fmt.Printf("%s\n", d)  // 01:30:00
 ```
+:::
 
 ### Formatter（完全控制输出）
 
+::: details 点击展开代码：Formatter（完全控制输出）
 ```go
 type Matrix [][]float64
 
@@ -186,6 +191,7 @@ fmt.Printf("%v\n", m)
 // [1.10, 2.20]
 // [3.30, 4.40]
 ```
+:::
 
 ---
 
@@ -193,6 +199,7 @@ fmt.Printf("%v\n", m)
 
 <GoLanguageDiagram kind="error-chain" />
 
+::: details 点击展开代码：四、fmt.Errorf 与 %w
 ```go
 // src/fmt/errors.go
 // %w 是 Errorf 的特殊动词，将 err 包装到返回的 error 中
@@ -221,6 +228,7 @@ if err := db.Query(sql); err != nil {
     return fmt.Errorf("query users: %w", err) // 保留 err 用于 errors.Is/As
 }
 ```
+:::
 
 ---
 
@@ -257,6 +265,7 @@ fmt 包的性能优化设计
 
 ### 格式化输出对比
 
+::: details 点击展开代码：格式化输出对比
 ```go
 type User struct {
     Name  string
@@ -271,9 +280,11 @@ fmt.Printf("%+v\n", u) // {Name:Alice Age:30 Email:alice@example.com}
 fmt.Printf("%#v\n", u) // main.User{Name:"Alice", Age:30, Email:"alice@example.com"}
 fmt.Printf("%T\n",  u) // main.User
 ```
+:::
 
 ### Sprintf vs 手动拼接性能
 
+::: details 点击展开代码：Sprintf vs 手动拼接性能
 ```go
 // ❌ Sprintf：反射 + 格式解析，适合可读性优先
 id := fmt.Sprintf("user:%d", userID)
@@ -287,9 +298,11 @@ buf = append(buf, "user:"...)
 buf = strconv.AppendInt(buf, int64(userID), 10)
 id := string(buf)
 ```
+:::
 
 ### 格式化宽度与对齐
 
+::: details 点击展开代码：格式化宽度与对齐
 ```go
 // 对齐表格输出
 headers := []string{"Name", "Age", "Score"}
@@ -303,9 +316,11 @@ for _, r := range rows {
 // Alice      30    98.5
 // Bob        25    87.3
 ```
+:::
 
 ### fmt.Sscanf 解析结构化文本
 
+::: details 点击展开代码：fmt.Sscanf 解析结构化文本
 ```go
 // 解析日志行："2024-01-01 12:00:00 INFO server started"
 line := "2024-01-01 12:00:00 INFO server started"
@@ -318,9 +333,11 @@ var year, month, day int
 fmt.Sscanf("2024-01-15", "%d-%d-%d", &year, &month, &day)
 // year=2024, month=1, day=15
 ```
+:::
 
 ### 实现 Stringer 的常见模式
 
+::: details 点击展开代码：实现 Stringer 的常见模式
 ```go
 // 枚举类型的 Stringer
 type Status int
@@ -349,6 +366,7 @@ func (s Status) String() string {
 fmt.Println(StatusRunning) // running
 fmt.Printf("%v\n", StatusFailed) // failed
 ```
+:::
 
 ---
 

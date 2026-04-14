@@ -50,6 +50,7 @@ zap 体系
 
 ## 一、核心示例
 
+::: details 点击展开代码：一、核心示例
 ```go
 import (
     "go.uber.org/zap"
@@ -84,6 +85,7 @@ func example(logger *zap.Logger) {
     )
 }
 ```
+:::
 
 ---
 
@@ -91,6 +93,7 @@ func example(logger *zap.Logger) {
 
 ### zapcore：自定义 Core（生产推荐配置）
 
+::: details 点击展开代码：zapcore：自定义 Core（生产推荐配置）
 ```go
 // 生产级自定义 Logger：JSON 格式 + 文件轮转 + 多级别输出
 func newCustomLogger(logPath string) *zap.Logger {
@@ -136,9 +139,11 @@ func newCustomLogger(logPath string) *zap.Logger {
     )
 }
 ```
+:::
 
 ### Logger vs SugaredLogger
 
+::: details 点击展开代码：Logger vs SugaredLogger
 ```go
 // zap.Logger：零分配，强类型字段（性能关键路径推荐）
 func withLogger(logger *zap.Logger) {
@@ -181,9 +186,11 @@ func NewOrderService(logger *zap.Logger) *OrderService {
     }
 }
 ```
+:::
 
 ### 字段类型全览
 
+::: details 点击展开代码：字段类型全览
 ```go
 // zap 内置字段类型（所有类型均零分配）
 func fieldExamples(logger *zap.Logger) {
@@ -217,9 +224,11 @@ func fieldExamples(logger *zap.Logger) {
     )
 }
 ```
+:::
 
 ### With：上下文字段（请求追踪）
 
+::: details 点击展开代码：With：上下文字段（请求追踪）
 ```go
 // With：创建携带固定字段的子 Logger（零分配字段）
 func handleRequest(logger *zap.Logger, r *http.Request) {
@@ -278,9 +287,11 @@ func LoggerFromContext(ctx context.Context) *zap.Logger {
     return zap.L() // 回退到全局 Logger
 }
 ```
+:::
 
 ### 动态日志级别（AtomicLevel）
 
+::: details 点击展开代码：动态日志级别（AtomicLevel）
 ```go
 // AtomicLevel：运行时动态调整日志级别（不重启服务）
 func newDynamicLogger() (*zap.Logger, zap.AtomicLevel) {
@@ -315,9 +326,11 @@ func main() {
     go http.ListenAndServe(":8080", mux)
 }
 ```
+:::
 
 ### 与 slog 互通（Go 1.21+）
 
+::: details 点击展开代码：与 slog 互通（Go 1.21+）
 ```go
 // zap 作为 slog 的 Handler（统一日志接口）
 import "go.uber.org/zap/exp/zapslog"
@@ -339,6 +352,7 @@ func integrateWithSlog(logger *zap.Logger) {
     slog.SetDefault(slogLogger)
 }
 ```
+:::
 
 ---
 

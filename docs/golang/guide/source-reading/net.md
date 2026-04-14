@@ -40,6 +40,7 @@ net 包架构分层
 
 ## 一、核心接口
 
+::: details 点击展开代码：一、核心接口
 ```go
 // src/net/net.go
 type Conn interface {
@@ -64,6 +65,7 @@ type Addr interface {
     String() string  // "127.0.0.1:8080"
 }
 ```
+:::
 
 ---
 
@@ -171,6 +173,7 @@ net.DialContext("tcp", "host:port") 完整流程
 
 ## 五、Deadline 实现原理
 
+::: details 点击展开代码：五、Deadline 实现原理
 ```go
 // SetDeadline 的底层实现
 func (c *conn) SetDeadline(t time.Time) error {
@@ -185,6 +188,7 @@ func (c *conn) SetDeadline(t time.Time) error {
 // 4. 将 poll.pollDesc 标记为超时
 // 5. 唤醒等待该 fd 的 goroutine（返回 ErrDeadlineExceeded）
 ```
+:::
 
 ---
 
@@ -192,6 +196,7 @@ func (c *conn) SetDeadline(t time.Time) error {
 
 ### TCP 服务端（标准范式）
 
+::: details 点击展开代码：TCP 服务端（标准范式）
 ```go
 func runServer(addr string) error {
     ln, err := net.Listen("tcp", addr)
@@ -236,9 +241,11 @@ func handleConn(conn net.Conn) {
     }
 }
 ```
+:::
 
 ### TCP 客户端（带超时与重试）
 
+::: details 点击展开代码：TCP 客户端（带超时与重试）
 ```go
 func dialWithRetry(ctx context.Context, addr string, maxRetries int) (net.Conn, error) {
     dialer := &net.Dialer{
@@ -263,11 +270,13 @@ func dialWithRetry(ctx context.Context, addr string, maxRetries int) (net.Conn, 
     return nil, fmt.Errorf("dial %s after %d retries: %w", addr, maxRetries, lastErr)
 }
 ```
+:::
 
 ### UDP 收发
 
 <GoNetworkDiagram kind="tcp-vs-udp" />
 
+::: details 点击展开代码：UDP 收发
 ```go
 // UDP 服务端
 func udpServer(addr string) error {
@@ -288,9 +297,11 @@ func udpServer(addr string) error {
     }
 }
 ```
+:::
 
 ### 控制 SO_REUSEPORT（多进程监听同一端口）
 
+::: details 点击展开代码：控制 SOREUSEPORT（多进程监听同一端口）
 ```go
 import "golang.org/x/net/netutil"
 
@@ -305,9 +316,11 @@ lc := net.ListenConfig{
 
 ln, err := lc.Listen(ctx, "tcp", ":8080")
 ```
+:::
 
 ### 连接状态检测
 
+::: details 点击展开代码：连接状态检测
 ```go
 // 检测连接是否存活（TCP keepalive 之外的应用层心跳）
 func isConnAlive(conn net.Conn) bool {
@@ -325,6 +338,7 @@ func isConnAlive(conn net.Conn) bool {
     return false // io.EOF 或其他错误说明连接已断
 }
 ```
+:::
 
 ---
 

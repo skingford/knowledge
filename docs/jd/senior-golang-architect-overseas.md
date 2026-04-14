@@ -574,10 +574,10 @@ function onLeave(el, done) {
 - [百万连接网关设计](/architecture/go-million-connection-gateway-design)
 - [分布式事务对比](/architecture/distributed-transaction-comparison)
 - [Outbox 模式](/architecture/outbox-pattern-design)
-- [支付回调幂等与补偿](/architecture/payment-callback-idempotency-and-compensation)
+- [支付回调幂等与补偿](/architecture/payment/callback-idempotency)
 - [秒杀系统库存设计](/architecture/seckill-system-inventory-design)
 - [秒杀限流与降级](/architecture/seckill-system-rate-limiting-and-degradation)
-- [高并发支付实践](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
+- [高并发支付实践](/architecture/payment/high-concurrency-notes)
 - [全球健身 App 架构](/architecture/case-studies/global-fitness-app-architecture-and-management-guide)
 - [架构师面试清单](/architecture/architect-interview-prep-checklist)
 - [Observability & Resilience](/golang/guide/08-observability-resilience)
@@ -689,7 +689,7 @@ function onLeave(el, done) {
 - **验证方式**：先 POC → 压测 → 灰度验证 → 正式引入
 
 ::: details 推荐阅读
-- [高并发支付实践](/architecture/case-studies/high-concurrency-payment-system-practice-notes)
+- [高并发支付实践](/architecture/payment/high-concurrency-notes)
 - [全球健身 App 架构与管理](/architecture/case-studies/global-fitness-app-architecture-and-management-guide)
 - [电商交易平台生产架构](/architecture/ecommerce-transaction-platform-production-architecture)
 - [秒杀压测与容量估算](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)

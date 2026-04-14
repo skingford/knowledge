@@ -55,6 +55,7 @@ text/tabwriter 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/text/tabwriter/tabwriter.go（简化）
 type Writer struct {
@@ -87,6 +88,7 @@ func (b *Writer) format(pos0 int, line0, line1 int) {
     // 按计算好的宽度填充输出
 }
 ```
+:::
 
 ---
 
@@ -94,6 +96,7 @@ func (b *Writer) format(pos0 int, line0, line1 int) {
 
 ### 基础表格输出
 
+::: details 点击展开代码：基础表格输出
 ```go
 import (
     "os"
@@ -120,9 +123,11 @@ func basicTable() {
     // Charlie  35   Chicago      Manager
 }
 ```
+:::
 
 ### 模拟 `kubectl get pods`
 
+::: details 点击展开代码：模拟 kubectl get pods
 ```go
 func kubectlStyleOutput(pods []PodInfo) {
     w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
@@ -156,9 +161,11 @@ type PodInfo struct {
 // backend-def456     2/2     Running   1          5h
 // db-ghi789          0/1     Pending   3          10m
 ```
+:::
 
 ### 右对齐（数字列）
 
+::: details 点击展开代码：右对齐（数字列）
 ```go
 func rightAlignedTable() {
     w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
@@ -179,9 +186,11 @@ func rightAlignedTable() {
     //      net/http    2.3MB     12,345
 }
 ```
+:::
 
 ### 结合 `go list` 风格
 
+::: details 点击展开代码：结合 go list 风格
 ```go
 // 模拟 `go list -m all` 的输出格式
 func listModules(modules []Module) {
@@ -202,9 +211,11 @@ type Module struct {
     Indirect bool
 }
 ```
+:::
 
 ### Debug 模式（查看列边界）
 
+::: details 点击展开代码：Debug 模式（查看列边界）
 ```go
 func debugMode() {
     w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '.', tabwriter.Debug)
@@ -219,9 +230,11 @@ func debugMode() {
     // aaa|bbb|ccc
 }
 ```
+:::
 
 ### 与 strings.Builder 结合（返回字符串而非写文件）
 
+::: details 点击展开代码：与 strings.Builder 结合（返回字符串而非写文件）
 ```go
 func tableToString(data [][]string) string {
     var sb strings.Builder
@@ -243,9 +256,11 @@ func tableHandler(resp http.ResponseWriter, req *http.Request) {
     w.Flush()
 }
 ```
+:::
 
 ### Flush 时机与性能注意事项
 
+::: details 点击展开代码：Flush 时机与性能注意事项
 ```go
 // ⚠️ tabwriter 需要缓冲整个"列对齐区域"才能计算宽度
 // 因此不适合实时流式输出（每行必须等所有行输出完才能对齐）
@@ -272,6 +287,7 @@ func segmentedFlush(w *tabwriter.Writer, rows [][]string) {
     w.Flush() // 最后剩余行
 }
 ```
+:::
 
 ---
 

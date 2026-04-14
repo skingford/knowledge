@@ -26,6 +26,7 @@ search: false
 
 当你写：
 
+::: details 点击展开代码：不指定 max 时，append 可能覆盖后续元素
 ```go
 package main
 
@@ -42,14 +43,17 @@ func main() {
 	fmt.Println("original:", original)
 }
 ```
+:::
 
 输出：
 
+::: details 点击展开代码：不指定 max 时，append 可能覆盖后续元素
 ```text
 s=[1 2] len=2 cap=4
 s after append: [1 2 99]
 original: [0 1 2 99 4]
 ```
+:::
 
 这里的关键点是：
 
@@ -69,6 +73,7 @@ original: [0 1 2 99 4]
 
 如果你写成：
 
+::: details 点击展开代码：2. 三指切片的保护作用
 ```go
 package main
 
@@ -85,14 +90,17 @@ func main() {
 	fmt.Println("original:", original)
 }
 ```
+:::
 
 输出：
 
+::: details 点击展开代码：2. 三指切片的保护作用
 ```text
 safe=[1 2] len=2 cap=2
 safe after append: [1 2 100]
 original: [0 1 2 3 4]
 ```
+:::
 
 这就是 The Three-Index Slice，也就是三下标切片 `s[low:high:max]`。
 

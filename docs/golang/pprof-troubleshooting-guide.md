@@ -115,6 +115,7 @@ search: false
 
 ## 常用命令只保留最实用的一组
 
+::: details 点击展开代码：常用命令只保留最实用的一组
 ```bash
 # CPU
 go tool pprof http://127.0.0.1:6060/debug/pprof/profile?seconds=30
@@ -134,6 +135,7 @@ go tool pprof http://127.0.0.1:6060/debug/pprof/block
 # Web UI
 go tool pprof -http=:8080 cpu.prof
 ```
+:::
 
 进入交互模式后，优先用这几个：
 
@@ -196,6 +198,7 @@ go tool pprof -http=:8080 cpu.prof
 
 如果下面这些没开，很多问题根本看不清：
 
+::: details 点击展开代码：代码层面的排障前提
 ```go
 import "runtime"
 
@@ -204,6 +207,7 @@ func init() {
 	runtime.SetBlockProfileRate(1)
 }
 ```
+:::
 
 同时建议保留这些运行时指标：
 

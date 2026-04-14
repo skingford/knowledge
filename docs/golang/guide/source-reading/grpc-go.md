@@ -51,6 +51,7 @@ gRPC-Go 体系
 
 ## 一、核心示例（.proto → Go）
 
+::: details 点击展开代码：一、核心示例（.proto → Go）
 ```protobuf
 // user.proto
 syntax = "proto3";
@@ -72,6 +73,7 @@ message UpdateUserRequest { int64 id = 1; string name = 2; }
 message UpdateUsersResponse { int32 updated = 1; }
 message ChatMessage { string user_id = 1; string content = 2; }
 ```
+:::
 
 ---
 
@@ -79,6 +81,7 @@ message ChatMessage { string user_id = 1; string content = 2; }
 
 ### 服务端：实现四种 RPC 类型
 
+::: details 点击展开代码：服务端：实现四种 RPC 类型
 ```go
 package main
 
@@ -198,9 +201,11 @@ func main() {
     srv.Serve(lis)
 }
 ```
+:::
 
 ### 拦截器（中间件）
 
+::: details 点击展开代码：拦截器（中间件）
 ```go
 import (
     "google.golang.org/grpc"
@@ -273,9 +278,11 @@ func authInterceptor(
     return handler(ctx, req)
 }
 ```
+:::
 
 ### 客户端：连接管理与调用
 
+::: details 点击展开代码：客户端：连接管理与调用
 ```go
 // 客户端连接（生产配置）
 func newGRPCClient(target string) (pb.UserServiceClient, func(), error) {
@@ -357,6 +364,7 @@ func listAllUsers(client pb.UserServiceClient) ([]*pb.ListUsersResponse, error) 
     }
 }
 ```
+:::
 
 ---
 

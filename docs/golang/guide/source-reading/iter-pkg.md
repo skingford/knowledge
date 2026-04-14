@@ -54,6 +54,7 @@ Go 1.23 迭代器体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/iter/iter.go（Go 1.23）
 package iter
@@ -74,6 +75,7 @@ func Pull[V any](seq Seq[V]) (next func() (V, bool), stop func()) {
     ...
 }
 ```
+:::
 
 ---
 
@@ -83,6 +85,7 @@ func Pull[V any](seq Seq[V]) (next func() (V, bool), stop func()) {
 
 <GoAdvancedTopicDiagram kind="iterator-range-func" />
 
+::: details 点击展开代码：range over func 基础用法
 ```go
 import (
     "fmt"
@@ -115,9 +118,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 树形结构深度优先遍历
 
+::: details 点击展开代码：树形结构深度优先遍历
 ```go
 type TreeNode struct {
     Val   int
@@ -149,9 +154,11 @@ func printTree(root *TreeNode) {
     }
 }
 ```
+:::
 
 ### Seq2：键值对迭代器
 
+::: details 点击展开代码：Seq2：键值对迭代器
 ```go
 // 数据库查询结果迭代器（避免一次性加载所有行）
 func queryRows(db *sql.DB, query string) iter.Seq2[int, string] {
@@ -184,9 +191,11 @@ for idx, name := range queryRows(db, "SELECT name FROM users") {
     }
 }
 ```
+:::
 
 ### Pull 迭代器：合并两个有序序列
 
+::: details 点击展开代码：Pull 迭代器：合并两个有序序列
 ```go
 import "iter"
 
@@ -232,9 +241,11 @@ func merge(a, b iter.Seq[int]) iter.Seq[int] {
     }
 }
 ```
+:::
 
 ### 迭代器适配器：map / filter / take
 
+::: details 点击展开代码：迭代器适配器：map / filter / take
 ```go
 // map：元素变换
 func Map[In, Out any](seq iter.Seq[In], f func(In) Out) iter.Seq[Out] {
@@ -283,9 +294,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### 与标准库集成（Go 1.23）
 
+::: details 点击展开代码：与标准库集成（Go 1.23）
 ```go
 import (
     "maps"
@@ -326,9 +339,11 @@ func Collect[V any](seq iter.Seq[V]) []V {
     return result
 }
 ```
+:::
 
 ### 文件行迭代器
 
+::: details 点击展开代码：文件行迭代器
 ```go
 // 懒加载文件行（内存高效）
 func lines(filename string) iter.Seq2[int, string] {
@@ -361,6 +376,7 @@ for lineNum, line := range lines("app.log") {
     }
 }
 ```
+:::
 
 ---
 

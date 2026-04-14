@@ -639,6 +639,7 @@ Go 标准库核心包关系图
 
 ## 源码查阅工具
 
+::: details 点击展开代码：源码查阅工具
 ```bash
 # 在线查阅（推荐，支持跳转）
 https://cs.opensource.google/go/go
@@ -649,3 +650,4 @@ go doc -src sync.Mutex
 # 查看包所有符号
 go doc sync
 ```
+:::

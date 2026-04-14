@@ -54,6 +54,7 @@ Go 性能剖析工具链
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/runtime/pprof/pprof.go（简化）
 
@@ -72,6 +73,7 @@ func WriteHeapProfile(w io.Writer) error {
     return writeHeapProto(w, memProfile(), defaultSampleRate)
 }
 ```
+:::
 
 ---
 
@@ -79,6 +81,7 @@ func WriteHeapProfile(w io.Writer) error {
 
 ### HTTP pprof 端点（生产最常用）
 
+::: details 点击展开代码：HTTP pprof 端点（生产最常用）
 ```go
 import (
     "net/http"
@@ -104,9 +107,11 @@ func main() {
 // Goroutine dump：
 //   curl http://localhost:6060/debug/pprof/goroutine?debug=2
 ```
+:::
 
 ### 文件采集 CPU Profile
 
+::: details 点击展开代码：文件采集 CPU Profile
 ```go
 import (
     "os"
@@ -144,11 +149,13 @@ func profileCPU(duration time.Duration, fn func()) error {
 // profileCPU(30*time.Second, func() { heavyWork() })
 // go tool pprof -http=:8081 cpu.prof
 ```
+:::
 
 ### 堆内存与 Allocs Profile
 
 <GoPerformanceDiagram kind="heap-profile" />
 
+::: details 点击展开代码：堆内存与 Allocs Profile
 ```go
 func captureHeapProfile(path string) error {
     f, err := os.Create(path)
@@ -176,9 +183,11 @@ func captureAllocsProfile(path string) error {
 // 分析差值：发现内存泄漏
 // go tool pprof -base before.prof after.prof http://...
 ```
+:::
 
 ### 开启 Block 和 Mutex Profile
 
+::: details 点击展开代码：开启 Block 和 Mutex Profile
 ```go
 func enableBlockMutexProfile() {
     // Block profile：记录 goroutine 阻塞事件
@@ -193,9 +202,11 @@ func enableBlockMutexProfile() {
     // go tool pprof http://localhost:6060/debug/pprof/mutex
 }
 ```
+:::
 
 ### 自定义 Profile（业务 Profile）
 
+::: details 点击展开代码：自定义 Profile（业务 Profile）
 ```go
 // 自定义 Profile：追踪业务特定资源（如 DB 连接）
 var dbConnProfile = pprof.NewProfile("db_connections")
@@ -211,9 +222,11 @@ func releaseDBConn(conn *sql.Conn) {
 
 // 查看：http://localhost:6060/debug/pprof/db_connections?debug=1
 ```
+:::
 
 ### 生产持续剖析（Continuous Profiling）
 
+::: details 点击展开代码：生产持续剖析（Continuous Profiling）
 ```go
 // 定期采集并上传（用于 Pyroscope/Parca 等持续剖析平台）
 func continuousProfiling(ctx context.Context, uploadFn func(name string, data []byte)) {
@@ -241,9 +254,11 @@ func continuousProfiling(ctx context.Context, uploadFn func(name string, data []
     }
 }
 ```
+:::
 
 ### pprof 分析工作流
 
+::: details 点击展开代码：pprof 分析工作流
 ```bash
 # 1. 采集 CPU profile（30秒）
 go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
@@ -261,6 +276,7 @@ go tool pprof -http=:8081 cpu.prof
 # 4. 内存泄漏对比分析
 go tool pprof -base heap_before.prof heap_after.prof
 ```
+:::
 
 ---
 

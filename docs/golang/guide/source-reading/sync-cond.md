@@ -62,6 +62,7 @@ sync.Cond 内部结构
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/sync/cond.go
 type Cond struct {
@@ -102,6 +103,7 @@ func (c *Cond) Broadcast() {
 
 // 关键：Wait 必须在持锁时调用，且用 for 循环检查条件（防虚假唤醒）
 ```
+:::
 
 ---
 
@@ -109,6 +111,7 @@ func (c *Cond) Broadcast() {
 
 ### 经典生产者-消费者
 
+::: details 点击展开代码：经典生产者-消费者
 ```go
 type BoundedQueue struct {
     mu    sync.Mutex
@@ -150,9 +153,11 @@ func (q *BoundedQueue) Get() int {
     return item
 }
 ```
+:::
 
 ### 一次性事件通知（类似 sync.WaitGroup）
 
+::: details 点击展开代码：一次性事件通知（类似 sync.WaitGroup）
 ```go
 // 等待某个初始化完成
 type Initializer struct {
@@ -197,9 +202,11 @@ go func() {
 go func() { fmt.Println("等待结果:", init.Wait()) }()
 go func() { fmt.Println("等待结果:", init.Wait()) }()
 ```
+:::
 
 ### Worker Pool：优雅关闭
 
+::: details 点击展开代码：Worker Pool：优雅关闭
 ```go
 type WorkerPool struct {
     mu       sync.Mutex
@@ -273,9 +280,11 @@ func (p *WorkerPool) Shutdown() {
     p.mu.Unlock()
 }
 ```
+:::
 
 ### 读写顺序控制（写者优先）
 
+::: details 点击展开代码：读写顺序控制（写者优先）
 ```go
 // 写者优先的读写锁（比 sync.RWMutex 更灵活的控制）
 type WriterPreferredRWLock struct {
@@ -329,9 +338,11 @@ func (l *WriterPreferredRWLock) Unlock() {
     l.mu.Unlock()
 }
 ```
+:::
 
 ### sync.Cond vs Channel 选择
 
+::: details 点击展开代码：sync.Cond vs Channel 选择
 ```go
 // ✅ 适合用 Cond 的场景：
 // - 需要 Broadcast（通知所有等待者）
@@ -352,6 +363,7 @@ cond.Broadcast()  // 唤醒所有等待者（O(n)，精确）
 close(ch)         // 关闭通知（一次性，不可重置）
 // 或者每个等待者一个独立 channel（维护复杂）
 ```
+:::
 
 ---
 

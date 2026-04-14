@@ -51,6 +51,7 @@ os/user 查询体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/os/user/user.go
 type User struct {
@@ -76,6 +77,7 @@ func lookupUnix(uid int, username string, lookupByName bool) (*User, error) {
 // struct passwd *getpwnam(const char *name);
 // struct passwd *getpwuid(uid_t uid);
 ```
+:::
 
 <GoEngineeringDiagram kind="os-user-backends" />
 
@@ -85,6 +87,7 @@ func lookupUnix(uid int, username string, lookupByName bool) (*User, error) {
 
 ### 基础用户信息查询
 
+::: details 点击展开代码：基础用户信息查询
 ```go
 import (
     "fmt"
@@ -120,9 +123,11 @@ func currentUserInfo() {
     }
 }
 ```
+:::
 
 ### 权限检查
 
+::: details 点击展开代码：权限检查
 ```go
 // 检查当前进程是否以 root 运行
 func isRoot() bool {
@@ -174,9 +179,11 @@ func requireDockerGroup() error {
     return nil
 }
 ```
+:::
 
 ### 文件权限检查（结合 os.Stat）
 
+::: details 点击展开代码：文件权限检查（结合 os.Stat）
 ```go
 // 检查当前用户对文件的访问权限
 func checkFileAccess(path string) {
@@ -219,9 +226,11 @@ func checkFileAccess(path string) {
     fmt.Printf("当前用户权限: %s（%s）\n", perms, map[bool]string{true: "所有者", false: map[bool]string{true: "组成员", false: "其他用户"}[inGroup]}[isOwner])
 }
 ```
+:::
 
 ### 跨平台：用户家目录查找
 
+::: details 点击展开代码：跨平台：用户家目录查找
 ```go
 // 查找指定用户的家目录（跨平台）
 func getUserHome(username string) (string, error) {
@@ -263,11 +272,13 @@ func ExpandTilde(path string) (string, error) {
     return filepath.Join(home, path[2:]), nil
 }
 ```
+:::
 
 ### 构建标签控制后端
 
 <GoEngineeringDiagram kind="os-user-backends" />
 
+::: details 点击展开代码：构建标签控制后端
 ```go
 // 强制使用纯 Go 实现（不依赖 CGO），适合静态编译
 // go build -tags osusergo .
@@ -283,6 +294,7 @@ func checkBackend() {
     fmt.Printf("当前用户: %+v\n", u)
 }
 ```
+:::
 
 ---
 

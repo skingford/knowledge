@@ -26,6 +26,7 @@ search: false
 
 <GoRuntimeDiagram kind="concurrent-append" />
 
+::: details 点击展开代码：1. 为什么并发 append 不安全
 ```go
 type slice struct {
 	array unsafe.Pointer
@@ -33,6 +34,7 @@ type slice struct {
 	cap   int
 }
 ```
+:::
 
 当你执行 `append(s, x)` 时，运行时可能会做这些事：
 
@@ -46,6 +48,7 @@ type slice struct {
 
 典型反例：
 
+::: details 点击展开代码：1. 为什么并发 append 不安全
 ```go
 package main
 
@@ -56,6 +59,7 @@ func main() {
 	go func() { s = append(s, 2) }()
 }
 ```
+:::
 
 可能出现的后果：
 
@@ -69,15 +73,19 @@ func main() {
 
 最直接的是 race detector：
 
+::: details 点击展开代码：2. 怎么验证并发切片问题
 ```bash
 go test -race ./...
 ```
+:::
 
 或者：
 
+::: details 点击展开代码：2. 怎么验证并发切片问题
 ```bash
 go run -race main.go
 ```
+:::
 
 如果多个 goroutine 并发读写同一个切片 header 或底层数组，而没有同步保护，race detector 通常会报出来。
 
@@ -88,6 +96,7 @@ go run -race main.go
 1. 如果切片长度已经固定，不做 `append`，每个 goroutine 只写自己独占的索引区间
 这在设计正确、没有索引冲突的前提下可以是安全的。
 
+::: details 点击展开代码：一个常见误区：并发写不同索引就一定安全吗？
 ```go
 result := make([]int, 100)
 for i := 0; i < 100; i++ {
@@ -96,6 +105,7 @@ for i := 0; i < 100; i++ {
 	}(i)
 }
 ```
+:::
 
 2. 如果 goroutine 里做的是 `append`
 那就默认视为不安全，因为它可能改 `len/cap`、可能扩容、可能换底层数组。
@@ -110,6 +120,7 @@ for i := 0; i < 100; i++ {
 
 适合任务数固定、每个 goroutine 都知道自己写哪一格的场景。
 
+::: details 点击展开代码：预分配结果切片，按索引写入
 ```go
 results := make([]int, n)
 for i := 0; i < n; i++ {
@@ -118,11 +129,13 @@ for i := 0; i < n; i++ {
 	}(i)
 }
 ```
+:::
 
 ### Channel 汇总
 
 适合结果数量动态、由单独 goroutine 串行收集的场景。
 
+::: details 点击展开代码：Channel 汇总
 ```go
 ch := make(chan int, n)
 go func() {
@@ -131,6 +144,7 @@ go func() {
 	}
 }()
 ```
+:::
 
 ### 加锁保护共享切片
 
@@ -148,6 +162,7 @@ go func() {
 
 如果业务里确实需要长期维护一个可并发访问的共享切片，通常会把切片封装进一个类型里，对外只暴露受控方法。
 
+::: details 点击展开代码：4. 工业级并发安全切片：RWMutex 方案
 ```go
 package main
 
@@ -203,6 +218,7 @@ func main() {
 	fmt.Printf("最终切片长度: %d\n", safeList.Len())
 }
 ```
+:::
 
 为什么这段代码更接近工业级：
 
@@ -224,6 +240,7 @@ Go 并发编程里有一句经典的话：
 
 Channel 方案的思路是：把切片的所有权交给唯一一个 goroutine，其他 goroutine 不能直接碰它，只能通过消息让它代办。
 
+::: details 点击展开代码：5. Monitor Goroutine：Channel 串行化方案
 ```go
 package main
 
@@ -297,6 +314,7 @@ func main() {
 	fmt.Printf("最终切片长度: %d\n", len(result))
 }
 ```
+:::
 
 这个方案的关键点：
 
@@ -360,6 +378,7 @@ func main() {
 
 `GetAll()` 这类 request-response 模式，真实项目里最好带 `context.Context`，避免调用方永远挂死。
 
+::: details 点击展开代码：超时与取消
 ```go
 func (cs *ChannelSlice) GetAll(ctx context.Context) ([]int, error) {
 	respCh := make(chan []int, 1)
@@ -378,6 +397,7 @@ func (cs *ChannelSlice) GetAll(ctx context.Context) ([]int, error) {
 	}
 }
 ```
+:::
 
 ### 把请求建模成结构体
 

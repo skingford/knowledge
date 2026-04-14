@@ -49,6 +49,7 @@ Go RESTful API 体系（Go 1.22+）
 
 ## 一、Go 1.22+ 路由：方法 + 路径参数
 
+::: details 点击展开代码：一、Go 1.22+ 路由：方法 + 路径参数
 ```go
 import "net/http"
 
@@ -78,6 +79,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
     // ...
 }
 ```
+:::
 
 ---
 
@@ -85,6 +87,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 
 ### 统一响应与错误处理
 
+::: details 点击展开代码：统一响应与错误处理
 ```go
 // API 响应结构
 type APIResponse struct {
@@ -173,11 +176,13 @@ func Handle(h HandlerFunc) http.HandlerFunc {
     }
 }
 ```
+:::
 
 ### 请求解析与验证
 
 <GoNetworkDiagram kind="json-stream-decoder" />
 
+::: details 点击展开代码：请求解析与验证
 ```go
 // 通用 JSON 解析 + 验证
 func decodeJSON[T any](r *http.Request, v *T) error {
@@ -233,6 +238,7 @@ func createUser(w http.ResponseWriter, r *http.Request) error {
     return nil
 }
 ```
+:::
 
 这里把 `r.Context()` 继续传给 `userService.Create(...)` 是刻意的：
 
@@ -242,6 +248,7 @@ func createUser(w http.ResponseWriter, r *http.Request) error {
 
 ### API 版本化策略
 
+::: details 点击展开代码：API 版本化策略
 ```go
 // 方案一：URL 路径版本（最常见）
 // /api/v1/users、/api/v2/users
@@ -279,9 +286,11 @@ func versionMiddleware(next http.Handler) http.Handler {
     })
 }
 ```
+:::
 
 ### 分页与过滤
 
+::: details 点击展开代码：分页与过滤
 ```go
 // 统一分页参数解析
 type Pagination struct {
@@ -327,9 +336,11 @@ func listUsers(w http.ResponseWriter, r *http.Request) error {
     return nil
 }
 ```
+:::
 
 ### CORS 中间件
 
+::: details 点击展开代码：CORS 中间件
 ```go
 func corsMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
     originSet := make(map[string]bool)
@@ -361,9 +372,11 @@ func corsMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
     }
 }
 ```
+:::
 
 ### 完整 API 服务组装
 
+::: details 点击展开代码：完整 API 服务组装
 ```go
 func NewAPIServer(cfg Config) *http.Server {
     mux := http.NewServeMux()
@@ -395,6 +408,7 @@ func NewAPIServer(cfg Config) *http.Server {
     }
 }
 ```
+:::
 
 ---
 

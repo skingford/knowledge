@@ -50,6 +50,7 @@ runtime/trace 追踪体系
 
 ## 一、核心 API
 
+::: details 点击展开代码：一、核心 API
 ```go
 // runtime/trace 包
 import "runtime/trace"
@@ -69,6 +70,7 @@ defer trace.StartRegion(ctx, "encryptData").End()
 trace.Log(ctx, "category", "message")
 trace.Logf(ctx, "db", "query took %v", dur)
 ```
+:::
 
 ---
 
@@ -76,6 +78,7 @@ trace.Logf(ctx, "db", "query took %v", dur)
 
 ### 基础：将追踪写入文件
 
+::: details 点击展开代码：基础：将追踪写入文件
 ```go
 import (
     "os"
@@ -96,9 +99,11 @@ func main() {
 
 // 分析：go tool trace trace.out
 ```
+:::
 
 ### HTTP 处理器中的追踪
 
+::: details 点击展开代码：HTTP 处理器中的追踪
 ```go
 import (
     "net/http"
@@ -123,9 +128,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(result)
 }
 ```
+:::
 
 ### 生产环境：定时采样（低开销）
 
+::: details 点击展开代码：生产环境：定时采样（低开销）
 ```go
 // 每隔 5 分钟采集 10 秒追踪，不持续开启
 func startPeriodicTrace(dir string) {
@@ -152,9 +159,11 @@ func collectTrace(dir string, dur time.Duration) {
     log.Printf("trace saved: %s", name)
 }
 ```
+:::
 
 ### HTTP 端点触发追踪（诊断工具）
 
+::: details 点击展开代码：HTTP 端点触发追踪（诊断工具）
 ```go
 // 注册调试端点：curl localhost:8080/debug/trace?seconds=5 > trace.out
 import _ "net/http/pprof" // 同步引入 pprof
@@ -181,9 +190,11 @@ func registerTraceHandler() {
     })
 }
 ```
+:::
 
 ### 编程式解析（Go 1.22+）
 
+::: details 点击展开代码：编程式解析（Go 1.22+）
 ```go
 import (
     "golang.org/x/exp/trace"  // 实验性包
@@ -223,9 +234,11 @@ func analyzeSchedulingLatency(traceFile string) {
     }
 }
 ```
+:::
 
 ### 与 pprof 结合使用
 
+::: details 点击展开代码：与 pprof 结合使用
 ```go
 // trace 和 pprof 互补：
 // - pprof: 统计 CPU/内存热点（聚合视图）
@@ -248,6 +261,7 @@ func diagnose() {
     f.Close()
 }
 ```
+:::
 
 ---
 

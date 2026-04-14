@@ -221,6 +221,7 @@ select 内部（runtime/select.go）
 
 ### 超时控制
 
+::: details 点击展开代码：超时控制
 ```go
 func doWork(ctx context.Context) (string, error) {
     resultCh := make(chan string, 1)
@@ -240,9 +241,11 @@ func doWork(ctx context.Context) (string, error) {
 
 func heavyCompute() string { return "done" }
 ```
+:::
 
 ### 信号量限流
 
+::: details 点击展开代码：信号量限流
 ```go
 // channel 作信号量：最多 N 个并发
 func parallelLimit(tasks []func(), limit int) {
@@ -261,9 +264,11 @@ func parallelLimit(tasks []func(), limit int) {
     wg.Wait()
 }
 ```
+:::
 
 ### 广播关闭
 
+::: details 点击展开代码：广播关闭
 ```go
 type Server struct {
     quit chan struct{}
@@ -284,6 +289,7 @@ func (s *Server) worker() {
     }
 }
 ```
+:::
 
 ---
 

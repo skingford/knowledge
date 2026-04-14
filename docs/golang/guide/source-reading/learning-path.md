@@ -37,11 +37,13 @@ search: false
 
 常见入口：
 
+::: details 点击展开代码：源码版本怎么选
 ```bash
 git clone https://github.com/golang/go
 cd go
 git checkout go1.25.3
 ```
+:::
 
 在线阅读可以直接用：
 
@@ -50,6 +52,7 @@ git checkout go1.25.3
 
 ### 目录先看什么
 
+::: details 点击展开代码：目录先看什么
 ```text
 src/
 ├── runtime/      调度器、GC、内存分配、channel、map
@@ -60,16 +63,19 @@ src/
 ├── encoding/     json、xml、gob、binary 等编解码
 └── internal/     标准库内部实现细节
 ```
+:::
 
 ### 入口怎么反查
 
 当你想知道一段 Go 代码最终落到了哪个 runtime 函数，优先反查编译结果。
 
+::: details 点击展开代码：入口怎么反查
 ```bash
 go build -gcflags="-S" main.go 2>&1 | head -80
 go tool objdump -s "main.main" ./your-binary
 go tool compile -S main.go
 ```
+:::
 
 典型例子：
 
@@ -80,10 +86,12 @@ go tool compile -S main.go
 
 ### 调试工具怎么配合
 
+::: details 点击展开代码：调试工具怎么配合
 ```bash
 go install github.com/go-delve/delve/cmd/dlv@latest
 dlv debug --check-go-version=false main.go
 ```
+:::
 
 进入 `dlv` 之后，常用操作：
 

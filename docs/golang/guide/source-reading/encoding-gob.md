@@ -49,6 +49,7 @@ encoding/gob 核心设计
 
 ## 一、编码机制
 
+::: details 点击展开代码：一、编码机制
 ```go
 // src/encoding/gob/type.go（简化）
 // gob 使用"wireType"描述结构体布局，首次发送时随数据一起传输
@@ -62,6 +63,7 @@ encoding/gob 核心设计
 // → 减少传输数据量
 // → 与 JSON omitempty 类似，但对所有字段自动生效
 ```
+:::
 
 ---
 
@@ -69,6 +71,7 @@ encoding/gob 核心设计
 
 ### 基础编解码
 
+::: details 点击展开代码：基础编解码
 ```go
 import (
     "bytes"
@@ -106,9 +109,11 @@ func main() {
     fmt.Printf("解码结果: %+v\n", c2)
 }
 ```
+:::
 
 ### 流式传输（多值序列）
 
+::: details 点击展开代码：流式传输（多值序列）
 ```go
 // gob 设计为流式——一个 Encoder 发送多个值，一个 Decoder 按序接收
 func streamExample() {
@@ -133,11 +138,13 @@ func streamExample() {
     }
 }
 ```
+:::
 
 ### 接口类型（需要 Register）
 
 <GoNetworkDiagram kind="gob-register" />
 
+::: details 点击展开代码：接口类型（需要 Register）
 ```go
 type Shape interface {
     Area() float64
@@ -178,9 +185,11 @@ func decodeCanvas(data []byte) Canvas {
     return canvas
 }
 ```
+:::
 
 ### 进程间通信（net.Conn + gob）
 
+::: details 点击展开代码：进程间通信（net.Conn + gob）
 ```go
 // Server：接收并处理消息
 func server(conn net.Conn) {
@@ -213,9 +222,11 @@ func client(conn net.Conn) {
     fmt.Println(resp.Status, resp.Body)
 }
 ```
+:::
 
 ### 向前兼容演示（版本升级）
 
+::: details 点击展开代码：向前兼容演示（版本升级）
 ```go
 // v1 发送的数据
 type UserV1 struct {
@@ -242,9 +253,11 @@ func compatExample() {
     fmt.Println(u2) // {Alice 30  false}
 }
 ```
+:::
 
 ### GobEncoder/GobDecoder 自定义
 
+::: details 点击展开代码：GobEncoder/GobDecoder 自定义
 ```go
 // 实现自定义编解码逻辑
 type SecretString struct {
@@ -265,6 +278,7 @@ func (s *SecretString) GobDecode(data []byte) error {
     return nil
 }
 ```
+:::
 
 ---
 

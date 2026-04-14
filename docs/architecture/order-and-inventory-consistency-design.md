@@ -432,7 +432,7 @@ WHERE sku_id = ?
 
 ## 相关阅读
 
-- [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+- [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)
 - [订单状态机设计实战](/architecture/order-state-machine-design)
 - [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
 - [订单超时取消与时间轮设计](/architecture/order-timeout-cancellation-and-timing-wheel)

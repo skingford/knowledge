@@ -109,6 +109,7 @@ regexp.Compile("a(b|c)+d") 编译流程
 
 ## 三、Thompson NFA 执行
 
+::: details 点击展开代码：三、Thompson NFA 执行
 ```go
 // src/regexp/exec.go
 type machine struct {
@@ -124,6 +125,7 @@ type machine struct {
     matchcap []int          // 捕获组结果
 }
 ```
+:::
 
 ```
 Thompson NFA 并行模拟原理
@@ -208,6 +210,7 @@ Find 方法族说明
 
 ### 编译与复用（生产关键）
 
+::: details 点击展开代码：编译与复用（生产关键）
 ```go
 // ✅ 正确：包级变量，编译一次
 var emailRegex = regexp.MustCompile(
@@ -225,9 +228,11 @@ func validateEmail(email string) bool {
     return emailRegex.MatchString(email)
 }
 ```
+:::
 
 ### 捕获组提取
 
+::: details 点击展开代码：捕获组提取
 ```go
 var logLine = regexp.MustCompile(
     `(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) (\w+) (.+)`,
@@ -242,9 +247,11 @@ func parseLog(line string) (date, time_, level, msg string, ok bool) {
     return m[1], m[2], m[3], m[4], true
 }
 ```
+:::
 
 ### 命名捕获组
 
+::: details 点击展开代码：命名捕获组
 ```go
 var dateRe = regexp.MustCompile(
     `(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})`,
@@ -265,9 +272,11 @@ func extractDate(s string) map[string]string {
 }
 // "2024-01-15" → {"year":"2024","month":"01","day":"15"}
 ```
+:::
 
 ### 替换
 
+::: details 点击展开代码：替换
 ```go
 // ReplaceAll：将所有匹配替换
 r := regexp.MustCompile(`\b\d{4}-\d{4}-\d{4}-\d{4}\b`)
@@ -283,9 +292,11 @@ result := r2.ReplaceAllStringFunc(template, func(match string) string {
     return match
 })
 ```
+:::
 
 ### 大文本扫描（FindReaderIndex）
 
+::: details 点击展开代码：大文本扫描（FindReaderIndex）
 ```go
 // 对大文件用 FindReaderIndex 避免加载全文到内存
 func countMatches(r io.RuneReader, pattern string) int {
@@ -298,6 +309,7 @@ func countMatches(r io.RuneReader, pattern string) int {
     return count
 }
 ```
+:::
 
 ---
 

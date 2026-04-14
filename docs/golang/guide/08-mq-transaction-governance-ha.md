@@ -21,6 +21,7 @@ search: false
 
 ### 9.1 Kafka 生产者模式
 
+::: details 点击展开代码：9.1 Kafka 生产者模式
 ```go
 package mq
 
@@ -91,11 +92,13 @@ func (p *KafkaProducer) Close() error {
     return p.writer.Close()
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="kafka-producer" />
 
 ### 9.2 Kafka 消费者模式
 
+::: details 点击展开代码：9.2 Kafka 消费者模式
 ```go
 package mq
 
@@ -168,11 +171,13 @@ func (c *KafkaConsumer) Close() error {
     return c.reader.Close()
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="kafka-consumer" />
 
 ### 9.3 使用示例
 
+::: details 点击展开代码：9.3 使用示例
 ```go
 func main() {
     ctx, cancel := context.WithCancel(context.Background())
@@ -215,6 +220,7 @@ func main() {
     })
 }
 ```
+:::
 
 ### 讲解重点
 
@@ -230,6 +236,7 @@ func main() {
 
 ### 10.1 Saga 模式
 
+::: details 点击展开代码：10.1 Saga 模式
 ```go
 package saga
 
@@ -297,9 +304,11 @@ func (s *Saga) compensate(ctx context.Context, executed []int) {
     }
 }
 ```
+:::
 
 ### 10.2 Saga 使用示例（订单流程）
 
+::: details 点击展开代码：10.2 Saga 使用示例（订单流程）
 ```go
 func CreateOrderSaga(ctx context.Context, order Order) error {
     saga := NewSaga()
@@ -351,11 +360,13 @@ func CreateOrderSaga(ctx context.Context, order Order) error {
     return saga.Execute(ctx)
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="saga-compensation" />
 
 ### 10.3 基于消息的最终一致性
 
+::: details 点击展开代码：10.3 基于消息的最终一致性
 ```go
 package transaction
 
@@ -477,6 +488,7 @@ type MessagePublisher interface {
     Publish(ctx context.Context, topic, key string, payload []byte) error
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="outbox-pattern" />
 
@@ -494,6 +506,7 @@ type MessagePublisher interface {
 
 ### 11.1 自定义负载均衡
 
+::: details 点击展开代码：11.1 自定义负载均衡
 ```go
 package lb
 
@@ -570,11 +583,13 @@ func (r *RandomBalancer) Pick(endpoints []string) string {
     return endpoints[rand.Intn(len(endpoints))]
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="load-balancing" />
 
 ### 11.2 健康检查
 
+::: details 点击展开代码：11.2 健康检查
 ```go
 package health
 
@@ -678,11 +693,13 @@ func (c *RedisChecker) Check(ctx context.Context) error {
     return c.rdb.Ping(ctx)
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="health-check" />
 
 ### 11.3 优雅启停
 
+::: details 点击展开代码：11.3 优雅启停
 ```go
 package main
 
@@ -786,6 +803,7 @@ func (app *Application) Run() error {
     return nil
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="graceful-shutdown" />
 
@@ -803,6 +821,7 @@ func (app *Application) Run() error {
 
 ### 12.1 冗余与故障转移
 
+::: details 点击展开代码：12.1 冗余与故障转移
 ```go
 package ha
 
@@ -903,9 +922,11 @@ func (c *MultiEndpointClient) HealthProbe(ctx context.Context, probe func(addr s
     }
 }
 ```
+:::
 
 ### 12.2 多可用区部署策略
 
+::: details 点击展开代码：12.2 多可用区部署策略
 ```go
 package ha
 
@@ -961,11 +982,13 @@ func (b *ZoneAwareBalancer) Pick(endpoints []Endpoint) *Endpoint {
     return nil
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="zone-failover" />
 
 ### 12.3 高可用设计清单
 
+::: details 点击展开代码：12.3 高可用设计清单
 ```go
 package ha
 
@@ -1007,9 +1030,11 @@ package ha
    - Feature Flag 控制新功能灰度范围
 */
 ```
+:::
 
 ### 12.4 Bulkhead 舱壁隔离模式
 
+::: details 点击展开代码：12.4 Bulkhead 舱壁隔离模式
 ```go
 package ha
 
@@ -1047,9 +1072,11 @@ func (b *Bulkhead) Execute(ctx context.Context, fn func() error) error {
     }
 }
 ```
+:::
 
 ### 使用示例
 
+::: details 点击展开代码：使用示例
 ```go
 func main() {
     // 对支付服务的调用限制并发 20
@@ -1067,6 +1094,7 @@ func main() {
     }
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="bulkhead-isolation" />
 

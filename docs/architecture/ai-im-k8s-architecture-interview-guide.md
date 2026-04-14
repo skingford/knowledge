@@ -1890,7 +1890,7 @@ WHERE id = 1
 
 - Go 能力自检导航：[../golang/interview-prep.md](../golang/interview-prep.md)
 - Go 调度器与并发主线：[../golang/guide/03-goroutine-and-scheduler.md](../golang/guide/03-goroutine-and-scheduler.md)
-- Go GC 与内存模型：[../golang/guide/02-gc-allocator-and-memory-model.md](../golang/guide/02-gc-allocator-and-memory-model.md)
+- Go 运行时内存主线：[../golang/guide/02-runtime-memory-lifecycle.md](../golang/guide/02-runtime-memory-lifecycle.md)
 - Go 逃逸分析：[../golang/guide/02-escape-analysis.md](../golang/guide/02-escape-analysis.md)
 - Go 高并发系统设计：[../golang/guide/08-go-high-concurrency-system-design.md](../golang/guide/08-go-high-concurrency-system-design.md)
 - Redis 与缓存模式：[../redis/redis-and-cache-patterns.md](../redis/redis-and-cache-patterns.md)

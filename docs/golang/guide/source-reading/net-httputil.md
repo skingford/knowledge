@@ -53,6 +53,7 @@ net/http/httputil 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/http/httputil/reverseproxy.go（简化）
 
@@ -92,6 +93,7 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
     p.copyResponse(rw, res.Body, p.flushInterval(res))
 }
 ```
+:::
 
 ---
 
@@ -99,6 +101,7 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 ### 最简单的单后端反向代理
 
+::: details 点击展开代码：最简单的单后端反向代理
 ```go
 import (
     "net/http"
@@ -120,9 +123,11 @@ func simpleProxy() {
     http.ListenAndServe(":80", proxy)
 }
 ```
+:::
 
 ### 多后端负载均衡代理
 
+::: details 点击展开代码：多后端负载均衡代理
 ```go
 type LoadBalancer struct {
     backends []*url.URL
@@ -168,9 +173,11 @@ func (lb *LoadBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     proxy.ServeHTTP(w, r)
 }
 ```
+:::
 
 ### 修改请求和响应（中间件能力）
 
+::: details 点击展开代码：修改请求和响应（中间件能力）
 ```go
 func proxyWithMiddleware(backend string) http.Handler {
     target, _ := url.Parse(backend)
@@ -213,9 +220,11 @@ func proxyWithMiddleware(backend string) http.Handler {
     }
 }
 ```
+:::
 
 ### 路径路由代理（API 网关模式）
 
+::: details 点击展开代码：路径路由代理（API 网关模式）
 ```go
 // 不同路径转发到不同后端
 func apiGateway() http.Handler {
@@ -244,9 +253,11 @@ func newProxy(backend string) *httputil.ReverseProxy {
     return proxy
 }
 ```
+:::
 
 ### DumpRequest/DumpResponse（调试利器）
 
+::: details 点击展开代码：DumpRequest/DumpResponse（调试利器）
 ```go
 // 调试中间件：记录完整请求和响应
 func debugMiddleware(next http.Handler) http.Handler {
@@ -291,6 +302,7 @@ func debugHTTPClient() {
     fmt.Printf("收到响应:\n%s\n", respDump)
 }
 ```
+:::
 
 ---
 

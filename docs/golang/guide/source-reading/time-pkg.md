@@ -51,6 +51,7 @@ time 包全景
 
 ## 一、Time 内存结构
 
+::: details 点击展开代码：一、Time 内存结构
 ```go
 // src/time/time.go
 type Time struct {
@@ -78,6 +79,7 @@ start := time.Now()       // 含单调时钟
 time.Sleep(time.Second)
 elapsed := time.Since(start) // 用 mono 计算，不受 NTP 影响
 ```
+:::
 
 <GoRuntimeDiagram kind="time-dual-clock" />
 
@@ -118,6 +120,7 @@ Go 时间格式化参考时间
 
 ## 三、Duration 设计
 
+::: details 点击展开代码：三、Duration 设计
 ```go
 // time.Duration = int64（单位：纳秒）
 type Duration int64
@@ -139,6 +142,7 @@ d.Seconds()   // float64
 d.Milliseconds() // int64（Go 1.13+）
 d.String()    // "5.5s"（自动单位）
 ```
+:::
 
 ---
 
@@ -146,6 +150,7 @@ d.String()    // "5.5s"（自动单位）
 
 ### 时间格式化与解析
 
+::: details 点击展开代码：时间格式化与解析
 ```go
 now := time.Now()
 
@@ -172,9 +177,11 @@ unixNano := now.UnixNano()                 // 纳秒
 t3 := time.Unix(unix, 0)                   // 时间戳 → Time
 t4 := time.UnixMilli(unixMilli)            // Go 1.17+
 ```
+:::
 
 ### 时间计算
 
+::: details 点击展开代码：时间计算
 ```go
 now := time.Now()
 
@@ -204,9 +211,11 @@ rounded := now.Round(time.Minute)
 if t1.Before(t2) { /* t1 < t2 */ }
 if t1.Equal(t2)  { /* t1 == t2（考虑时区） */ }
 ```
+:::
 
 ### 时区处理
 
+::: details 点击展开代码：时区处理
 ```go
 // 加载时区（需要 tzdata）
 loc, err := time.LoadLocation("Asia/Shanghai")
@@ -228,11 +237,13 @@ import _ "time/tzdata" // Go 1.15+，不依赖系统 tzdata 文件
 // 时区偏移量
 name, offset := now.Zone() // "CST", 28800（+8h 的秒数）
 ```
+:::
 
 ### 定时器正确用法
 
 <GoRuntimeDiagram kind="timer-heap" />
 
+::: details 点击展开代码：定时器正确用法
 ```go
 // ✅ NewTimer（可复用、可取消）
 timer := time.NewTimer(5 * time.Second)
@@ -278,11 +289,13 @@ for {
     }
 }
 ```
+:::
 
 ### 性能计时（Benchmark 精确测量）
 
 <GoEngineeringDiagram kind="benchmark-reading" />
 
+::: details 点击展开代码：性能计时（Benchmark 精确测量）
 ```go
 func BenchmarkProcess(b *testing.B) {
     b.ResetTimer()
@@ -304,9 +317,11 @@ start := time.Now()
 // ... 操作 ...
 ns := time.Since(start).Nanoseconds()
 ```
+:::
 
 ### 超时控制（time + context 组合）
 
+::: details 点击展开代码：超时控制（time + context 组合）
 ```go
 // context.WithTimeout 内部就是用 time.AfterFunc 实现的
 ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -329,6 +344,7 @@ func withRetry(ctx context.Context, maxAttempts int, fn func() error) error {
     return fmt.Errorf("超过最大重试次数 %d", maxAttempts)
 }
 ```
+:::
 
 ---
 

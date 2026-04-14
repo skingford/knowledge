@@ -66,7 +66,7 @@ const { landing } = sections.find((section) => section.key === 'architecture')!
 - [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
 - [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design)
 - [秒杀系统库存设计专题](/architecture/seckill-system-inventory-design)
-- [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+- [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)
 
 ## 高并发活动系统专题
 

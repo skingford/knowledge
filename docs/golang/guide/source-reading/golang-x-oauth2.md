@@ -50,6 +50,7 @@ golang.org/x/oauth2 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // oauth2/transport.go（简化）
 type Transport struct {
@@ -91,6 +92,7 @@ func (s *reuseTokenSource) Token() (*Token, error) {
     return t, nil
 }
 ```
+:::
 
 ---
 
@@ -98,6 +100,7 @@ func (s *reuseTokenSource) Token() (*Token, error) {
 
 ### 授权码流程（Web 应用）
 
+::: details 点击展开代码：授权码流程（Web 应用）
 ```go
 import (
     "context"
@@ -178,9 +181,11 @@ func generateSecureState() string {
     return base64.URLEncoding.EncodeToString(b)
 }
 ```
+:::
 
 ### PKCE 流程（移动 / SPA 应用）
 
+::: details 点击展开代码：PKCE 流程（移动 / SPA 应用）
 ```go
 // PKCE（Proof Key for Code Exchange）：防止授权码拦截攻击
 // 适用于公开客户端（无法安全存储 ClientSecret）
@@ -219,9 +224,11 @@ func exchangeWithPKCE(ctx context.Context, config *oauth2.Config, code, verifier
     )
 }
 ```
+:::
 
 ### 客户端凭证流程（服务间认证）
 
+::: details 点击展开代码：客户端凭证流程（服务间认证）
 ```go
 import (
     "context"
@@ -263,9 +270,11 @@ func callInternalAPI() error {
     return nil
 }
 ```
+:::
 
 ### Token 持久化与恢复
 
+::: details 点击展开代码：Token 持久化与恢复
 ```go
 // 持久化 Token 到数据库（保存 refresh_token 以便下次启动复用）
 type TokenStore interface {
@@ -363,9 +372,11 @@ func (p *persistentTokenSource) Token() (*oauth2.Token, error) {
     return newToken, nil
 }
 ```
+:::
 
 ### Device Flow（CLI 工具授权）
 
+::: details 点击展开代码：Device Flow（CLI 工具授权）
 ```go
 import "golang.org/x/oauth2/deviceauth"
 
@@ -392,6 +403,7 @@ func deviceFlowLogin(ctx context.Context, config *oauth2.Config) (*oauth2.Token,
     return token, nil
 }
 ```
+:::
 
 ---
 

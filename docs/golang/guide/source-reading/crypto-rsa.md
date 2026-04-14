@@ -51,6 +51,7 @@ crypto/rsa 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/rsa/rsa.go（简化）
 
@@ -68,6 +69,7 @@ func decrypt(priv *PrivateKey, c *big.Int) (*big.Int, error) {
 // OAEP 加密：添加随机 padding 防止确定性攻击
 // 同一明文每次加密结果不同（随机 seed）
 ```
+:::
 
 <GoSecurityDiagram kind="public-key-sign-verify" />
 
@@ -77,6 +79,7 @@ func decrypt(priv *PrivateKey, c *big.Int) (*big.Int, error) {
 
 ### 密钥生成与序列化
 
+::: details 点击展开代码：密钥生成与序列化
 ```go
 import (
     "crypto/rand"
@@ -127,9 +130,11 @@ func loadPrivateKey(pemData []byte) (*rsa.PrivateKey, error) {
     return rsaKey, nil
 }
 ```
+:::
 
 ### OAEP 加解密（推荐）
 
+::: details 点击展开代码：OAEP 加解密（推荐）
 ```go
 import (
     "crypto/rand"
@@ -178,9 +183,11 @@ func hybridEncrypt(pubKey *rsa.PublicKey, plaintext []byte) (encryptedKey, ciphe
     return
 }
 ```
+:::
 
 ### PSS 签名与验证（推荐）
 
+::: details 点击展开代码：PSS 签名与验证（推荐）
 ```go
 import (
     "crypto"
@@ -226,9 +233,11 @@ func verifyPSS(pubKey *rsa.PublicKey, message, signature []byte) error {
     )
 }
 ```
+:::
 
 ### PKCS1v15 签名（JWT RS256 兼容）
 
+::: details 点击展开代码：PKCS1v15 签名（JWT RS256 兼容）
 ```go
 // PKCS1v15 签名（兼容 JWT RS256/RS384/RS512）
 func signPKCS1v15(privKey *rsa.PrivateKey, message []byte) ([]byte, error) {
@@ -245,9 +254,11 @@ func verifyPKCS1v15(pubKey *rsa.PublicKey, message, sig []byte) error {
     return rsa.VerifyPKCS1v15(pubKey, crypto.SHA256, digest, sig)
 }
 ```
+:::
 
 ### 简易 JWT 实现（RS256）
 
+::: details 点击展开代码：简易 JWT 实现（RS256）
 ```go
 import (
     "encoding/base64"
@@ -306,6 +317,7 @@ func verifyJWT(pubKey *rsa.PublicKey, token string) (*JWTClaims, error) {
     return &claims, nil
 }
 ```
+:::
 
 ---
 

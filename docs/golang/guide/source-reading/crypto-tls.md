@@ -60,6 +60,7 @@ crypto/tls 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/tls/conn.go（简化）
 
@@ -91,6 +92,7 @@ func (c *Conn) Read(b []byte) (int, error) {
 // 3. 检查 ServerName（SNI）与证书 CN/SAN 匹配
 // 4. 检查证书有效期和吊销状态（OCSP）
 ```
+:::
 
 <GoSecurityDiagram kind="certificate-chain-verify" />
 
@@ -100,6 +102,7 @@ func (c *Conn) Read(b []byte) (int, error) {
 
 ### HTTPS 服务端
 
+::: details 点击展开代码：HTTPS 服务端
 ```go
 import (
     "crypto/tls"
@@ -135,9 +138,11 @@ func startHTTPS() {
     log.Fatal(server.ListenAndServeTLS("", "")) // 证书已在 Config 中
 }
 ```
+:::
 
 ### HTTPS 客户端（自定义 CA）
 
+::: details 点击展开代码：HTTPS 客户端（自定义 CA）
 ```go
 import (
     "crypto/tls"
@@ -168,9 +173,11 @@ func newHTTPSClient(caCertFile string) *http.Client {
     }
 }
 ```
+:::
 
 ### mTLS：双向证书认证
 
+::: details 点击展开代码：mTLS：双向证书认证
 ```go
 // 服务端：要求客户端提供证书
 func mTLSServer(serverCert, caCert string) *http.Server {
@@ -209,9 +216,11 @@ func mTLSClient(clientCert, caCert string) *http.Client {
     }
 }
 ```
+:::
 
 ### 从内存加载证书（embed + 热更新）
 
+::: details 点击展开代码：从内存加载证书（embed + 热更新）
 ```go
 //go:embed certs/server.crt certs/server.key
 var certFS embed.FS
@@ -235,9 +244,11 @@ func dynamicCertConfig(getCert func(*tls.ClientHelloInfo) (*tls.Certificate, err
     }
 }
 ```
+:::
 
 ### 检查握手结果
 
+::: details 点击展开代码：检查握手结果
 ```go
 // 验证连接的 TLS 状态（审计、日志）
 func inspectTLS(conn *tls.Conn) {
@@ -261,9 +272,11 @@ func inspectTLS(conn *tls.Conn) {
     }
 }
 ```
+:::
 
 ### 原始 TLS 连接（非 HTTP）
 
+::: details 点击展开代码：原始 TLS 连接（非 HTTP）
 ```go
 // TCP + TLS 服务端（自定义协议）
 func rawTLSServer() {
@@ -294,6 +307,7 @@ func rawTLSClient(host string) {
     conn.Write([]byte("hello\n"))
 }
 ```
+:::
 
 ---
 

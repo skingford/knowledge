@@ -662,7 +662,7 @@ Feature Flag 也非常关键，因为它能把：
 - [分布式系统设计详解](/architecture/distributed-system-design)
 - [分布式事务方案对比](/architecture/distributed-transaction-comparison)
 - [库存扣减与订单创建一致性设计](/architecture/order-and-inventory-consistency-design)
-- [支付系统回调幂等与补偿设计](/architecture/payment-callback-idempotency-and-compensation)
+- [支付系统回调幂等与补偿设计](/architecture/payment/callback-idempotency)
 - [Outbox 本地消息表设计实战](/architecture/outbox-pattern-design)
 - [大促活动预热、压测与开关治理手册](/architecture/promotion-readiness-pressure-test-and-switch-governance)
 - [秒杀系统压测脚本、容量估算与演练方法论](/architecture/seckill-pressure-testing-capacity-estimation-and-drills)

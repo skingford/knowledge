@@ -41,6 +41,7 @@ math/rand 版本对比
 
 ## 一、ChaCha8 算法
 
+::: details 点击展开代码：一、ChaCha8 算法
 ```go
 // src/math/rand/v2/chacha8.go
 type ChaCha8 struct {
@@ -51,6 +52,7 @@ type ChaCha8 struct {
     readLen int
 }
 ```
+:::
 
 ```
 ChaCha8 = ChaCha20 的 8 轮变体
@@ -78,6 +80,7 @@ ChaCha8 = ChaCha20 的 8 轮变体
 
 ## 二、PCG 算法
 
+::: details 点击展开代码：二、PCG 算法
 ```go
 // src/math/rand/v2/pcg.go
 type PCG struct {
@@ -92,6 +95,7 @@ func (p *PCG) Uint64() uint64 {
     ...
 }
 ```
+:::
 
 ```
 PCG（Permuted Congruential Generator）
@@ -122,6 +126,7 @@ PCG（Permuted Congruential Generator）
 
 ## 三、全局 Rand 的并发安全
 
+::: details 点击展开代码：三、全局 Rand 的并发安全
 ```go
 // src/math/rand/v2/rand.go
 // 全局 globalRand 的并发安全实现（简化）
@@ -143,6 +148,7 @@ func newPerGoroutineRand() *rand.Rand {
     return seed
 }
 ```
+:::
 
 ```
 并发场景的 Rand 选择策略
@@ -164,6 +170,7 @@ func newPerGoroutineRand() *rand.Rand {
 
 ### 基础使用（v2）
 
+::: details 点击展开代码：基础使用（v2）
 ```go
 import "math/rand/v2"
 
@@ -185,9 +192,11 @@ rand.Shuffle(len(s), func(i, j int) {
 items := []string{"apple", "banana", "cherry"}
 pick := items[rand.N(len(items))]
 ```
+:::
 
 ### Shuffle：无偏洗牌（Fisher-Yates）
 
+::: details 点击展开代码：Shuffle：无偏洗牌（Fisher-Yates）
 ```go
 // 洗牌（v2 比 v1 的 Shuffle 更简洁）
 func shuffle(s []string) []string {
@@ -213,9 +222,11 @@ func sample[T any](items []T, k int) []T {
     return cp[:k]
 }
 ```
+:::
 
 ### 可重现的随机序列（固定种子）
 
+::: details 点击展开代码：可重现的随机序列（固定种子）
 ```go
 // 测试或模拟场景：固定种子保证可重现
 var seed [32]byte
@@ -226,9 +237,11 @@ for i := range 5 {
     fmt.Println(rng.N(100)) // 每次运行结果相同
 }
 ```
+:::
 
 ### 高并发场景：sync.Pool 复用
 
+::: details 点击展开代码：高并发场景：sync.Pool 复用
 ```go
 var randPool = sync.Pool{
     New: func() any {
@@ -247,9 +260,11 @@ func randomInt(max int) int {
     return r.N(max)
 }
 ```
+:::
 
 ### 加权随机选择
 
+::: details 点击展开代码：加权随机选择
 ```go
 // 按权重随机选择（轮盘赌算法）
 func weightedChoice(items []string, weights []float64) string {
@@ -270,11 +285,13 @@ func weightedChoice(items []string, weights []float64) string {
 
 // items=["A","B","C"], weights=[1,2,7] → A:10%, B:20%, C:70%
 ```
+:::
 
 ### 指数退避抖动（防雷群效应）
 
 <GoNetworkDiagram kind="retry-backoff" />
 
+::: details 点击展开代码：指数退避抖动（防雷群效应）
 ```go
 // 带抖动的指数退避（Cloud Spanner/Envoy 标准模式）
 func exponentialBackoffWithJitter(attempt int, base, max time.Duration) time.Duration {
@@ -304,9 +321,11 @@ func retryWithBackoff(fn func() error, maxRetries int) error {
     return errors.New("max retries exceeded")
 }
 ```
+:::
 
 ### 测试辅助：随机测试数据生成
 
+::: details 点击展开代码：测试辅助：随机测试数据生成
 ```go
 // 随机字符串（测试数据生成）
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -338,9 +357,11 @@ func TestSomeFunc(t *testing.T) {
     }
 }
 ```
+:::
 
 ### v1 → v2 迁移指南
 
+::: details 点击展开代码：v1 → v2 迁移指南
 ```go
 // v1（旧写法）：
 import "math/rand"
@@ -365,9 +386,11 @@ import "crypto/rand"
 token := make([]byte, 32)
 crypto_rand.Read(token)
 ```
+:::
 
 ### 正态分布
 
+::: details 点击展开代码：正态分布
 ```go
 // math/rand/v2 内置正态分布
 rng := rand.New(rand.NewPCG(42, 0))
@@ -377,9 +400,11 @@ for i := range 5 {
     fmt.Printf("%.2f\n", scaled)
 }
 ```
+:::
 
 ### crypto/rand vs math/rand
 
+::: details 点击展开代码：crypto/rand vs math/rand
 ```go
 import (
     cryptorand "crypto/rand"
@@ -406,6 +431,7 @@ func simulationRandom(n int) int {
     return rand.N(n) // 快约 100x vs crypto/rand
 }
 ```
+:::
 
 ---
 

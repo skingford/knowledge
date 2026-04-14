@@ -15,6 +15,7 @@ Go 提供多种变量声明方式：`var` 显式声明、`:=` 短变量声明、
 
 <GoLanguageDiagram kind="iota-bitmask" />
 
+::: details 点击展开代码：1. 变量、常量、iota
 ```go
 package main
 
@@ -67,6 +68,7 @@ func main() {
 	fmt.Println("有读权限?", perm&Read != 0)     // true
 }
 ```
+:::
 
 讲解重点：
 
@@ -82,6 +84,7 @@ Go 中所有赋值和函数传参都是**值拷贝**（pass by value），没有
 
 <GoLanguageDiagram kind="value-semantics" />
 
+::: details 点击展开代码：2. 值类型 vs 引用语义
 ```go
 package main
 
@@ -126,6 +129,7 @@ func main() {
 	fmt.Println("modifyPointer 后:", u4) // {modified [viewer]}
 }
 ```
+:::
 
 讲解重点：
 
@@ -143,6 +147,7 @@ func main() {
 
 <GoInternalsDiagram kind="map-hmap" />
 
+::: details 点击展开代码：3. 数组、Slice、Map
 ```go
 package main
 
@@ -205,6 +210,7 @@ func main() {
 	// nilMap["key"] = 1 // panic: assignment to entry in nil map
 }
 ```
+:::
 
 讲解重点：
 
@@ -226,6 +232,7 @@ Go 的 string 是不可变的字节序列，底层由指针和长度组成。`[]
 
 <GoLanguageDiagram kind="string-byte-rune" />
 
+::: details 点击展开代码：4. String 与 []byte 转换
 ```go
 package main
 
@@ -274,6 +281,7 @@ func main() {
 	// 注意：此后不能再修改 bs，否则 str 也会变
 }
 ```
+:::
 
 讲解重点：
 

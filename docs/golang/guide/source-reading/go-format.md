@@ -49,6 +49,7 @@ Go 代码格式化工具链
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/go/format/format.go（简化）
 func Source(src []byte) ([]byte, error) {
@@ -78,6 +79,7 @@ func Node(dst io.Writer, fset *token.FileSet, node any) error {
 // 遍历 AST 节点，按节点类型输出对应的 Go 语法
 // 特殊处理：注释、分号插入、括号、缩进
 ```
+:::
 
 <GoCodegenDiagram kind="format-roundtrip" />
 
@@ -87,6 +89,7 @@ func Node(dst io.Writer, fset *token.FileSet, node any) error {
 
 ### 格式化 Go 源码
 
+::: details 点击展开代码：格式化 Go 源码
 ```go
 import (
     "go/format"
@@ -125,9 +128,11 @@ fmt.Println(x)
     // }
 }
 ```
+:::
 
 ### 代码生成：生成结构体并格式化
 
+::: details 点击展开代码：代码生成：生成结构体并格式化
 ```go
 import (
     "go/ast"
@@ -183,11 +188,13 @@ func generateStruct(pkgName, typeName string, fields map[string]string) ([]byte,
 //     Email string
 // }
 ```
+:::
 
 ### 文本模板 + 格式化（代码生成最常见模式）
 
 <GoCodegenDiagram kind="template-codegen" />
 
+::: details 点击展开代码：文本模板 + 格式化（代码生成最常见模式）
 ```go
 import (
     "go/format"
@@ -245,9 +252,11 @@ code, _ := generateEnum(EnumDef{
 })
 os.WriteFile("status_gen.go", code, 0644)
 ```
+:::
 
 ### CI 格式检查
 
+::: details 点击展开代码：CI 格式检查
 ```go
 // 检查文件是否符合 gofmt 格式（CI 流水线中常用）
 func checkFormat(filePath string) error {
@@ -282,9 +291,11 @@ func checkDirFormat(dir string) []string {
     return unformatted
 }
 ```
+:::
 
 ### 格式化代码片段（不完整文件）
 
+::: details 点击展开代码：格式化代码片段（不完整文件）
 ```go
 // 格式化函数体片段（非完整文件）
 func formatFragment(stmts string) (string, error) {
@@ -311,6 +322,7 @@ func formatFragment(stmts string) (string, error) {
     return strings.Join(lines, "\n"), nil
 }
 ```
+:::
 
 ---
 

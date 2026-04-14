@@ -21,6 +21,7 @@ search: false
 
 ### 5.1 OpenTelemetry 基础设置
 
+::: details 点击展开代码：5.1 OpenTelemetry 基础设置
 ```go
 package tracing
 
@@ -90,9 +91,11 @@ func InitTracer(ctx context.Context, serviceName string) (func(), error) {
     return cleanup, nil
 }
 ```
+:::
 
 ### 5.2 创建 Span 与上下文传播
 
+::: details 点击展开代码：5.2 创建 Span 与上下文传播
 ```go
 package main
 
@@ -158,11 +161,13 @@ func processOrder(ctx context.Context) (string, error) {
     return "ORD-20240101-001", nil
 }
 ```
+:::
 
 如果你的 HTTP 服务已经用 `otelhttp.NewHandler(...)` 做了自动插桩，那 `r.Context()` 里通常已经带着提取后的 Span 上下文，就不需要在 Handler 里再次手动 `Extract(...)`。
 
 ### 5.2.1 请求内传播 vs 离线异步任务
 
+::: details 点击展开代码：5.2.1 请求内传播 vs 离线异步任务
 ```go
 func handleAsyncNotify(w http.ResponseWriter, r *http.Request) {
     // 先保存链路关联信息
@@ -189,6 +194,7 @@ func handleAsyncNotify(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusAccepted)
 }
 ```
+:::
 
 这个模式适合：
 
@@ -199,6 +205,7 @@ func handleAsyncNotify(w http.ResponseWriter, r *http.Request) {
 
 ### 5.3 gRPC 拦截器集成追踪
 
+::: details 点击展开代码：5.3 gRPC 拦截器集成追踪
 ```go
 import (
     "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -220,6 +227,7 @@ func newTracedGRPCConn(addr string) (*grpc.ClientConn, error) {
     )
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="otel-trace" />
 
@@ -238,6 +246,7 @@ func newTracedGRPCConn(addr string) (*grpc.ClientConn, error) {
 
 ### 6.1 熔断器（Circuit Breaker）
 
+::: details 点击展开代码：6.1 熔断器（Circuit Breaker）
 ```go
 package circuitbreaker
 
@@ -334,11 +343,13 @@ func (cb *CircuitBreaker) State() State {
     return cb.state
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="circuit-breaker" />
 
 ### 6.2 限流器（Rate Limiter）
 
+::: details 点击展开代码：6.2 限流器（Rate Limiter）
 ```go
 package ratelimit
 
@@ -408,11 +419,13 @@ func (pcl *PerClientLimiter) Allow(clientID string) bool {
     return pcl.GetLimiter(clientID).Allow()
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="rate-limiter" />
 
 ### 6.3 降级策略
 
+::: details 点击展开代码：6.3 降级策略
 ```go
 package degradation
 
@@ -460,6 +473,7 @@ type Product struct {
     Price float64
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="degradation-fallback" />
 
@@ -477,6 +491,7 @@ type Product struct {
 
 ### 7.1 基于幂等 Key 的方案
 
+::: details 点击展开代码：7.1 基于幂等 Key 的方案
 ```go
 package idempotent
 
@@ -585,9 +600,11 @@ func (s *IdempotencyStore) Execute(
     return response, nil
 }
 ```
+:::
 
 ### 7.2 基于 Token 的防重提交
 
+::: details 点击展开代码：7.2 基于 Token 的防重提交
 ```go
 package idempotent
 
@@ -641,9 +658,11 @@ func (t *TokenDedup) ConsumeToken(ctx context.Context, token string) (bool, erro
     return result > 0, nil
 }
 ```
+:::
 
 ### 7.3 数据库唯一约束方案
 
+::: details 点击展开代码：7.3 数据库唯一约束方案
 ```go
 // 利用数据库唯一索引实现自然幂等
 // 场景：创建订单时，使用 业务流水号 作为唯一约束
@@ -671,6 +690,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
     return nil
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="idempotency-key" />
 
@@ -688,6 +708,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 
 ### 8.1 指数退避重试
 
+::: details 点击展开代码：8.1 指数退避重试
 ```go
 package retry
 
@@ -797,9 +818,11 @@ func IsRetryable(err error) bool {
     return false
 }
 ```
+:::
 
 ### 8.2 重试预算（Retry Budget）
 
+::: details 点击展开代码：8.2 重试预算（Retry Budget）
 ```go
 package retry
 
@@ -859,9 +882,11 @@ func (rb *RetryBudget) RecordRetry() {
     rb.retryRequests.Add(1)
 }
 ```
+:::
 
 ### 8.3 使用示例
 
+::: details 点击展开代码：8.3 使用示例
 ```go
 func main() {
     ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -887,6 +912,7 @@ func main() {
     }
 }
 ```
+:::
 
 <GoMicroserviceDiagram kind="retry-budget" />
 

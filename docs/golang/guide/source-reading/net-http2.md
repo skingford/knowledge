@@ -52,6 +52,7 @@ HTTP/2 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // net/http 内部集成 http2（golang.org/x/net/http2）
 // TLS 握手时通过 ALPN 协商协议：
@@ -69,6 +70,7 @@ HTTP/2 体系
 // Stream 5: POST /api/events
 // → 这 3 个请求在同一 TCP 连接上并发
 ```
+:::
 
 ---
 
@@ -76,6 +78,7 @@ HTTP/2 体系
 
 ### 启用 HTTP/2（自动）
 
+::: details 点击展开代码：启用 HTTP/2（自动）
 ```go
 import (
     "crypto/tls"
@@ -109,9 +112,11 @@ func checkHTTP2(url string) {
     fmt.Printf("协议: %s\n", resp.Proto) // HTTP/2.0
 }
 ```
+:::
 
 ### h2c：明文 HTTP/2（不加密）
 
+::: details 点击展开代码：h2c：明文 HTTP/2（不加密）
 ```go
 import "golang.org/x/net/http2/h2c"
 
@@ -136,9 +141,11 @@ func startH2C() error {
     return srv.ListenAndServe()
 }
 ```
+:::
 
 ### Server Push：服务端主动推送资源
 
+::: details 点击展开代码：Server Push：服务端主动推送资源
 ```go
 // Server Push：在响应主 HTML 时，提前推送 CSS/JS
 // 客户端收到 PUSH_PROMISE 帧后直接缓存，无需发起额外请求
@@ -179,9 +186,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // 2. 更好的替代：Link: </static/style.css>; rel=preload 头部
 // 3. gRPC 场景中 Push 不常用，主要用于 Web 加速
 ```
+:::
 
 ### HTTP/2 Client：连接复用诊断
 
+::: details 点击展开代码：HTTP/2 Client：连接复用诊断
 ```go
 // HTTP/2 客户端：单连接多路复用（高并发场景优势明显）
 func http2Client() {
@@ -227,9 +236,11 @@ func http2Client() {
     }
 }
 ```
+:::
 
 ### HTTP/2 调优参数
 
+::: details 点击展开代码：HTTP/2 调优参数
 ```go
 import "golang.org/x/net/http2"
 
@@ -267,9 +278,11 @@ func showNegotiatedProtocol(resp *http.Response) {
     fmt.Printf("HTTP 协议: %s\n", resp.Proto)
 }
 ```
+:::
 
 ### gRPC 与 HTTP/2
 
+::: details 点击展开代码：gRPC 与 HTTP/2
 ```go
 // gRPC 使用 HTTP/2 h2c（明文）作为传输层
 // 理解 gRPC 底层有助于调试连接问题
@@ -284,6 +297,7 @@ func showNegotiatedProtocol(resp *http.Response) {
 // GODEBUG=http2debug=1 → 打印帧级别调试信息
 // GODEBUG=http2debug=2 → 更详细（含数据帧内容）
 ```
+:::
 
 ---
 

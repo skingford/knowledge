@@ -49,6 +49,7 @@ description: 精读 crypto/rand 的密码学安全随机数实现，掌握 Token
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/rand/rand.go
 // Reader 是全局 io.Reader，读取密码学安全随机字节
@@ -77,6 +78,7 @@ func Int(rand io.Reader, max *big.Int) (n *big.Int, err error) {
     // 循环读取随机字节，丢弃超出范围的值，保证均匀分布
 }
 ```
+:::
 
 ---
 
@@ -84,6 +86,7 @@ func Int(rand io.Reader, max *big.Int) (n *big.Int, err error) {
 
 ### 生成随机字节与安全 Token
 
+::: details 点击展开代码：生成随机字节与安全 Token
 ```go
 import (
     "crypto/rand"
@@ -123,9 +126,11 @@ func generateHexToken() (string, error) {
 token, _ := generateToken(32)  // 43字符 base64 URL-safe
 hexTok, _ := generateHexToken() // 64字符十六进制
 ```
+:::
 
 ### UUID v4 生成
 
+::: details 点击展开代码：UUID v4 生成
 ```go
 // UUID v4：基于随机数（RFC 4122）
 func newUUIDv4() (string, error) {
@@ -150,9 +155,11 @@ func newUUIDv4() (string, error) {
 // uuid.New()           // v4
 // uuid.NewString()     // 字符串形式
 ```
+:::
 
 ### 密码学安全的随机整数
 
+::: details 点击展开代码：密码学安全的随机整数
 ```go
 import (
     "crypto/rand"
@@ -190,9 +197,11 @@ func secureShuffleStrings(s []string) error {
     return nil
 }
 ```
+:::
 
 ### API 密钥生成器
 
+::: details 点击展开代码：API 密钥生成器
 ```go
 // 生成带前缀的 API Key（类似 GitHub/Stripe 风格）
 func generateAPIKey(prefix string) (string, error) {
@@ -210,9 +219,11 @@ func generateAPIKey(prefix string) (string, error) {
 // stripe_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx （Stripe 风格示例）
 key, _ := generateAPIKey("stripe_live")
 ```
+:::
 
 ### 密码重置 Token（带过期时间）
 
+::: details 点击展开代码：密码重置 Token（带过期时间）
 ```go
 type ResetToken struct {
     Token     string
@@ -241,9 +252,11 @@ func storeToken(ctx context.Context, rt *ResetToken) error {
     ).Err()
 }
 ```
+:::
 
 ### 加密 salt 生成
 
+::: details 点击展开代码：加密 salt 生成
 ```go
 // bcrypt salt 由 bcrypt 库内部用 crypto/rand 生成
 // 但若需要手动生成 salt（用于 PBKDF2/Argon2）
@@ -264,6 +277,7 @@ func deriveKey(password string, salt []byte) []byte {
     )
 }
 ```
+:::
 
 ---
 

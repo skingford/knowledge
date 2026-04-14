@@ -172,6 +172,7 @@ hmap（Go 1.23 及以前）
 
 ### 正确使用 map
 
+::: details 点击展开代码：正确使用 map
 ```go
 // 预分配：避免频繁扩容
 m := make(map[string]int, 1000)
@@ -188,11 +189,13 @@ for k, v := range m {
     fmt.Println(k, v)
 }
 ```
+:::
 
 ### map 并发安全
 
 <GoLeakRaceDiagram kind="map-concurrent-write" />
 
+::: details 点击展开代码：map 并发安全
 ```go
 // ❌ 错误：并发读写未加锁 → data race
 var m = map[string]int{}
@@ -222,9 +225,11 @@ var sm sync.Map
 sm.Store("key", 1)
 v, ok := sm.Load("key")
 ```
+:::
 
 ### 结构体作 value（就地修改陷阱）
 
+::: details 点击展开代码：结构体作 value（就地修改陷阱）
 ```go
 type Point struct{ X, Y int }
 
@@ -242,6 +247,7 @@ m["a"] = p
 pm := map[string]*Point{"a": {1, 2}}
 pm["a"].X = 10 // 可以
 ```
+:::
 
 ---
 

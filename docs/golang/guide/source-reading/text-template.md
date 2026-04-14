@@ -55,6 +55,7 @@ text/template 与 html/template 关系
 
 ## 一、核心数据结构
 
+::: details 点击展开代码：一、核心数据结构
 ```go
 // src/text/template/template.go
 type Template struct {
@@ -83,6 +84,7 @@ type state struct {
     depth int        // 递归深度（防止无限模板调用）
 }
 ```
+:::
 
 ---
 
@@ -123,6 +125,7 @@ Action 完整语法表
 
 ## 三、执行核心（eval 机制）
 
+::: details 点击展开代码：三、执行核心（eval 机制）
 ```go
 // src/text/template/exec.go（简化）
 func (s *state) evalCall(dot, fun reflect.Value, node parse.Node,
@@ -159,6 +162,7 @@ func (s *state) walkRange(dot reflect.Value, r *parse.RangeNode) {
     }
 }
 ```
+:::
 
 ---
 
@@ -166,6 +170,7 @@ func (s *state) walkRange(dot reflect.Value, r *parse.RangeNode) {
 
 ### 基础模板渲染
 
+::: details 点击展开代码：基础模板渲染
 ```go
 package main
 
@@ -202,9 +207,11 @@ func main() {
 //   - 微服务
 // 成年人
 ```
+:::
 
 ### 自定义函数（FuncMap）
 
+::: details 点击展开代码：自定义函数（FuncMap）
 ```go
 funcMap := template.FuncMap{
     "upper":    strings.ToUpper,
@@ -232,9 +239,11 @@ tmpl := template.Must(
     ),
 )
 ```
+:::
 
 ### 多模板定义（define + template）
 
+::: details 点击展开代码：多模板定义（define + template）
 ```go
 const layout = `
 {{define "base"}}
@@ -257,9 +266,11 @@ const layout = `
 tmpl, err := template.New("").ParseFiles("layout.html", "page.html")
 tmpl.ExecuteTemplate(w, "base", data)
 ```
+:::
 
 ### html/template（Web 安全）
 
+::: details 点击展开代码：html/template（Web 安全）
 ```go
 import "html/template"
 
@@ -278,9 +289,11 @@ data := SafeData{HTML: template.HTML("<b>安全内容</b>")}
 
 // ⚠️ 绝对不要：template.HTML(userInput) ← XSS 漏洞！
 ```
+:::
 
 ### 模板缓存（生产级写法）
 
+::: details 点击展开代码：模板缓存（生产级写法）
 ```go
 type TemplateCache map[string]*template.Template
 
@@ -309,6 +322,7 @@ func NewTemplateCache(dir string) (TemplateCache, error) {
     return cache, nil
 }
 ```
+:::
 
 ---
 

@@ -48,6 +48,7 @@ strconv 包功能全景
 
 ## 一、ParseInt 实现
 
+::: details 点击展开代码：一、ParseInt 实现
 ```go
 // src/strconv/atoi.go（简化）
 func ParseInt(s string, base int, bitSize int) (int64, error) {
@@ -84,6 +85,7 @@ func ParseUint(s string, base int, bitSize int) (uint64, error) {
     return n, nil
 }
 ```
+:::
 
 ```
 ParseInt 快速路径优化（Atoi）
@@ -167,6 +169,7 @@ AppendInt vs FormatInt 的内存对比
 
 ## 四、常见错误类型
 
+::: details 点击展开代码：四、常见错误类型
 ```go
 // strconv 的两种错误
 var ErrRange = errors.New("value out of range")
@@ -190,6 +193,7 @@ if err != nil {
     }
 }
 ```
+:::
 
 ---
 
@@ -197,6 +201,7 @@ if err != nil {
 
 ### 基础转换
 
+::: details 点击展开代码：基础转换
 ```go
 // 字符串 → int（最常用）
 n, err := strconv.Atoi("42")       // 42, nil
@@ -225,9 +230,11 @@ b, _ := strconv.ParseBool("true")  // true, nil
 b, _ = strconv.ParseBool("1")      // true, nil
 b, _ = strconv.ParseBool("false")  // false, nil
 ```
+:::
 
 ### AppendXxx 高性能拼接
 
+::: details 点击展开代码：AppendXxx 高性能拼接
 ```go
 // 构建 CSV 行（无中间字符串分配）
 func formatCSVRow(fields []int64) string {
@@ -255,9 +262,11 @@ func formatJSONNumbers(nums []float64) string {
     return string(buf)
 }
 ```
+:::
 
 ### 字符串引用处理
 
+::: details 点击展开代码：字符串引用处理
 ```go
 // Quote：为字符串加 Go 风格双引号（转义特殊字符）
 s := strconv.Quote("Hello\nWorld")  // "\"Hello\\nWorld\""
@@ -272,9 +281,11 @@ original, err := strconv.Unquote(`"Hello\nWorld"`)
 
 // 用于解析配置文件中的带引号字符串
 ```
+:::
 
 ### 性能对比（避免 fmt.Sprintf 的场景）
 
+::: details 点击展开代码：性能对比（避免 fmt.Sprintf 的场景）
 ```go
 // ❌ 低效：fmt.Sprintf 有反射和格式解析开销
 func slowConcat(n int) string {
@@ -296,6 +307,7 @@ func batchConcat(ns []int) string {
     return string(buf)
 }
 ```
+:::
 
 ---
 

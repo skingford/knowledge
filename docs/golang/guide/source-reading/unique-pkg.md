@@ -53,6 +53,7 @@ unique 包（Go 1.23+）
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/unique/handle.go（Go 1.23，简化）
 package unique
@@ -84,6 +85,7 @@ func Make[T comparable](v T) Handle[T] {
     ...
 }
 ```
+:::
 
 ---
 
@@ -91,6 +93,7 @@ func Make[T comparable](v T) Handle[T] {
 
 ### 基础：字符串驻留
 
+::: details 点击展开代码：基础：字符串驻留
 ```go
 import "unique"
 
@@ -107,9 +110,11 @@ func basicInterning() {
     fmt.Println(h1.Value()) // "hello"
 }
 ```
+:::
 
 ### 高基数 Tag 内存优化
 
+::: details 点击展开代码：高基数 Tag 内存优化
 ```go
 // 场景：Prometheus/OpenTelemetry 的 label/attribute
 // 同一个 label key 会被成千上万的 metric 重复存储
@@ -137,9 +142,11 @@ func optimizedMetrics() {
     // tags[0].Key == tags[999].Key → true（指针相等）
 }
 ```
+:::
 
 ### 高效 map key：Handle 替换 string
 
+::: details 点击展开代码：高效 map key：Handle 替换 string
 ```go
 // 场景：缓存系统中用复合 key 查找（用户+区域+语言）
 type CacheKey struct {
@@ -170,9 +177,11 @@ func (c *Cache) Get(userID, region, lang string) (any, bool) {
 // 2. 相等比较是指针比较（不逐字节比对字符串内容）
 // 3. map 中存储的 key 不重复分配字符串内存
 ```
+:::
 
 ### 协议字段规范化
 
+::: details 点击展开代码：协议字段规范化
 ```go
 // 场景：HTTP 请求解析时，Content-Type 等头字段大量重复
 type ParsedHeader struct {
@@ -195,9 +204,11 @@ func (p *HTTPParser) parseHeader(name, value string) {
 // 大量并发请求时，"content-type", "application/json" 只各存一份
 // 显著减少 GC 压力
 ```
+:::
 
 ### 与 comparable 泛型约束配合
 
+::: details 点击展开代码：与 comparable 泛型约束配合
 ```go
 // unique.Make 接受任何 comparable 类型，不限于 string
 type Point struct {
@@ -218,9 +229,11 @@ func internedPoints() {
     fmt.Println(addr1 == addr2) // true
 }
 ```
+:::
 
 ### 驻留生命周期：弱引用与 GC
 
+::: details 点击展开代码：驻留生命周期：弱引用与 GC
 ```go
 // unique 使用弱引用（weak pointer）管理驻留表
 // 当没有任何 Handle 引用某个值时，GC 可以回收该条目
@@ -240,6 +253,7 @@ func lifecycleDemo() {
 // Java：intern 的字符串永远不 GC（PermGen/Metaspace 内存泄漏风险）
 // Go unique：使用弱引用，无引用时自动 GC，更安全
 ```
+:::
 
 ---
 

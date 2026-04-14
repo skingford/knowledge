@@ -42,6 +42,7 @@ log/slog 架构分层
 
 ### slog.Value：零分配标量
 
+::: details 点击展开代码：slog.Value：零分配标量
 ```go
 // src/log/slog/value.go
 type Value struct {
@@ -65,6 +66,7 @@ const (
     KindLogValuer
 )
 ```
+:::
 
 ```
 Value 内存布局（16 字节，无堆分配）
@@ -87,6 +89,7 @@ Value 内存布局（16 字节，无堆分配）
 
 ### slog.Record
 
+::: details 点击展开代码：slog.Record
 ```go
 // src/log/slog/record.go
 type Record struct {
@@ -105,11 +108,13 @@ type Record struct {
 
 const nAttrsInline = 5  // 实际值，栈上预留空间
 ```
+:::
 
 ---
 
 ## 二、Handler 接口
 
+::: details 点击展开代码：二、Handler 接口
 ```go
 // src/log/slog/handler.go
 type Handler interface {
@@ -126,6 +131,7 @@ type Handler interface {
     WithGroup(name string) Handler
 }
 ```
+:::
 
 ```
 Handler 的不可变链式设计
@@ -181,6 +187,7 @@ slog.Info("msg", "key", val) 完整调用链
 
 ## 四、级别系统
 
+::: details 点击展开代码：四、级别系统
 ```go
 // src/log/slog/level.go
 type Level int
@@ -203,6 +210,7 @@ h := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
     Level: programLevel, // 实现 Leveler 接口，动态读取
 })
 ```
+:::
 
 ---
 
@@ -210,6 +218,7 @@ h := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 
 ### 基础使用
 
+::: details 点击展开代码：基础使用
 ```go
 import "log/slog"
 
@@ -224,9 +233,11 @@ func main() {
     // {"time":"...","level":"INFO","msg":"user login","userID":42,"ip":"127.0.0.1"}
 }
 ```
+:::
 
 ### 配置 JSON Handler（生产推荐）
 
+::: details 点击展开代码：配置 JSON Handler（生产推荐）
 ```go
 func setupProductionLogger() *slog.Logger {
     handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
@@ -252,11 +263,13 @@ func setupProductionLogger() *slog.Logger {
 // 输出格式：
 // {"ts":1704067200,"level":"info","source":{"function":"main.xxx","file":"main.go","line":42},"msg":"server started","port":8080}
 ```
+:::
 
 ### WithAttrs 预绑定属性（per-request Logger）
 
 <GoEngineeringDiagram kind="slog-pipeline" />
 
+::: details 点击展开代码：WithAttrs 预绑定属性（per-request Logger）
 ```go
 // WithAttrs 返回新 Logger，预格式化属性（避免重复序列化）
 func contextualLogging(baseLogger *slog.Logger) {
@@ -294,9 +307,11 @@ func LoggerFromCtx(ctx context.Context) *slog.Logger {
     return slog.Default()
 }
 ```
+:::
 
 ### WithGroup 属性分组
 
+::: details 点击展开代码：WithGroup 属性分组
 ```go
 // WithGroup 将后续属性放入命名组
 func groupedAttributes() {
@@ -317,9 +332,11 @@ func groupedAttributes() {
     // 输出：{"msg":"incoming","http":{"request":{"method":"GET","path":"/api/v1"}}}
 }
 ```
+:::
 
 ### 自定义 Handler（多目标 + 动态 Level）
 
+::: details 点击展开代码：自定义 Handler（多目标 + 动态 Level）
 ```go
 // 多目标 Handler：同时输出到控制台（Text）和文件（JSON）
 type MultiHandler struct {
@@ -377,9 +394,11 @@ func (h *DynamicLevelHandler) Enabled(_ context.Context, level slog.Level) bool 
     return level >= slog.Level(h.level.Load())
 }
 ```
+:::
 
 ### 与 OpenTelemetry 集成
 
+::: details 点击展开代码：与 OpenTelemetry 集成
 ```go
 // 将 slog 日志关联到 OTel trace span
 type OTelHandler struct {
@@ -402,9 +421,11 @@ func (h *OTelHandler) Handle(ctx context.Context, r slog.Record) error {
     return h.base.Handle(ctx, r)
 }
 ```
+:::
 
 ### 结构化错误日志
 
+::: details 点击展开代码：结构化错误日志
 ```go
 func processOrder(ctx context.Context, orderID int64) error {
     log := slog.With("orderID", orderID)
@@ -426,9 +447,11 @@ func processOrder(ctx context.Context, orderID int64) error {
     return nil
 }
 ```
+:::
 
 ### 性能敏感路径：使用 LogAttrs
 
+::: details 点击展开代码：性能敏感路径：使用 LogAttrs
 ```go
 // Info(msg, args...) 会在内部做 key-value 配对，有轻微反射
 // LogAttrs 直接传 Attr，更快
@@ -443,6 +466,7 @@ if logger.Enabled(ctx, slog.LevelDebug) {
     logger.Debug("expensive debug", "data", computeExpensiveData())
 }
 ```
+:::
 
 ---
 

@@ -52,6 +52,7 @@ crypto/x509 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/x509/verify.go（简化）
 
@@ -75,6 +76,7 @@ func (c *Certificate) Verify(opts VerifyOptions) (chains [][]*Certificate, err e
 // 对每个可能的中间 CA，验证其是否签署了当前证书
 // 最终到达 opts.Roots 中的根 CA
 ```
+:::
 
 ---
 
@@ -82,6 +84,7 @@ func (c *Certificate) Verify(opts VerifyOptions) (chains [][]*Certificate, err e
 
 ### 解析和检查证书
 
+::: details 点击展开代码：解析和检查证书
 ```go
 import (
     "crypto/x509"
@@ -112,9 +115,11 @@ func inspectCertificate(cert *x509.Certificate) {
     }
 }
 ```
+:::
 
 ### 验证证书链
 
+::: details 点击展开代码：验证证书链
 ```go
 // 验证服务端证书（自定义 CA）
 func verifyCertChain(cert *x509.Certificate, caCertPEM []byte) error {
@@ -146,9 +151,11 @@ func verifyClientCert(cert *x509.Certificate, clientCAs *x509.CertPool) error {
     return err
 }
 ```
+:::
 
 ### 生成自签名证书（开发/测试）
 
+::: details 点击展开代码：生成自签名证书（开发/测试）
 ```go
 import (
     "crypto/ecdsa"
@@ -204,9 +211,11 @@ func generateSelfSignedCert(domain string) (certPEM, keyPEM []byte, err error) {
     return certPEM, keyPEM, nil
 }
 ```
+:::
 
 ### 搭建完整 CA（本地 PKI）
 
+::: details 点击展开代码：搭建完整 CA（本地 PKI）
 ```go
 type LocalCA struct {
     cert *x509.Certificate
@@ -266,9 +275,11 @@ func (ca *LocalCA) Sign(csrDER []byte) ([]byte, error) {
     return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certDER}), nil
 }
 ```
+:::
 
 ### 生成 CSR（证书签名请求）
 
+::: details 点击展开代码：生成 CSR（证书签名请求）
 ```go
 // 生成 CSR（发送给 CA 签名，不暴露私钥）
 func generateCSR(domain string) (csrPEM, keyPEM []byte, err error) {
@@ -293,6 +304,7 @@ func generateCSR(domain string) (csrPEM, keyPEM []byte, err error) {
     return
 }
 ```
+:::
 
 ---
 

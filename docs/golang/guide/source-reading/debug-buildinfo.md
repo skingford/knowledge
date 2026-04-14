@@ -56,6 +56,7 @@ debug/buildinfo 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/runtime/debug/build.go
 type BuildInfo struct {
@@ -84,6 +85,7 @@ func ReadBuildInfo() (info *BuildInfo, ok bool)
 // 从文件读取（debug/buildinfo 包）
 func ReadFile(name string) (*BuildInfo, error)
 ```
+:::
 
 <GoEngineeringDiagram kind="buildinfo-read-flow" />
 
@@ -93,6 +95,7 @@ func ReadFile(name string) (*BuildInfo, error)
 
 ### 运行时读取构建信息
 
+::: details 点击展开代码：运行时读取构建信息
 ```go
 import (
     "fmt"
@@ -125,9 +128,11 @@ func printBuildInfo() {
     }
 }
 ```
+:::
 
 ### 版本信息注入（生产实践）
 
+::: details 点击展开代码：版本信息注入（生产实践）
 ```go
 // 推荐做法：通过 BuildInfo 自动获取版本，无需 ldflags
 
@@ -198,9 +203,11 @@ func (i *Info) String() string {
         i.Version, i.Commit, modified, i.GoVersion, i.BuildTime)
 }
 ```
+:::
 
 ### HTTP 版本端点
 
+::: details 点击展开代码：HTTP 版本端点
 ```go
 // 暴露版本信息给健康检查/监控系统
 func RegisterVersionHandlers(mux *http.ServeMux) {
@@ -225,11 +232,13 @@ func RegisterVersionHandlers(mux *http.ServeMux) {
     })
 }
 ```
+:::
 
 ### 读取任意二进制的构建信息
 
 <GoEngineeringDiagram kind="buildinfo-read-flow" />
 
+::: details 点击展开代码：读取任意二进制的构建信息
 ```go
 import "debug/buildinfo"
 
@@ -272,9 +281,11 @@ func scanBinaries(dir string) {
     })
 }
 ```
+:::
 
 ### 对比 ldflags 方案
 
+::: details 点击展开代码：对比 ldflags 方案
 ```go
 // ❌ 旧方案：ldflags 注入（需要 CI 脚本配合，容易遗漏）
 // go build -ldflags="-X main.version=v1.2.3 -X main.commit=$(git rev-parse HEAD)"
@@ -289,6 +300,7 @@ var (
 // go build -buildvcs=false .  ← 禁用 VCS 信息（加快 CI 构建）
 // go build -trimpath .        ← 去除路径信息（减小二进制大小）
 ```
+:::
 
 ---
 

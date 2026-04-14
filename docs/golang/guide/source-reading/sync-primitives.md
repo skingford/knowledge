@@ -106,6 +106,7 @@ Lock() 调用流程
 
 ### 代码示例
 
+::: details 点击展开代码：代码示例
 ```go
 package main
 
@@ -146,6 +147,7 @@ func main() {
     fmt.Println(c.Value()) // 1000
 }
 ```
+:::
 
 ---
 
@@ -177,6 +179,7 @@ func main() {
 
 ### 代码示例
 
+::: details 点击展开代码：代码示例
 ```go
 type Config struct {
     mu   sync.RWMutex
@@ -197,6 +200,7 @@ func (c *Config) Set(key, val string) {
     c.data[key] = val
 }
 ```
+:::
 
 ---
 
@@ -224,6 +228,7 @@ func (c *Config) Set(key, val string) {
 
 ### 代码示例
 
+::: details 点击展开代码：代码示例
 ```go
 func fanOut(tasks []string) []string {
     var (
@@ -249,6 +254,7 @@ func fanOut(tasks []string) []string {
 
 func process(s string) string { return "[done]" + s }
 ```
+:::
 
 ---
 
@@ -273,6 +279,7 @@ func process(s string) string { return "[done]" + s }
 
 ### 代码示例
 
+::: details 点击展开代码：代码示例
 ```go
 var (
     instance *DB
@@ -289,6 +296,7 @@ func GetDB() *DB {
 type DB struct{ conn interface{} }
 func connect() interface{} { return nil }
 ```
+:::
 
 ---
 
@@ -332,6 +340,7 @@ func connect() interface{} { return nil }
 
 ### 代码示例
 
+::: details 点击展开代码：代码示例
 ```go
 var cache sync.Map
 
@@ -353,6 +362,7 @@ func getOrSet(key, val string) string {
     return actual.(string)
 }
 ```
+:::
 
 ---
 

@@ -53,6 +53,7 @@ GMP 调度模型
 
 ### G（Goroutine）关键字段
 
+::: details 点击展开代码：G（Goroutine）关键字段
 ```go
 // src/runtime/runtime2.go:471
 type g struct {
@@ -68,9 +69,11 @@ type g struct {
     waitreason  waitReason  // 等待原因（chan recv/mutex/...）
 }
 ```
+:::
 
 ### P（Processor）关键字段
 
+::: details 点击展开代码：P（Processor）关键字段
 ```go
 // src/runtime/runtime2.go:774
 type p struct {
@@ -86,6 +89,7 @@ type p struct {
     runnext  guintptr       // 下一个优先运行的 G
 }
 ```
+:::
 
 ---
 
@@ -270,11 +274,13 @@ M 进入系统调用
 - **常见信号**：`runtime.NumGoroutine()` 持续增长；goroutine profile 里大量栈帧集中在少数等待点。
 - **典型结论**：如果大量 G 都在等待下游 I/O 或锁，问题可能不在调度器本身，而在上游并发度和资源配额。
 
+::: details 点击展开代码：用 pprof 看 Goroutine 堆积点
 ```bash
 go tool pprof http://localhost:6060/debug/pprof/goroutine
 go tool pprof http://localhost:6060/debug/pprof/block
 go tool pprof http://localhost:6060/debug/pprof/mutex
 ```
+:::
 
 ### 用 trace 看调度延迟和阻塞原因
 
@@ -285,10 +291,12 @@ go tool pprof http://localhost:6060/debug/pprof/mutex
   - `Network blocking`：看 netpoll 路径上的等待
 - **特别适合**：排查“CPU 不高但接口就是慢”“偶发尾延迟很高”这类问题。
 
+::: details 点击展开代码：用 trace 看调度延迟和阻塞原因
 ```bash
 go test -trace=trace.out ./...
 go tool trace trace.out
 ```
+:::
 
 ### 建议关注的运行时指标
 
@@ -307,6 +315,7 @@ go tool trace trace.out
 
 ## 八、代码示例
 
+::: details 点击展开代码：八、代码示例
 ```go
 package main
 
@@ -333,7 +342,9 @@ func main() {
     wg.Wait()
 }
 ```
+:::
 
+::: details 点击展开代码：八、代码示例
 ```go
 // 观察调度延迟（生产慎用）
 import _ "net/http/pprof"
@@ -341,6 +352,7 @@ import _ "net/http/pprof"
 // 通过 pprof 查看 goroutine 阻塞原因
 // go tool pprof http://localhost:6060/debug/pprof/goroutine
 ```
+:::
 
 ---
 

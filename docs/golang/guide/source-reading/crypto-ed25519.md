@@ -50,6 +50,7 @@ crypto/ed25519 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/crypto/ed25519/ed25519.go（简化）
 
@@ -72,6 +73,7 @@ const (
 // 2. k = SHA-512(R || A || message)
 // 3. 验证 S·B == R + k·A（批量验证可加速）
 ```
+:::
 
 ---
 
@@ -79,6 +81,7 @@ const (
 
 ### 基础：密钥生成与签名验证
 
+::: details 点击展开代码：基础：密钥生成与签名验证
 ```go
 import (
     "crypto/ed25519"
@@ -111,9 +114,11 @@ func basicEdDSA() {
     fmt.Println("篡改后验证:", ed25519.Verify(pub, tampered, sig)) // false
 }
 ```
+:::
 
 ### 密钥序列化（PEM 格式）
 
+::: details 点击展开代码：密钥序列化（PEM 格式）
 ```go
 import (
     "crypto/ed25519"
@@ -179,9 +184,11 @@ func loadPrivateKey(privFile string) (ed25519.PrivateKey, error) {
     return edKey, nil
 }
 ```
+:::
 
 ### JWT EdDSA（RFC 8037 - OKP 密钥）
 
+::: details 点击展开代码：JWT EdDSA（RFC 8037 - OKP 密钥）
 ```go
 // 手动实现 EdDSA JWT（alg: EdDSA, crv: Ed25519）
 import (
@@ -272,9 +279,11 @@ func jwtExample() {
     fmt.Printf("Claims: %+v, err: %v\n", claims, err)
 }
 ```
+:::
 
 ### 用 Ed25519 签发 TLS 证书
 
+::: details 点击展开代码：用 Ed25519 签发 TLS 证书
 ```go
 import (
     "crypto/ed25519"
@@ -327,9 +336,11 @@ func generateSelfSignedCert() (tls.Certificate, error) {
     )
 }
 ```
+:::
 
 ### 从 Seed 派生密钥（确定性密钥）
 
+::: details 点击展开代码：从 Seed 派生密钥（确定性密钥）
 ```go
 // Ed25519 支持从 32 字节 seed 确定性派生密钥对
 // 用途：HD 钱包（分层确定性）、密钥备份恢复
@@ -384,6 +395,7 @@ func signRequest(priv ed25519.PrivateKey, keyID, method, path string, body []byt
     }
 }
 ```
+:::
 
 ---
 

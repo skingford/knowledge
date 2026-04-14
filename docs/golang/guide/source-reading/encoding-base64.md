@@ -49,6 +49,7 @@ encoding/base64 编码体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/encoding/base64/base64.go（简化）
 type Encoding struct {
@@ -74,6 +75,7 @@ func (enc *Encoding) encode(dst, src []byte) {
     }
 }
 ```
+:::
 
 ---
 
@@ -81,6 +83,7 @@ func (enc *Encoding) encode(dst, src []byte) {
 
 ### 基础编解码
 
+::: details 点击展开代码：基础编解码
 ```go
 import "encoding/base64"
 
@@ -102,9 +105,11 @@ func basics() {
     fmt.Println(urlEncoded, raw)
 }
 ```
+:::
 
 ### 四种编码对比
 
+::: details 点击展开代码：四种编码对比
 ```go
 func compareEncodings() {
     data := []byte{0xFF, 0xFE, 0xFD} // 包含 +/- 差异的字节
@@ -119,11 +124,13 @@ func compareEncodings() {
     // RawURLEncoding: __79 (无 =)
 }
 ```
+:::
 
 ### 流式编码器（大文件）
 
 <GoNetworkDiagram kind="base64-streaming" />
 
+::: details 点击展开代码：流式编码器（大文件）
 ```go
 // 编码大文件时使用流式 API，避免全量内存加载
 func encodeFileToBase64(src, dst string) error {
@@ -161,9 +168,11 @@ func decodeBase64File(src, dst string) error {
     return err
 }
 ```
+:::
 
 ### HTTP Basic Auth 解析
 
+::: details 点击展开代码：HTTP Basic Auth 解析
 ```go
 // HTTP Authorization: Basic <base64(user:password)>
 func parseBasicAuth(authHeader string) (user, pass string, ok bool) {
@@ -190,9 +199,11 @@ func makeBasicAuth(user, pass string) string {
     return "Basic " + creds
 }
 ```
+:::
 
 ### JWT 载荷解析（RawURLEncoding）
 
+::: details 点击展开代码：JWT 载荷解析（RawURLEncoding）
 ```go
 // JWT = header.payload.signature（均用 RawURLEncoding，无 padding）
 func parseJWTPayload(token string) (map[string]any, error) {
@@ -214,9 +225,11 @@ func parseJWTPayload(token string) (map[string]any, error) {
     return claims, nil
 }
 ```
+:::
 
 ### 内嵌二进制到 Go 代码（常用于测试）
 
+::: details 点击展开代码：内嵌二进制到 Go 代码（常用于测试）
 ```go
 // 将图片/证书等二进制嵌入 Go 代码
 func embedBinary(data []byte) string {
@@ -231,9 +244,11 @@ func loadTestCert() []byte {
     return data
 }
 ```
+:::
 
 ### 编码长度预计算
 
+::: details 点击展开代码：编码长度预计算
 ```go
 // 提前分配正确大小的 buffer，避免 EncodeToString 的内存分配
 func encodeNoCopy(data []byte) []byte {
@@ -251,6 +266,7 @@ func decodeNoCopy(encoded []byte) ([]byte, error) {
     return dst[:n], nil // DecodedLen 是上界，n 是实际长度
 }
 ```
+:::
 
 ---
 

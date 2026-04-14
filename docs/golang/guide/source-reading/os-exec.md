@@ -52,6 +52,7 @@ os/exec 核心结构
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/os/exec/exec.go（简化）
 type Cmd struct {
@@ -101,6 +102,7 @@ func (c *Cmd) Wait() error {
     return err
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="exec-cmd-lifecycle" />
 
@@ -110,6 +112,7 @@ func (c *Cmd) Wait() error {
 
 ### 基础命令执行
 
+::: details 点击展开代码：基础命令执行
 ```go
 // 最简单：直接获取输出
 out, err := exec.Command("git", "log", "--oneline", "-5").Output()
@@ -135,9 +138,11 @@ if errors.Is(err, exec.ErrNotFound) {
     log.Fatal("ffmpeg 未安装")
 }
 ```
+:::
 
 ### 超时控制（context）
 
+::: details 点击展开代码：超时控制（context）
 ```go
 // context.WithTimeout 取消时向子进程发送 SIGKILL（默认）
 ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -161,11 +166,13 @@ if err := cmd.Run(); err != nil {
 cmd = exec.CommandContext(ctx, "long-running-task")
 cmd.WaitDelay = 5 * time.Second // 等待 5s 后强制 kill
 ```
+:::
 
 ### 流式管道（大输出场景）
 
 <GoNetworkDiagram kind="io-pipe-stream" />
 
+::: details 点击展开代码：流式管道（大输出场景）
 ```go
 // 流式读取输出（避免全部加载到内存）
 cmd := exec.Command("kubectl", "logs", "-f", "my-pod")
@@ -191,9 +198,11 @@ if err := cmd.Wait(); err != nil {
     log.Printf("命令退出: %v", err)
 }
 ```
+:::
 
 ### 管道链（多命令串联）
 
+::: details 点击展开代码：管道链（多命令串联）
 ```go
 // 等价于：ps aux | grep go | wc -l
 func pipeCommands() (string, error) {
@@ -234,9 +243,11 @@ func pipeCommands() (string, error) {
     return strings.TrimSpace(buf.String()), nil
 }
 ```
+:::
 
 ### 向进程发送输入
 
+::: details 点击展开代码：向进程发送输入
 ```go
 // 通过 StdinPipe 发送数据
 cmd := exec.Command("python3", "-c", "import sys; print(sys.stdin.read().upper())")
@@ -261,9 +272,11 @@ if err := cmd.Wait(); err != nil {
 }
 fmt.Println(out.String()) // HELLO WORLD
 ```
+:::
 
 ### 安全执行（防止命令注入）
 
+::: details 点击展开代码：安全执行（防止命令注入）
 ```go
 // ❌ 危险：使用 shell，用户输入可注入
 userInput := "foo; rm -rf /"
@@ -287,9 +300,11 @@ func safeExec(name string, args ...string) ([]byte, error) {
     return exec.Command(name, args...).Output()
 }
 ```
+:::
 
 ### 设置环境变量
 
+::: details 点击展开代码：设置环境变量
 ```go
 // 继承父进程环境并追加
 cmd := exec.Command("go", "test", "./...")
@@ -306,6 +321,7 @@ cmd.Env = []string{
     "HOME=/tmp",
 }
 ```
+:::
 
 ---
 

@@ -44,6 +44,7 @@ go-redis v9 体系
 
 ## 一、核心示例
 
+::: details 点击展开代码：一、核心示例
 ```go
 import (
     "context"
@@ -72,6 +73,7 @@ func newRedisClient() *redis.Client {
     })
 }
 ```
+:::
 
 ---
 
@@ -79,6 +81,7 @@ func newRedisClient() *redis.Client {
 
 ### 基础操作与错误处理
 
+::: details 点击展开代码：基础操作与错误处理
 ```go
 func basicOps(ctx context.Context, rdb *redis.Client) {
     // SET with TTL
@@ -123,11 +126,13 @@ func basicOps(ctx context.Context, rdb *redis.Client) {
     fmt.Println("top3:", top3)
 }
 ```
+:::
 
 ### Pipeline：减少网络往返
 
 <GoDataCacheDiagram kind="redis-pipeline" />
 
+::: details 点击展开代码：Pipeline：减少网络往返
 ```go
 // Pipeline：批量发送多个命令，一次网络往返（非原子）
 func pipelineExample(ctx context.Context, rdb *redis.Client, userIDs []int64) ([]string, error) {
@@ -169,11 +174,13 @@ func pipelinedExample(ctx context.Context, rdb *redis.Client) error {
     return err
 }
 ```
+:::
 
 ### 分布式锁（Redlock 简化版）
 
 <GoDataCacheDiagram kind="redis-distributed-lock" />
 
+::: details 点击展开代码：分布式锁（Redlock 简化版）
 ```go
 // 基于 Redis SET NX PX 的简单分布式锁
 type RedisLock struct {
@@ -247,11 +254,13 @@ func doWithLock(ctx context.Context, rdb *redis.Client) error {
     return processOrder(ctx)
 }
 ```
+:::
 
 ### Watch + TxPipeline（乐观锁）
 
 <GoDataCacheDiagram kind="redis-watch-tx" />
 
+::: details 点击展开代码：Watch + TxPipeline（乐观锁）
 ```go
 // 场景：库存扣减（CAS 模式：先读，CAS 写，冲突重试）
 func decreaseStock(ctx context.Context, rdb *redis.Client, productID string, qty int) error {
@@ -291,11 +300,13 @@ func decreaseStock(ctx context.Context, rdb *redis.Client, productID string, qty
     return fmt.Errorf("too many conflicts, please retry")
 }
 ```
+:::
 
 ### 发布订阅（Pub/Sub）
 
 <GoDataCacheDiagram kind="redis-pubsub" />
 
+::: details 点击展开代码：发布订阅（Pub/Sub）
 ```go
 // 发布消息
 func publishEvent(ctx context.Context, rdb *redis.Client, channel, msg string) error {
@@ -353,11 +364,13 @@ func doSubscribe(ctx context.Context, rdb *redis.Client, channel string, handler
     return nil
 }
 ```
+:::
 
 ### 缓存模式（Cache-Aside + 防缓存击穿）
 
 <GoDataCacheDiagram kind="cache-aside" />
 
+::: details 点击展开代码：缓存模式（Cache-Aside + 防缓存击穿）
 ```go
 // Cache-Aside + singleflight 防缓存击穿
 type UserCache struct {
@@ -434,6 +447,7 @@ func (c *UserCache) GetUserWithNullCache(ctx context.Context, userID int64) (*Us
     return user, nil
 }
 ```
+:::
 
 ---
 

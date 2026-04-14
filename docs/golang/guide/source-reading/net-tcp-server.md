@@ -52,6 +52,7 @@ net TCP 服务器体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // 二进制帧协议定义
 // Header = Magic(2) + Type(1) + Reserved(1) + Length(4) = 8 字节
@@ -110,6 +111,7 @@ func readFrame(r io.Reader) (Frame, error) {
     return Frame{Type: frameType, Payload: payload}, nil
 }
 ```
+:::
 
 ---
 
@@ -117,6 +119,7 @@ func readFrame(r io.Reader) (Frame, error) {
 
 ### 基础 TCP 服务器
 
+::: details 点击展开代码：基础 TCP 服务器
 ```go
 import (
     "bufio"
@@ -286,9 +289,11 @@ func (s *Server) Shutdown(timeout time.Duration) error {
     }
 }
 ```
+:::
 
 ### 完整使用示例（服务端）
 
+::: details 点击展开代码：完整使用示例（服务端）
 ```go
 func main() {
     srv := NewServer(":9090")
@@ -317,9 +322,11 @@ func main() {
     }
 }
 ```
+:::
 
 ### TCP 客户端（连接池版本）
 
+::: details 点击展开代码：TCP 客户端（连接池版本）
 ```go
 // 连接池：复用 TCP 连接（减少三次握手开销）
 type ConnPool struct {
@@ -406,9 +413,11 @@ func (c *Client) Send(msgType byte, payload []byte) ([]byte, error) {
     return resp.Payload, nil
 }
 ```
+:::
 
 ### TLS 加密 TCP 服务器
 
+::: details 点击展开代码：TLS 加密 TCP 服务器
 ```go
 // TLS 版本（生产推荐）
 func StartTLSServer(addr, certFile, keyFile string) error {
@@ -460,9 +469,11 @@ func handleTLSConn(conn *tls.Conn) {
     // 后续同 TCP 处理
 }
 ```
+:::
 
 ### 心跳检测机制
 
+::: details 点击展开代码：心跳检测机制
 ```go
 // 服务端：检测僵尸连接（TCP KeepAlive + 应用层心跳双保险）
 func setupKeepAlive(conn net.Conn) {
@@ -499,6 +510,7 @@ func (h *HeartbeatClient) Start() {
     }()
 }
 ```
+:::
 
 ---
 

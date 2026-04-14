@@ -54,6 +54,7 @@ compress/gzip 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/compress/gzip/gzip.go（简化）
 
@@ -79,6 +80,7 @@ func (z *Writer) Close() error {
     return err
 }
 ```
+:::
 
 ---
 
@@ -86,6 +88,7 @@ func (z *Writer) Close() error {
 
 ### 基础压缩与解压
 
+::: details 点击展开代码：基础压缩与解压
 ```go
 import "compress/gzip"
 
@@ -115,9 +118,11 @@ func decompress(data []byte) ([]byte, error) {
     return io.ReadAll(gz)
 }
 ```
+:::
 
 ### HTTP 响应 gzip 压缩中间件
 
+::: details 点击展开代码：HTTP 响应 gzip 压缩中间件
 ```go
 type gzipResponseWriter struct {
     http.ResponseWriter
@@ -154,9 +159,11 @@ func GzipMiddleware(next http.Handler) http.Handler {
     })
 }
 ```
+:::
 
 ### 文件压缩（带元信息）
 
+::: details 点击展开代码：文件压缩（带元信息）
 ```go
 // 压缩文件并保留元信息
 func compressFile(srcPath, dstPath string) error {
@@ -204,11 +211,13 @@ func readGzipHeader(path string) (*gzip.Header, error) {
     return &header, nil
 }
 ```
+:::
 
 ### sync.Pool 复用 gzip.Writer（高并发优化）
 
 <GoNetworkDiagram kind="gzip-writer-pool" />
 
+::: details 点击展开代码：sync.Pool 复用 gzip.Writer（高并发优化）
 ```go
 // gzip.Writer 初始化有内存分配开销，高并发场景用 Pool 复用
 var gzipWriterPool = sync.Pool{
@@ -232,9 +241,11 @@ func compressWithPool(w io.Writer, data []byte) error {
     return gz.Close()
 }
 ```
+:::
 
 ### 流式 gzip（大文件不占用内存）
 
+::: details 点击展开代码：流式 gzip（大文件不占用内存）
 ```go
 // 场景：边读取数据库记录边压缩输出（不缓冲全部数据）
 func streamingExport(db *sql.DB, w http.ResponseWriter) {
@@ -278,9 +289,11 @@ func gzipToZlib(gzReader io.Reader, zlibWriter io.Writer) error {
     return err
 }
 ```
+:::
 
 ### 压缩等级基准选择
 
+::: details 点击展开代码：压缩等级基准选择
 ```go
 // 根据场景选择压缩等级
 func chooseLevel(scenario string) int {
@@ -302,6 +315,7 @@ func chooseLevel(scenario string) int {
     }
 }
 ```
+:::
 
 ---
 

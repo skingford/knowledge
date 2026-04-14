@@ -15,6 +15,7 @@ Goroutine 泄漏是 Go 程序最常见的资源泄漏类型，表现为 goroutin
 
 ### 常见泄漏模式
 
+::: details 点击展开代码：常见泄漏模式
 ```go
 package main
 
@@ -75,11 +76,13 @@ func main() {
 	fmt.Println("after:", runtime.NumGoroutine()) // 远大于 before
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="goroutine-leak-patterns" />
 
 ### 修复方式：使用 context 控制退出
 
+::: details 点击展开代码：修复方式：使用 context 控制退出
 ```go
 package main
 
@@ -124,11 +127,13 @@ func main() {
 	fmt.Println("goroutines after:", runtime.NumGoroutine())
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="goroutine-context-exit" />
 
 ### 线上检测 Goroutine 泄漏
 
+::: details 点击展开代码：线上检测 Goroutine 泄漏
 ```bash
 # 查看当前 goroutine 数量和堆栈
 curl http://localhost:6060/debug/pprof/goroutine?debug=1
@@ -141,6 +146,7 @@ go tool pprof http://localhost:6060/debug/pprof/goroutine
 # (pprof) top    查看哪些函数创建了最多的 goroutine
 # (pprof) traces 查看完整调用栈
 ```
+:::
 
 ### 讲解重点
 
@@ -184,6 +190,7 @@ go tool pprof http://localhost:6060/debug/pprof/goroutine
 
 ### 运行时自检工具
 
+::: details 点击展开代码：运行时自检工具
 ```go
 package main
 
@@ -266,11 +273,13 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="runtime-selfcheck" />
 
 ### 指标/日志/Trace 三件套
 
+::: details 点击展开代码：指标/日志/Trace 三件套
 ```go
 package main
 
@@ -349,6 +358,7 @@ func main() {
 	fmt.Println("done")
 }
 ```
+:::
 
 <GoPerformanceDiagram kind="telemetry-triad" />
 

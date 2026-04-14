@@ -23,6 +23,7 @@ search: false
 
 ### database/sql 连接池配置
 
+::: details 点击展开代码：database/sql 连接池配置
 ```go
 package main
 
@@ -61,9 +62,11 @@ func main() {
 	fmt.Printf("Wait duration: %v\n", stats.WaitDuration)
 }
 ```
+:::
 
 ### 自定义连接池实现
 
+::: details 点击展开代码：自定义连接池实现
 ```go
 package main
 
@@ -206,6 +209,7 @@ func main() {
 	wg.Wait()
 }
 ```
+:::
 
 <GoNetworkDiagram kind="connection-pool" />
 
@@ -223,6 +227,7 @@ func main() {
 
 ### 各层超时配置
 
+::: details 点击展开代码：各层超时配置
 ```go
 package main
 
@@ -287,9 +292,11 @@ func main() {
 	fmt.Println("Raw response:", string(buf[:n]))
 }
 ```
+:::
 
 ### Context 超时在函数调用链中传播
 
+::: details 点击展开代码：Context 超时在函数调用链中传播
 ```go
 package main
 
@@ -373,6 +380,7 @@ func main() {
 	}
 }
 ```
+:::
 
 <GoNetworkDiagram kind="timeout-layers" />
 
@@ -390,6 +398,7 @@ func main() {
 
 ### 指数退避 + 抖动
 
+::: details 点击展开代码：指数退避 + 抖动
 ```go
 package main
 
@@ -503,6 +512,7 @@ func main() {
 	fmt.Println("Final status:", resp.StatusCode)
 }
 ```
+:::
 
 <GoNetworkDiagram kind="retry-backoff" />
 
@@ -520,6 +530,7 @@ func main() {
 
 ### 使用 time.Ticker 简易限流
 
+::: details 点击展开代码：使用 time.Ticker 简易限流
 ```go
 package main
 
@@ -559,9 +570,11 @@ func main() {
 	}
 }
 ```
+:::
 
 ### 使用 golang.org/x/time/rate（令牌桶）
 
+::: details 点击展开代码：使用 golang.org/x/time/rate（令牌桶）
 ```go
 package main
 
@@ -648,6 +661,7 @@ func main() {
 	wg.Wait()
 }
 ```
+:::
 
 <GoNetworkDiagram kind="rate-limit-modes" />
 

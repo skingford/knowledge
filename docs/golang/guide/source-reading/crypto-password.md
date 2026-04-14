@@ -51,6 +51,7 @@ description: 精读 Go x/crypto 密码散列实现，掌握 bcrypt/Argon2id/scry
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // bcrypt 内部：OpenBSD Blowfish 算法变体
 // cost factor 控制 key setup 轮数：2^cost 次
@@ -63,6 +64,7 @@ description: 精读 Go x/crypto 密码散列实现，掌握 bcrypt/Argon2id/scry
 // 多次迭代混合 → 输出 keyLen 字节
 // 攻击者必须真正占用内存，GPU/ASIC 优势大幅缩小
 ```
+:::
 
 ---
 
@@ -70,6 +72,7 @@ description: 精读 Go x/crypto 密码散列实现，掌握 bcrypt/Argon2id/scry
 
 ### bcrypt：密码散列与验证
 
+::: details 点击展开代码：bcrypt：密码散列与验证
 ```go
 import "golang.org/x/crypto/bcrypt"
 
@@ -118,9 +121,11 @@ func loginUser(username, password string) (bool, error) {
     return verifyPassword(hash, password), nil
 }
 ```
+:::
 
 ### Argon2id：OWASP 2023 首选算法
 
+::: details 点击展开代码：Argon2id：OWASP 2023 首选算法
 ```go
 import (
     "crypto/rand"
@@ -206,9 +211,11 @@ func verifyArgon2id(password, encodedHash string) (bool, error) {
     return subtle.ConstantTimeCompare(hash, computed) == 1, nil
 }
 ```
+:::
 
 ### 密码重散列：自动升级 cost factor
 
+::: details 点击展开代码：密码重散列：自动升级 cost factor
 ```go
 // 生产最佳实践：登录成功后检测 cost，自动升级旧散列
 func loginWithRehash(username, password string) error {
@@ -233,9 +240,11 @@ func loginWithRehash(username, password string) error {
     return nil
 }
 ```
+:::
 
 ### 算法性能对比基准
 
+::: details 点击展开代码：算法性能对比基准
 ```go
 func BenchmarkPasswordHashing(b *testing.B) {
     password := "test-password-123"
@@ -273,6 +282,7 @@ func BenchmarkPasswordHashing(b *testing.B) {
 // argon2id-64MB:  ~30ms（内存 64MB，线程 2）
 // scrypt-N32768:  ~150ms
 ```
+:::
 
 ---
 

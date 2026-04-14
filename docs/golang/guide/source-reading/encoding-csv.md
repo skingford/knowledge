@@ -51,6 +51,7 @@ encoding/csv 核心结构
 
 ## 一、Reader 核心实现
 
+::: details 点击展开代码：一、Reader 核心实现
 ```go
 // src/encoding/csv/reader.go（简化）
 type Reader struct {
@@ -76,6 +77,7 @@ func (r *Reader) Read() (record []string, err error) {
     // ReuseRecord：直接返回内部 slice（调用者不能持有）
 }
 ```
+:::
 
 ---
 
@@ -83,6 +85,7 @@ func (r *Reader) Read() (record []string, err error) {
 
 ### 基础读取
 
+::: details 点击展开代码：基础读取
 ```go
 // 读取 CSV 字符串
 data := `name,age,city
@@ -109,11 +112,13 @@ for {
         record[0], record[1], record[2])
 }
 ```
+:::
 
 ### 大文件流式处理（ReuseRecord 优化）
 
 <GoNetworkDiagram kind="csv-streaming" />
 
+::: details 点击展开代码：大文件流式处理（ReuseRecord 优化）
 ```go
 func processLargeCSV(path string) error {
     f, err := os.Open(path)
@@ -154,9 +159,11 @@ func processLargeCSV(path string) error {
     return nil
 }
 ```
+:::
 
 ### 映射到结构体
 
+::: details 点击展开代码：映射到结构体
 ```go
 type Employee struct {
     Name   string
@@ -203,9 +210,11 @@ func parseEmployees(r io.Reader) ([]Employee, error) {
     return employees, nil
 }
 ```
+:::
 
 ### 写入 CSV
 
+::: details 点击展开代码：写入 CSV
 ```go
 func writeCSV(w io.Writer, records [][]string) error {
     cw := csv.NewWriter(w)
@@ -242,9 +251,11 @@ func writeCSVWithBOM(path string, records [][]string) error {
     return cw.Error()
 }
 ```
+:::
 
 ### 处理带 BOM 的 CSV（读取 Excel 导出文件）
 
+::: details 点击展开代码：处理带 BOM 的 CSV（读取 Excel 导出文件）
 ```go
 func newCSVReaderSkipBOM(r io.Reader) *csv.Reader {
     br := bufio.NewReader(r)
@@ -256,9 +267,11 @@ func newCSVReaderSkipBOM(r io.Reader) *csv.Reader {
     return csv.NewReader(br)
 }
 ```
+:::
 
 ### TSV（Tab 分隔）和自定义分隔符
 
+::: details 点击展开代码：TSV（Tab 分隔）和自定义分隔符
 ```go
 // TSV 读取
 r := csv.NewReader(strings.NewReader("a\tb\tc\n1\t2\t3"))
@@ -276,9 +289,11 @@ r3.Comment = '#'
 r4 := csv.NewReader(data)
 r4.FieldsPerRecord = -1
 ```
+:::
 
 ### HTTP 流式输出 CSV（大数据导出）
 
+::: details 点击展开代码：HTTP 流式输出 CSV（大数据导出）
 ```go
 func exportHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "text/csv; charset=utf-8")
@@ -315,6 +330,7 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
     cw.Flush()
 }
 ```
+:::
 
 ---
 

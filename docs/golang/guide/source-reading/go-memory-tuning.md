@@ -52,6 +52,7 @@ Go 内存管理调优体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/runtime/mgc.go（简化）
 
@@ -71,6 +72,7 @@ func SetMemoryLimit(limit int64) int64 {
     return old
 }
 ```
+:::
 
 ---
 
@@ -78,6 +80,7 @@ func SetMemoryLimit(limit int64) int64 {
 
 ### GOMEMLIMIT：容器化部署推荐配置
 
+::: details 点击展开代码：GOMEMLIMIT：容器化部署推荐配置
 ```go
 import (
     "runtime/debug"
@@ -127,9 +130,11 @@ func getContainerMemoryLimit() int64 {
 //   limits:
 //     memory: "512Mi"
 ```
+:::
 
 ### GOGC 调优：吞吐量 vs 延迟权衡
 
+::: details 点击展开代码：GOGC 调优：吞吐量 vs 延迟权衡
 ```go
 // GOGC 调优建议（不同场景）：
 
@@ -161,9 +166,11 @@ func adaptiveGC(targetHeapMB int) {
     }
 }
 ```
+:::
 
 ### 内存气球（Memory Ballast）技术
 
+::: details 点击展开代码：内存气球（Memory Ballast）技术
 ```go
 // 内存气球：分配一大块不使用的内存，强制提高 GC 触发阈值
 // 原理：live heap 变大 → gcController.heapGoal 变大 → GC 触发阈值变高
@@ -184,9 +191,11 @@ func init() {
 // GOMEMLIMIT=200MiB go run main.go
 // 或代码中：debug.SetMemoryLimit(200 << 20)
 ```
+:::
 
 ### 内存泄漏检测
 
+::: details 点击展开代码：内存泄漏检测
 ```go
 // 定期采集内存指标，检测内存持续增长
 type MemoryMonitor struct {
@@ -265,9 +274,11 @@ func commonLeakPatterns() {
     _ = small2
 }
 ```
+:::
 
 ### Heap Profile 分析
 
+::: details 点击展开代码：Heap Profile 分析
 ```go
 // 采集 Heap Profile（定位内存分配热点）
 import "runtime/pprof"
@@ -311,9 +322,11 @@ func autoCapture(thresholdMB int) {
 // go tool pprof -alloc_objects heap.pprof  # 分配次数最多的
 // go tool pprof -inuse_space heap.pprof    # 当前占用最多的
 ```
+:::
 
 ### runtime.MemStats 关键指标解读
 
+::: details 点击展开代码：runtime.MemStats 关键指标解读
 ```go
 func printMemStats() {
     var ms runtime.MemStats
@@ -337,6 +350,7 @@ func printMemStats() {
 
 func mb(bytes uint64) float64 { return float64(bytes) / 1024 / 1024 }
 ```
+:::
 
 ---
 

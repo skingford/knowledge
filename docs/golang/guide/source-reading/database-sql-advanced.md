@@ -61,6 +61,7 @@ database/sql 高级体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/database/sql/sql.go（简化）
 
@@ -81,6 +82,7 @@ func (db *DB) BeginTx(ctx context.Context, opts *TxOptions) (*Tx, error) {
 // 2. 发送 Execute 命令
 // 3. 释放连接回池
 ```
+:::
 
 ---
 
@@ -88,6 +90,7 @@ func (db *DB) BeginTx(ctx context.Context, opts *TxOptions) (*Tx, error) {
 
 ### 事务基础：正确使用 defer
 
+::: details 点击展开代码：事务基础：正确使用 defer
 ```go
 import (
     "context"
@@ -156,9 +159,11 @@ func transferMoney(ctx context.Context, db *sql.DB, fromID, toID int64, amount f
     })
 }
 ```
+:::
 
 ### Savepoint：嵌套事务（PostgreSQL）
 
+::: details 点击展开代码：Savepoint：嵌套事务（PostgreSQL）
 ```go
 // Savepoint 实现部分可回滚的事务
 func processOrdersWithSavepoint(ctx context.Context, db *sql.DB, orders []Order) error {
@@ -204,9 +209,11 @@ func insertOrder(ctx context.Context, tx *sql.Tx, order Order) error {
     return err
 }
 ```
+:::
 
 ### 批量插入优化
 
+::: details 点击展开代码：批量插入优化
 ```go
 // 方式一：多值 INSERT（适合 < 1000 行）
 func bulkInsertMultiValue(ctx context.Context, db *sql.DB, users []User) error {
@@ -305,9 +312,11 @@ func bulkInsertCopy(ctx context.Context, db *sql.DB, users []User) error {
     return tx.Commit()
 }
 ```
+:::
 
 ### RETURNING 子句（PostgreSQL）
 
+::: details 点击展开代码：RETURNING 子句（PostgreSQL）
 ```go
 // INSERT ... RETURNING：插入并立即获取数据库生成的值
 func createUserReturning(ctx context.Context, db *sql.DB, name, email string) (*User, error) {
@@ -354,9 +363,11 @@ func upsertUser(ctx context.Context, db *sql.DB, user User) (int64, error) {
     return id, err
 }
 ```
+:::
 
 ### Prepared Statement 缓存与复用
 
+::: details 点击展开代码：Prepared Statement 缓存与复用
 ```go
 // 全局 Prepared Statement 缓存（服务启动时初始化）
 type StmtCache struct {
@@ -429,11 +440,13 @@ func getUser(ctx context.Context, cache *StmtCache, id int64) (*User, error) {
     return user, err
 }
 ```
+:::
 
 ### 连接池调优与监控
 
 <GoDataCacheDiagram kind="sql-pool-stats" />
 
+::: details 点击展开代码：连接池调优与监控
 ```go
 func configurePool(db *sql.DB) {
     // 最大打开连接数（= 数据库 max_connections × 0.8）
@@ -473,9 +486,11 @@ func monitorPool(db *sql.DB, dbName string) {
 // MaxIdleClosed:  因超过 MaxIdle 而关闭的连接数
 // MaxLifetimeClosed: 因超过 MaxLifetime 而关闭的连接数
 ```
+:::
 
 ### 行扫描辅助（避免样板代码）
 
+::: details 点击展开代码：行扫描辅助（避免样板代码）
 ```go
 // 泛型行扫描（Go 1.18+）
 func scanRows[T any](rows *sql.Rows, scan func(*sql.Rows) (T, error)) ([]T, error) {
@@ -527,6 +542,7 @@ func bioOrDefault(bio sql.NullString, def string) string {
     return def
 }
 ```
+:::
 
 ---
 

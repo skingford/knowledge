@@ -52,6 +52,7 @@ io/fs + testing/fstest 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/testing/fstest/fstest.go（简化）
 
@@ -79,6 +80,7 @@ func TestFS(fsys fs.FS, expected ...string) error {
     // 约 20 项测试：Open/Stat/ReadDir/Glob 行为、路径规范化等
 }
 ```
+:::
 
 <GoNetworkDiagram kind="fs-abstraction" />
 
@@ -90,6 +92,7 @@ func TestFS(fsys fs.FS, expected ...string) error {
 
 <GoEngineeringDiagram kind="fstest-mapfs" />
 
+::: details 点击展开代码：MapFS：基础用法
 ```go
 import (
     "testing/fstest"
@@ -136,9 +139,11 @@ func TestWithMapFS(t *testing.T) {
     t.Logf("config: %s", data)
 }
 ```
+:::
 
 ### 测试依赖文件系统的代码
 
+::: details 点击展开代码：测试依赖文件系统的代码
 ```go
 // 被测试的函数（接受 fs.FS 接口，可注入不同实现）
 type TemplateEngine struct {
@@ -198,11 +203,13 @@ func TestTemplateEngine(t *testing.T) {
     })
 }
 ```
+:::
 
 ### io/fs.WalkDir：遍历文件系统
 
 <GoNetworkDiagram kind="walkdir-flow" />
 
+::: details 点击展开代码：io/fs.WalkDir：遍历文件系统
 ```go
 // fs.WalkDir：类似 filepath.WalkDir，但适用于任何 fs.FS
 func listFiles(fsys fs.FS) ([]string, error) {
@@ -238,9 +245,11 @@ func TestListFiles(t *testing.T) {
     }
 }
 ```
+:::
 
 ### fs.Sub：子文件系统
 
+::: details 点击展开代码：fs.Sub：子文件系统
 ```go
 // fs.Sub：取子目录，返回新的 fs.FS（相对路径变换）
 func TestSubFS(t *testing.T) {
@@ -264,11 +273,13 @@ func TestSubFS(t *testing.T) {
     t.Logf("index: %s", data) // "index"
 }
 ```
+:::
 
 ### fstest.TestFS：校验自定义 fs.FS 实现
 
 <GoEngineeringDiagram kind="fstest-mapfs" />
 
+::: details 点击展开代码：fstest.TestFS：校验自定义 fs.FS 实现
 ```go
 // 自定义 fs.FS 实现（如基于 S3/HTTP 的远程 FS）
 type S3FS struct {
@@ -294,9 +305,11 @@ func TestS3FS(t *testing.T) {
     }
 }
 ```
+:::
 
 ### 与 embed.FS 无缝切换
 
+::: details 点击展开代码：与 embed.FS 无缝切换
 ```go
 //go:embed templates
 var embedFS embed.FS
@@ -321,6 +334,7 @@ func newTestEngine(templates map[string]string) *TemplateEngine {
 
 // 同一套代码，测试和生产可以无缝切换
 ```
+:::
 
 ---
 

@@ -22,6 +22,7 @@ search: false
 
 ### 错误码定义
 
+::: details 点击展开代码：错误码定义
 ```go
 package errcode
 
@@ -69,9 +70,11 @@ var (
 	ErrInsufficientStock = &ErrCode{Code: 30002, Message: "insufficient stock", HTTPStatus: 422}
 )
 ```
+:::
 
 ### 错误码注册与查询
 
+::: details 点击展开代码：错误码注册与查询
 ```go
 package errcode
 
@@ -110,9 +113,11 @@ func Lookup(code int) (*ErrCode, bool) {
 	return e, ok
 }
 ```
+:::
 
 ### 统一 API 响应
 
+::: details 点击展开代码：统一 API 响应
 ```go
 package response
 
@@ -150,6 +155,7 @@ func writeJSON(w http.ResponseWriter, status int, v interface{}) {
 	json.NewEncoder(w).Encode(v)
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="error-code-system" />
 
@@ -167,6 +173,7 @@ func writeJSON(w http.ResponseWriter, status int, v interface{}) {
 
 ### 中间件签名与链式组合
 
+::: details 点击展开代码：中间件签名与链式组合
 ```go
 package middleware
 
@@ -185,9 +192,11 @@ func Chain(middlewares ...Middleware) Middleware {
 	}
 }
 ```
+:::
 
 ### 请求 ID 中间件
 
+::: details 点击展开代码：请求 ID 中间件
 ```go
 package middleware
 
@@ -214,9 +223,11 @@ func RequestID(next http.Handler) http.Handler {
 	})
 }
 ```
+:::
 
 ### 日志中间件
 
+::: details 点击展开代码：日志中间件
 ```go
 package middleware
 
@@ -255,9 +266,11 @@ func Logger(next http.Handler) http.Handler {
 	})
 }
 ```
+:::
 
 ### Recovery 中间件
 
+::: details 点击展开代码：Recovery 中间件
 ```go
 package middleware
 
@@ -283,9 +296,11 @@ func Recovery(next http.Handler) http.Handler {
 	})
 }
 ```
+:::
 
 ### CORS 中间件
 
+::: details 点击展开代码：CORS 中间件
 ```go
 package middleware
 
@@ -335,9 +350,11 @@ func joinStrings(ss []string) string {
 	return result
 }
 ```
+:::
 
 ### 使用示例
 
+::: details 点击展开代码：使用示例
 ```go
 func main() {
 	mux := http.NewServeMux()
@@ -359,6 +376,7 @@ func main() {
 	http.ListenAndServe(":8080", chain(mux))
 }
 ```
+:::
 
 <GoEngineeringDiagram kind="middleware-stack" />
 
@@ -376,6 +394,7 @@ func main() {
 
 ### 命名规范
 
+::: details 点击展开代码：命名规范
 ```go
 // 包名：小写单词，不用下划线或驼峰
 package httputil  // ✅
@@ -412,9 +431,11 @@ const maxRetries = 3        // ✅
 const MAX_RETRIES = 3       // ❌（Go 不是 Java/Python）
 const MaxRetries = 3        // ✅（导出时）
 ```
+:::
 
 ### Effective Go 常用模式
 
+::: details 点击展开代码：Effective Go 常用模式
 ```go
 // 1. 零值可用
 type Buffer struct {
@@ -457,9 +478,11 @@ func WithLogger(l *slog.Logger) Option {
 //     FindByID(ctx context.Context, id int64) (*User, error)
 // }
 ```
+:::
 
 ### golangci-lint 配置
 
+::: details 点击展开代码：golangci-lint 配置
 ```yaml
 # .golangci.yml
 run:
@@ -499,7 +522,9 @@ issues:
         - errcheck
         - gocritic
 ```
+:::
 
+::: details 点击展开代码：golangci-lint 配置
 ```bash
 # 安装和使用
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -510,6 +535,7 @@ golangci-lint run ./...
 # 只检查改动的文件（适合 CI）
 golangci-lint run --new-from-rev=HEAD~1 ./...
 ```
+:::
 
 <GoEngineeringDiagram kind="code-style-principles" />
 

@@ -67,6 +67,7 @@ database/sql 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/database/sql/sql.go（简化）
 
@@ -127,6 +128,7 @@ func (db *DB) putConn(dc *driverConn, err error) {
     db.mu.Unlock()
 }
 ```
+:::
 
 ---
 
@@ -134,6 +136,7 @@ func (db *DB) putConn(dc *driverConn, err error) {
 
 ### 基础查询与扫描
 
+::: details 点击展开代码：基础查询与扫描
 ```go
 import (
     "database/sql"
@@ -179,9 +182,11 @@ func listUsers(db *sql.DB) ([]User, error) {
     return users, rows.Err() // ⚠️ 检查迭代中的错误
 }
 ```
+:::
 
 ### 连接池配置（生产最佳实践）
 
+::: details 点击展开代码：连接池配置（生产最佳实践）
 ```go
 func newDB(dsn string) (*sql.DB, error) {
     db, err := sql.Open("mysql", dsn)
@@ -202,9 +207,11 @@ func newDB(dsn string) (*sql.DB, error) {
     return db, nil
 }
 ```
+:::
 
 ### 事务：正确的 defer 模式
 
+::: details 点击展开代码：事务：正确的 defer 模式
 ```go
 func transfer(db *sql.DB, fromID, toID int, amount float64) error {
     tx, err := db.BeginTx(context.Background(), &sql.TxOptions{
@@ -233,11 +240,13 @@ func transfer(db *sql.DB, fromID, toID int, amount float64) error {
     return tx.Commit()
 }
 ```
+:::
 
 ### 预编译语句（批量写入性能优化）
 
 <GoDataCacheDiagram kind="prepared-statement" />
 
+::: details 点击展开代码：预编译语句（批量写入性能优化）
 ```go
 func bulkInsertTx(db *sql.DB, users []User) error {
     tx, err := db.Begin()
@@ -260,9 +269,11 @@ func bulkInsertTx(db *sql.DB, users []User) error {
     return tx.Commit()
 }
 ```
+:::
 
 ### 自定义 Scanner（JSON 列扫描）
 
+::: details 点击展开代码：自定义 Scanner（JSON 列扫描）
 ```go
 // 场景：MySQL JSON 列扫描为 Go struct
 type JSONField[T any] struct{ Val T }
@@ -292,11 +303,13 @@ var meta JSONField[UserMeta]
 err := db.QueryRow("SELECT meta FROM users WHERE id = ?", 1).Scan(&meta)
 fmt.Println(meta.Val.Tags)
 ```
+:::
 
 ### 连接池监控
 
 <GoDataCacheDiagram kind="sql-pool-stats" />
 
+::: details 点击展开代码：连接池监控
 ```go
 // DB 健康检查（K8s Readiness Probe）
 func healthCheck(db *sql.DB) http.HandlerFunc {
@@ -318,6 +331,7 @@ func healthCheck(db *sql.DB) http.HandlerFunc {
     }
 }
 ```
+:::
 
 ---
 

@@ -21,6 +21,10 @@ description: 精读 sync.Pool 的对象复用机制，理解 per-P 本地池、v
 - 为什么对象最多只会跨两轮 GC
 - 为什么它和 per-P、本地性、性能热点密切相关
 
+::: tip 阅读方式
+这页优先讲原理、边界和使用判断，代码示例默认收起；先顺着正文理解，再按需展开代码对照实现。
+:::
+
 ## 包结构图
 
 <GoPerformanceDiagram kind="sync-pool-lifecycle" />
@@ -62,6 +66,7 @@ sync.Pool 内部结构（Go 1.13+ victim cache 设计）
 
 ## 一、核心实现
 
+::: details 点击展开代码：sync.Pool 核心实现（简化）
 ```go
 // src/sync/pool.go（简化）
 type Pool struct {
@@ -117,6 +122,7 @@ func poolCleanup() {
     // local = 新分配（清空）
 }
 ```
+:::
 
 ---
 
@@ -124,6 +130,7 @@ func poolCleanup() {
 
 ### 基础用法：bytes.Buffer 复用
 
+::: details 点击展开代码：bytes.Buffer 复用
 ```go
 var bufPool = sync.Pool{
     New: func() any {
@@ -143,9 +150,11 @@ func processData(data []byte) string {
     return buf.String()
 }
 ```
+:::
 
 ### fmt 包中的实际用法（标准库参考）
 
+::: details 点击展开代码：fmt 包中的 sync.Pool 用法
 ```go
 // src/fmt/print.go 使用 sync.Pool 复用 pp 对象
 var ppFree = sync.Pool{
@@ -161,9 +170,11 @@ func Fprintf(w io.Writer, format string, a ...any) (n int, err error) {
     return
 }
 ```
+:::
 
 ### JSON 编码器复用（减少 GC 压力）
 
+::: details 点击展开代码：JSON 编码器复用
 ```go
 // 复用 json.Encoder（避免每次 HTTP 请求都分配）
 var encoderPool = sync.Pool{
@@ -196,9 +207,11 @@ func writeJSON(w http.ResponseWriter, v any) error {
     return err
 }
 ```
+:::
 
 ### 固定大小 byte slice 池
 
+::: details 点击展开代码：固定大小 byte slice 池
 ```go
 // 按大小分档的 byte slice 池（类似 sync.Pool + bucket）
 const (
@@ -234,9 +247,11 @@ func putBuf(buf *[]byte, size int) {
     // 超大 buf 不归还，让 GC 回收
 }
 ```
+:::
 
 ### 验证 Pool 效果（Benchmark）
 
+::: details 点击展开代码：Benchmark 对比
 ```go
 // 对比：不用 Pool vs 用 Pool
 func BenchmarkWithoutPool(b *testing.B) {
@@ -261,9 +276,11 @@ func BenchmarkWithPool(b *testing.B) {
 }
 // 典型结果：WithPool 分配次数减少 ~90%，ns/op 降低 30-50%
 ```
+:::
 
 ### 常见错误
 
+::: details 点击展开代码：sync.Pool 常见错误
 ```go
 // ❌ 错误1：归还前忘记重置状态
 buf := pool.Get().(*bytes.Buffer)
@@ -286,6 +303,17 @@ conn := pool.Get() // 可能返回 nil（已被 GC 回收）
 var p sync.Pool
 p2 := p // ← go vet 会检测到 noCopy 违规
 ```
+:::
+
+### 使用注意事项
+
+| 维度 | 注意事项 |
+|------|----------|
+| 持久性 | 对象不保证一直存在，GC 会清理；`sync.Pool` 只能做临时复用，不能做持久存储 |
+| 并发安全 | `sync.Pool` 本身是并发安全的，但 `Get` 和 `Put` 之间不保证原子性，不能把它当成带事务语义的资源池 |
+| 内存重置 | 必须手动 `Reset` 或清理对象状态，否则会发生数据交叉、脏数据复用 |
+| 对象大小 | 警惕大对象扩容后长期留在池中；必要时在 `Put` 前截断，或直接丢弃让 GC 回收 |
+| 适用场景 | 适合高频、高成本临时对象的复用，例如 JSON 编解码中的 `Buffer`、临时 `[]byte`、短生命周期结构体 |
 
 ---
 

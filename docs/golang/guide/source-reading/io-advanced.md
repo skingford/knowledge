@@ -51,6 +51,7 @@ io 包组合工具全览
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // TeeReader：读取时同步写入
 func TeeReader(r Reader, w Writer) Reader {
@@ -88,6 +89,7 @@ type pipe struct {
 // 写：发送 buf 到 wrCh → 等待 rdCh 确认
 // 读：从 wrCh 接收 → 拷贝数据 → 发送字节数到 rdCh
 ```
+:::
 
 ---
 
@@ -95,6 +97,7 @@ type pipe struct {
 
 ### TeeReader：读取同时记录
 
+::: details 点击展开代码：TeeReader：读取同时记录
 ```go
 // 场景：读取 HTTP 响应体，同时记录原始字节（调试/审计）
 func readAndLog(resp *http.Response) ([]byte, error) {
@@ -124,9 +127,11 @@ func copyWithHash(dst io.Writer, src io.Reader) ([]byte, error) {
     return h.Sum(nil), nil
 }
 ```
+:::
 
 ### LimitReader：防止读取过量
 
+::: details 点击展开代码：LimitReader：防止读取过量
 ```go
 // 限制请求体大小（防止大文件 DoS）
 func readLimitedBody(r *http.Request, maxBytes int64) ([]byte, error) {
@@ -145,9 +150,11 @@ func readLimitedBody(r *http.Request, maxBytes int64) ([]byte, error) {
 // 对比：http.MaxBytesReader（功能类似但会设置连接错误）
 // r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
 ```
+:::
 
 ### SectionReader：随机定位区间读取
 
+::: details 点击展开代码：SectionReader：随机定位区间读取
 ```go
 // 场景：读取大文件的特定字节范围（HTTP Range 请求实现）
 func serveRange(w http.ResponseWriter, f *os.File, start, length int64) {
@@ -174,9 +181,11 @@ func parallelRead(f *os.File) {
     }
 }
 ```
+:::
 
 ### MultiReader：拼接多个 Reader
 
+::: details 点击展开代码：MultiReader：拼接多个 Reader
 ```go
 // 场景：HTTP 请求体 = 前置 JSON 头 + 文件内容
 func buildCompositeRequest(header []byte, file *os.File) io.Reader {
@@ -196,9 +205,11 @@ func wrapResponse(prefix, suffix string, body io.Reader) io.Reader {
     )
 }
 ```
+:::
 
 ### MultiWriter：广播写入
 
+::: details 点击展开代码：MultiWriter：广播写入
 ```go
 // 同时写入文件、控制台和哈希器
 func setupMultiWriter(logFile *os.File) io.Writer {
@@ -223,11 +234,13 @@ func compressWithChecksum(dst *os.File, src io.Reader) (checksum []byte, err err
     return h.Sum(nil), nil
 }
 ```
+:::
 
 ### io.Pipe：连接不兼容接口
 
 <GoNetworkDiagram kind="io-pipe-stream" />
 
+::: details 点击展开代码：io.Pipe：连接不兼容接口
 ```go
 // 场景：将 json.Encoder（需要 io.Writer）接到 http.Request（需要 io.Reader）
 func postJSON(url string, v any) (*http.Response, error) {
@@ -263,6 +276,7 @@ func decompressStream(compressed io.Reader) io.Reader {
     return pr
 }
 ```
+:::
 
 ---
 

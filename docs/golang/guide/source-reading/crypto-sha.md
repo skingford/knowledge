@@ -57,6 +57,7 @@ Go hash 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/hash/hash.go
 type Hash interface {
@@ -107,6 +108,7 @@ func (d0 *digest) Sum(in []byte) []byte {
     return append(in, hash[:]...)
 }
 ```
+:::
 
 ---
 
@@ -114,6 +116,7 @@ func (d0 *digest) Sum(in []byte) []byte {
 
 ### 基础：计算文件哈希
 
+::: details 点击展开代码：基础：计算文件哈希
 ```go
 import (
     "crypto/sha256"
@@ -144,9 +147,11 @@ func sha256Sum(data []byte) string {
     return hex.EncodeToString(sum[:])
 }
 ```
+:::
 
 ### SHA-256 vs SHA-512 选择
 
+::: details 点击展开代码：SHA-256 vs SHA-512 选择
 ```go
 import (
     "crypto/sha256"
@@ -171,9 +176,11 @@ func hash512(data []byte) []byte {
     return h[:]
 }
 ```
+:::
 
 ### HMAC：基于 hash 接口的消息认证
 
+::: details 点击展开代码：HMAC：基于 hash 接口的消息认证
 ```go
 import (
     "crypto/hmac"
@@ -201,9 +208,11 @@ func validateWebhook(secret string, body []byte, sigHeader string) bool {
     return hmac.Equal([]byte(expected), []byte(sigHeader))
 }
 ```
+:::
 
 ### Merkle 树：数据完整性验证
 
+::: details 点击展开代码：Merkle 树：数据完整性验证
 ```go
 // Merkle 树（简化版，用于区块链/文件分块校验）
 func buildMerkleRoot(chunks [][]byte) []byte {
@@ -235,9 +244,11 @@ func buildMerkleRoot(chunks [][]byte) []byte {
     return hashes[0]
 }
 ```
+:::
 
 ### sync.Pool 复用 hash.Hash（高并发优化）
 
+::: details 点击展开代码：sync.Pool 复用 hash.Hash（高并发优化）
 ```go
 var sha256Pool = sync.Pool{
     New: func() any { return sha256.New() },
@@ -253,9 +264,11 @@ func sha256Fast(data []byte) []byte {
     return h.Sum(nil) // ⚠️ 不要持有返回值的引用
 }
 ```
+:::
 
 ### 内容寻址存储（CAS）
 
+::: details 点击展开代码：内容寻址存储（CAS）
 ```go
 // 基于 SHA-256 的内容寻址存储（类似 Git 对象存储）
 type ContentStore struct {
@@ -287,9 +300,11 @@ func (cs *ContentStore) Get(key string) ([]byte, error) {
     return data, nil
 }
 ```
+:::
 
 ### 彩虹表防护：加盐哈希
 
+::: details 点击展开代码：彩虹表防护：加盐哈希
 ```go
 import (
     "crypto/rand"
@@ -328,6 +343,7 @@ func verifyPassword(password string, sh SaltedHash) bool {
     return hmac.Equal([]byte(computed), []byte(sh.Hash))
 }
 ```
+:::
 
 ---
 

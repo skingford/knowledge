@@ -62,6 +62,7 @@ archive/tar 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/archive/tar/writer.go（简化）
 type Writer struct {
@@ -91,6 +92,7 @@ func (tr *Reader) Next() (*Header, error) {
     return hdr, nil
 }
 ```
+:::
 
 ---
 
@@ -98,6 +100,7 @@ func (tr *Reader) Next() (*Header, error) {
 
 ### 创建 TAR 归档
 
+::: details 点击展开代码：创建 TAR 归档
 ```go
 import (
     "archive/tar"
@@ -161,9 +164,11 @@ func addFileToTar(tw *tar.Writer, filePath string) error {
     return err
 }
 ```
+:::
 
 ### 打包整个目录（递归）
 
+::: details 点击展开代码：打包整个目录（递归）
 ```go
 func tarDirectory(srcDir, outputPath string) error {
     f, _ := os.Create(outputPath)
@@ -220,9 +225,11 @@ func tarDirectory(srcDir, outputPath string) error {
     })
 }
 ```
+:::
 
 ### 解压 TAR 归档（安全版）
 
+::: details 点击展开代码：解压 TAR 归档（安全版）
 ```go
 // 安全解压：防止 Zip Slip（路径穿越）攻击
 func extractTarGz(src, dstDir string) error {
@@ -281,9 +288,11 @@ func extractTarGz(src, dstDir string) error {
     return nil
 }
 ```
+:::
 
 ### Docker 镜像层（in-memory tar）
 
+::: details 点击展开代码：Docker 镜像层（in-memory tar）
 ```go
 // Docker 镜像层本质上是 tar 流，可以在内存中构建
 func buildDockerLayer() ([]byte, error) {
@@ -314,9 +323,11 @@ func buildDockerLayer() ([]byte, error) {
     return buf.Bytes(), nil
 }
 ```
+:::
 
 ### 流式处理大型 TAR（不解压到磁盘）
 
+::: details 点击展开代码：流式处理大型 TAR（不解压到磁盘）
 ```go
 // 扫描 tar 文件，仅读取特定文件内容（不全量解压）
 func extractSpecificFile(tarPath, targetName string) ([]byte, error) {
@@ -341,6 +352,7 @@ func extractSpecificFile(tarPath, targetName string) ([]byte, error) {
     }
 }
 ```
+:::
 
 ---
 

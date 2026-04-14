@@ -56,6 +56,7 @@ net/smtp 协议层次
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/smtp/smtp.go（简化）
 type Client struct {
@@ -85,6 +86,7 @@ func SendMail(addr string, a Auth, from string, to []string, msg []byte) error {
     return c.Quit()               // 10. QUIT
 }
 ```
+:::
 
 ---
 
@@ -92,6 +94,7 @@ func SendMail(addr string, a Auth, from string, to []string, msg []byte) error {
 
 ### 基础邮件发送（Gmail）
 
+::: details 点击展开代码：基础邮件发送（Gmail）
 ```go
 import (
     "net/smtp"
@@ -126,9 +129,11 @@ func sendSimpleEmail() error {
     )
 }
 ```
+:::
 
 ### 完整邮件（含 HTML、CC、BCC、附件）
 
+::: details 点击展开代码：完整邮件（含 HTML、CC、BCC、附件）
 ```go
 import (
     "bytes"
@@ -213,9 +218,11 @@ func joinAddrs(addrs []string) string {
     return result
 }
 ```
+:::
 
 ### 直接 TLS 连接（465 端口）
 
+::: details 点击展开代码：直接 TLS 连接（465 端口）
 ```go
 import (
     "crypto/tls"
@@ -263,9 +270,11 @@ func sendWithTLS(host, user, pass string, to []string, msg []byte) error {
     return w.Close()
 }
 ```
+:::
 
 ### 邮件发送服务（含重试）
 
+::: details 点击展开代码：邮件发送服务（含重试）
 ```go
 type MailService struct {
     host     string
@@ -305,9 +314,11 @@ func (s *MailService) Send(ctx context.Context, msg EmailMessage) error {
     return fmt.Errorf("send email after %d retries: %w", s.maxRetry, lastErr)
 }
 ```
+:::
 
 ### 测试：本地 SMTP 服务器模拟
 
+::: details 点击展开代码：测试：本地 SMTP 服务器模拟
 ```go
 // 测试时用 mailhog 或 smtp4dev 启动本地 SMTP 服务器
 // docker run -p 1025:1025 -p 8025:8025 mailhog/mailhog
@@ -327,6 +338,7 @@ func TestSendEmail(t *testing.T) {
     // 在 http://localhost:8025 查看收到的邮件
 }
 ```
+:::
 
 ---
 

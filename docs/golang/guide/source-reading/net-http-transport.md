@@ -64,6 +64,7 @@ net/http 传输层体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/net/http/transport.go（简化）
 
@@ -93,6 +94,7 @@ type Transport struct {
 // 3. 通过 persistConn.roundTrip 发送请求
 // 4. 响应 Body 关闭后，连接归还连接池
 ```
+:::
 
 ---
 
@@ -100,6 +102,7 @@ type Transport struct {
 
 ### 生产级 HTTP Client 配置
 
+::: details 点击展开代码：生产级 HTTP Client 配置
 ```go
 import (
     "context"
@@ -148,11 +151,13 @@ func newHTTPClient() *http.Client {
 // ⚠️ 必须是全局/包级别单例，不要在每次请求中 new 新 Client
 var globalClient = newHTTPClient()
 ```
+:::
 
 ### 超时级联：按需设置不同阶段超时
 
 <GoNetworkDiagram kind="timeout-layers" />
 
+::: details 点击展开代码：超时级联：按需设置不同阶段超时
 ```go
 // 场景：下载大文件需要长超时，但首包要快速
 func downloadFile(ctx context.Context, url string) (io.ReadCloser, error) {
@@ -189,11 +194,13 @@ func callAPI(endpoint string, payload []byte) (*http.Response, error) {
     return client.Do(req)
 }
 ```
+:::
 
 ### 自定义 RoundTripper：请求日志、重试、限速
 
 <GoNetworkDiagram kind="retry-backoff" />
 
+::: details 点击展开代码：自定义 RoundTripper：请求日志、重试、限速
 ```go
 // 日志中间件：记录每次请求的耗时和状态码
 type LoggingTransport struct {
@@ -274,9 +281,11 @@ func buildClient() *http.Client {
     return &http.Client{Transport: transport, Timeout: 60 * time.Second}
 }
 ```
+:::
 
 ### 连接池监控与诊断
 
+::: details 点击展开代码：连接池监控与诊断
 ```go
 import "net/http/httptrace"
 
@@ -323,9 +332,11 @@ func monitorTransport(t *http.Transport, interval time.Duration) {
     }()
 }
 ```
+:::
 
 ### 代理配置：企业内网 / SOCKS5
 
+::: details 点击展开代码：代理配置：企业内网 / SOCKS5
 ```go
 import (
     "golang.org/x/net/proxy"
@@ -365,6 +376,7 @@ func autoProxyClient() *http.Client {
     return &http.Client{Transport: transport}
 }
 ```
+:::
 
 ---
 

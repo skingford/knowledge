@@ -53,6 +53,7 @@ math/bits 函数体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/math/bits/bits.go
 // OnesCount64：计算 uint64 中 1 的个数（popcount）
@@ -87,6 +88,7 @@ func Len64(x uint64) (n int) {
     return n + int(len8tab[x])
 }
 ```
+:::
 
 <GoAdvancedTopicDiagram kind="bits-intrinsics" />
 
@@ -96,6 +98,7 @@ func Len64(x uint64) (n int) {
 
 ### 基础位操作
 
+::: details 点击展开代码：基础位操作
 ```go
 import (
     "math/bits"
@@ -119,9 +122,11 @@ func basics() {
     // 10001101（位序完全反转）
 }
 ```
+:::
 
 ### 快速幂（利用位运算）
 
+::: details 点击展开代码：快速幂（利用位运算）
 ```go
 // x^n，利用 bits.Len 计算需要的迭代次数
 func fastPow(x, n uint64) uint64 {
@@ -151,9 +156,11 @@ fmt.Println(nextPowerOf2(5))  // 8
 fmt.Println(nextPowerOf2(8))  // 8
 fmt.Println(nextPowerOf2(9))  // 16
 ```
+:::
 
 ### 高性能 128 位乘法
 
+::: details 点击展开代码：高性能 128 位乘法
 ```go
 // bits.Mul64 返回 128 位乘法结果（hi, lo）
 // 无需 big.Int，直接使用 MULQ 指令
@@ -183,9 +190,11 @@ func add256(a, b [4]uint64) [4]uint64 {
     return result
 }
 ```
+:::
 
 ### 哈希表桶索引（取模的位运算替代）
 
+::: details 点击展开代码：哈希表桶索引（取模的位运算替代）
 ```go
 // 当桶数是 2 的幂时，用 & 替代 % （快一倍）
 type FastHashMap struct {
@@ -207,9 +216,11 @@ func (m *FastHashMap) index(key int) int {
     return int(uint(key) & m.mask)
 }
 ```
+:::
 
 ### 位图（Bitmap）操作
 
+::: details 点击展开代码：位图（Bitmap）操作
 ```go
 // 用 uint64 数组实现高性能位图
 type Bitmap struct {
@@ -251,9 +262,11 @@ func (b *Bitmap) And(other *Bitmap) int {
     return count
 }
 ```
+:::
 
 ### 对齐与填充计算
 
+::: details 点击展开代码：对齐与填充计算
 ```go
 // 计算内存对齐（编译器/协议实现中常用）
 func alignUp(n, align uintptr) uintptr {
@@ -272,6 +285,7 @@ func isPowerOf2(n uint) bool {
     // 等价于：n != 0 && n&(n-1) == 0
 }
 ```
+:::
 
 ---
 

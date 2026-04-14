@@ -39,6 +39,7 @@ search: false
 
 ### Slice 扩容与底层数组共享
 
+::: details 点击展开代码：Slice 扩容与底层数组共享
 ```go
 package main
 
@@ -57,6 +58,7 @@ func main() {
 	fmt.Println(a, b, c)
 }
 ```
+:::
 
 讲解重点：
 
@@ -65,6 +67,7 @@ func main() {
 
 ### Nil Interface 问题
 
+::: details 点击展开代码：Nil Interface 问题
 ```go
 package main
 
@@ -82,6 +85,7 @@ func main() {
 	fmt.Println(err == nil) // false
 }
 ```
+:::
 
 讲解重点：
 
@@ -89,6 +93,7 @@ func main() {
 
 ### Defer 参数求值
 
+::: details 点击展开代码：Defer 参数求值
 ```go
 package main
 
@@ -105,6 +110,7 @@ func main() {
 	x = 2
 }
 ```
+:::
 
 讲解重点：
 
@@ -115,6 +121,7 @@ func main() {
 
 ### Channel 同步
 
+::: details 点击展开代码：Channel 同步
 ```go
 package main
 
@@ -131,6 +138,7 @@ func main() {
 	fmt.Println(v)
 }
 ```
+:::
 
 讲解重点：
 
@@ -138,6 +146,7 @@ func main() {
 
 ### Context 取消传播
 
+::: details 点击展开代码：Context 取消传播
 ```go
 package main
 
@@ -159,6 +168,7 @@ func main() {
 	time.Sleep(200 * time.Millisecond)
 }
 ```
+:::
 
 讲解重点：
 
@@ -168,6 +178,7 @@ func main() {
 
 ### HTTP 请求结束后的异步任务边界
 
+::: details 点击展开代码：HTTP 请求结束后的异步任务边界
 ```go
 package main
 
@@ -207,6 +218,7 @@ func writeAuditLog(ctx context.Context, userID string) {
 	}
 }
 ```
+:::
 
 讲解重点：
 
@@ -217,6 +229,7 @@ func writeAuditLog(ctx context.Context, userID string) {
 
 ### WaitGroup 正确用法
 
+::: details 点击展开代码：WaitGroup 正确用法
 ```go
 package main
 
@@ -239,6 +252,7 @@ func main() {
 	wg.Wait()
 }
 ```
+:::
 
 讲解重点：
 
@@ -247,6 +261,7 @@ func main() {
 
 ### Mutex 保护共享状态
 
+::: details 点击展开代码：Mutex 保护共享状态
 ```go
 package main
 
@@ -274,6 +289,7 @@ func main() {
 	fmt.Println(n)
 }
 ```
+:::
 
 讲解重点：
 
@@ -283,6 +299,7 @@ func main() {
 
 ### 逃逸分析观察
 
+::: details 点击展开代码：逃逸分析观察
 ```go
 package main
 
@@ -299,12 +316,15 @@ func main() {
 	_ = newUser()
 }
 ```
+:::
 
 命令：
 
+::: details 点击展开代码：逃逸分析观察
 ```bash
 go build -gcflags="-m" .
 ```
+:::
 
 讲解重点：
 
@@ -312,6 +332,7 @@ go build -gcflags="-m" .
 
 ### sync.Pool 复用对象
 
+::: details 点击展开代码：sync.Pool 复用对象
 ```go
 package main
 
@@ -336,6 +357,7 @@ func main() {
 	pool.Put(buf)
 }
 ```
+:::
 
 讲解重点：
 
@@ -343,6 +365,7 @@ func main() {
 
 ### Pprof 接入
 
+::: details 点击展开代码：Pprof 接入
 ```go
 package main
 
@@ -356,6 +379,7 @@ func main() {
 	log.Println(http.ListenAndServe("localhost:6060", nil))
 }
 ```
+:::
 
 讲解重点：
 
@@ -363,6 +387,7 @@ func main() {
 
 ### 复用 http.Client
 
+::: details 点击展开代码：复用 http.Client
 ```go
 package main
 
@@ -379,6 +404,7 @@ func main() {
 	_, _ = client.Get("https://example.com")
 }
 ```
+:::
 
 讲解重点：
 

@@ -50,6 +50,7 @@ math/big 类型体系
 
 ## 一、核心设计
 
+::: details 点击展开代码：一、核心设计
 ```go
 // src/math/big/int.go（简化）
 type Int struct {
@@ -66,6 +67,7 @@ type Int struct {
 // - 中等：Karatsuba（约 40 Word 以上）
 // - 大数：3-way Toom-Cook 或 FFT（未来版本）
 ```
+:::
 
 ---
 
@@ -73,6 +75,7 @@ type Int struct {
 
 ### 基础大数运算
 
+::: details 点击展开代码：基础大数运算
 ```go
 import "math/big"
 
@@ -98,9 +101,11 @@ func basics() {
     _ = bits
 }
 ```
+:::
 
 ### 斐波那契数列（演示大数性能）
 
+::: details 点击展开代码：斐波那契数列（演示大数性能）
 ```go
 // 迭代方式，避免递归栈溢出，复用 big.Int 内存
 func fibonacci(n int) *big.Int {
@@ -124,9 +129,11 @@ func main() {
     // 输出：Fib(10000) 位数: 2090
 }
 ```
+:::
 
 ### 密码学：RSA 模幂运算
 
+::: details 点击展开代码：密码学：RSA 模幂运算
 ```go
 // math/big 最重要的密码学用途：模幂运算 m^e mod n
 func rsaEncrypt(m, e, n *big.Int) *big.Int {
@@ -166,9 +173,11 @@ func rsaDemo() {
     fmt.Println("原文:", m, "解密:", decoded)
 }
 ```
+:::
 
 ### 精确小数运算（big.Rat）
 
+::: details 点击展开代码：精确小数运算（big.Rat）
 ```go
 // big.Rat 适合需要精确分数的场景（如金融计算）
 func rationalArithmetic() {
@@ -187,9 +196,11 @@ func rationalArithmetic() {
     fmt.Println(r.FloatString(30)) // 0.333333333333333333333333333333
 }
 ```
+:::
 
 ### 高精度浮点（big.Float）
 
+::: details 点击展开代码：高精度浮点（big.Float）
 ```go
 // big.Float 支持可配置精度，适合科学计算
 func highPrecisionPi() {
@@ -218,9 +229,11 @@ func floatPrecision() {
     fmt.Println(result.Acc())         // Below / Above / Exact
 }
 ```
+:::
 
 ### 性能优化：复用 big.Int
 
+::: details 点击展开代码：性能优化：复用 big.Int
 ```go
 // ❌ 低效：每次运算都分配新 big.Int
 func slowFactorial(n int) *big.Int {
@@ -243,6 +256,7 @@ func fastFactorial(n int) *big.Int {
     return result
 }
 ```
+:::
 
 ---
 

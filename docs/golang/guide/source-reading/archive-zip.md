@@ -55,6 +55,7 @@ archive 包生态
 
 ## 一、核心数据结构
 
+::: details 点击展开代码：一、核心数据结构
 ```go
 // src/archive/zip/struct.go
 type File struct {
@@ -95,6 +96,7 @@ type Writer struct {
     compressors map[uint16]Compressor
 }
 ```
+:::
 
 ---
 
@@ -102,6 +104,7 @@ type Writer struct {
 
 ### 读取 ZIP 文件
 
+::: details 点击展开代码：读取 ZIP 文件
 ```go
 // 打开并遍历 ZIP
 r, err := zip.OpenReader("archive.zip")
@@ -128,9 +131,11 @@ for _, f := range r.File {
     _ = content
 }
 ```
+:::
 
 ### 解压 ZIP（安全版）
 
+::: details 点击展开代码：解压 ZIP（安全版）
 ```go
 func unzip(src, dst string) error {
     r, err := zip.OpenReader(src)
@@ -183,9 +188,11 @@ func unzip(src, dst string) error {
     return nil
 }
 ```
+:::
 
 ### 创建 ZIP（写入文件）
 
+::: details 点击展开代码：创建 ZIP（写入文件）
 ```go
 func createZip(dst string, files map[string][]byte) error {
     out, err := os.Create(dst)
@@ -217,9 +224,11 @@ func createZip(dst string, files map[string][]byte) error {
     return nil
 }
 ```
+:::
 
 ### 打包目录为 ZIP
 
+::: details 点击展开代码：打包目录为 ZIP
 ```go
 func zipDir(dir, dst string) error {
     out, err := os.Create(dst)
@@ -279,9 +288,11 @@ func zipDir(dir, dst string) error {
     })
 }
 ```
+:::
 
 ### 内存 ZIP（bytes.Buffer）
 
+::: details 点击展开代码：内存 ZIP（bytes.Buffer）
 ```go
 // 在内存中创建 ZIP（适合 HTTP 响应直接下载）
 func zipInMemory(files map[string][]byte) ([]byte, error) {
@@ -321,11 +332,13 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
     w.Write(zipData)
 }
 ```
+:::
 
 ### TAR + GZIP（.tar.gz）
 
 <GoNetworkDiagram kind="tar-archive-layout" />
 
+::: details 点击展开代码：TAR + GZIP（.tar.gz）
 ```go
 // 对比：archive/tar 流式压缩（Linux 常用）
 func createTarGz(dir, dst string) error {
@@ -358,6 +371,7 @@ func createTarGz(dir, dst string) error {
     })
 }
 ```
+:::
 
 ---
 

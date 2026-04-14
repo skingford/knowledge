@@ -53,6 +53,7 @@ CGO 互操作体系
 
 ## 一、核心示例
 
+::: details 点击展开代码：一、核心示例
 ```go
 // CGO 启用：import "C" 前的注释块即为 C 代码
 package main
@@ -94,6 +95,7 @@ func main() {
     fmt.Println(C.GoString(result))       // C char* → Go string
 }
 ```
+:::
 
 ---
 
@@ -101,6 +103,7 @@ func main() {
 
 ### 字符串与字节切片互转
 
+::: details 点击展开代码：字符串与字节切片互转
 ```go
 /*
 #include <string.h>
@@ -143,9 +146,11 @@ func xorBytes(data []byte, key byte) {
     )
 }
 ```
+:::
 
 ### 调用 C 共享库（SQLite 示例）
 
+::: details 点击展开代码：调用 C 共享库（SQLite 示例）
 ```go
 // 文件：sqlite.go
 package main
@@ -206,11 +211,13 @@ func (s *SQLiteDB) Close() {
     C.sqlite3_close(s.db)
 }
 ```
+:::
 
 ### C 回调 Go 函数（//export）
 
 <GoEngineeringDiagram kind="cgo-call-bridge" />
 
+::: details 点击展开代码：C 回调 Go 函数（//export）
 ```go
 // 文件：callback.go
 package main
@@ -251,9 +258,11 @@ func processArray(nums []int) int {
     return int(result)
 }
 ```
+:::
 
 ### 集成静态库（.a 文件）
 
+::: details 点击展开代码：集成静态库（.a 文件）
 ```go
 // 文件：mylib.go
 package mylib
@@ -279,9 +288,11 @@ func Compute(x float64) float64 {
     return float64(C.compute(C.double(x)))
 }
 ```
+:::
 
 ### CGO 性能测试与优化
 
+::: details 点击展开代码：CGO 性能测试与优化
 ```go
 // 批量调用比循环单次调用更高效（减少 CGO 开销次数）
 
@@ -332,9 +343,11 @@ func fastProcess(data []float64) []float64 {
     return result
 }
 ```
+:::
 
 ### 资源管理（Finalizer + CGO 内存）
 
+::: details 点击展开代码：资源管理（Finalizer + CGO 内存）
 ```go
 /*
 #include <stdlib.h>
@@ -391,6 +404,7 @@ func (b *Buffer) Close() {
     runtime.SetFinalizer(b, nil) // 取消 Finalizer
 }
 ```
+:::
 
 ---
 

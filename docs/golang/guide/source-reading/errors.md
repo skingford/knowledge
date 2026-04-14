@@ -41,6 +41,7 @@ errors 包结构
 
 ## 一、errors.New
 
+::: details 点击展开代码：一、errors.New
 ```go
 // src/errors/errors.go
 type errorString struct {
@@ -55,6 +56,7 @@ func New(text string) error {
     return &errorString{text}
 }
 ```
+:::
 
 ```
 为什么 New 返回指针？
@@ -105,6 +107,7 @@ func New(text string) error {
 
 ## 三、errors.Is（深度匹配）
 
+::: details 点击展开代码：三、errors.Is（深度匹配）
 ```go
 // src/errors/wrap.go - 核心逻辑简化版
 func Is(err, target error) bool {
@@ -129,6 +132,7 @@ func Is(err, target error) bool {
     }
 }
 ```
+:::
 
 ```
 Is 遍历示意
@@ -152,6 +156,7 @@ Is 遍历示意
 
 ## 四、errors.As（类型提取）
 
+::: details 点击展开代码：四、errors.As（类型提取）
 ```go
 // 简化版
 func As(err error, target any) bool {
@@ -172,11 +177,13 @@ func As(err error, target any) bool {
     return false
 }
 ```
+:::
 
 ---
 
 ## 五、errors.Join（Go 1.20+）
 
+::: details 点击展开代码：五、errors.Join（Go 1.20+）
 ```go
 // errors.Join 返回包含多个错误的聚合错误
 // 任意一个 nil 被自动过滤
@@ -197,6 +204,7 @@ type joinError struct{ errs []error }
 func (e *joinError) Error() string { /* 用 \n 连接所有错误信息 */ }
 func (e *joinError) Unwrap() []error { return e.errs }
 ```
+:::
 
 ---
 
@@ -204,6 +212,7 @@ func (e *joinError) Unwrap() []error { return e.errs }
 
 ### sentinel error + 包装
 
+::: details 点击展开代码：sentinel error + 包装
 ```go
 // 定义 sentinel error（包级变量，全局唯一）
 var (
@@ -228,9 +237,11 @@ if errors.Is(err, ErrNotFound) {
     fmt.Println("user not found")
 }
 ```
+:::
 
 ### 自定义错误类型 + As
 
+::: details 点击展开代码：自定义错误类型 + As
 ```go
 type ValidationError struct {
     Field   string
@@ -256,9 +267,11 @@ if errors.As(err, &ve) {
     fmt.Printf("field=%s, msg=%s\n", ve.Field, ve.Message)
 }
 ```
+:::
 
 ### 聚合多个错误
 
+::: details 点击展开代码：聚合多个错误
 ```go
 func validateAll(name string, age int) error {
     var errs []error
@@ -279,9 +292,11 @@ if err != nil {
                      //  validation error: age - out of range"
 }
 ```
+:::
 
 ### 自定义 Is（让错误族匹配）
 
+::: details 点击展开代码：自定义 Is（让错误族匹配）
 ```go
 type HTTPError struct {
     Code    int
@@ -300,6 +315,7 @@ func (e *HTTPError) Is(target error) bool {
 err := &HTTPError{Code: 404, Message: "not found"}
 fmt.Println(errors.Is(err, ErrClientError)) // true
 ```
+:::
 
 ---
 

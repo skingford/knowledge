@@ -51,6 +51,7 @@ hash/crc32 体系
 
 ## 一、核心实现
 
+::: details 点击展开代码：一、核心实现
 ```go
 // src/hash/crc32/crc32.go（简化）
 type digest struct {
@@ -80,6 +81,7 @@ func updateSlicingBy8(crc uint32, tab *slicing8Table, p []byte) uint32 {
 // 使用 PCMPESTRI 或 CLMUL 指令
 // func iEEEUpdate(crc uint32, p []byte) uint32  ← 汇编
 ```
+:::
 
 <GoAdvancedTopicDiagram kind="crc32-update-flow" />
 
@@ -89,6 +91,7 @@ func updateSlicingBy8(crc uint32, tab *slicing8Table, p []byte) uint32 {
 
 ### 基础校验和计算
 
+::: details 点击展开代码：基础校验和计算
 ```go
 import (
     "hash/crc32"
@@ -114,9 +117,11 @@ func basics() {
     fmt.Printf("Stream CRC: %08X\n", h.Sum32())
 }
 ```
+:::
 
 ### 文件完整性校验
 
+::: details 点击展开代码：文件完整性校验
 ```go
 // 计算文件 CRC32，用于传输完整性验证
 func fileCRC32(path string) (uint32, error) {
@@ -151,9 +156,11 @@ func verifyTransfer(srcPath, dstPath string) error {
     return nil
 }
 ```
+:::
 
 ### 分片传输：增量 CRC 更新
 
+::: details 点击展开代码：分片传输：增量 CRC 更新
 ```go
 // 大文件分块传输，逐块更新 CRC（避免全量重新计算）
 type ChunkedTransfer struct {
@@ -202,9 +209,11 @@ func transferLargeFile(src io.Reader, dst io.Writer) (uint32, error) {
     return transfer.Checksum(), nil
 }
 ```
+:::
 
 ### 哈希分片（一致性哈希 / 分库分表路由）
 
+::: details 点击展开代码：哈希分片（一致性哈希 / 分库分表路由）
 ```go
 // 用 CRC32 做快速哈希路由（比 MD5/SHA1 快 10 倍以上）
 type ShardRouter struct {
@@ -228,9 +237,11 @@ func (r *ShardRouter) Shard(key string) int {
 router := NewShardRouter(16)
 fmt.Println(router.Shard("user:12345")) // 0-15 的分片编号
 ```
+:::
 
 ### CRC32 vs 其他哈希性能对比
 
+::: details 点击展开代码：CRC32 vs 其他哈希性能对比
 ```go
 func BenchmarkHashFunctions(b *testing.B) {
     data := make([]byte, 1024*1024) // 1MB
@@ -264,11 +275,13 @@ func BenchmarkHashFunctions(b *testing.B) {
     // SHA256:           ~0.5 GB/s（相对较慢）
 }
 ```
+:::
 
 ### ZIP 文件中的 CRC32 验证
 
 <GoNetworkDiagram kind="zip-central-directory" />
 
+::: details 点击展开代码：ZIP 文件中的 CRC32 验证
 ```go
 // archive/zip 包内部使用 CRC32-IEEE 验证文件完整性
 import "archive/zip"
@@ -302,6 +315,7 @@ func verifyZipIntegrity(zipPath string) error {
     return nil
 }
 ```
+:::
 
 ---
 
