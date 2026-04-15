@@ -41,15 +41,19 @@ const { landing } = sections.find((section) => section.key === 'network')!
 ## 当前专题入口
 
 - [网络学习 Checklist](./learning-checklist.md)：按 Go 后端和实战排障目标，把学习顺序、实操检查和故障排查清单收成一页
-- [网络必备知识](./essential-knowledge.md)：从分层模型、IP、TCP、HTTP/HTTPS、DNS/CDN/负载均衡到排障方法与高频自检题，建立统一认知框架
-- [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)：把解析、缓存、边缘加速、回源和 L4/L7 转发统一收口
-- [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)：把地址转换、访问控制、内外网打通和远程接入统一起来理解
-- [网络排障与常用命令](./troubleshooting-and-commands.md)：把 ping、dig、curl、ss、tcpdump 等命令放回真实排障场景里使用
+- [网络必备知识](./essential-knowledge.md)：从分层模型到一次完整请求链路，建立网络知识全景图
+- [IP 与路由](./ip-and-routing.md)：IP 层寻路、子网掩码、路由表、NAT 和 TTL
+- [TCP 与 UDP](./tcp-and-udp.md)：TCP/UDP 对比、三次握手、四次挥手、滑动窗口与拥塞控制
+- [HTTP 与 HTTPS](./http-and-https.md)：HTTP 版本演进、TLS 握手与 HTTPS 排障
+- [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)：域名解析、边缘缓存、回源和 L4/L7 负载均衡
+- [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)：地址转换、访问控制、内外网打通和远程接入
+- [网络排障与常用命令](./troubleshooting-and-commands.md)：ping、dig、curl、ss、tcpdump 等命令的排障场景
 
 ## 建议阅读顺序
 
-1. 先读 [网络学习 Checklist](./learning-checklist.md)，先把学习目标、阶段顺序和最少实操固定下来
-2. 再读 [网络必备知识](./essential-knowledge.md)，把整体框架、协议细节和高频自检题一次建立起来
-3. 接着读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)，补齐真实线上访问路径里的基础设施认知
-4. 再读 [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)，把”为什么访问不通”这类问题补到网络边界层
-5. 再读 [网络排障与常用命令](./troubleshooting-and-commands.md)，把知识转成可执行的排查动作
+1. 先读 [网络学习 Checklist](./learning-checklist.md)，把学习目标和阶段顺序固定下来
+2. 再读 [网络必备知识](./essential-knowledge.md)，建立分层模型和请求链路全景图
+3. 按层深入：[IP 与路由](./ip-and-routing.md) → [TCP 与 UDP](./tcp-and-udp.md) → [HTTP 与 HTTPS](./http-and-https.md)
+4. 补线上基础设施：[DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
+5. 补网络边界：[NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)
+6. 最后把知识转成排查动作：[网络排障与常用命令](./troubleshooting-and-commands.md)
