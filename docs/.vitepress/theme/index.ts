@@ -11,6 +11,7 @@ import WechatQrNotice from '@docs-components/WechatQrNotice.vue'
 import DocAfterSlot from '@docs-components/DocAfterSlot.vue'
 import SvgPreview from '@docs-components/SvgPreview.vue'
 import JdAccessGate from '@docs-components/JdAccessGate.vue'
+import DocSidebarToggle from '@docs-components/DocSidebarToggle.vue'
 
 const staticGlobalComponents = {
   QuickNav,
@@ -99,6 +100,7 @@ const theme: Theme = {
         h(DefaultTheme.Layout, null, {
           'doc-after': () => h(DocAfterSlot),
         }),
+        h(DocSidebarToggle),
         h(SvgPreview),
         h(WechatQrNotice),
       ]),
