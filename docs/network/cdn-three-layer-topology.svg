@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="CDN 三层物理拓扑图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="cdn-topology-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+    <marker id="cdn-topology-arrow-soft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow-light)" />
+    </marker>
+    <linearGradient id="center-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--d-blue-light)" />
+      <stop offset="100%" stop-color="var(--d-blue-bg)" />
+    </linearGradient>
+    <linearGradient id="origin-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--d-engine-bg)" />
+      <stop offset="100%" stop-color="var(--d-bg-alt)" />
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="52" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    CDN 三层物理拓扑
+  </text>
+  <text x="490" y="78" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    控制与回源能力在上层汇聚，缓存与接入能力逐层向边缘展开
+  </text>
+
+  <path d="M 390 106 L 590 106 Q 608 106 608 124 L 608 150 Q 608 168 590 168 L 390 168 Q 372 168 372 150 L 372 124 Q 372 106 390 106 Z"
+    fill="url(#origin-grad)" stroke="var(--d-engine-border)" stroke-width="2" />
+  <text x="490" y="132" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-engine-text)">
+    源站 Origin
+  </text>
+  <text x="490" y="153" text-anchor="middle" font-size="11" fill="var(--d-engine-sub)">
+    最终内容来源 / API / 文件存储
+  </text>
+
+  <path d="M 490 168 L 490 196" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+
+  <polygon points="270,204 710,204 740,236 240,236" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-dasharray="5 5" />
+  <polygon points="200,376 780,376 830,414 150,414" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-dasharray="5 5" />
+  <polygon points="110,560 870,560 930,610 50,610" fill="var(--d-bg-alt)" stroke="var(--d-border)" stroke-dasharray="5 5" />
+
+  <text x="120" y="224" font-size="12" font-weight="700" fill="var(--d-layer-title)">L3 控制层</text>
+  <text x="120" y="396" font-size="12" font-weight="700" fill="var(--d-layer-title)">L2 区域层</text>
+  <text x="120" y="580" font-size="12" font-weight="700" fill="var(--d-layer-title)">L1 边缘层</text>
+
+  <rect x="240" y="220" width="500" height="112" rx="28" fill="url(#center-grad)" stroke="var(--d-blue-border)" stroke-width="2.5" />
+  <text x="490" y="255" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-blue)">
+    中心站 Center Node
+  </text>
+  <text x="490" y="281" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    对接源站、全局调度、日志汇聚、统计分析、最终回源兜底
+  </text>
+  <rect x="298" y="295" width="112" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="354" y="313" text-anchor="middle" font-size="11" fill="var(--d-text)">GSLB 控制</text>
+  <rect x="434" y="295" width="112" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="490" y="313" text-anchor="middle" font-size="11" fill="var(--d-text)">日志与指标</text>
+  <rect x="570" y="295" width="112" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="626" y="313" text-anchor="middle" font-size="11" fill="var(--d-text)">回源兜底</text>
+
+  <path d="M 490 332 L 490 366" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 490 366 L 305 366" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 490 366 L 675 366" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 305 366 L 305 382" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+  <path d="M 675 366 L 675 382" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+
+  <rect x="110" y="382" width="390" height="116" rx="26" fill="var(--d-bg-alt)" stroke="var(--d-layer-border)" stroke-width="2" />
+  <text x="305" y="417" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-layer-title)">
+    区域中心 Regional Node
+  </text>
+  <text x="305" y="441" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    作为边缘与中心之间的缓冲层，优先承接未命中请求
+  </text>
+  <rect x="154" y="456" width="126" height="26" rx="13" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="217" y="473" text-anchor="middle" font-size="11" fill="var(--d-text)">热点聚合</text>
+  <rect x="290" y="456" width="126" height="26" rx="13" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="353" y="473" text-anchor="middle" font-size="11" fill="var(--d-text)">合并回源</text>
+
+  <rect x="480" y="382" width="390" height="116" rx="26" fill="var(--d-bg-alt)" stroke="var(--d-layer-border)" stroke-width="2" />
+  <text x="675" y="417" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-layer-title)">
+    区域中心 Regional Node
+  </text>
+  <text x="675" y="441" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    跨区域共享热点资源，降低边缘节点同时直连源站的概率
+  </text>
+  <rect x="524" y="456" width="126" height="26" rx="13" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="587" y="473" text-anchor="middle" font-size="11" fill="var(--d-text)">区域缓存</text>
+  <rect x="660" y="456" width="126" height="26" rx="13" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="723" y="473" text-anchor="middle" font-size="11" fill="var(--d-text)">源站保护</text>
+
+  <path d="M 305 498 L 305 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 675 498 L 675 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 305 528 L 192 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 305 528 L 418 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 675 528 L 562 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 675 528 L 788 528" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" />
+  <path d="M 192 528 L 192 548" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+  <path d="M 418 528 L 418 548" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+  <path d="M 562 528 L 562 548" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+  <path d="M 788 528 L 788 548" fill="none" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#cdn-topology-arrow)" />
+
+  <rect x="82" y="548" width="220" height="100" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="192" y="579" text-anchor="middle" font-size="16" font-weight="700" fill="var(--d-client-text)">边缘节点 Edge PoP</text>
+  <text x="192" y="600" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">Cache 模块</text>
+  <text x="192" y="618" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">L4 / L7 接入</text>
+  <text x="192" y="636" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">内存 + SSD 本地缓存</text>
+
+  <rect x="308" y="548" width="220" height="100" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="418" y="579" text-anchor="middle" font-size="16" font-weight="700" fill="var(--d-client-text)">边缘节点 Edge PoP</text>
+  <text x="418" y="600" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">热门静态资源命中</text>
+  <text x="418" y="618" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">TLS / 协议处理</text>
+  <text x="418" y="636" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">就近接入用户</text>
+
+  <rect x="452" y="548" width="220" height="100" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="562" y="579" text-anchor="middle" font-size="16" font-weight="700" fill="var(--d-client-text)">边缘节点 Edge PoP</text>
+  <text x="562" y="600" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">接近用户网络入口</text>
+  <text x="562" y="618" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">首跳加速</text>
+  <text x="562" y="636" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">热点对象本地留存</text>
+
+  <rect x="678" y="548" width="220" height="100" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="788" y="579" text-anchor="middle" font-size="16" font-weight="700" fill="var(--d-client-text)">边缘节点 Edge PoP</text>
+  <text x="788" y="600" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">广覆盖部署</text>
+  <text x="788" y="618" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">快速响应用户请求</text>
+  <text x="788" y="636" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">失败时向上层取数</text>
+
+  <path d="M 192 648 L 192 668" fill="none" stroke="var(--d-arrow-light)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#cdn-topology-arrow-soft)" />
+  <path d="M 418 648 L 418 668" fill="none" stroke="var(--d-arrow-light)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#cdn-topology-arrow-soft)" />
+  <path d="M 562 648 L 562 668" fill="none" stroke="var(--d-arrow-light)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#cdn-topology-arrow-soft)" />
+  <path d="M 788 648 L 788 668" fill="none" stroke="var(--d-arrow-light)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#cdn-topology-arrow-soft)" />
+
+  <text x="192" y="691" text-anchor="middle" font-size="12" fill="var(--d-text-muted)">用户</text>
+  <text x="418" y="691" text-anchor="middle" font-size="12" fill="var(--d-text-muted)">用户</text>
+  <text x="562" y="691" text-anchor="middle" font-size="12" fill="var(--d-text-muted)">用户</text>
+  <text x="788" y="691" text-anchor="middle" font-size="12" fill="var(--d-text-muted)">用户</text>
+
+  <rect x="110" y="708" width="760" height="24" rx="12" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="724" text-anchor="middle" font-size="11" fill="var(--d-text-dim)">
+    常态目标：请求尽量在边缘结束；未命中时逐层向上取数，而不是让所有节点直接打到源站
+  </text>
+</svg>

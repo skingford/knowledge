@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="浏览器缓存、CDN 缓存与源站缓存对比图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="cache-compare-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="50" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    浏览器缓存 vs CDN 缓存 vs 源站缓存
+  </text>
+  <text x="490" y="74" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    三者都叫“缓存”，但控制者、作用位置、适用对象和失效方式都不同
+  </text>
+
+  <rect x="60" y="110" width="260" height="414" rx="26" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="190" y="145" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-client-text)">
+    浏览器缓存
+  </text>
+  <text x="190" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Browser Cache
+  </text>
+  <rect x="86" y="190" width="208" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="190" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">离用户最近，存在本机</text>
+  <text x="88" y="246" font-size="12" font-weight="700" fill="var(--d-text)">谁控制</text>
+  <text x="88" y="266" font-size="11" fill="var(--d-text-sub)">源站通过 `Cache-Control` / `Expires` 引导</text>
+  <text x="88" y="296" font-size="12" font-weight="700" fill="var(--d-text)">主要解决什么</text>
+  <text x="88" y="316" font-size="11" fill="var(--d-text-sub)">减少重复下载，提升单个用户二次访问速度</text>
+  <text x="88" y="346" font-size="12" font-weight="700" fill="var(--d-text)">最适合缓存</text>
+  <text x="88" y="366" font-size="11" fill="var(--d-text-sub)">静态资源、带 hash 的 JS / CSS / 图片 / 字体</text>
+  <text x="88" y="396" font-size="12" font-weight="700" fill="var(--d-text)">典型特征</text>
+  <text x="88" y="416" font-size="11" fill="var(--d-text-sub)">命中了 CDN 也未必命中浏览器缓存</text>
+  <text x="88" y="436" font-size="11" fill="var(--d-text-sub)">更偏“同一个用户”的本地复用</text>
+  <text x="88" y="466" font-size="12" font-weight="700" fill="var(--d-text)">风险点</text>
+  <text x="88" y="486" font-size="11" fill="var(--d-text-sub)">HTML 长缓存会让用户发布后仍拿旧入口</text>
+
+  <rect x="360" y="110" width="260" height="414" rx="26" fill="var(--d-blue-light)" stroke="var(--d-blue-border)" stroke-width="2.2" />
+  <text x="490" y="145" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-blue)">
+    CDN 缓存
+  </text>
+  <text x="490" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Shared Edge Cache
+  </text>
+  <rect x="386" y="190" width="208" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="490" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">离用户近，但服务于大量用户共享</text>
+  <text x="388" y="246" font-size="12" font-weight="700" fill="var(--d-text)">谁控制</text>
+  <text x="388" y="266" font-size="11" fill="var(--d-text-sub)">源站响应头 + CDN 控制台策略共同决定</text>
+  <text x="388" y="296" font-size="12" font-weight="700" fill="var(--d-text)">主要解决什么</text>
+  <text x="388" y="316" font-size="11" fill="var(--d-text-sub)">减少跨地域回源、降低源站压力、提升首访速度</text>
+  <text x="388" y="346" font-size="12" font-weight="700" fill="var(--d-text)">最适合缓存</text>
+  <text x="388" y="366" font-size="11" fill="var(--d-text-sub)">公共静态资源、热点下载、可短暂过期的公共读接口</text>
+  <text x="388" y="396" font-size="12" font-weight="700" fill="var(--d-text)">典型特征</text>
+  <text x="388" y="416" font-size="11" fill="var(--d-text-sub)">按 `Cache Key`、`Vary`、Query、Header 拆分版本</text>
+  <text x="388" y="436" font-size="11" fill="var(--d-text-sub)">更偏“不同用户共享同一份公共内容”</text>
+  <text x="388" y="466" font-size="12" font-weight="700" fill="var(--d-text)">风险点</text>
+  <text x="388" y="486" font-size="11" fill="var(--d-text-sub)">把私有内容缓存成公共内容会直接造成数据泄漏</text>
+
+  <rect x="660" y="110" width="260" height="414" rx="26" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="2.2" />
+  <text x="790" y="145" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-engine-text)">
+    源站缓存
+  </text>
+  <text x="790" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Nginx / 应用 / 数据缓存
+  </text>
+  <rect x="686" y="190" width="208" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="790" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">在源站内部，离用户最远</text>
+  <text x="688" y="246" font-size="12" font-weight="700" fill="var(--d-text)">谁控制</text>
+  <text x="688" y="266" font-size="11" fill="var(--d-text-sub)">Nginx 配置、应用代码、Redis / 本地缓存策略</text>
+  <text x="688" y="296" font-size="12" font-weight="700" fill="var(--d-text)">主要解决什么</text>
+  <text x="688" y="316" font-size="11" fill="var(--d-text-sub)">降低后端计算与数据库压力，不一定减少网络 RTT</text>
+  <text x="688" y="346" font-size="12" font-weight="700" fill="var(--d-text)">最适合缓存</text>
+  <text x="688" y="366" font-size="11" fill="var(--d-text-sub)">公共读接口、复杂计算结果、数据库热点数据</text>
+  <text x="688" y="396" font-size="12" font-weight="700" fill="var(--d-text)">典型特征</text>
+  <text x="688" y="416" font-size="11" fill="var(--d-text-sub)">即使 CDN Miss，也可能在源站缓存层命中</text>
+  <text x="688" y="436" font-size="11" fill="var(--d-text-sub)">更偏“保护业务系统”，不是直接贴近用户</text>
+  <text x="688" y="466" font-size="12" font-weight="700" fill="var(--d-text)">风险点</text>
+  <text x="688" y="486" font-size="11" fill="var(--d-text-sub)">把缓存当真数据源，容易带来一致性和失效复杂度</text>
+
+  <rect x="60" y="546" width="860" height="84" rx="22" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="574" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-text)">
+    它们在一条真实链路里的位置
+  </text>
+  <rect x="92" y="590" width="140" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-client-border)" />
+  <text x="162" y="606" text-anchor="middle" font-size="11" fill="var(--d-text)">浏览器缓存</text>
+  <line x1="232" y1="602" x2="336" y2="602" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#cache-compare-arrow)" />
+  <rect x="350" y="590" width="140" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-blue-border)" />
+  <text x="420" y="606" text-anchor="middle" font-size="11" fill="var(--d-text)">CDN 边缘缓存</text>
+  <line x1="490" y1="602" x2="594" y2="602" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#cache-compare-arrow)" />
+  <rect x="608" y="590" width="140" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-engine-border)" />
+  <text x="678" y="606" text-anchor="middle" font-size="11" fill="var(--d-text)">源站缓存</text>
+  <line x1="748" y1="602" x2="820" y2="602" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#cache-compare-arrow)" />
+  <rect x="824" y="590" width="66" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="857" y="606" text-anchor="middle" font-size="11" fill="var(--d-text)">数据库</text>
+
+  <rect x="90" y="656" width="800" height="50" rx="18" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="676" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">
+    判断原则
+  </text>
+  <text x="490" y="695" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">
+    越靠近用户，越偏向减少网络往返；越靠近源站，越偏向保护后端计算与数据层
+  </text>
+</svg>

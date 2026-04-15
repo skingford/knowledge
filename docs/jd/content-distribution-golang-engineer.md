@@ -11,6 +11,7 @@ head:
 
 <script setup>
 import { ref } from 'vue'
+import InlineSvg from '@docs-components/InlineSvg.vue'
 
 const expanded = ref(false)
 
@@ -875,7 +876,39 @@ kubectl top pod                   # 查看资源使用
 - `Action`：Docker 多阶段构建 → K8s Deployment + HPA → GitHub Actions CI → ArgoCD 灰度发布
 - `Result`：发布频率从每周 1 次提升到每天多次，扩容时间从 30 分钟降到 2 分钟
 
-### 4. 技术选型评估
+### 4. IoT 物联网高并发平台（MQTT + Go 微服务）
+
+> 该案例直接命中 JD 的"支撑百万 QPS、百万同时在线、日处理十亿+请求"硬指标。
+
+**架构链路：**
+
+<InlineSvg src="/jd/iot-mqtt-architecture.svg" alt="IoT MQTT 消息接入架构链路" />
+
+- `Situation`：物联网平台需要接入百万级设备，设备通过 MQTT 协议实时上报状态、接收指令，原有单体架构在 10 万连接时已出现消息堆积和丢失
+- `Task`：设计并落地支撑百万级并发连接的 IoT 消息接入与分发平台
+- `Action`：
+  - **双通道分离**：设备通过 HTTP 请求 iot-router 完成白名单认证与鉴权（认证通道）；通过 MQTT 协议直连 EMQX 集群收发消息（消息通道）。两条链路独立部署，iot-router 拦截非法设备，EMQX 专注消息吞吐
+  - **消息接入层**（EMQX 集群）：MQTT Broker 支撑百万级长连接，配置共享订阅实现消费端水平扩展
+  - **协议转换层**（iot-emqx 服务）：Go 实现，通过 Go MQTT Client 与 EMQX 建立长连接订阅消息，负责 MQTT 消息解析、协议标准化、消息路由
+  - **消息编排层**（iot-broker 服务）：负责消息聚合、去重、限流、分发策略（广播/定向/分组），内置 Ring Buffer 削峰
+  - **业务层**：下游业务 Server 按领域消费（设备管理、告警引擎、数据分析），通过 gRPC 接口解耦
+  - **影子表设计（Shadow Table）**：服务端与设备本地各维护一份影子表，通过双向同步保障离线可用：
+    - **S2C（服务端 → 设备）**：业务侧下发的指令写入服务端影子表，在线时实时推送到设备本地影子表；设备离线期间指令在服务端影子表堆积，上线后差量下推
+    - **C2S（设备 → 服务端）**：设备本地操作写入本地影子表，在线时实时上报服务端；离线期间设备基于本地影子表正常使用，上线后将离线期间的变更差量上报服务端
+    - 设备离线不影响本地正常使用，上线后双向 diff 对齐，保障消息不丢失、指令不遗漏
+  - **高可用保障**：EMQX 多节点集群 + K8s 自动扩缩容 + Redis 会话漂移 + Kafka 异步持久化兜底
+- `Result`：
+  - 支撑 **100 万 QPS** 消息吞吐
+  - **100 万设备同时在线**，连接成功率 99.9%+
+  - **日处理 10 亿+请求**，消息端到端延迟 P99 < 200ms
+  - 服务可用性 99.99%，单次发版零断线（EMQX 会话迁移 + 滚动更新）
+  - 影子表机制实现离线消息零丢失，设备上线后平均 2s 内完成状态同步
+
+**面试表达示例：**
+
+> 我负责设计和开发了公司 IoT 平台的消息接入链路。架构上做了认证与消息的双通道分离：设备通过 HTTP 调用 iot-router 完成白名单认证，通过 MQTT 协议连接 EMQX 集群收发消息。EMQX 的消息经 iot-emqx 服务做协议转换，再由 iot-broker 进行消息编排和分发，最终投递到各业务 Server。整套架构支撑了 100 万同时在线设备、峰值 100 万 QPS 的消息吞吐，日均处理超过 10 亿次请求。关键设计包括认证与消息通道独立部署互不影响、EMQX 共享订阅实现消费端水平扩展、iot-broker 内置 Ring Buffer 做消息削峰、影子表设计保障离线消息零丢失，以及 Kafka 异步持久化作为可靠性兜底。
+
+### 5. 技术选型评估
 
 - **业务价值**：它解决什么问题？有更简单方案吗？
 - **成熟度**：社区活跃度、License、生产验证
@@ -1002,6 +1035,8 @@ kubectl top pod                   # 查看资源使用
 
 **追问准备：**
 - **Go-Zero 的自适应熔断怎么实现的？** 基于 Google SRE 的滑动窗口算法，统计请求成功率，当成功率低于阈值时自动触发熔断，不需要手动设定阈值
+- **Go-Zero 的限流怎么做的？** 内置两种限流器：`PeriodLimit`（固定窗口，基于 Redis + Lua 脚本实现分布式限流）和 `TokenLimiter`（令牌桶，支持突发流量）。API 层在 middleware 中按路由或用户维度配置，RPC 层通过拦截器统一限流
+- **Go-Zero 的降级策略怎么用？** 熔断触发后自动降级，开发者在 fallback 逻辑中返回兜底数据（如缓存旧数据、默认值）。也支持手动降级开关——通过配置中心（etcd）动态下发降级标记，代码中判断标记跳过非核心链路（如推荐、日志上报），保障核心链路可用
 - **goctl 生成的代码有什么局限性？** Model 层对复杂查询支持有限，生产中通常需要手写 SQL 或配合 sqlx 扩展
 
 ---
@@ -1326,6 +1361,149 @@ kubectl top pod                   # 查看资源使用
 - **Memcached 的内存分配机制？** Slab Allocator，按固定大小的 Chunk 分配内存，减少碎片但可能造成空间浪费
 - **为什么说 Memcached 内存效率更高？** 纯字符串场景下没有 Redis 的数据结构开销（如 ziplist/quicklist 的元信息），同样的数据存储占用更少内存
 - **Memcached 集群怎么做？** 客户端通过一致性哈希分片，没有 Redis Cluster 那样的原生集群支持
+
+---
+
+### 六、IoT 物联网高并发平台专场
+
+> 以下题目围绕模块八第 4 节「IoT 物联网高并发平台」的架构展开，覆盖 EMQX 集群、Go 微服务链路、影子表设计和安全认证四个维度。
+
+#### Q23: EMQX 共享订阅的负载均衡策略怎么选？百万连接的集群怎么规划？
+
+**参考回答：**
+
+> EMQX 共享订阅支持四种策略：`random`、`round_robin`、`sticky`、`hash`。我们选的是 **sticky**——同一 clientId 的消息尽量路由到同一个消费者实例，好处是减少跨实例的去重和排序开销。当消费者扩缩容时，sticky 会自动 rebalance，短暂的消息乱序在 iot-emqx 层通过消息时间戳做最终排序兜底。
+>
+> 集群规划方面，EMQX 单节点在 16 核 32G 规格下可以承载约 20-30 万连接。百万连接需要 4-5 个节点组成集群，节点间通过 Erlang 分布式协议同步路由表（topic → node 映射）。我们还做了两个关键配置：一是**按地域分组**，不同地域的设备连不同的 EMQX 节点，减少跨节点路由；二是**集群脑裂自动恢复**，配置 `autoheal` 模式，脑裂后自动选举多数派节点恢复集群，少数派节点上的连接自动重连。
+
+**追问准备：**
+- **为什么不用 round_robin？** round_robin 会把同一设备的消息分散到不同消费者，增加去重和排序复杂度，sticky 更适合 IoT 场景
+- **EMQX 节点间路由表同步有性能问题吗？** 百万级 topic 时路由表较大，我们通过通配符订阅（`device/+/data`）减少 topic 数量，路由表规模可控
+
+---
+
+#### Q24: EMQX 滚动更新怎么做到零断线？Redis 会话漂移的具体实现？
+
+**参考回答：**
+
+> 滚动更新零断线分三步。第一步，**摘流**——通过 K8s preStop hook 调用 EMQX API 将待更新节点标记为"不接受新连接"，LB 不再分发新设备到该节点。第二步，**会话迁移**——EMQX 的 session 信息（clientId、subscriptions、QoS inflight queue）通过 write-through 方式持久化到 Redis Cluster。待更新节点上的存量连接不会被强杀，而是等设备端心跳超时后自然断开重连到其他节点。第三步，**恢复订阅**——设备重连到新节点后，新节点从 Redis 读取 session 恢复订阅关系，设备侧完全无感。
+>
+> Redis 中存储的字段包括：`clientId`、`subscriptions`（topic + QoS）、`inflight_messages`（未确认的 QoS 1/2 消息）、`last_connected_node`、`session_expiry` 时间戳。我们为 session 设置了 24 小时 TTL，超过 24 小时未重连的设备 session 自动清理，避免 Redis 被永久离线设备撑爆。
+
+**追问准备：**
+- **Redis 本身挂了怎么办？** Redis Cluster 本身是多副本高可用。极端情况下 Redis 全部不可用时，降级为 EMQX 内存 session，设备重连后需要重新订阅，但消息不丢（Kafka 兜底）
+- **设备全部重连的风暴怎么扛？** 设备端 SDK 内置**指数退避 + 随机抖动**（jitter），重连间隔从 1s 到 60s 递增，避免雪崩式重连
+
+---
+
+#### Q25: Go MQTT Client 长连接断线重连怎么做？同一设备消息的有序性怎么保证？
+
+**参考回答：**
+
+> iot-emqx 使用 `eclipse/paho.mqtt.golang` 作为 MQTT Client，长连接管理有三层保障。第一层是**Client 级心跳**，设置 KeepAlive 为 30s，Client 自动发送 PINGREQ 维持连接。第二层是**断线自动重连**，配置 `AutoReconnect: true`，断线后按指数退避策略（1s/2s/4s/8s...最大 60s）重连，重连成功后自动重新订阅所有 topic。第三层是**实例级健康检查**，K8s 的 liveness probe 检测 MQTT 连接状态，连接彻底不可恢复时重启 Pod。
+>
+> 消息有序性方面，我们通过 EMQX 共享订阅的 sticky 策略，让同一设备的消息尽量路由到同一个 iot-emqx 实例。在 iot-emqx 内部，同一设备的消息按 clientId 哈希到同一个 goroutine 处理，单 goroutine 内天然有序。极端情况下（消费者 rebalance）可能出现短暂乱序，iot-emqx 在转发给 iot-broker 前会按消息时间戳做 50ms 窗口排序兜底。
+
+**追问准备：**
+- **重连期间消息会丢吗？** 不会。我们使用 QoS 1，EMQX 会将未 ACK 的消息缓存在 session 中（已持久化到 Redis），重连后重新投递
+- **为什么不用 QoS 2？** QoS 2 需要四次握手，吞吐量下降约 40%，IoT 数据上报场景允许少量重复（iot-emqx 做幂等去重），用 QoS 1 + 业务去重性价比更高
+
+---
+
+#### Q26: iot-broker 的 Ring Buffer 削峰怎么设计？满了怎么办？
+
+**参考回答：**
+
+> Ring Buffer 的核心设计是**固定容量的环形队列 + 生产消费指针分离**。容量按峰值流量的 3 倍冗余设定——日常 QPS 30 万，峰值 100 万，Ring Buffer 容量设为 300 万条消息（约占 3GB 内存）。生产者（iot-emqx 来的消息）写入 head 指针，消费者（下游 gRPC 分发）从 tail 指针读取，两者独立推进，天然解耦。
+>
+> 满了的处理策略分两层。第一层是**反压**——当 Ring Buffer 使用率超过 80% 时，iot-broker 向 iot-emqx 返回限流信号（gRPC 状态码 `RESOURCE_EXHAUSTED`），iot-emqx 降低发送速率。第二层是**溢出兜底**——如果使用率达到 95%（说明反压没压住），溢出的消息写入 Kafka 作为 overflow queue，下游消费恢复后从 Kafka 回补。所以消息不会丢，只是延迟增大。
+>
+> 用 Ring Buffer 而不是直接用 Kafka 的原因是**延迟**——Ring Buffer 是纯内存操作，P99 在微秒级，Kafka 写磁盘 P99 在毫秒级。常态下消息走 Ring Buffer 保证低延迟，只有极端峰值才溢出到 Kafka。
+
+**追问准备：**
+- **Ring Buffer 用的什么实现？** Go 中用 `sync.Pool` 复用消息对象 + 原子操作推进指针，无锁设计避免 mutex 竞争
+- **Ring Buffer 重启数据丢失怎么办？** iot-broker 是无状态的，Ring Buffer 中的消息在 iot-emqx 侧有 ACK 机制——iot-broker 消费成功才 ACK，未 ACK 的消息 iot-emqx 会重新投递
+
+---
+
+#### Q27: 100 万 QPS 是怎么压测出来的？瓶颈在哪，怎么突破的？
+
+**参考回答：**
+
+> 压测分三个阶段。第一阶段用 **emqtt-bench**（EMQX 官方压测工具）模拟百万设备连接和消息发布，在独立的压测集群（与生产环境同规格）上执行。每台压测机模拟 10 万设备，10 台机器并行，每个设备每秒发 1 条消息，总计 100 万 QPS。
+>
+> 第二阶段**逐层压测定位瓶颈**。先压 EMQX 集群，5 节点在 100 万 QPS 时 CPU 约 65%，不是瓶颈。再压 iot-emqx，发现 50 万 QPS 时 GC 压力激增——大量小消息对象频繁分配回收，STW 从 1ms 涨到 20ms。解决方案：引入 `sync.Pool` 复用消息对象 + 将 `GOGC` 从默认 100 调到 200（减少 GC 频率，用内存换延迟）。优化后 iot-emqx 单实例扛 25 万 QPS，4 个实例水平扩展到 100 万。
+>
+> 第三阶段是 iot-broker 到业务 Server 的 gRPC 链路。瓶颈出现在 gRPC 连接复用——默认单连接的流控窗口（64KB）在高并发下成为瓶颈。解决方案：iot-broker 到每个业务 Server 维护连接池（8 条连接），同时调大 `MaxRecvMsgSize` 和流控窗口到 4MB。最终端到端 P99 稳定在 200ms 以内。
+
+**追问准备：**
+- **为什么不在生产环境压测？** IoT 设备是真实硬件，无法模拟。压测集群与生产同规格同配置，压测结果可信度足够
+- **GOGC 调大会不会导致 OOM？** 会增加内存使用，我们通过 `GOMEMLIMIT` 设置内存上限（容器 limit 的 80%），GC 在内存接近上限时仍然会触发
+
+---
+
+#### Q28: 影子表的存储选型是什么？S2C 和 C2S 双向 diff 冲突怎么解决？
+
+**参考回答：**
+
+> 影子表存储选型是 **Redis Hash + MySQL 持久化**。Redis Hash 以 `shadow:{deviceId}` 为 key，field 是属性名（如 `switch`、`brightness`），value 是 JSON（包含值、版本号、更新时间戳）。选 Redis 是因为影子表读写频繁（每次设备上报 / 指令下发都要读写），要求延迟在毫秒级。MySQL 作为持久化底层，通过异步 binlog 同步，用于故障恢复和历史审计。
+>
+> 冲突解决采用**版本号 + 时间戳 + 业务语义**三层机制。每个属性有独立的 `version` 字段，每次修改递增。S2C 和 C2S 的 diff 是按属性粒度做的，不是整个影子表做 diff。具体规则：如果同一属性 S2C 和 C2S 都有变更，比较 version——version 大的赢。version 相同时（理论上不会发生，但防御性编程），看时间戳。特殊情况下（如安全指令，紧急停机），服务端标记 `force: true`，强制覆盖设备端。
+
+**追问准备：**
+- **百万设备的影子表 Redis 占多少内存？** 每台设备影子表约 1-2KB（20 个属性），百万设备约 1-2GB，Redis Cluster 轻松承载
+- **Redis 和 MySQL 之间一致性怎么保证？** 写入时先写 Redis 再异步写 MySQL，Redis 是权威数据源。MySQL 有延迟但不影响实时业务，重建时从 MySQL 恢复到 Redis
+
+---
+
+#### Q29: 设备离线很久（比如一个月），影子表堆积了大量指令，上线后怎么处理？
+
+**参考回答：**
+
+> 核心策略是**只推最终态，不推中间过程**。影子表存的是每个属性的当前期望值，不是指令队列。比如业务侧先后下发"亮度调到 50"、"亮度调到 80"、"亮度调到 60"，影子表里 `brightness.desired = 60`，设备上线后只收到"亮度调到 60"这一条，不需要回放中间的 50 和 80。这就是影子表相比消息队列的核心优势——**天然去重和压缩**。
+>
+> 上线同步流程：设备上线后发送本地影子表的版本摘要（每个属性的 version），iot-broker 对比服务端影子表，只下推 version 不一致的属性差量。百万属性级别的 diff 在 Redis 端用 Lua 脚本原子执行，延迟在 10ms 以内。同时设备上报本地影子表中离线期间变更的属性（C2S diff），iot-broker 合并后更新服务端。
+>
+> 对于需要保留完整指令历史的场景（如固件升级指令），我们单独走**指令队列**（Kafka topic），不走影子表。影子表只管状态同步，指令队列管有序执行——两个机制各司其职。
+
+**追问准备：**
+- **设备上线瞬间大量 diff 下推会不会把设备打挂？** 会做流控，diff 按属性分批下推，每批最多 50 个属性，设备 ACK 后再推下一批
+- **影子表有过期清理吗？** 设备超过 90 天未上线，影子表数据归档到 MySQL 冷存储，Redis 中删除，设备重新上线时从 MySQL 恢复
+
+---
+
+#### Q30: 影子表下推到设备后，设备执行失败怎么办？有确认机制吗？
+
+**参考回答：**
+
+> 有完整的 **ACK + 重试 + 超时** 机制。影子表属性下推后，iot-broker 为每个属性创建一个待确认记录（pending ACK），设备执行成功后上报 `reported` 值与 `desired` 一致，iot-broker 对比后清除 pending 状态。
+>
+> 如果设备执行失败，设备上报 `reported` 值不等于 `desired`（或上报错误码），iot-broker 会做**有限重试**——间隔 5s/15s/30s 重试 3 次。三次都失败后标记该属性为 `failed`，触发告警通知业务侧（可能是设备硬件故障，如灯泡烧了）。
+>
+> 超时机制：属性下推后 60s 内未收到任何 ACK（设备可能掉线了），标记为 `timeout`，下次设备上线时 iot-broker 重新触发 diff 同步，该属性还在 desired 和 reported 的差量里，自然会被重新下推。
+>
+> 整个流程的状态机是：`pending → acked / failed / timeout`。pending 和 timeout 的属性会持续出现在 diff 结果中，直到设备成功执行或业务侧取消指令。
+
+**追问准备：**
+- **重试会不会导致重复执行？** 会，所以设备端的指令执行必须是幂等的——"设置亮度为 60"执行多次结果一样，不是"亮度+10"
+- **如何知道设备是执行失败还是压根没收到？** 通过 MQTT QoS 1 的 PUBACK 区分：有 PUBACK 说明收到了但执行失败，无 PUBACK 说明没收到（网络问题或掉线）
+
+---
+
+#### Q31: 双通道分离的安全设计怎么做？白名单怎么更新？EMQX 有没有二次鉴权？
+
+**参考回答：**
+
+> 安全设计分三层。第一层是 **iot-router 白名单认证**——设备出厂时烧录唯一 deviceId 和 deviceSecret，首次连接通过 HTTP 请求 iot-router 做身份认证（HMAC 签名校验），认证通过后 iot-router 下发一个有时效性的 Token（JWT，有效期 24 小时）。白名单存储在 Redis Set 中，新设备入网由运营后台审核后加入白名单，吊销时从 Set 中删除即时生效。
+>
+> 第二层是 **EMQX 连接鉴权**——设备使用 Token 作为 MQTT 的 password 字段连接 EMQX。EMQX 配置了 `auth.http` 插件，每次新连接时回调 iot-router 的 `/verify` 接口校验 Token 有效性。Token 过期后设备被断开，需要重新走 HTTP 认证获取新 Token。所以不是"完全信任已连接设备"，而是有二次鉴权。
+>
+> 第三层是 **传输加密**——设备到 EMQX 之间强制 TLS 1.2+（EMQX 配置 `listener.ssl`），证书由平台 CA 签发。EMQX 到 iot-emqx 之间是内网通信，走 mTLS（双向证书认证）。iot-emqx 到下游服务走 gRPC 内置的 TLS。端到端全链路加密。
+
+**追问准备：**
+- **Token 过期续期怎么做？** 设备端 SDK 在 Token 过期前 10 分钟自动发起续期请求（HTTP 调 iot-router），拿到新 Token 后更新 MQTT 连接的 credentials，不断开连接
+- **如何防止设备被仿冒？** deviceSecret 是出厂烧录的，不走网络传输。认证时用 HMAC-SHA256 签名（deviceId + timestamp + nonce），即使抓包也拿不到 Secret
+- **DDoS 怎么防？** iot-router 前面有云厂商的 WAF + 限流网关（按 IP 限流），EMQX 也配置了 `max_conn_rate`（每秒最大新连接数）防止连接风暴
 
 <style>
 .jd-card {
