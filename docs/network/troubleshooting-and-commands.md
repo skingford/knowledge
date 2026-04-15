@@ -3,7 +3,13 @@ title: 网络排障与常用命令
 description: 按 DNS、连通性、端口监听、HTTP、TLS 和抓包分层整理网络排障顺序，并汇总常用命令的典型用法。
 ---
 
+<script setup>
+import InlineSvg from '@docs-components/InlineSvg.vue'
+</script>
+
 # 网络排障与常用命令
+
+<InlineSvg src="/network/troubleshooting-flowchart.svg" alt="网络排障决策流程" />
 
 ## 适合谁看
 
