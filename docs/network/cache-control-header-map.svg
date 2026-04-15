@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="CDN 缓存控制头关系图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="header-map-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="50" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    CDN 缓存控制头关系图
+  </text>
+  <text x="490" y="74" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    不是所有缓存头都在解决同一件事：有的管时长，有的管版本拆分，有的管协商校验
+  </text>
+
+  <rect x="306" y="106" width="368" height="72" rx="20" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="2.2" />
+  <text x="490" y="136" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-engine-text)">
+    源站响应头
+  </text>
+  <text x="490" y="158" text-anchor="middle" font-size="12" fill="var(--d-engine-sub)">
+    浏览器和 CDN 的缓存行为，大多从这里开始
+  </text>
+
+  <line x1="490" y1="178" x2="490" y2="212" stroke="var(--d-arrow)" stroke-width="2.5" marker-end="url(#header-map-arrow)" />
+
+  <rect x="60" y="220" width="200" height="194" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="160" y="252" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-client-text)">
+    `Cache-Control`
+  </text>
+  <text x="160" y="274" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    主缓存策略入口
+  </text>
+  <text x="84" y="306" font-size="11" fill="var(--d-text-sub)">- `max-age`：浏览器缓存多久</text>
+  <text x="84" y="326" font-size="11" fill="var(--d-text-sub)">- `public` / `private`：能否共享缓存</text>
+  <text x="84" y="346" font-size="11" fill="var(--d-text-sub)">- `no-cache`：可存，但使用前要校验</text>
+  <text x="84" y="366" font-size="11" fill="var(--d-text-sub)">- `no-store`：不要存</text>
+  <rect x="84" y="382" width="152" height="20" rx="10" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="160" y="396" text-anchor="middle" font-size="10" fill="var(--d-text)">优先级高于 `Expires`</text>
+
+  <rect x="282" y="220" width="200" height="194" rx="24" fill="var(--d-blue-light)" stroke="var(--d-blue-border)" stroke-width="2.2" />
+  <text x="382" y="252" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-blue)">
+    `s-maxage`
+  </text>
+  <text x="382" y="274" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    共享缓存专用 TTL
+  </text>
+  <text x="306" y="306" font-size="11" fill="var(--d-text-sub)">- 主要影响 CDN、反向代理</text>
+  <text x="306" y="326" font-size="11" fill="var(--d-text-sub)">- 优先级高于 `max-age`</text>
+  <text x="306" y="346" font-size="11" fill="var(--d-text-sub)">- 适合“浏览器短缓存，CDN 长缓存”</text>
+  <rect x="306" y="382" width="152" height="20" rx="10" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="382" y="396" text-anchor="middle" font-size="10" fill="var(--d-text)">控制共享缓存，不直接控制浏览器</text>
+
+  <rect x="504" y="220" width="200" height="194" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-layer-border)" stroke-width="2.2" />
+  <text x="604" y="252" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-layer-title)">
+    `Expires`
+  </text>
+  <text x="604" y="274" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    绝对过期时间
+  </text>
+  <text x="528" y="306" font-size="11" fill="var(--d-text-sub)">- HTTP/1.0 时代的旧写法</text>
+  <text x="528" y="326" font-size="11" fill="var(--d-text-sub)">- 写成一个具体时间点</text>
+  <text x="528" y="346" font-size="11" fill="var(--d-text-sub)">- 时钟不一致时更容易出问题</text>
+  <rect x="528" y="382" width="152" height="20" rx="10" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="604" y="396" text-anchor="middle" font-size="10" fill="var(--d-text)">有 `Cache-Control` 时通常退居次要</text>
+
+  <rect x="726" y="220" width="194" height="194" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-layer-border)" stroke-width="2.2" />
+  <text x="823" y="252" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-layer-title)">
+    `Vary`
+  </text>
+  <text x="823" y="274" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    不是 TTL，而是缓存分片规则
+  </text>
+  <text x="748" y="306" font-size="11" fill="var(--d-text-sub)">- 按 Header 区分不同缓存版本</text>
+  <text x="748" y="326" font-size="11" fill="var(--d-text-sub)">- 常见：`Accept-Encoding`</text>
+  <text x="748" y="346" font-size="11" fill="var(--d-text-sub)">- 也可按语言、设备能力区分</text>
+  <rect x="748" y="382" width="150" height="20" rx="10" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="823" y="396" text-anchor="middle" font-size="10" fill="var(--d-text)">决定“是不是同一份对象”</text>
+
+  <line x1="160" y1="414" x2="160" y2="456" stroke="var(--d-arrow)" stroke-width="2.2" marker-end="url(#header-map-arrow)" />
+  <line x1="382" y1="414" x2="382" y2="456" stroke="var(--d-arrow)" stroke-width="2.2" marker-end="url(#header-map-arrow)" />
+  <line x1="604" y1="414" x2="604" y2="456" stroke="var(--d-arrow)" stroke-width="2.2" marker-end="url(#header-map-arrow)" />
+  <line x1="823" y1="414" x2="823" y2="456" stroke="var(--d-arrow)" stroke-width="2.2" marker-end="url(#header-map-arrow)" />
+
+  <rect x="60" y="470" width="420" height="176" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="270" y="504" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-client-text)">
+    浏览器主要看什么
+  </text>
+  <text x="90" y="536" font-size="11" fill="var(--d-text-sub)">- 先看 `Cache-Control: max-age` 是否还能直接使用</text>
+  <text x="90" y="558" font-size="11" fill="var(--d-text-sub)">- 没有或过期时，再参考 `Expires` 或发起协商请求</text>
+  <text x="90" y="580" font-size="11" fill="var(--d-text-sub)">- `no-store` 基本就是“不要在浏览器里留”</text>
+  <text x="90" y="602" font-size="11" fill="var(--d-text-sub)">- `private` 更偏告诉共享缓存别碰，浏览器仍可缓存</text>
+  <rect x="90" y="616" width="360" height="18" rx="9" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="270" y="629" text-anchor="middle" font-size="10" fill="var(--d-text)">浏览器关心的是“我这个用户现在还能不能直接用这份资源”</text>
+
+  <rect x="500" y="470" width="420" height="176" rx="24" fill="var(--d-blue-light)" stroke="var(--d-blue-border)" stroke-width="2.2" />
+  <text x="710" y="504" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-blue)">
+    CDN / 共享缓存主要看什么
+  </text>
+  <text x="530" y="536" font-size="11" fill="var(--d-text-sub)">- 优先看 `s-maxage`，没有时再退回 `max-age`</text>
+  <text x="530" y="558" font-size="11" fill="var(--d-text-sub)">- 看 `public` / `private` / `no-store` 判断能不能共享缓存</text>
+  <text x="530" y="580" font-size="11" fill="var(--d-text-sub)">- 看 `Vary` 判断要不要拆成多个缓存版本</text>
+  <text x="530" y="602" font-size="11" fill="var(--d-text-sub)">- 过期后会结合 `ETag` / `Last-Modified` 做协商回源</text>
+  <rect x="530" y="616" width="360" height="18" rx="9" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="710" y="629" text-anchor="middle" font-size="10" fill="var(--d-text)">共享缓存关心的是“这份对象能不能共享、共享多久、如何区分版本”</text>
+
+  <rect x="180" y="670" width="620" height="52" rx="18" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="691" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">
+    协商缓存相关头
+  </text>
+  <text x="490" y="710" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">
+    `ETag` / `If-None-Match`、`Last-Modified` / `If-Modified-Since` 主要解决“过期后如何轻量验证对象是否变化”
+  </text>
+</svg>

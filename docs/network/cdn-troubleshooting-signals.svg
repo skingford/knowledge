@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="CDN 线上排障观察点速查图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="trouble-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="50" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    CDN 线上排障观察点速查图
+  </text>
+  <text x="490" y="74" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    先看响应头和链路信号，再决定问题是在 DNS、CDN、回源链路还是源站
+  </text>
+
+  <rect x="50" y="106" width="280" height="264" rx="24" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="190" y="138" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-client-text)">
+    先看哪些 Header
+  </text>
+  <text x="78" y="172" font-size="12" font-weight="700" fill="var(--d-text)">缓存状态</text>
+  <text x="78" y="192" font-size="11" fill="var(--d-text-sub)">- `X-Cache: HIT / MISS / BYPASS`</text>
+  <text x="78" y="212" font-size="11" fill="var(--d-text-sub)">- 厂商头示例：`CF-Cache-Status`、`X-Cache-Remote`</text>
+  <text x="78" y="242" font-size="12" font-weight="700" fill="var(--d-text)">缓存年龄</text>
+  <text x="78" y="262" font-size="11" fill="var(--d-text-sub)">- `Age` 越大，说明对象在共享缓存里停留越久</text>
+  <text x="78" y="282" font-size="11" fill="var(--d-text-sub)">- `Age: 0` 常意味着刚回源或刚写入缓存</text>
+  <text x="78" y="312" font-size="12" font-weight="700" fill="var(--d-text)">链路标识</text>
+  <text x="78" y="332" font-size="11" fill="var(--d-text-sub)">- `Via`、`Server-Timing`、`X-Request-Id`</text>
+  <text x="78" y="352" font-size="11" fill="var(--d-text-sub)">- 用来判断请求是否经过 CDN / 网关，以及慢在哪一跳</text>
+
+  <rect x="350" y="106" width="280" height="264" rx="24" fill="var(--d-blue-light)" stroke="var(--d-blue-border)" stroke-width="2.2" />
+  <text x="490" y="138" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-blue)">
+    再看缓存控制相关头
+  </text>
+  <text x="378" y="172" font-size="12" font-weight="700" fill="var(--d-text)">策略头</text>
+  <text x="378" y="192" font-size="11" fill="var(--d-text-sub)">- `Cache-Control`、`s-maxage`、`Expires`</text>
+  <text x="378" y="212" font-size="11" fill="var(--d-text-sub)">- 不对时，CDN 命中率和浏览器行为都会偏</text>
+  <text x="378" y="242" font-size="12" font-weight="700" fill="var(--d-text)">分片头</text>
+  <text x="378" y="262" font-size="11" fill="var(--d-text-sub)">- `Vary` 过多会把缓存切碎，导致“总是 MISS”</text>
+  <text x="378" y="282" font-size="11" fill="var(--d-text-sub)">- 尤其要警惕按 Cookie / 复杂 Header 分片</text>
+  <text x="378" y="312" font-size="12" font-weight="700" fill="var(--d-text)">校验头</text>
+  <text x="378" y="332" font-size="11" fill="var(--d-text-sub)">- `ETag`、`Last-Modified`</text>
+  <text x="378" y="352" font-size="11" fill="var(--d-text-sub)">- 过期后能不能轻量校验，决定回源成本是否可控</text>
+
+  <rect x="650" y="106" width="280" height="264" rx="24" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="2.2" />
+  <text x="790" y="138" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-engine-text)">
+    最常用验证动作
+  </text>
+  <text x="678" y="172" font-size="12" font-weight="700" fill="var(--d-text)">看响应头</text>
+  <text x="678" y="192" font-size="11" fill="var(--d-text-sub)">- `curl -I https://example.com/file.js`</text>
+  <text x="678" y="222" font-size="12" font-weight="700" fill="var(--d-text)">绕过错误解析</text>
+  <text x="678" y="242" font-size="11" fill="var(--d-text-sub)">- `curl --resolve example.com:443:IP https://example.com`</text>
+  <text x="678" y="272" font-size="12" font-weight="700" fill="var(--d-text)">检查 DNS</text>
+  <text x="678" y="292" font-size="11" fill="var(--d-text-sub)">- `dig example.com` 看解析结果和 TTL</text>
+  <text x="678" y="322" font-size="12" font-weight="700" fill="var(--d-text)">比对直连与走 CDN</text>
+  <text x="678" y="342" font-size="11" fill="var(--d-text-sub)">- 直连快、走 CDN 慢：入口层问题</text>
+  <text x="678" y="362" font-size="11" fill="var(--d-text-sub)">- 直连也慢：源站或应用层问题</text>
+
+  <line x1="190" y1="386" x2="190" y2="420" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#trouble-arrow)" />
+  <line x1="490" y1="386" x2="490" y2="420" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#trouble-arrow)" />
+  <line x1="790" y1="386" x2="790" y2="420" stroke="var(--d-arrow)" stroke-width="2.4" marker-end="url(#trouble-arrow)" />
+
+  <rect x="50" y="434" width="880" height="252" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="466" text-anchor="middle" font-size="18" font-weight="700" fill="var(--d-text)">
+    看到什么信号，优先怀疑什么
+  </text>
+
+  <rect x="76" y="490" width="188" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="170" y="515" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">`X-Cache: MISS` 持续出现</text>
+  <text x="170" y="535" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">先怀疑缓存策略不对</text>
+  <text x="170" y="551" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">或 `Vary` / Query 把对象切碎了</text>
+
+  <rect x="288" y="490" width="188" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="382" y="515" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">`Age` 很小且频繁回 0</text>
+  <text x="382" y="535" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">先怀疑对象频繁失效</text>
+  <text x="382" y="551" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">或多级缓存没真正稳住</text>
+
+  <rect x="500" y="490" width="188" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="594" y="515" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">HIT 但用户仍觉得慢</text>
+  <text x="594" y="535" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">先怀疑边缘节点质量</text>
+  <text x="594" y="551" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">TLS、节点负载或动态接口回源</text>
+
+  <rect x="712" y="490" width="188" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="806" y="515" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">走 CDN 慢，直连实例快</text>
+  <text x="806" y="535" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">优先排入口层</text>
+  <text x="806" y="551" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">DNS / CDN / LB / WAF</text>
+
+  <rect x="182" y="584" width="260" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="312" y="609" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">缓存头看起来对，但仍旧内容</text>
+  <text x="312" y="629" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">优先排浏览器缓存、Service Worker</text>
+  <text x="312" y="645" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">以及多级缓存是否全部失效</text>
+
+  <rect x="538" y="584" width="260" height="72" rx="18" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="668" y="609" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">回源慢但命中策略正确</text>
+  <text x="668" y="629" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">优先排边缘到源站 RTT、带宽、丢包</text>
+  <text x="668" y="645" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">以及源站自身处理耗时</text>
+</svg>

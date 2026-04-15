@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="CDN 命中、未命中与回源流程图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="cdn-flow-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+    <marker id="cdn-flow-green" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-green)" />
+    </marker>
+    <marker id="cdn-flow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-blue)" />
+    </marker>
+    <marker id="cdn-flow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-orange)" />
+    </marker>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="50" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    CDN 命中、未命中与回源流程
+  </text>
+  <text x="490" y="74" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    同一份资源的请求会优先在边缘结束；只有未命中时才逐层向上取数
+  </text>
+
+  <rect x="60" y="104" width="140" height="52" rx="16" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2" />
+  <text x="130" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-client-text)">用户</text>
+  <text x="130" y="145" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">Browser / App</text>
+
+  <rect x="250" y="104" width="180" height="52" rx="16" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2" />
+  <text x="340" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-client-text)">边缘节点 Edge PoP</text>
+  <text x="340" y="145" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">L1 Cache</text>
+
+  <rect x="490" y="104" width="200" height="52" rx="16" fill="var(--d-bg-alt)" stroke="var(--d-layer-border)" stroke-width="2" />
+  <text x="590" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-layer-title)">区域中心 / Origin Shield</text>
+  <text x="590" y="145" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">L2 / Parent Cache</text>
+
+  <rect x="750" y="104" width="160" height="52" rx="16" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="2" />
+  <text x="830" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="var(--d-engine-text)">源站 Origin</text>
+  <text x="830" y="145" text-anchor="middle" font-size="11" fill="var(--d-engine-sub)">最终内容来源</text>
+
+  <line x1="130" y1="156" x2="130" y2="682" stroke="var(--d-border-dash)" stroke-dasharray="6 5" />
+  <line x1="340" y1="156" x2="340" y2="682" stroke="var(--d-border-dash)" stroke-dasharray="6 5" />
+  <line x1="590" y1="156" x2="590" y2="682" stroke="var(--d-border-dash)" stroke-dasharray="6 5" />
+  <line x1="830" y1="156" x2="830" y2="682" stroke="var(--d-border-dash)" stroke-dasharray="6 5" />
+
+  <rect x="50" y="182" width="880" height="138" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <rect x="70" y="200" width="92" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-green)" />
+  <text x="116" y="216" text-anchor="middle" font-size="11" font-weight="700" fill="var(--d-green)">路径 A</text>
+  <text x="190" y="217" font-size="16" font-weight="700" fill="var(--d-text)">边缘命中</text>
+  <text x="190" y="239" font-size="12" fill="var(--d-text-sub)">最理想情况，请求在离用户最近的一跳结束</text>
+
+  <line x1="130" y1="266" x2="340" y2="266" stroke="var(--d-green)" stroke-width="3" marker-end="url(#cdn-flow-green)" />
+  <text x="235" y="256" text-anchor="middle" font-size="11" fill="var(--d-green)">请求资源</text>
+  <line x1="340" y1="292" x2="130" y2="292" stroke="var(--d-green)" stroke-width="3" marker-end="url(#cdn-flow-green)" />
+  <text x="235" y="309" text-anchor="middle" font-size="11" fill="var(--d-green)">缓存命中，直接返回 200</text>
+
+  <rect x="352" y="245" width="110" height="52" rx="14" fill="var(--d-bg)" stroke="var(--d-green)" />
+  <text x="407" y="266" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">Memory / Disk Hit</text>
+  <text x="407" y="285" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">本地缓存可直接响应</text>
+
+  <rect x="50" y="342" width="880" height="154" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <rect x="70" y="360" width="92" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-blue)" />
+  <text x="116" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="var(--d-blue)">路径 B</text>
+  <text x="190" y="377" font-size="16" font-weight="700" fill="var(--d-text)">边缘未命中，上级命中</text>
+  <text x="190" y="399" font-size="12" fill="var(--d-text-sub)">边缘没有对象，但区域中心或 Shield 已有缓存，不需要打到源站</text>
+
+  <line x1="130" y1="426" x2="340" y2="426" stroke="var(--d-blue)" stroke-width="3" marker-end="url(#cdn-flow-blue)" />
+  <line x1="340" y1="444" x2="590" y2="444" stroke="var(--d-blue)" stroke-width="3" marker-end="url(#cdn-flow-blue)" />
+  <line x1="590" y1="462" x2="340" y2="462" stroke="var(--d-blue)" stroke-width="3" marker-end="url(#cdn-flow-blue)" />
+  <line x1="340" y1="480" x2="130" y2="480" stroke="var(--d-blue)" stroke-width="3" marker-end="url(#cdn-flow-blue)" />
+
+  <text x="235" y="416" text-anchor="middle" font-size="11" fill="var(--d-blue)">请求资源</text>
+  <text x="465" y="434" text-anchor="middle" font-size="11" fill="var(--d-blue)">L1 Miss，向上级取数</text>
+  <text x="465" y="452" text-anchor="middle" font-size="11" fill="var(--d-blue)">L2 / Shield Hit</text>
+  <text x="235" y="497" text-anchor="middle" font-size="11" fill="var(--d-blue)">回填边缘缓存后返回用户</text>
+
+  <rect x="610" y="420" width="126" height="48" rx="14" fill="var(--d-bg)" stroke="var(--d-blue)" />
+  <text x="673" y="440" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">Parent Hit</text>
+  <text x="673" y="458" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">减少源站压力</text>
+
+  <rect x="50" y="518" width="880" height="176" rx="24" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <rect x="70" y="536" width="92" height="24" rx="12" fill="var(--d-bg)" stroke="var(--d-orange)" />
+  <text x="116" y="552" text-anchor="middle" font-size="11" font-weight="700" fill="var(--d-orange)">路径 C</text>
+  <text x="190" y="553" font-size="16" font-weight="700" fill="var(--d-text)">多级未命中，真正回源</text>
+  <text x="190" y="575" font-size="12" fill="var(--d-text-sub)">热点资源刚过期时，通常只放行第一个请求回源，其他相同请求挂起等待</text>
+
+  <line x1="130" y1="606" x2="340" y2="606" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+  <line x1="340" y1="624" x2="590" y2="624" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+  <line x1="590" y1="642" x2="830" y2="642" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+  <line x1="830" y1="660" x2="590" y2="660" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+  <line x1="590" y1="678" x2="340" y2="678" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+  <line x1="340" y1="696" x2="130" y2="696" stroke="var(--d-orange)" stroke-width="3" marker-end="url(#cdn-flow-orange)" />
+
+  <text x="235" y="596" text-anchor="middle" font-size="11" fill="var(--d-orange)">请求资源</text>
+  <text x="465" y="614" text-anchor="middle" font-size="11" fill="var(--d-orange)">L1 Miss</text>
+  <text x="710" y="632" text-anchor="middle" font-size="11" fill="var(--d-orange)">L2 Miss，继续回源</text>
+  <text x="710" y="650" text-anchor="middle" font-size="11" fill="var(--d-orange)">源站返回对象</text>
+  <text x="465" y="688" text-anchor="middle" font-size="11" fill="var(--d-orange)">逐层写回缓存</text>
+  <text x="235" y="713" text-anchor="middle" font-size="11" fill="var(--d-orange)">返回用户</text>
+
+  <rect x="364" y="548" width="140" height="52" rx="14" fill="var(--d-bg)" stroke="var(--d-orange)" />
+  <text x="434" y="569" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">Request Collapsing</text>
+  <text x="434" y="588" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">只放行一个回源请求</text>
+
+  <rect x="720" y="546" width="156" height="56" rx="14" fill="var(--d-bg)" stroke="var(--d-engine-border)" />
+  <text x="798" y="568" text-anchor="middle" font-size="12" font-weight="700" fill="var(--d-text)">源站校验 / 拉取内容</text>
+  <text x="798" y="588" text-anchor="middle" font-size="10" fill="var(--d-text-sub)">可能返回 200 或 304</text>
+</svg>

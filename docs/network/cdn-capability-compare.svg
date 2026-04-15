@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" role="img" aria-label="静态加速、动态加速与边缘计算对比图" style="font-family: system-ui, sans-serif;">
+  <defs>
+    <marker id="cap-compare-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--d-arrow)" />
+    </marker>
+  </defs>
+
+  <rect x="18" y="18" width="944" height="724" rx="28" fill="var(--d-bg)" stroke="var(--d-border)" />
+
+  <text x="490" y="50" text-anchor="middle" font-size="24" font-weight="700" fill="var(--d-text)">
+    静态加速 vs 动态加速 vs 边缘计算
+  </text>
+  <text x="490" y="74" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    都发生在“CDN 边缘”，但解决的问题完全不同：缓存、链路优化、边缘执行
+  </text>
+
+  <rect x="56" y="110" width="270" height="452" rx="26" fill="var(--d-client-bg)" stroke="var(--d-client-border)" stroke-width="2.2" />
+  <text x="191" y="144" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-client-text)">
+    静态加速
+  </text>
+  <text x="191" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Static Acceleration
+  </text>
+  <rect x="82" y="190" width="218" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="191" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">核心手段：缓存公共静态内容</text>
+  <text x="82" y="246" font-size="12" font-weight="700" fill="var(--d-text)">最适合处理</text>
+  <text x="82" y="266" font-size="11" fill="var(--d-text-sub)">- JS / CSS / 图片 / 字体 / 视频切片</text>
+  <text x="82" y="286" font-size="11" fill="var(--d-text-sub)">- 带 hash 的前端构建产物</text>
+  <text x="82" y="316" font-size="12" font-weight="700" fill="var(--d-text)">主要收益</text>
+  <text x="82" y="336" font-size="11" fill="var(--d-text-sub)">- 降低用户访问 RTT</text>
+  <text x="82" y="356" font-size="11" fill="var(--d-text-sub)">- 大幅减少源站带宽和连接压力</text>
+  <text x="82" y="376" font-size="11" fill="var(--d-text-sub)">- 热点资源可在边缘直接结束</text>
+  <text x="82" y="406" font-size="12" font-weight="700" fill="var(--d-text)">依赖什么</text>
+  <text x="82" y="426" font-size="11" fill="var(--d-text-sub)">- 合理的 `Cache-Control` / `s-maxage`</text>
+  <text x="82" y="446" font-size="11" fill="var(--d-text-sub)">- 内容版本化、失效和预热策略</text>
+  <text x="82" y="476" font-size="12" font-weight="700" fill="var(--d-text)">最常见误区</text>
+  <text x="82" y="496" font-size="11" fill="var(--d-text-sub)">- 把 HTML 入口页和私有接口也长缓存</text>
+  <text x="82" y="516" font-size="11" fill="var(--d-text-sub)">- 文件不带版本号，发版依赖手工刷新</text>
+
+  <rect x="354" y="110" width="270" height="452" rx="26" fill="var(--d-blue-light)" stroke="var(--d-blue-border)" stroke-width="2.2" />
+  <text x="489" y="144" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-blue)">
+    动态加速
+  </text>
+  <text x="489" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Dynamic Acceleration
+  </text>
+  <rect x="380" y="190" width="218" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="489" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">核心手段：优化边缘到源站链路</text>
+  <text x="380" y="246" font-size="12" font-weight="700" fill="var(--d-text)">最适合处理</text>
+  <text x="380" y="266" font-size="11" fill="var(--d-text-sub)">- API 请求、登录、下单、查询接口</text>
+  <text x="380" y="286" font-size="11" fill="var(--d-text-sub)">- 不能缓存但对时延敏感的动态流量</text>
+  <text x="380" y="316" font-size="12" font-weight="700" fill="var(--d-text)">主要收益</text>
+  <text x="380" y="336" font-size="11" fill="var(--d-text-sub)">- 通过更优链路减少跨网 RTT</text>
+  <text x="380" y="356" font-size="11" fill="var(--d-text-sub)">- 长连接、QUIC、压缩减少协议开销</text>
+  <text x="380" y="376" font-size="11" fill="var(--d-text-sub)">- 降低回源路径上的抖动和丢包影响</text>
+  <text x="380" y="406" font-size="12" font-weight="700" fill="var(--d-text)">依赖什么</text>
+  <text x="380" y="426" font-size="11" fill="var(--d-text-sub)">- 边缘到源站的专有线路或 Overlay Network</text>
+  <text x="380" y="446" font-size="11" fill="var(--d-text-sub)">- 协议复用、链路质量探测、智能调度</text>
+  <text x="380" y="476" font-size="12" font-weight="700" fill="var(--d-text)">最常见误区</text>
+  <text x="380" y="496" font-size="11" fill="var(--d-text-sub)">- 误以为“动态加速 = 把动态接口缓存起来”</text>
+  <text x="380" y="516" font-size="11" fill="var(--d-text-sub)">- 忽略真实瓶颈其实在源站应用层</text>
+
+  <rect x="652" y="110" width="270" height="452" rx="26" fill="var(--d-engine-bg)" stroke="var(--d-engine-border)" stroke-width="2.2" />
+  <text x="787" y="144" text-anchor="middle" font-size="20" font-weight="700" fill="var(--d-engine-text)">
+    边缘计算
+  </text>
+  <text x="787" y="168" text-anchor="middle" font-size="12" fill="var(--d-text-sub)">
+    Edge Computing
+  </text>
+  <rect x="678" y="190" width="218" height="28" rx="14" fill="var(--d-bg)" stroke="var(--d-border)" />
+  <text x="787" y="208" text-anchor="middle" font-size="11" fill="var(--d-text)">核心手段：在边缘直接执行业务逻辑</text>
+  <text x="678" y="246" font-size="12" font-weight="700" fill="var(--d-text)">最适合处理</text>
+  <text x="678" y="266" font-size="11" fill="var(--d-text-sub)">- A/B Testing、鉴权、重写、地区路由</text>
+  <text x="678" y="286" font-size="11" fill="var(--d-text-sub)">- 轻量逻辑前移，不必进入核心应用</text>
+  <text x="678" y="316" font-size="12" font-weight="700" fill="var(--d-text)">主要收益</text>
+  <text x="678" y="336" font-size="11" fill="var(--d-text-sub)">- 提前拦截非法请求</text>
+  <text x="678" y="356" font-size="11" fill="var(--d-text-sub)">- 降低核心应用层流量和计算压力</text>
+  <text x="678" y="376" font-size="11" fill="var(--d-text-sub)">- 更贴近用户做定制化分发</text>
+  <text x="678" y="406" font-size="12" font-weight="700" fill="var(--d-text)">依赖什么</text>
+  <text x="678" y="426" font-size="11" fill="var(--d-text-sub)">- Workers / Functions / Wasm 运行时</text>
+  <text x="678" y="446" font-size="11" fill="var(--d-text-sub)">- 严格的运行时限制和轻量执行模型</text>
+  <text x="678" y="476" font-size="12" font-weight="700" fill="var(--d-text)">最常见误区</text>
+  <text x="678" y="496" font-size="11" fill="var(--d-text-sub)">- 把重业务逻辑或状态写入也放到边缘跑</text>
+  <text x="678" y="516" font-size="11" fill="var(--d-text-sub)">- 低估边缘调试、观测和一致性复杂度</text>
+
+  <rect x="80" y="590" width="820" height="52" rx="18" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="612" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">
+    一句话区分
+  </text>
+  <text x="490" y="631" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">
+    静态加速靠“缓存内容”，动态加速靠“优化链路”，边缘计算靠“前移逻辑”
+  </text>
+
+  <rect x="80" y="662" width="820" height="52" rx="18" fill="var(--d-bg-alt)" stroke="var(--d-border)" />
+  <text x="490" y="684" text-anchor="middle" font-size="14" font-weight="700" fill="var(--d-text)">
+    选型顺序
+  </text>
+  <text x="490" y="703" text-anchor="middle" font-size="11" fill="var(--d-text-sub)">
+    先判断内容能不能缓存；不能缓存再看链路是否可优化；还需要前置逻辑时再考虑边缘计算
+  </text>
+</svg>
