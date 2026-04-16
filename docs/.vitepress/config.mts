@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import * as vueCompilerSfc from 'vue/compiler-sfc'
+import { createMarkdownHighlight } from './config/markdown-highlighter'
 import { localSearchOptions } from './config/search'
 import docsViteConfig from './config/vite'
 import { quickNavLink, sections } from './theme/content-data'
@@ -9,6 +10,18 @@ const siteUrl = 'https://skingford.github.io/knowledge/'
 const siteBase = process.env.VITEPRESS_BASE || (process.env.GITHUB_ACTIONS === 'true' ? '/knowledge/' : '/')
 const voidHtmlTagPattern = /<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)(\s[^<>]*?)?\s*(\/?)>/gi
 const hiddenRouteBase = 'jd/'
+const markdownTheme = {
+  light: 'github-light',
+  dark: 'github-dark',
+} as const
+const markdownLanguageAlias = {
+  just: 'makefile',
+  justfile: 'makefile',
+} as const
+const markdownHighlight = await createMarkdownHighlight({
+  theme: markdownTheme,
+  languageAlias: markdownLanguageAlias,
+})
 
 const hiddenSidebar = {
   '/jd/': [
@@ -111,14 +124,9 @@ export default defineConfig({
   markdown: {
     image: { lazyLoading: true },
     xhtmlOut: true,
-    theme: {
-      light: 'github-light',
-      dark: 'github-dark',
-    },
-    languageAlias: {
-      just: 'makefile',
-      justfile: 'makefile',
-    },
+    theme: markdownTheme,
+    languageAlias: markdownLanguageAlias,
+    highlight: markdownHighlight,
     config(md) {
       const defaultHtmlBlock =
         md.renderer.rules.html_block ??

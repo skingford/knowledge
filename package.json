@@ -1,7 +1,9 @@
 {
   "devDependencies": {
+    "@shikijs/transformers": "^2.5.0",
     "@types/node": "^25.5.0",
     "lightningcss": "^1.32.0",
+    "shiki": "^2.5.0",
     "vitepress": "^1.6.3",
     "vitepress-plugin-tabs": "^0.8.0"
   },
