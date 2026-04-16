@@ -39,7 +39,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 ## 架构全景图
 
-<InlineSvg src="/architecture/distributed-system-design-diagram.svg" alt="分布式系统设计全景架构图" />
+<InlineSvg src="/images/architecture/distributed-system-design-diagram.svg" alt="分布式系统设计全景架构图" />
 
 ## 一、先看分布式系统真正难在哪里
 

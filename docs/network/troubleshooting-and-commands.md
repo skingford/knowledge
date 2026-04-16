@@ -9,7 +9,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 # 网络排障与常用命令
 
-<InlineSvg src="/network/troubleshooting-flowchart.svg" alt="网络排障决策流程" />
+<InlineSvg src="/images/network/troubleshooting-flowchart.svg" alt="网络排障决策流程" />
 
 ## 适合谁看
 

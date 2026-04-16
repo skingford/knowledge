@@ -142,7 +142,7 @@ def is_allowed(key, limit, window_seconds):
 3. 用加权公式估算"最近一个完整窗口"内的请求总数
 4. 如果估算值超过阈值，拒绝请求
 
-<InlineSvg src="/algorithm/sliding-window.svg" alt="滑动窗口计数器示意图" />
+<InlineSvg src="/images/algorithm/sliding-window.svg" alt="滑动窗口计数器示意图" />
 
 #### 加权公式
 
@@ -349,7 +349,7 @@ def is_allowed(key, limit, window_seconds):
 2. **桶以恒定速率流出请求**（处理速率固定）
 3. **桶满则溢出**——新请求被丢弃或返回限流响应
 
-<InlineSvg src="/algorithm/leaky-bucket.svg" alt="漏桶算法示意图" />
+<InlineSvg src="/images/algorithm/leaky-bucket.svg" alt="漏桶算法示意图" />
 
 ### 关键参数
 
@@ -412,7 +412,7 @@ class LeakyBucket:
 2. **桶有最大容量**，满了之后新令牌被丢弃
 3. **每个请求到达时需要消耗一个令牌**——有令牌就放行，没有就拒绝（或排队等待）
 
-<InlineSvg src="/algorithm/token-bucket.svg" alt="令牌桶算法示意图" />
+<InlineSvg src="/images/algorithm/token-bucket.svg" alt="令牌桶算法示意图" />
 
 ### 关键参数
 
@@ -618,7 +618,7 @@ Alibaba Sentinel 的 **LeapArray** 是目前开源社区中滑动窗口最优雅
 
 #### 核心设计
 
-<InlineSvg src="/algorithm/sentinel-leaparray.svg" alt="Sentinel LeapArray 无锁滑动窗口结构" />
+<InlineSvg src="/images/algorithm/sentinel-leaparray.svg" alt="Sentinel LeapArray 无锁滑动窗口结构" />
 
 **数据结构层级**：
 

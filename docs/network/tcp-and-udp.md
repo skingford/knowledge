@@ -46,7 +46,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 ## TCP 连接管理
 
-<InlineSvg src="/network/tcp-handshake.svg" alt="TCP 三次握手与四次挥手" />
+<InlineSvg src="/images/network/tcp-handshake.svg" alt="TCP 三次握手与四次挥手" />
 
 ### 三次握手
 
@@ -91,7 +91,7 @@ TIME_WAIT 的价值主要是两件事：
 
 ## TCP 可靠传输
 
-<InlineSvg src="/network/tcp-reliable-transmission.svg" alt="TCP 可靠传输机制" />
+<InlineSvg src="/images/network/tcp-reliable-transmission.svg" alt="TCP 可靠传输机制" />
 
 TCP 的可靠，不是靠"永远不丢"，而是靠一组机制把不可靠网络尽量收敛成可靠连接：
 

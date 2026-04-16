@@ -38,7 +38,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 ## 先建立一张网络全景图
 
-<InlineSvg src="/network/network-layers.svg" alt="TCP/IP 四层网络模型" />
+<InlineSvg src="/images/network/network-layers.svg" alt="TCP/IP 四层网络模型" />
 
 最值得先记住的不是单个协议，而是网络问题可以按层拆：
 
@@ -66,7 +66,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 ## 一次请求到底经过哪些环节
 
-<InlineSvg src="/network/request-lifecycle.svg" alt="一次 HTTPS 请求完整链路" />
+<InlineSvg src="/images/network/request-lifecycle.svg" alt="一次 HTTPS 请求完整链路" />
 
 假设浏览器访问 `https://example.com/api/orders`，大致会经过：
 

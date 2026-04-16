@@ -138,7 +138,7 @@ import InlineSvg from '@docs-components/InlineSvg.vue'
 
 ## 一条推荐的风控决策链路
 
-<InlineSvg src="/architecture/payment/risk-control.svg" alt="支付风控六层决策链路" />
+<InlineSvg src="/images/architecture/payment/risk-control.svg" alt="支付风控六层决策链路" />
 
 ```
 请求进入

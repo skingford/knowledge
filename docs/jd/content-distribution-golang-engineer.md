@@ -882,7 +882,7 @@ kubectl top pod                   # 查看资源使用
 
 **架构链路：**
 
-<InlineSvg src="/jd/iot-mqtt-architecture.svg" alt="IoT MQTT 消息接入架构链路" />
+<InlineSvg src="/images/jd/iot-mqtt-architecture.svg" alt="IoT MQTT 消息接入架构链路" />
 
 - `Situation`：物联网平台需要接入百万级设备，设备通过 MQTT 协议实时上报状态、接收指令，原有单体架构在 10 万连接时已出现消息堆积和丢失
 - `Task`：设计并落地支撑百万级并发连接的 IoT 消息接入与分发平台
