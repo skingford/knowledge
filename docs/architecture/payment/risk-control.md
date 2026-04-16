@@ -15,7 +15,7 @@ vocabulary:
 ---
 
 <script setup>
-import InlineSvg from '@docs-components/InlineSvg.vue'
+import InlineSvg from '@docs-components/common/InlineSvg.vue'
 </script>
 
 # 支付交易风控设计

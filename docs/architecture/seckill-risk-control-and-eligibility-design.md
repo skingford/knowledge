@@ -125,7 +125,7 @@ description: 围绕活动资格、抢购 Token、黑白名单、行为识别、�
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/seckill-risk-control-and-eligibility-design-mermaid-1.svg" alt="秒杀系统风控、防刷与资格校验设计 - 一条推荐的入口治理链路 图示 1" />
+<img class="mermaid-static" src="/mermaid/seckill-risk-control-and-eligibility-design-mermaid-1.svg" alt="秒杀系统风控、防刷与资格校验设计 - 一条推荐的入口治理链路 图示 1" />
 
 </div>
 

@@ -11,7 +11,7 @@ head:
 
 <script setup>
 import { ref } from 'vue'
-import InlineSvg from '@docs-components/InlineSvg.vue'
+import InlineSvg from '@docs-components/common/InlineSvg.vue'
 
 const expanded = ref(false)
 

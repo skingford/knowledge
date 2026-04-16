@@ -34,7 +34,7 @@ description: 从 CAP、Paxos、时钟回拨、幂等、TCC、事务消息到 Tru
 - [相关阅读](#相关阅读)
 
 <script setup>
-import InlineSvg from '@docs-components/InlineSvg.vue'
+import InlineSvg from '@docs-components/common/InlineSvg.vue'
 </script>
 
 ## 架构全景图

@@ -107,7 +107,7 @@ Outbox 最标准的一条链路可以这样理解：
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/outbox-pattern-design-mermaid-1.svg" alt="Outbox 本地消息表设计实战 - 核心流程怎么走 图示 1" />
+<img class="mermaid-static" src="/mermaid/outbox-pattern-design-mermaid-1.svg" alt="Outbox 本地消息表设计实战 - 核心流程怎么走 图示 1" />
 
 </div>
 

@@ -195,7 +195,7 @@ description: 围绕券模板、领券资格、库存配额、异步发券、核�
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/coupon-claim-system-design-and-comparison-mermaid-1.svg" alt="抢券系统设计专题：与秒杀系统的异同 - 一条推荐的抢券链路 图示 1" />
+<img class="mermaid-static" src="/mermaid/coupon-claim-system-design-and-comparison-mermaid-1.svg" alt="抢券系统设计专题：与秒杀系统的异同 - 一条推荐的抢券链路 图示 1" />
 
 </div>
 

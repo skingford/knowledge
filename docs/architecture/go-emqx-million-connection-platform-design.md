@@ -16,15 +16,6 @@ vocabulary:
   - exhook
 ---
 
-<script setup lang="ts">
-import EmqxPlatformDecisionDiagram from '@docs-components/EmqxPlatformDecisionDiagram.vue'
-import EmqxPlatformOverviewDiagram from '@docs-components/EmqxPlatformOverviewDiagram.vue'
-import EmqxInternalArchDiagram from '@docs-components/EmqxInternalArchDiagram.vue'
-import EmqxMriaDiagram from '@docs-components/EmqxMriaDiagram.vue'
-import EmqxImMessageFlowDiagram from '@docs-components/EmqxImMessageFlowDiagram.vue'
-import EmqxIotDataPipelineDiagram from '@docs-components/EmqxIotDataPipelineDiagram.vue'
-import EmqxAuthChainDiagram from '@docs-components/EmqxAuthChainDiagram.vue'
-</script>
 
 # Go + EMQX 百万长连接平台架构设计
 

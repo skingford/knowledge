@@ -276,7 +276,7 @@ Kafka 的一个天然优势是：
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/delayed-task-solution-comparison-mermaid-1.svg" alt="延时任务方案对比 - 怎么选最合适 图示 1" />
+<img class="mermaid-static" src="/mermaid/delayed-task-solution-comparison-mermaid-1.svg" alt="延时任务方案对比 - 怎么选最合适 图示 1" />
 
 </div>
 

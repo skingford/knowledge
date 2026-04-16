@@ -149,7 +149,7 @@ vocabulary:
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-1.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 1" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-1.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 1" />
 
 </div>
 
@@ -201,7 +201,7 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-2.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 2" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-2.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 2" />
 
 </div>
 
@@ -211,7 +211,7 @@ func (s *PaymentService) HandlePaymentResult(ctx context.Context, orderID string
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-3.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 3" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-3.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 3" />
 
 </div>
 
@@ -270,7 +270,7 @@ func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string,
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-4.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 4" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-4.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 4" />
 
 </div>
 
@@ -280,7 +280,7 @@ func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string,
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-5.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 5" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-5.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 5" />
 
 </div>
 
@@ -293,7 +293,7 @@ func (r *OrderRepo) UpdateStatusWithVersion(ctx context.Context, orderID string,
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-6.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 6" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-6.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 6" />
 
 </div>
 
@@ -347,7 +347,7 @@ func (s *PaymentService) correctToSuccess(ctx context.Context, order *Order, res
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/payment/high-concurrency-notes-mermaid-7.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 7" />
+<img class="mermaid-static" src="/mermaid/payment/high-concurrency-notes-mermaid-7.svg" alt="高并发支付系统专题整理 - 状态机设计 图示 7" />
 
 </div>
 

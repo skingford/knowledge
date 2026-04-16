@@ -65,7 +65,7 @@ description: 从订单、库存、支付、延时任务、Outbox 与补偿出发
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/transaction-system-consistency-overview-mermaid-1.svg" alt="交易系统一致性设计总览 - 先建立一个总框架 图示 1" />
+<img class="mermaid-static" src="/mermaid/transaction-system-consistency-overview-mermaid-1.svg" alt="交易系统一致性设计总览 - 先建立一个总框架 图示 1" />
 
 </div>
 

@@ -17,12 +17,13 @@ const docsViteConfig: UserConfig = {
           if (id.includes('node_modules') && (id.includes('/vue/') || id.includes('/@vue/'))) {
             return 'framework'
           }
-          // Group diagram components by domain for better parallelism and caching
+          // Group diagram components by domain subdirectory for better parallelism and caching
           if (id.includes('/theme/components/')) {
-            if (id.includes('/Go') || id.includes('/go-scheduler/')) return 'diagrams-go'
-            if (id.includes('/Hc') || id.includes('/HighConcurrency')) return 'diagrams-hc'
-            if (id.includes('/MySQL')) return 'diagrams-mysql'
-            if (id.includes('/K8s') || id.includes('/k8s/') || id.includes('/Kafka') || id.includes('/Nginx') || id.includes('/Git') || id.includes('/Redis') || id.includes('/PostgreSQL')) return 'diagrams-infra'
+            if (id.includes('/components/go/')) return 'diagrams-go'
+            if (id.includes('/components/hc/')) return 'diagrams-hc'
+            if (id.includes('/components/mysql/')) return 'diagrams-mysql'
+            if (id.includes('/components/emqx/')) return 'diagrams-emqx'
+            if (id.includes('/components/k8s/') || id.includes('/components/kafka/') || id.includes('/components/infra/') || id.includes('/components/redis/') || id.includes('/components/postgresql/')) return 'diagrams-infra'
           }
         },
       },
@@ -35,9 +36,9 @@ const docsViteConfig: UserConfig = {
     warmup: {
       clientFiles: [
         './docs/.vitepress/theme/index.ts',
-        './docs/.vitepress/theme/components/QuickNav.vue',
-        './docs/.vitepress/theme/components/ClaudeHome.vue',
-        './docs/.vitepress/theme/components/SectionLanding.vue',
+        './docs/.vitepress/theme/components/layout/QuickNav.vue',
+        './docs/.vitepress/theme/components/layout/ClaudeHome.vue',
+        './docs/.vitepress/theme/components/layout/SectionLanding.vue',
         './docs/index.md',
       ],
     },

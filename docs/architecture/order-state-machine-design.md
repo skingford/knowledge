@@ -151,7 +151,7 @@ status = PENDING_PAY / PAID / CANCELLED / FINISHED
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/order-state-machine-design-mermaid-1.svg" alt="订单状态机设计实战 - 合法流转关系怎么定义 图示 1" />
+<img class="mermaid-static" src="/mermaid/order-state-machine-design-mermaid-1.svg" alt="订单状态机设计实战 - 合法流转关系怎么定义 图示 1" />
 
 </div>
 

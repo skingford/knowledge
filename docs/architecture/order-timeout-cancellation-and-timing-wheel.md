@@ -82,7 +82,7 @@ description: 从 30 分钟未支付自动取消切入，系统梳理延时消息
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/order-timeout-cancellation-and-timing-wheel-mermaid-1.svg" alt="订单超时取消与时间轮设计 - 方案怎么选 图示 1" />
+<img class="mermaid-static" src="/mermaid/order-timeout-cancellation-and-timing-wheel-mermaid-1.svg" alt="订单超时取消与时间轮设计 - 方案怎么选 图示 1" />
 
 </div>
 
@@ -174,7 +174,7 @@ description: 从 30 分钟未支付自动取消切入，系统梳理延时消息
 
 <div class="mermaid-svg-wrapper">
 
-<img class="mermaid-static" src="/architecture/order-timeout-cancellation-and-timing-wheel-mermaid-2.svg" alt="订单超时取消与时间轮设计 - 推荐的生产级架构 图示 2" />
+<img class="mermaid-static" src="/mermaid/order-timeout-cancellation-and-timing-wheel-mermaid-2.svg" alt="订单超时取消与时间轮设计 - 推荐的生产级架构 图示 2" />
 
 </div>
 
