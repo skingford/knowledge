@@ -3,25 +3,47 @@ import type { UserConfig } from 'vite'
 
 const docsViteConfig: UserConfig = {
   build: {
+    target: 'es2022',
+    modulePreload: { polyfill: false },
     // Local search index is emitted as a lazy-loaded chunk and is expected to be larger than
     // regular route assets for this knowledge base.
     chunkSizeWarningLimit: 5000,
+    cssMinify: 'lightningcss',
     rollupOptions: {
       output: {
+        compact: true,
+        generatedCode: 'es2015',
         manualChunks(id) {
           if (id.includes('node_modules') && (id.includes('/vue/') || id.includes('/@vue/'))) {
             return 'framework'
+          }
+          // Group diagram components by domain for better parallelism and caching
+          if (id.includes('/theme/components/')) {
+            if (id.includes('/Go') || id.includes('/go-scheduler/')) return 'diagrams-go'
+            if (id.includes('/Hc') || id.includes('/HighConcurrency')) return 'diagrams-hc'
+            if (id.includes('/MySQL')) return 'diagrams-mysql'
+            if (id.includes('/K8s') || id.includes('/k8s/') || id.includes('/Kafka') || id.includes('/Nginx') || id.includes('/Git') || id.includes('/Redis') || id.includes('/PostgreSQL')) return 'diagrams-infra'
           }
         },
       },
     },
   },
+  css: {
+    transformer: 'lightningcss',
+  },
+  server: {
+    warmup: {
+      clientFiles: [
+        './docs/.vitepress/theme/index.ts',
+        './docs/.vitepress/theme/components/QuickNav.vue',
+        './docs/.vitepress/theme/components/ClaudeHome.vue',
+        './docs/.vitepress/theme/components/SectionLanding.vue',
+        './docs/index.md',
+      ],
+    },
+  },
   optimizeDeps: {
-    include: [
-      '@braintree/sanitize-url',
-      'dayjs',
-      'debug',
-    ],
+    include: [],
   },
   resolve: {
     alias: {
