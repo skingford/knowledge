@@ -60,6 +60,7 @@ brew "fd"
 brew "jq"
 brew "lazygit"
 brew "bat"
+brew "mole"
 
 # GUI 应用
 cask "iterm2"
@@ -185,6 +186,7 @@ brew install --cask rectangle
 |------|------|---------|
 | [Ghostty](./ghostty.md) | 现代终端 | `brew install --cask ghostty` |
 | Warp | AI 终端 | `brew install --cask warp` |
+| [Mole](https://github.com/tw93/mole) | Mac 清理与优化，适合做缓存清理、应用残留扫描和系统状态检查 | `brew install mole` |
 | Dash / DevDocs | 离线文档查阅 | `brew install --cask dash` |
 | Bruno | API 调试（开源替代 Postman） | `brew install --cask bruno` |
 | Sourcetree | Git GUI 客户端 | `brew install --cask sourcetree` |

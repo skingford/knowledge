@@ -231,6 +231,26 @@ const categories: Category[] = [
     ],
   },
   {
+    title: "Agent",
+    icon: "workflow",
+    sites: [
+      {
+        name: "Hermes Agent",
+        desc: "Nous Research 的开源个人 Agent，支持持续学习、技能沉淀与跨会话记忆",
+        domain: "hermes-agent.nousresearch.com",
+        fallback: "🧠",
+        url: "https://hermes-agent.nousresearch.com",
+      },
+      {
+        name: "OpenClaw",
+        desc: "把 WhatsApp、Telegram 等聊天应用接到 AI Agent 的个人助理平台",
+        domain: "openclaw.ai",
+        fallback: "🦾",
+        url: "https://openclaw.ai/",
+      },
+    ],
+  },
+  {
     title: "AI 研究工具",
     icon: "research",
     sites: [
@@ -538,6 +558,19 @@ const categories: Category[] = [
         domain: "devdocs.io",
         fallback: "📖",
         url: "https://devdocs.io",
+      },
+    ],
+  },
+  {
+    title: "Mac 工具",
+    icon: "tools",
+    sites: [
+      {
+        name: "Mole",
+        desc: "开源 Mac 清理与优化工具，支持缓存清理、卸载残留扫描和系统状态检查",
+        domain: "github.com",
+        fallback: "🐹",
+        url: "https://github.com/tw93/mole",
       },
     ],
   },
