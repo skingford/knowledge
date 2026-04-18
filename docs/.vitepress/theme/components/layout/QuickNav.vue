@@ -436,6 +436,13 @@ const categories: Category[] = [
     icon: "design",
     sites: [
       {
+        name: "Claude Design",
+        desc: "Anthropic 推出的设计工作台，可生成设计稿、交互原型、演示文稿与单页内容",
+        domain: "claude.ai",
+        fallback: "🪄",
+        url: "https://claude.ai/design",
+      },
+      {
         name: "Stitch",
         desc: "Google 出品的 AI UI 设计工具，适合快速生成界面草图与页面结构",
         domain: "stitch.withgoogle.com",
@@ -558,6 +565,47 @@ const categories: Category[] = [
         domain: "devdocs.io",
         fallback: "📖",
         url: "https://devdocs.io",
+      },
+      {
+        name: "Recompressor",
+        desc: "在线图片压缩与优化工具，支持 PNG、JPG、SVG，并可在浏览器内预览压缩效果",
+        domain: "recompressor.com",
+        fallback: "🗜️",
+        url: "https://recompressor.com/",
+      },
+    ],
+  },
+  {
+    title: "环境管理",
+    icon: "tools",
+    sites: [
+      {
+        name: "nvm",
+        desc: "Node.js 版本管理工具，适合安装、切换和管理多个 Node 版本",
+        domain: "github.com",
+        fallback: "⬢",
+        url: "https://github.com/nvm-sh/nvm",
+      },
+      {
+        name: "fnm",
+        desc: "基于 Rust 的快速 Node.js 版本管理器，启动更快，适合替代 nvm 试用",
+        domain: "github.com",
+        fallback: "🚀",
+        url: "https://github.com/Schniz/fnm",
+      },
+      {
+        name: "g",
+        desc: "Go 环境版本管理工具，支持安装、切换与维护多个 Go 版本",
+        domain: "github.com",
+        fallback: "🛠️",
+        url: "https://github.com/voidint/g",
+      },
+      {
+        name: "uv",
+        desc: "高性能 Python 包与项目管理工具，可统一处理依赖、虚拟环境和 Python 版本",
+        domain: "github.com",
+        fallback: "⚡",
+        url: "https://github.com/astral-sh/uv",
       },
     ],
   },
