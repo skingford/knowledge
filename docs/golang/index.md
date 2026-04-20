@@ -32,6 +32,7 @@ outline: false
 | 想补线上排障 | [Pprof 排障指南](./pprof-troubleshooting-guide.md) | 先从 profile 和 trace 的实操路径开始 |
 | 想看工程边界问题 | [Context 使用边界](./context-usage-boundaries.md) | 适合补服务治理、取消传播和值传递边界 |
 | 想从源码看懂 `context` | [context 包源码精读](./guide/source-reading/context.md) | 适合补取消树、`WithoutCancel` 和 `net/http` 请求生命周期 |
+| 想读 LLM 框架源码（eino） | [Eino 源码阅读总览](./guide/source-reading/eino/index.md) | CloudWeGo eino 框架的结构、图编排与组件体系精读 |
 
 ## 目录结构
 

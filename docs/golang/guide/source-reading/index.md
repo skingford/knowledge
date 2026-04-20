@@ -59,6 +59,20 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 5. [net/http/httputil](./net-httputil.md)：把反向代理、请求转发和调试工具补齐。
 6. [gRPC-Go](./grpc-go.md)：最后把 HTTP/2、拦截器、流式调用迁移到 RPC 视角。
 
+### 路线四：eino LLM 框架源码
+
+适合：想从源码层面读懂 Go 语言 LLM 应用框架设计的人。
+
+1. [Eino 源码阅读总览](./eino/index.md)：先看模块定位、术语约定和阅读顺序。
+2. [架构与仓库结构](./eino/architecture.md)：梳理 eino / eino-ext 双仓布局和包依赖。
+3. [schema：消息与流](./eino/schema.md)：读最底层的 Message 与 StreamReader 抽象。
+4. [components：组件抽象总览](./eino/components-overview.md)：理解 Runnable 与四种交互模式。
+5. [compose：编排总览](./eino/compose-overview.md)：进入 Graph / Chain / Workflow 的心脏。
+6. [Graph：图编排核心](./eino/graph.md) ⭐：必读，节点、边、分支、Compile 全流程。
+7. [Stream：流处理内部](./eino/stream.md)：补上流式场景的自动适配机制。
+8. [Callback：回调机制](./eino/callback.md)：把观测、trace、metrics 串起来。
+9. [从源码提炼的最佳实践](./eino/best-practices.md)：综合收尾。
+
 ## 按主题分组索引
 
 ### Runtime 与调度
@@ -173,6 +187,26 @@ description: 以专家视角精炼剖析 Go 标准库核心包，配 text 图例
 - [`go-redis`](./go-redis.md)
 - [`golang-x-oauth2`](./golang-x-oauth2.md)
 - [`golang-x-text`](./golang-x-text.md)
+
+### Eino LLM 框架
+
+> 钉版本：`github.com/cloudwego/eino@v0.8.10`
+
+- [`eino/`](./eino/index.md) — Eino 源码阅读总览
+- [`eino/architecture`](./eino/architecture.md) — 架构与仓库结构
+- [`eino/schema`](./eino/schema.md) — 消息与流抽象
+- [`eino/components-overview`](./eino/components-overview.md) — 组件抽象与 Runnable
+- [`eino/chatmodel`](./eino/chatmodel.md) / [`eino/chattemplate`](./eino/chattemplate.md) / [`eino/tool`](./eino/tool.md)
+- [`eino/retriever`](./eino/retriever.md) / [`eino/embedding`](./eino/embedding.md) / [`eino/indexer`](./eino/indexer.md) / [`eino/document`](./eino/document.md)
+- [`eino/lambda`](./eino/lambda.md) — 函数式组件
+- [`eino/compose-overview`](./eino/compose-overview.md) — 编排总览
+- [`eino/graph`](./eino/graph.md) ⭐ — 图编排核心
+- [`eino/chain`](./eino/chain.md) / [`eino/workflow`](./eino/workflow.md)
+- [`eino/stream`](./eino/stream.md) — 流处理内部
+- [`eino/callback`](./eino/callback.md) — 回调机制
+- [`eino/type-check`](./eino/type-check.md) / [`eino/state`](./eino/state.md)
+- [`eino/ext-adapters`](./eino/ext-adapters.md) — eino-ext 适配器模式
+- [`eino/best-practices`](./eino/best-practices.md) — 从源码提炼的最佳实践
 
 ### 操作系统、安全与底层边界
 

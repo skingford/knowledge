@@ -16,6 +16,7 @@ search: false
 - ~~Prompt Engineering 实践要点~~ → [Prompt Engineering 实践指南](./prompt-engineering.md)
 - ~~Context Engineering 实践要点~~ → [Context Engineering 实践指南](./context-engineering.md)
 - ~~Harness Engineering 实践要点~~ → [Harness Engineering 实践指南](./harness-engineering.md)
+- ~~Skill 设计与沉淀方法~~ → [Agent Skill 设计与实践](./skill-design-and-practice.md)
 
 ## 优先级高
 
@@ -48,3 +49,4 @@ search: false
 - Agent 学习路径与顺序 → [Agent 学习综合指南](./agent-learning-guide.md)
 - 7 天实操计划 → [7 天 Agent 学习路线](./agent-learning-roadmap.md) + [Day 1-7 详解](./roadmap/day1-what-is-agent.md)
 - 技术栈与工具全景（后端、存储、部署、安全、监控）→ [LLM Agent 必学知识地图](./knowledge-map.md)
+- Skill 设计与团队沉淀 → [Agent Skill 设计与实践](./skill-design-and-practice.md)
