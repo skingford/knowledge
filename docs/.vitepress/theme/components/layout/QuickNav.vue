@@ -576,6 +576,19 @@ const categories: Category[] = [
     ],
   },
   {
+    title: "学习工具",
+    icon: "tools",
+    sites: [
+      {
+        name: "新概念英语 NCE",
+        desc: "新概念英语在线学习与听力练习工具",
+        domain: "nce.ichochy.com",
+        fallback: "🎧",
+        url: "https://nce.ichochy.com/",
+      },
+    ],
+  },
+  {
     title: "环境管理",
     icon: "tools",
     sites: [
