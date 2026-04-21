@@ -1,7 +1,7 @@
 ---
 layout: page
 title: false
-description: AI / Agent 学习入口，覆盖知识地图、综合指南、7 天路线、Tool Calling 与 RAG 工作流。
+description: AI / Agent 学习入口，覆盖知识地图、综合指南、7 天路线、进阶专题、协议治理与落地实践。
 search: false
 aside: false
 outline: false

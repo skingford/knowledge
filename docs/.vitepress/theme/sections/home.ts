@@ -59,7 +59,7 @@ export const learningOverviewTracks = sections.map((section) => ({
 export const learningOverviewGoals = [
   { title: '想先看路线图', href: '/architecture/architect-learning-roadmap', description: '先从架构路线开始，再延伸到 AI 或 Go 的专题。' },
   { title: '想补网络基础', href: '/network/essential-knowledge', description: '从分层模型、TCP/IP、HTTP/HTTPS 到 DNS 和负载均衡，先把网络主线补完整。' },
-  { title: '想快速入门 Agent 开发', href: '/ai/agent-learning-guide', description: '先建立 Agent 全局认知，再展开 Tool Calling 和 RAG。' },
+  { title: '想快速入门 Agent 开发', href: '/ai/agent-learning-guide', description: '先建立 Agent 全局认知，再展开 Tool Calling、RAG、治理与落地实践。' },
   { title: '想强化 Go 高级能力', href: '/golang/guide/source-reading/learning-path', description: '从源码阅读主线切入，再补性能、排障和高频题。' },
   { title: '想系统补 Python 基础', href: '/python/essential-knowledge', description: '从语法、函数、对象模型到工程化和并发，把 Python 基本盘补扎实。' },
   { title: '想系统补 React', href: '/react/react-technical-guide', description: '从组件、状态、Effect 到渲染性能，把 React 主线补完整。' },
@@ -72,7 +72,7 @@ export const learningOverviewGoals = [
 ]
 
 const homeTrackDescriptions: Record<string, string> = {
-  ai: '从 Agent 模式、Tool Calling 到 RAG 与 workflow，把概念、设计和可落地实现串成完整路径。',
+  ai: '从 Agent 模式、Tool Calling 到 RAG、治理、评测和落地实践，把概念、设计与可交付实现串成完整路径。',
   architecture: '围绕系统设计、高并发与分布式治理，构建能复用到真实业务的判断框架与清单。',
   network: '从分层模型、传输层到 HTTP、DNS、CDN 和负载均衡，把网络知识整理成适合工程实践的主线。',
   algorithm: '从分布式共识（Raft / Paxos）到一致性哈希、限流与经典数据结构，把工程高频算法讲透原理和选型。',
@@ -116,7 +116,7 @@ export const homeHighlights = [
   {
     eyebrow: 'AI focus',
     title: 'Agent 学习综合指南',
-    description: '适合先搭整体地图，再逐步展开 Tool Calling、RAG 和 workflow 细节。',
+    description: '适合先搭整体地图，再逐步展开 Tool Calling、RAG、治理和落地实践细节。',
     href: '/ai/agent-learning-guide',
   },
   {

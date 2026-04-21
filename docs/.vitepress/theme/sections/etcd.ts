@@ -1,44 +1,76 @@
 import type { SectionConfig } from './types'
 
 export const etcdSection: SectionConfig = {
-    key: 'etcd',
-    base: '/etcd/',
-    navText: 'Etcd',
-    overviewDescription:
-      '系统整理 Etcd 必须掌握的核心知识，涵盖 Raft、多数派、MVCC revision、Lease/Watch、Txn/CAS、读一致性与生产运维边界。',
-    landing: {
-      eyebrow: 'Etcd',
-      title: 'Etcd 专题',
-      intro:
-        '把 Etcd 从“知道能做注册中心”提升到“理解一致性存储系统”的层面，先抓必须掌握的知识点，再延伸到服务发现、配置中心和高可用场景。',
-      primary: { title: '专题总览', href: '/etcd/', description: '从总览页开始，先建立统一框架。' },
-      secondary: { title: 'RPC、注册发现与配置', href: '/golang/guide/08-rpc-discovery-config', description: '看 Go 场景中的 Etcd 落地。' },
-      scope: [
-        'Raft 与多数派',
-        'MVCC 与 revision',
-        'Lease / TTL / KeepAlive',
-        'Watch 与 compaction',
-        'Txn / CAS / 分布式锁',
-        '线性一致性读写',
-        '备份恢复与运维边界',
-      ],
-      docs: [
-        { title: '专题总览', href: '/etcd/', description: '先建立 Etcd 的定位、核心机制和必须掌握知识点。' },
-        { title: 'RPC、注册发现与配置', href: '/golang/guide/08-rpc-discovery-config', description: '看 Etcd 在服务注册发现和配置中心里的 Go 实战。' },
-        { title: 'PostgreSQL 高可用集群整理', href: '/postgresql/ha-cluster', description: '看 Etcd 在 Patroni + HAProxy 方案中的角色。' },
-      ],
-      order: [
-        '专题总览',
-        'RPC、注册发现与配置',
-        'PostgreSQL 高可用集群整理',
+  key: 'etcd',
+  base: '/etcd/',
+  navText: 'Etcd',
+  overviewDescription:
+    '系统整理 Etcd 必须掌握的核心知识，覆盖一致性定位、Raft 多数派、MVCC revision、Lease / Watch、Txn / CAS、etcdctl 实操、部署与 TLS、故障演练、高频问题口径、源码阅读入口、线性一致性读和生产运维排障。',
+  landing: {
+    eyebrow: 'Etcd',
+    title: 'Etcd 专题',
+    intro:
+      '围绕“关键元数据的一致性存储”这条主线，系统整理 Etcd 的核心机制、典型场景和生产边界。重点不是只会调用 API，而是把 revision、Lease、Watch、Txn、读一致性和运维排障讲成一套统一模型。',
+    primary: { title: '专题总览', href: '/etcd/', description: '先看专题范围、阅读顺序和能力边界。' },
+    secondary: { title: '核心机制', href: '/etcd/technical-guide', description: '先建立 Raft、revision、Lease 和 Watch 的统一框架。' },
+    scope: [
+      'Raft 与多数派',
+      'MVCC 与 revision',
+      'Lease / TTL / KeepAlive',
+      'Watch 与 compaction',
+      'Txn / CAS / 分布式锁',
+      'etcdctl 命令与实验',
+      '单机 / 3 节点部署与 TLS',
+      '故障演练与排障实验',
+      '高频问题与复习口径',
+      '源码阅读与实现链路',
+      '服务注册发现与配置中心',
+      'Leader 选举与幂等更新',
+      '线性一致性读写',
+      '快照恢复与空间治理',
+      '成员替换与故障排障',
+    ],
+    docs: [
+      { title: 'Etcd 专题总览', href: '/etcd/', description: '先建立定位、学习主线、阅读顺序和关联资料。' },
+      { title: 'Etcd 核心机制：Raft、Revision、Lease 与 Watch', href: '/etcd/technical-guide', description: '系统整理一致性基础、MVCC、Lease、Watch 和读语义。' },
+      { title: 'Etcd 场景与模式：注册发现、配置中心、选主与分布式锁', href: '/etcd/scenarios-patterns', description: '把服务治理场景里的常见模式和误区讲清楚。' },
+      { title: 'Etcdctl 常用命令与实验手册', href: '/etcd/etcdctl-commands-and-lab', description: '整理连接模板、KV / Watch / Lease / Txn 和 endpoint / member / snapshot 命令。' },
+      { title: 'Etcd 单机 / 3 节点部署与 TLS 证书实战', href: '/etcd/deployment-and-tls-practice', description: '整理目录规划、配置文件、TLS 证书、systemd 和上线验证顺序。' },
+      { title: 'Etcd 运维与排障：快照恢复、空间治理与故障处理', href: '/etcd/operations-troubleshooting', description: '围绕 snapshot、quota、compaction、defrag、member replace 和 Leader 抖动展开。' },
+      { title: 'Etcd 故障场景演练与排障实验手册', href: '/etcd/failure-drills-and-troubleshooting-lab', description: '整理单节点故障、Leader 切换、NOSPACE、Watch compacted 和恢复演练。' },
+      { title: 'Etcd 必备问题与自检清单', href: '/etcd/essential-questions', description: '按由浅入深整理 Etcd 高频问题与稳定回答口径。' },
+      { title: 'Etcd 源码阅读入口与实现链路', href: '/etcd/source-reading-guide', description: '整理模块地图、阅读顺序和从请求入口到 MVCC / Raft / WAL 的实现链路。' },
+      { title: 'RPC、注册发现与配置', href: '/golang/guide/08-rpc-discovery-config', description: '看 Etcd 在 Go 服务注册发现和配置中心中的落地。' },
+      { title: 'PostgreSQL 高可用集群整理', href: '/postgresql/ha-cluster', description: '看 Etcd 在 Patroni 高可用架构中的角色。' },
+    ],
+    order: [
+      'Etcd 专题总览',
+      'Etcd 核心机制：Raft、Revision、Lease 与 Watch',
+      'Etcd 场景与模式：注册发现、配置中心、选主与分布式锁',
+      'Etcdctl 常用命令与实验手册',
+      'Etcd 单机 / 3 节点部署与 TLS 证书实战',
+      'Etcd 运维与排障：快照恢复、空间治理与故障处理',
+      'Etcd 故障场景演练与排障实验手册',
+      'Etcd 必备问题与自检清单',
+      'Etcd 源码阅读入口与实现链路',
+      'RPC、注册发现与配置',
+      'PostgreSQL 高可用集群整理',
+    ],
+  },
+  sidebar: [
+    {
+      text: '核心入口',
+      items: [
+        { text: '专题总览', link: '/etcd/' },
+        { text: '核心机制', link: '/etcd/technical-guide' },
+        { text: '场景与模式', link: '/etcd/scenarios-patterns' },
+        { text: 'etcdctl 手册', link: '/etcd/etcdctl-commands-and-lab' },
+        { text: '部署与证书', link: '/etcd/deployment-and-tls-practice' },
+        { text: '运维与排障', link: '/etcd/operations-troubleshooting' },
+        { text: '故障演练', link: '/etcd/failure-drills-and-troubleshooting-lab' },
+        { text: '自检清单', link: '/etcd/essential-questions' },
+        { text: '源码阅读', link: '/etcd/source-reading-guide' },
       ],
     },
-    sidebar: [
-      {
-        text: '核心入口',
-        items: [
-          { text: '专题总览', link: '/etcd/' },
-        ],
-      },
-    ],
-  }
+  ],
+}
