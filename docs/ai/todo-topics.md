@@ -38,6 +38,9 @@ search: false
 - ~~不同框架选型对比~~ → [Agent 框架选型对比：LangGraph、LangChain、LlamaIndex、AutoGen、原生 SDK](./framework-selection-and-comparison.md)
 - ~~本地知识库构建实践~~ → [本地知识库构建实践](./local-knowledge-base-practice.md)
 - ~~Agent 能力自检题与案例~~ → [Agent 能力自检题与案例](./agent-self-check-and-cases.md)
+- ~~数据集构建、标注与合成数据~~ → [Agent 数据集构建、标注与合成数据](./dataset-curation-labeling-and-synthetic-data.md)
+- ~~长任务、队列与检查点恢复~~ → [Agent 长任务、队列与检查点恢复](./long-running-agents-queues-and-checkpointing.md)
+- ~~灰度发布、变更管理与回滚~~ → [Agent 灰度发布、变更管理与回滚](./release-strategies-change-management-and-rollbacks.md)
 
 ## 已有文档覆盖的主题
 
@@ -55,6 +58,9 @@ search: false
 - 本地知识库实践 → [本地知识库构建实践](./local-knowledge-base-practice.md)
 - 失败复盘 → [Agent 常见失败案例复盘](./agent-failure-postmortems.md)
 - 能力自检 → [Agent 能力自检题与案例](./agent-self-check-and-cases.md)
+- 数据集与合成数据 → [Agent 数据集构建、标注与合成数据](./dataset-curation-labeling-and-synthetic-data.md)
+- 长任务与恢复 → [Agent 长任务、队列与检查点恢复](./long-running-agents-queues-and-checkpointing.md)
+- 灰度发布与回滚 → [Agent 灰度发布、变更管理与回滚](./release-strategies-change-management-and-rollbacks.md)
 - Memory / 状态管理 → [Agent Memory 设计与状态管理](./memory-design-and-state-management.md)
 - Multi-Agent / Handoff → [Multi-Agent、Handoff 与路由边界](./multi-agent-handoff-and-routing.md)
 - 可观测性 / 回放 → [Agent 可观测性、回放与故障复盘](./observability-replay-and-incident-review.md)

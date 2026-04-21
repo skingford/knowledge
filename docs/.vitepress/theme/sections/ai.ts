@@ -5,12 +5,12 @@ export const aiSection: SectionConfig = {
   base: '/ai/',
   navText: 'Agent',
   overviewDescription:
-    '适合希望系统入门并继续深入 Agent 和 LLM 应用开发的工程师，覆盖 Agent、Tool Calling、RAG、workflow，以及 Memory、Eval、Multi-Agent、知识系统设计、协议治理、运行优化和产品化落地。',
+    '适合希望系统入门并继续深入 Agent 和 LLM 应用开发的工程师，覆盖 Agent、Tool Calling、RAG、workflow，以及 Memory、Eval、Multi-Agent、知识系统设计、协议治理、运行优化、数据闭环和生产交付。',
   landing: {
     eyebrow: 'Agent',
     title: 'Agent 方向',
     intro:
-      '从 Agent 模式、Tool Calling、RAG 到 workflow 设计，再延伸到 Memory、Eval、Multi-Agent 与可观测性，把零散资料收敛成一条更适合工程师持续推进的学习路径。',
+      '从 Agent 模式、Tool Calling、RAG 到 workflow 设计，再延伸到 Memory、Eval、Multi-Agent、可观测性、数据闭环与生产交付，把零散资料收敛成一条更适合工程师持续推进的学习路径。',
     primary: { title: '知识地图', href: '/ai/knowledge-map', description: '先建立全局地图。' },
     secondary: { title: '综合指南', href: '/ai/agent-learning-guide', description: '再进入系统学习。' },
     scope: [
@@ -25,6 +25,7 @@ export const aiSection: SectionConfig = {
       '知识系统与向量检索选型',
       '协议、治理与成本控制',
       '实验、人工接管与运行优化',
+      '数据闭环、长任务与灰度交付',
       '框架选型与产品化落地',
       'LLM 基础与学习路径',
     ],
@@ -47,6 +48,9 @@ export const aiSection: SectionConfig = {
       { title: 'Prompt 版本化、实验与回滚', href: '/ai/prompt-versioning-experiments-and-rollbacks', description: '讲清 prompt/context/tool/workflow 如何一起版本化，以及 A/B、影子流量和回滚怎么做。' },
       { title: 'Human-in-the-loop、人工接管与升级策略', href: '/ai/human-in-the-loop-and-escalation', description: '讲清人工接管、审批、人工校对、人工终审和交接包的边界。' },
       { title: 'Agent 缓存、延迟与吞吐优化', href: '/ai/caching-latency-and-throughput-optimization', description: '讲清缓存、上下文压缩、并发设计、流式输出和高频路径优化顺序。' },
+      { title: 'Agent 数据集构建、标注与合成数据', href: '/ai/dataset-curation-labeling-and-synthetic-data', description: '讲清真实样本沉淀、标注规范、合成数据边界、数据集版本化和线上回流。' },
+      { title: 'Agent 长任务、队列与检查点恢复', href: '/ai/long-running-agents-queues-and-checkpointing', description: '讲清异步任务、队列、worker、幂等、检查点、补偿和人工恢复。' },
+      { title: 'Agent 灰度发布、变更管理与回滚', href: '/ai/release-strategies-change-management-and-rollbacks', description: '讲清 Agent 变更包、影子流量、灰度策略、发布闸门和整包回滚。' },
       { title: 'Agent 产品化 Checklist', href: '/ai/agent-productization-checklist', description: '从权限、评测、回放、预算、灰度和运营反馈看 Agent 上线清单。' },
       { title: 'Agent 框架选型对比：LangGraph、LangChain、LlamaIndex、AutoGen、原生 SDK', href: '/ai/framework-selection-and-comparison', description: '按任务形状、控制流、RAG 比重和团队可控性看框架选型。' },
       { title: '本地知识库构建实践', href: '/ai/local-knowledge-base-practice', description: '讲清本地文档知识库的清洗、切块、元信息、索引更新和评测闭环。' },
@@ -79,6 +83,9 @@ export const aiSection: SectionConfig = {
       'Prompt 版本化、实验与回滚',
       'Human-in-the-loop、人工接管与升级策略',
       'Agent 缓存、延迟与吞吐优化',
+      'Agent 数据集构建、标注与合成数据',
+      'Agent 长任务、队列与检查点恢复',
+      'Agent 灰度发布、变更管理与回滚',
       'Agent 产品化 Checklist',
       'Agent 框架选型对比：LangGraph、LangChain、LlamaIndex、AutoGen、原生 SDK',
       '本地知识库构建实践',
@@ -136,6 +143,14 @@ export const aiSection: SectionConfig = {
         { text: 'Prompt 实验', link: '/ai/prompt-versioning-experiments-and-rollbacks' },
         { text: '人工接管', link: '/ai/human-in-the-loop-and-escalation' },
         { text: '缓存与延迟', link: '/ai/caching-latency-and-throughput-optimization' },
+      ],
+    },
+    {
+      text: '数据与交付',
+      items: [
+        { text: '数据集与合成数据', link: '/ai/dataset-curation-labeling-and-synthetic-data' },
+        { text: '长任务与队列', link: '/ai/long-running-agents-queues-and-checkpointing' },
+        { text: '灰度与回滚', link: '/ai/release-strategies-change-management-and-rollbacks' },
       ],
     },
     {
