@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 500" width="100%" style="max-width:880px;font-family:'trebuchet ms',verdana,arial,sans-serif">
+  <defs>
+    <marker id="m3-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+  <style>
+    .title{font-size:18px;fill:#333;font-weight:bold}
+    .cluster{fill:#fafafa;stroke:#bbb;stroke-width:1}
+    .cluster-label{font-size:13px;fill:#555;font-weight:bold}
+    .node rect{fill:#eee;stroke:#999;stroke-width:1}
+    .node text{font-size:13px;fill:#000;text-anchor:middle;dominant-baseline:middle}
+    .edge{stroke:#666;fill:none;stroke-width:1.2}
+    .hook rect{fill:#fff4e6;stroke:#c88a3a}
+    .model rect{fill:#eef4ff;stroke:#4a86c8}
+    .mcp rect{fill:#f3eaff;stroke:#8c6fc2}
+    .note{font-size:12px;fill:#777;text-anchor:middle}
+  </style>
+
+  <text x="440" y="28" class="title" text-anchor="middle">Claude Code 架构：Tool Use + Hooks + Skills + Sub-agents + MCP</text>
+
+  <!-- 顶：CLI Shell -->
+  <rect class="cluster" x="20" y="58" width="840" height="56" rx="6"/>
+  <text x="440" y="78" class="cluster-label" text-anchor="middle">CLI Shell / TUI（Terminal · VS Code · Cursor · Windsurf）</text>
+  <g class="node">
+    <rect x="360" y="82" width="160" height="24" rx="4" style="fill:#f5f5f5"/><text x="440" y="95" style="font-size:12px">User Prompt / Slash Command</text>
+  </g>
+
+  <!-- 中核：Model + Tool Use -->
+  <g class="node model">
+    <rect x="340" y="140" width="200" height="70" rx="6"/>
+    <text x="440" y="167">Claude Model</text>
+    <text x="440" y="188" style="font-size:11px;fill:#2f5ea0">Opus 4.7 / Sonnet / Haiku</text>
+  </g>
+
+  <!-- Hooks 环绕 -->
+  <rect class="cluster hook" x="20" y="140" width="240" height="70" rx="6" style="fill:#fff4e6;stroke:#c88a3a"/>
+  <text x="140" y="162" class="cluster-label" text-anchor="middle" style="fill:#7a5a22">Hooks</text>
+  <g class="node hook">
+    <rect x="40" y="172" width="100" height="28" rx="4"/><text x="90" y="186" style="font-size:11px">PreToolUse</text>
+    <rect x="150" y="172" width="100" height="28" rx="4"/><text x="200" y="186" style="font-size:11px">PostToolUse</text>
+  </g>
+
+  <rect class="cluster hook" x="620" y="140" width="240" height="70" rx="6" style="fill:#fff4e6;stroke:#c88a3a"/>
+  <text x="740" y="162" class="cluster-label" text-anchor="middle" style="fill:#7a5a22">Permissions</text>
+  <g class="node hook">
+    <rect x="640" y="172" width="70" height="28" rx="4"/><text x="675" y="186" style="font-size:11px">allow</text>
+    <rect x="720" y="172" width="60" height="28" rx="4"/><text x="750" y="186" style="font-size:11px">ask</text>
+    <rect x="790" y="172" width="60" height="28" rx="4"/><text x="820" y="186" style="font-size:11px">deny</text>
+  </g>
+
+  <!-- Tool Use 工具族 -->
+  <rect class="cluster" x="20" y="240" width="840" height="90" rx="6"/>
+  <text x="440" y="260" class="cluster-label" text-anchor="middle">Tool Use</text>
+  <g class="node">
+    <rect x="40" y="272" width="100" height="44" rx="4"/><text x="90" y="294">Bash</text>
+    <rect x="150" y="272" width="100" height="44" rx="4"/><text x="200" y="294">Read/Edit/Write</text>
+    <rect x="260" y="272" width="100" height="44" rx="4"/><text x="310" y="294">Grep/Glob</text>
+    <rect x="370" y="272" width="100" height="44" rx="4"/><text x="420" y="294">Agent</text>
+    <rect x="480" y="272" width="100" height="44" rx="4"/><text x="530" y="294">WebFetch/Search</text>
+    <rect x="590" y="272" width="100" height="44" rx="4"/><text x="640" y="294">Task/Plan</text>
+    <rect x="700" y="272" width="140" height="44" rx="4"/><text x="770" y="294">Skill（/slash）</text>
+  </g>
+
+  <!-- 底：Skills / Sub-agents / MCP -->
+  <rect class="cluster" x="20" y="360" width="260" height="110" rx="6"/>
+  <text x="150" y="380" class="cluster-label" text-anchor="middle">Skills</text>
+  <g class="node">
+    <rect x="40" y="390" width="220" height="32" rx="4"/><text x="150" y="406" style="font-size:12px">/ecc:plan · /ecc:code-review …</text>
+    <rect x="40" y="428" width="220" height="32" rx="4"/><text x="150" y="444" style="font-size:12px">插件市场（ECC / 自建）</text>
+  </g>
+
+  <rect class="cluster" x="300" y="360" width="260" height="110" rx="6"/>
+  <text x="430" y="380" class="cluster-label" text-anchor="middle">Sub-agents（300+）</text>
+  <g class="node">
+    <rect x="320" y="390" width="220" height="32" rx="4"/><text x="430" y="406" style="font-size:12px">Plan · Explore · Code Reviewer</text>
+    <rect x="320" y="428" width="220" height="32" rx="4"/><text x="430" y="444" style="font-size:12px">Security · SRE · Architect …</text>
+  </g>
+
+  <rect class="cluster mcp" x="580" y="360" width="280" height="110" rx="6" style="fill:#f3eaff;stroke:#8c6fc2"/>
+  <text x="720" y="380" class="cluster-label" text-anchor="middle" style="fill:#5e3e99">MCP Servers</text>
+  <g class="node mcp">
+    <rect x="600" y="390" width="240" height="32" rx="4"/><text x="720" y="406" style="font-size:12px">GitHub · Context7 · Playwright</text>
+    <rect x="600" y="428" width="240" height="32" rx="4"/><text x="720" y="444" style="font-size:12px">Memory Graph · Exa · …</text>
+  </g>
+
+  <!-- Edges -->
+  <path class="edge" d="M440 114 L440 140" marker-end="url(#m3-arrow)"/>
+  <path class="edge" d="M340 175 L260 175" marker-end="url(#m3-arrow)"/>
+  <path class="edge" d="M540 175 L620 175" marker-end="url(#m3-arrow)"/>
+  <path class="edge" d="M440 210 L440 240" marker-end="url(#m3-arrow)"/>
+
+  <path class="edge" d="M420 316 L420 345 L150 345 L150 360" marker-end="url(#m3-arrow)"/>
+  <path class="edge" d="M440 316 L440 345 L430 360" marker-end="url(#m3-arrow)"/>
+  <path class="edge" d="M460 316 L460 345 L720 345 L720 360" marker-end="url(#m3-arrow)"/>
+
+  <text x="440" y="490" class="note">Hooks 拦截每次 Tool Use，Permissions 决定放行，Sub-agents 与 MCP 扩展能力边界</text>
+</svg>

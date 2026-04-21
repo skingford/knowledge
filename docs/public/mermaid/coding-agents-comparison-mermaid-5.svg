@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="100%" style="max-width:960px;font-family:'trebuchet ms',verdana,arial,sans-serif">
+  <style>
+    .title{font-size:18px;fill:#333;font-weight:bold}
+    .col-head{font-size:15px;fill:#222;font-weight:bold;text-anchor:middle}
+    .row-head{font-size:13px;fill:#555;font-weight:bold}
+    .cell{font-size:12px;fill:#000;text-anchor:middle;dominant-baseline:middle}
+    .cell-strong{font-weight:bold;fill:#1a4a80}
+    .grid{fill:none;stroke:#ccc;stroke-width:1}
+    .col-bg-1{fill:#f7f1e6}
+    .col-bg-2{fill:#eef7ee}
+    .col-bg-3{fill:#eef4ff}
+    .col-bg-4{fill:#fdecec}
+    .row-bg{fill:#fafafa}
+    .note{font-size:12px;fill:#777;text-anchor:middle}
+    .strength{fill:#2c672c;font-weight:bold}
+    .weakness{fill:#8a3232}
+  </style>
+
+  <text x="480" y="30" class="title" text-anchor="middle">四者并列对比：扩展 · 权限 · 记忆 · 观测</text>
+
+  <!-- Column backgrounds -->
+  <rect class="col-bg-1" x="200" y="60" width="180" height="420"/>
+  <rect class="col-bg-2" x="380" y="60" width="180" height="420"/>
+  <rect class="col-bg-3" x="560" y="60" width="180" height="420"/>
+  <rect class="col-bg-4" x="740" y="60" width="180" height="420"/>
+
+  <!-- Row backgrounds alt -->
+  <rect class="row-bg" x="40" y="170" width="880" height="80"/>
+  <rect class="row-bg" x="40" y="330" width="880" height="80"/>
+
+  <!-- Column headers -->
+  <text x="290" y="90" class="col-head">OpenClaw</text>
+  <text x="290" y="108" class="cell" style="fill:#7a5a22">个人助手 · 多通道</text>
+
+  <text x="470" y="90" class="col-head">Hermes-Agent</text>
+  <text x="470" y="108" class="cell" style="fill:#2c672c">自进化 · 三层记忆</text>
+
+  <text x="650" y="90" class="col-head">Claude Code</text>
+  <text x="650" y="108" class="cell" style="fill:#2f5ea0">CLI · Hooks + MCP</text>
+
+  <text x="830" y="90" class="col-head">Codex</text>
+  <text x="830" y="108" class="cell" style="fill:#8a3232">CLI · 沙箱 + 审批</text>
+
+  <!-- Row: 扩展机制 -->
+  <text x="50" y="150" class="row-head">扩展机制</text>
+  <text x="290" y="140" class="cell cell-strong">SOUL.md + Skills</text>
+  <text x="290" y="158" class="cell">文件化 · 社区 13K+</text>
+  <text x="470" y="140" class="cell cell-strong">Skills + 学习闭环</text>
+  <text x="470" y="158" class="cell">自动沉淀 SKILL.md</text>
+  <text x="650" y="140" class="cell cell-strong">多层组合</text>
+  <text x="650" y="150" class="cell">Hooks · Skills · Subagents</text>
+  <text x="650" y="163" class="cell">+ MCP · 插件市场</text>
+  <text x="830" y="140" class="cell cell-strong">AGENTS.md + 插件市场</text>
+  <text x="830" y="158" class="cell">跨 repo / 本地源</text>
+
+  <!-- Row: 权限模型 -->
+  <text x="50" y="215" class="row-head">权限模型</text>
+  <text x="290" y="205" class="cell weakness">较弱</text>
+  <text x="290" y="223" class="cell">skill 级配置</text>
+  <text x="290" y="238" class="cell" style="font-size:11px">CVE 爬坡中</text>
+  <text x="470" y="205" class="cell weakness">较弱</text>
+  <text x="470" y="223" class="cell">依赖运行环境</text>
+  <text x="470" y="238" class="cell" style="font-size:11px">无统一沙箱</text>
+  <text x="650" y="205" class="cell strength">成熟</text>
+  <text x="650" y="223" class="cell">allow / ask / deny</text>
+  <text x="650" y="238" class="cell" style="font-size:11px">Hooks 全流程拦截</text>
+  <text x="830" y="205" class="cell strength">最成熟</text>
+  <text x="830" y="223" class="cell">三档审批 + 沙箱</text>
+  <text x="830" y="238" class="cell" style="font-size:11px">deny-read glob</text>
+
+  <!-- Row: 记忆 -->
+  <text x="50" y="295" class="row-head">记忆 / 上下文</text>
+  <text x="290" y="285" class="cell">memory-lancedb</text>
+  <text x="290" y="303" class="cell">本地 / 云端对象存储</text>
+  <text x="470" y="285" class="cell strength">三层 + Honcho</text>
+  <text x="470" y="303" class="cell">skill 库规模与 context 解耦</text>
+  <text x="650" y="285" class="cell">CLAUDE.md + memory</text>
+  <text x="650" y="303" class="cell">MCP · 会话压缩</text>
+  <text x="830" y="285" class="cell">AGENTS.md + Plan Mode</text>
+  <text x="830" y="303" class="cell">规划 / 实施上下文分离</text>
+
+  <!-- Row: 可观测性 -->
+  <text x="50" y="375" class="row-head">可观测性</text>
+  <text x="290" y="365" class="cell">Gateway 日志</text>
+  <text x="290" y="383" class="cell">插件监控 UI</text>
+  <text x="470" y="365" class="cell">任务轨迹</text>
+  <text x="470" y="383" class="cell">skill 沉淀记录</text>
+  <text x="650" y="365" class="cell strength">完整 trace + replay</text>
+  <text x="650" y="383" class="cell">Hooks 拦截可审计</text>
+  <text x="830" y="365" class="cell">执行日志 + Plan 可视化</text>
+  <text x="830" y="383" class="cell">上下文占用指标</text>
+
+  <!-- Row: 典型场景 -->
+  <text x="50" y="455" class="row-head">典型场景</text>
+  <text x="290" y="445" class="cell">个人多通道助理</text>
+  <text x="290" y="463" class="cell">日常 / 家用</text>
+  <text x="470" y="445" class="cell">长期使用</text>
+  <text x="470" y="463" class="cell">研究型任务</text>
+  <text x="650" y="445" class="cell">团队重度编程</text>
+  <text x="650" y="463" class="cell">协作 + 审计</text>
+  <text x="830" y="445" class="cell">合规企业</text>
+  <text x="830" y="463" class="cell">自托管 / 开源路线</text>
+
+  <!-- Grid lines -->
+  <line class="grid" x1="40" y1="110" x2="920" y2="110"/>
+  <line class="grid" x1="40" y1="170" x2="920" y2="170"/>
+  <line class="grid" x1="40" y1="250" x2="920" y2="250"/>
+  <line class="grid" x1="40" y1="330" x2="920" y2="330"/>
+  <line class="grid" x1="40" y1="410" x2="920" y2="410"/>
+  <line class="grid" x1="40" y1="480" x2="920" y2="480"/>
+  <line class="grid" x1="200" y1="60" x2="200" y2="480"/>
+  <line class="grid" x1="380" y1="60" x2="380" y2="480"/>
+  <line class="grid" x1="560" y1="60" x2="560" y2="480"/>
+  <line class="grid" x1="740" y1="60" x2="740" y2="480"/>
+  <line class="grid" x1="920" y1="60" x2="920" y2="480"/>
+  <line class="grid" x1="40" y1="60" x2="40" y2="480"/>
+  <line class="grid" x1="40" y1="60" x2="920" y2="60"/>
+
+  <text x="480" y="505" class="note">四行扫视：行是维度、列是产品；颜色越偏绿成熟度越高、越偏红代价越高</text>
+</svg>

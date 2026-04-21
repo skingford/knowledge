@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 460" width="100%" style="max-width:880px;font-family:'trebuchet ms',verdana,arial,sans-serif">
+  <defs>
+    <marker id="m1-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+  <style>
+    .title{font-size:18px;fill:#333;font-weight:bold}
+    .cluster{fill:#fafafa;stroke:#bbb;stroke-width:1}
+    .cluster-label{font-size:13px;fill:#555}
+    .node rect{fill:#eee;stroke:#999;stroke-width:1}
+    .node text{font-size:14px;fill:#000;text-anchor:middle;dominant-baseline:middle}
+    .edge{stroke:#666;fill:none;stroke-width:1.2}
+    .note{font-size:12px;fill:#777;text-anchor:middle}
+    .accent rect{fill:#e8f1ff;stroke:#4a86c8}
+  </style>
+
+  <text x="440" y="28" class="title" text-anchor="middle">OpenClaw 架构：多通道接入 + Persona + Skills 库</text>
+
+  <!-- 左：用户通道 -->
+  <rect class="cluster" x="20" y="60" width="200" height="340" rx="6"/>
+  <text x="120" y="82" class="cluster-label" text-anchor="middle">Messaging Channels</text>
+  <g class="node">
+    <rect x="40" y="100" width="160" height="36" rx="4"/><text x="120" y="120">WhatsApp / Telegram</text>
+    <rect x="40" y="148" width="160" height="36" rx="4"/><text x="120" y="168">Slack / Discord</text>
+    <rect x="40" y="196" width="160" height="36" rx="4"/><text x="120" y="216">iMessage / Signal</text>
+    <rect x="40" y="244" width="160" height="36" rx="4"/><text x="120" y="264">Feishu / WeCom</text>
+    <rect x="40" y="292" width="160" height="36" rx="4"/><text x="120" y="312">Matrix / IRC / Web</text>
+    <rect x="40" y="340" width="160" height="36" rx="4"/><text x="120" y="360">…24+ 通道</text>
+  </g>
+
+  <!-- 中：Gateway 控制面 -->
+  <rect class="cluster accent" x="260" y="60" width="260" height="340" rx="6" style="fill:#eef4ff;stroke:#4a86c8"/>
+  <text x="390" y="82" class="cluster-label" text-anchor="middle" style="fill:#2f5ea0;font-weight:bold">Gateway（控制面）</text>
+  <g class="node accent">
+    <rect x="280" y="100" width="220" height="48" rx="4"/><text x="390" y="124">Router / Session</text>
+    <rect x="280" y="160" width="220" height="48" rx="4"/><text x="390" y="184">SOUL.md · IDENTITY.md</text>
+    <rect x="280" y="220" width="220" height="48" rx="4"/><text x="390" y="244">AGENTS.md（Persona 规则）</text>
+    <rect x="280" y="280" width="220" height="48" rx="4"/><text x="390" y="304">Model Adapter（Claude/GPT/Gemini/Ollama）</text>
+    <rect x="280" y="340" width="220" height="48" rx="4"/><text x="390" y="364">Canvas / Voice</text>
+  </g>
+
+  <!-- 右上：Skills -->
+  <rect class="cluster" x="560" y="60" width="300" height="160" rx="6"/>
+  <text x="710" y="82" class="cluster-label" text-anchor="middle">Skills 库（~/.openclaw/…/skills）</text>
+  <g class="node">
+    <rect x="580" y="100" width="260" height="36" rx="4"/><text x="710" y="120">SKILL.md（社区 13K+ skill）</text>
+    <rect x="580" y="148" width="260" height="36" rx="4"/><text x="710" y="168">Lobster 工作流宏</text>
+    <rect x="580" y="196" width="260" height="20" rx="4" style="fill:#f5f5f5"/><text x="710" y="207" style="font-size:12px">持久化于文件系统</text>
+  </g>
+
+  <!-- 右下：Tools & Memory -->
+  <rect class="cluster" x="560" y="240" width="300" height="160" rx="6"/>
+  <text x="710" y="262" class="cluster-label" text-anchor="middle">Tools / Plugins / Memory</text>
+  <g class="node">
+    <rect x="580" y="280" width="260" height="36" rx="4"/><text x="710" y="300">Google / Anthropic / Copilot Emb.</text>
+    <rect x="580" y="328" width="260" height="36" rx="4"/><text x="710" y="348">memory-lancedb（本地 / 云端）</text>
+  </g>
+
+  <!-- Edges -->
+  <path class="edge" d="M220 118 Q250 118 278 124" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M220 166 Q250 166 278 184" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M220 214 Q250 214 278 244" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M220 262 Q250 262 278 304" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M220 310 Q250 310 278 364" marker-end="url(#m1-arrow)"/>
+
+  <path class="edge" d="M500 140 Q540 130 580 120" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M500 184 Q540 170 580 160" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M500 304 Q540 300 580 300" marker-end="url(#m1-arrow)"/>
+  <path class="edge" d="M500 364 Q540 355 580 348" marker-end="url(#m1-arrow)"/>
+
+  <text x="440" y="440" class="note">SOUL.md 定义人格，Gateway 统一路由，Skills 以文件沉淀，Tools/Memory 可插拔</text>
+</svg>

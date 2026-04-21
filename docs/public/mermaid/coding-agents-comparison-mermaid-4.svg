@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" width="100%" style="max-width:880px;font-family:'trebuchet ms',verdana,arial,sans-serif">
+  <defs>
+    <marker id="m4-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#666"/>
+    </marker>
+    <marker id="m4-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#c05a5a"/>
+    </marker>
+  </defs>
+  <style>
+    .title{font-size:18px;fill:#333;font-weight:bold}
+    .cluster{fill:#fafafa;stroke:#bbb;stroke-width:1}
+    .cluster-label{font-size:13px;fill:#555;font-weight:bold}
+    .node rect{fill:#eee;stroke:#999;stroke-width:1}
+    .node text{font-size:13px;fill:#000;text-anchor:middle;dominant-baseline:middle}
+    .edge{stroke:#666;fill:none;stroke-width:1.2}
+    .edge-gate{stroke:#c05a5a;fill:none;stroke-width:1.6}
+    .gate rect{fill:#fdecec;stroke:#c05a5a}
+    .sandbox rect{fill:#eef7ee;stroke:#5aa05a}
+    .plan rect{fill:#eef4ff;stroke:#4a86c8}
+    .note{font-size:12px;fill:#777;text-anchor:middle}
+  </style>
+
+  <text x="440" y="28" class="title" text-anchor="middle">Codex CLI 架构：Approval Gate + Sandbox + Plan Mode</text>
+
+  <!-- 顶：CLI -->
+  <rect class="cluster" x="20" y="58" width="840" height="56" rx="6"/>
+  <text x="440" y="78" class="cluster-label" text-anchor="middle">Codex CLI / TUI（Rust，跨平台；codex exec 隔离执行）</text>
+  <g class="node">
+    <rect x="320" y="82" width="240" height="24" rx="4" style="fill:#f5f5f5"/><text x="440" y="95" style="font-size:12px">User Prompt · AGENTS.md 注入</text>
+  </g>
+
+  <!-- 左中：Plan Mode -->
+  <rect class="cluster plan" x="20" y="140" width="240" height="130" rx="6" style="fill:#eef4ff;stroke:#4a86c8"/>
+  <text x="140" y="160" class="cluster-label" text-anchor="middle" style="fill:#2f5ea0">Plan Mode</text>
+  <g class="node plan">
+    <rect x="40" y="172" width="200" height="38" rx="4"/><text x="140" y="191">新上下文开始规划</text>
+    <rect x="40" y="218" width="200" height="38" rx="4"/><text x="140" y="237">上下文占用可视化</text>
+  </g>
+
+  <!-- 中：Approval Gate -->
+  <rect class="cluster gate" x="300" y="140" width="280" height="130" rx="6" style="fill:#fdecec;stroke:#c05a5a"/>
+  <text x="440" y="160" class="cluster-label" text-anchor="middle" style="fill:#8a3232">Approval Gate</text>
+  <g class="node gate">
+    <rect x="320" y="172" width="80" height="38" rx="4"/><text x="360" y="191" style="font-size:12px">suggest</text>
+    <rect x="410" y="172" width="80" height="38" rx="4"/><text x="450" y="191" style="font-size:12px">auto-edit</text>
+    <rect x="500" y="172" width="70" height="38" rx="4"/><text x="535" y="191" style="font-size:12px">full-auto</text>
+    <rect x="320" y="218" width="250" height="38" rx="4"/><text x="445" y="237" style="font-size:12px">写操作强制确认（可配置）</text>
+  </g>
+
+  <!-- 右：Sandbox -->
+  <rect class="cluster sandbox" x="620" y="140" width="240" height="130" rx="6" style="fill:#eef7ee;stroke:#5aa05a"/>
+  <text x="740" y="160" class="cluster-label" text-anchor="middle" style="fill:#2c672c">Sandbox</text>
+  <g class="node sandbox">
+    <rect x="640" y="172" width="200" height="38" rx="4"/><text x="740" y="191" style="font-size:12px">macOS sandbox-exec</text>
+    <rect x="640" y="218" width="200" height="38" rx="4"/><text x="740" y="237" style="font-size:12px">Linux Landlock · Windows</text>
+  </g>
+
+  <!-- 底：Marketplace + AGENTS.md + Git -->
+  <rect class="cluster" x="20" y="300" width="260" height="140" rx="6"/>
+  <text x="150" y="320" class="cluster-label" text-anchor="middle">AGENTS.md 上下文</text>
+  <g class="node">
+    <rect x="40" y="334" width="220" height="36" rx="4"/><text x="150" y="352" style="font-size:12px">项目级 Agent 规则</text>
+    <rect x="40" y="378" width="220" height="36" rx="4"/><text x="150" y="396" style="font-size:12px">类似 CLAUDE.md 的主源</text>
+  </g>
+
+  <rect class="cluster" x="300" y="300" width="280" height="140" rx="6"/>
+  <text x="440" y="320" class="cluster-label" text-anchor="middle">Plugin Marketplace（v0.123）</text>
+  <g class="node">
+    <rect x="320" y="334" width="240" height="36" rx="4"/><text x="440" y="352" style="font-size:12px">tabbed 浏览 · inline 开关</text>
+    <rect x="320" y="378" width="240" height="36" rx="4"/><text x="440" y="396" style="font-size:12px">跨 repo / 本地插件源</text>
+  </g>
+
+  <rect class="cluster sandbox" x="600" y="300" width="260" height="140" rx="6" style="fill:#eef7ee;stroke:#5aa05a"/>
+  <text x="730" y="320" class="cluster-label" text-anchor="middle" style="fill:#2c672c">Filesystem Policy</text>
+  <g class="node sandbox">
+    <rect x="620" y="334" width="220" height="36" rx="4"/><text x="730" y="352" style="font-size:12px">deny-read glob 策略</text>
+    <rect x="620" y="378" width="220" height="36" rx="4"/><text x="730" y="396" style="font-size:12px">工作区隔离 · git worktree</text>
+  </g>
+
+  <!-- Edges -->
+  <path class="edge" d="M440 114 L440 140" marker-end="url(#m4-arrow)"/>
+  <path class="edge" d="M260 205 L300 205" marker-end="url(#m4-arrow)"/>
+  <path class="edge-gate" d="M580 205 L620 205" marker-end="url(#m4-arrow-red)"/>
+
+  <path class="edge" d="M140 270 L140 300" marker-end="url(#m4-arrow)"/>
+  <path class="edge" d="M440 270 L440 300" marker-end="url(#m4-arrow)"/>
+  <path class="edge" d="M740 270 L730 300" marker-end="url(#m4-arrow)"/>
+
+  <text x="440" y="468" class="note">Approval Gate 决定是否放行，Sandbox 兜底，Plan Mode 分离规划与实施上下文</text>
+</svg>

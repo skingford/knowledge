@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" width="100%" style="max-width:880px;font-family:'trebuchet ms',verdana,arial,sans-serif">
+  <defs>
+    <marker id="m2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#666"/>
+    </marker>
+    <marker id="m2-arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3a7cc2"/>
+    </marker>
+  </defs>
+  <style>
+    .title{font-size:18px;fill:#333;font-weight:bold}
+    .cluster{fill:#fafafa;stroke:#bbb;stroke-width:1}
+    .cluster-label{font-size:13px;fill:#555}
+    .node rect{fill:#eee;stroke:#999;stroke-width:1}
+    .node text{font-size:14px;fill:#000;text-anchor:middle;dominant-baseline:middle}
+    .edge{stroke:#666;fill:none;stroke-width:1.2}
+    .edge-loop{stroke:#3a7cc2;fill:none;stroke-width:1.6;stroke-dasharray:6 3}
+    .note{font-size:12px;fill:#777;text-anchor:middle}
+    .accent rect{fill:#eef7ee;stroke:#5aa05a}
+  </style>
+
+  <text x="440" y="28" class="title" text-anchor="middle">Hermes-Agent 架构：Planner-Executor 闭环 + 三层记忆</text>
+
+  <!-- 顶：入口 -->
+  <rect class="cluster" x="20" y="60" width="840" height="60" rx="6"/>
+  <text x="440" y="82" class="cluster-label" text-anchor="middle">Gateway（CLI · Telegram · Discord · Slack · WhatsApp · Signal · Matrix · Feishu · iMessage bridge …）</text>
+  <g class="node">
+    <rect x="380" y="88" width="120" height="24" rx="4" style="fill:#f5f5f5"/><text x="440" y="101" style="font-size:12px">User Input</text>
+  </g>
+
+  <!-- 中：闭环三节点 -->
+  <g class="node accent">
+    <rect x="100" y="160" width="180" height="60" rx="6"/><text x="190" y="190">Planner</text>
+    <rect x="100" y="157" width="180" height="16" rx="4" style="fill:#d6ead6;stroke:#5aa05a"/>
+    <text x="190" y="169" style="font-size:11px;fill:#2c672c">规划多步任务</text>
+  </g>
+  <g class="node accent">
+    <rect x="350" y="160" width="180" height="60" rx="6"/><text x="440" y="190">Executor</text>
+    <rect x="350" y="157" width="180" height="16" rx="4" style="fill:#d6ead6;stroke:#5aa05a"/>
+    <text x="440" y="169" style="font-size:11px;fill:#2c672c">执行工具 / 代码</text>
+  </g>
+  <g class="node accent">
+    <rect x="600" y="160" width="180" height="60" rx="6"/><text x="690" y="190">Observation</text>
+    <rect x="600" y="157" width="180" height="16" rx="4" style="fill:#d6ead6;stroke:#5aa05a"/>
+    <text x="690" y="169" style="font-size:11px;fill:#2c672c">结果反馈与判断</text>
+  </g>
+
+  <!-- 闭环箭头 -->
+  <path class="edge-loop" d="M280 190 L350 190" marker-end="url(#m2-arrow-blue)"/>
+  <path class="edge-loop" d="M530 190 L600 190" marker-end="url(#m2-arrow-blue)"/>
+  <path class="edge-loop" d="M690 220 C690 260, 190 260, 190 220" marker-end="url(#m2-arrow-blue)"/>
+  <text x="440" y="255" class="note" style="fill:#3a7cc2">Self-Improving Loop：任务完成后自动沉淀 skill</text>
+
+  <!-- 底：三层记忆 + Honcho -->
+  <rect class="cluster" x="20" y="300" width="840" height="140" rx="6"/>
+  <text x="440" y="322" class="cluster-label" text-anchor="middle">Three-Layer Memory + Honcho</text>
+  <g class="node">
+    <rect x="50" y="340" width="190" height="80" rx="4"/>
+    <text x="145" y="365">Session Archive</text>
+    <text x="145" y="385" style="font-size:12px;fill:#555">SQLite + FTS</text>
+    <text x="145" y="405" style="font-size:12px;fill:#555">LLM 摘要后注入</text>
+  </g>
+  <g class="node">
+    <rect x="260" y="340" width="190" height="80" rx="4"/>
+    <text x="355" y="365">Skill Files</text>
+    <text x="355" y="385" style="font-size:12px;fill:#555">默认仅加载名称+简介</text>
+    <text x="355" y="405" style="font-size:12px;fill:#555">按需拉全文</text>
+  </g>
+  <g class="node">
+    <rect x="470" y="340" width="190" height="80" rx="4"/>
+    <text x="565" y="365">Closed Learning Loop</text>
+    <text x="565" y="385" style="font-size:12px;fill:#555">自动生成 SKILL.md</text>
+    <text x="565" y="405" style="font-size:12px;fill:#555">后续同类任务 -40% 耗时</text>
+  </g>
+  <g class="node">
+    <rect x="680" y="340" width="150" height="80" rx="4" style="fill:#fff4e6;stroke:#c88a3a"/>
+    <text x="755" y="365">Honcho（可选）</text>
+    <text x="755" y="385" style="font-size:12px;fill:#7a5a22">用户偏好建模</text>
+    <text x="755" y="405" style="font-size:12px;fill:#7a5a22">跨 session 累积</text>
+  </g>
+
+  <!-- Top -> Planner -->
+  <path class="edge" d="M440 120 L440 160" marker-end="url(#m2-arrow)"/>
+
+  <!-- Executor 调 Skill Files -->
+  <path class="edge" d="M440 220 L440 260 L355 260 L355 340" marker-end="url(#m2-arrow)"/>
+  <!-- Observation -> Session Archive -->
+  <path class="edge" d="M690 220 L690 260 L145 260 L145 340" marker-end="url(#m2-arrow)"/>
+  <!-- Learning Loop 回写 skill -->
+  <path class="edge" d="M565 340 L565 280 L440 250" marker-end="url(#m2-arrow)"/>
+
+  <text x="440" y="468" class="note">三层记忆 + Honcho：context 成本与 skill 数量解耦</text>
+</svg>
