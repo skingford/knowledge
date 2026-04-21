@@ -26,11 +26,20 @@ const markdownHighlight = await createMarkdownHighlight({
 const hiddenSidebar = {
   '/jd/': [
     {
-      text: 'JD 模块',
+      text: 'JD 岗位',
       items: [
         { text: '模块首页', link: '/jd/' },
         { text: 'Go 架构师', link: '/jd/senior-golang-architect-overseas' },
         { text: 'Go 资深工程师', link: '/jd/content-distribution-golang-engineer' },
+      ],
+    },
+    {
+      text: '提示词分类',
+      items: [
+        { text: '提示词总览', link: '/jd/prompts/' },
+        { text: '算法笔试助手', link: '/jd/prompts/go-algorithm-written-test-assistant-prompt' },
+        { text: '面试回答优化器', link: '/jd/prompts/go-backend-interview-answer-optimizer-prompt' },
+        { text: '面试模拟问答', link: '/jd/prompts/interview-mock-qa-prompt' },
       ],
     },
   ],

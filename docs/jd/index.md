@@ -19,3 +19,10 @@ head:
 
 - [高级 Golang 开发工程师 / 架构师 JD](./senior-golang-architect-overseas.md)
 - [内容分发平台 高级 Golang 开发工程师 JD](./content-distribution-golang-engineer.md)
+
+## 提示词分类
+
+- [提示词总览](./prompts/index.md)
+- [Go 算法笔试助手提示词](./prompts/go-algorithm-written-test-assistant-prompt.md)
+- [Go 后端面试回答优化器提示词](./prompts/go-backend-interview-answer-optimizer-prompt.md)
+- [面试模拟问答提示词](./prompts/interview-mock-qa-prompt.md)

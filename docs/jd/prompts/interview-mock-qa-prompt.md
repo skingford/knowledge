@@ -1,4 +1,15 @@
-# 面试模拟问答
+---
+title: 面试模拟问答提示词
+description: 用于生成面试模拟问答的提示词模板，强调第一人称口语回答、具体技术细节和追问准备。
+search: false
+lastUpdated: false
+head:
+  - - meta
+    - name: robots
+      content: noindex, nofollow, noarchive
+---
+
+# 面试模拟问答提示词
 
 这个文档的"参考回答"格式是一个面试模拟问答，每个 Q 由三部分组成：
 
