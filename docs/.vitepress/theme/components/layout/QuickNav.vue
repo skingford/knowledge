@@ -429,6 +429,27 @@ const categories: Category[] = [
         fallback: "🏛️",
         url: "https://github.com/ashishps1/awesome-system-design-resources",
       },
+      {
+        name: "system-design-notes",
+        desc: "《System Design Interview》读书笔记整理",
+        domain: "github.com",
+        fallback: "📝",
+        url: "https://github.com/liquidslr/system-design-notes",
+      },
+      {
+        name: "interview-company-wise-problems",
+        desc: "按公司整理的 LeetCode 面试题单",
+        domain: "github.com",
+        fallback: "🏢",
+        url: "https://github.com/liquidslr/interview-company-wise-problems",
+      },
+      {
+        name: "leetcode-master",
+        desc: "《代码随想录》LeetCode 刷题攻略",
+        domain: "github.com",
+        fallback: "📚",
+        url: "https://github.com/youngyangyang04/leetcode-master",
+      },
     ],
   },
   {
