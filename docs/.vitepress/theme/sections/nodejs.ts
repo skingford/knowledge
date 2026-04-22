@@ -5,12 +5,12 @@ export const nodejsSection: SectionConfig = {
   base: '/nodejs/',
   navText: 'Node.js',
   overviewDescription:
-    '适合希望系统补齐 Node.js 服务端能力的工程师，重点覆盖事件循环、模块系统、高并发治理、配置治理、Secrets 与凭证轮换、可观测性、监控告警与压测演练、导出与大结果集治理、Feature Flag 与运行时治理、Webhook 与回调边界、数据库边界、测试工程化，以及 NestJS 与后台任务实践。',
+    '适合希望系统补齐 Node.js 服务端能力的工程师，按「运行时基础 / 高并发与性能 / 一致性与幂等 / 异步与数据 / 工程化与运维 / Web 框架 / 源码专题」分组组织，从应用层逐步下沉到 libuv、V8 与 C++ Binding 源码，覆盖事件循环、模块系统、高并发治理、配置治理、Secrets 与凭证轮换、可观测性、监控告警与压测演练、导出与大结果集治理、Feature Flag 与运行时治理、Webhook 与回调边界、数据库边界、测试工程化，以及 NestJS 与后台任务实践。',
   landing: {
     eyebrow: 'Node.js',
     title: 'Node.js 专题',
     intro:
-      '把 Node.js 从“会跑一个脚本”提升到“能解释运行时、能定位性能问题、能设计高并发方案、能治理 Secrets 与凭证轮换、能做监控告警与压测演练、能治理导出与大结果集、能落地 Feature Flag 与运行时开关、能守住 Webhook 与回调边界、能落地 NestJS 与后台任务工程实践”的层面，先建立服务端对象模型，再进入模块拆分、流量治理、测试治理、异步任务和部署主线。',
+      '把 Node.js 从"会跑一个脚本"提升到"能解释运行时、能定位性能问题、能设计高并发方案、能治理 Secrets 与凭证轮换、能做监控告警与压测演练、能治理导出与大结果集、能落地 Feature Flag 与运行时开关、能守住 Webhook 与回调边界、能落地 NestJS 与后台任务工程实践"的层面，再从应用层下沉到 libuv、V8、Worker Threads 与 C++ Binding 源码视角，把"为什么这样治理"与"底层如何实现"连成同一张知识地图。',
     primary: { title: '专题总览', href: '/nodejs/', description: '先看 Node.js 服务端能力地图和阅读顺序。' },
     secondary: { title: 'NestJS 实战指南', href: '/nodejs/nestjs-practice-guide', description: '从模块分层到测试部署，系统补齐 NestJS 工程落地方法。' },
     scope: [
@@ -29,6 +29,7 @@ export const nodejsSection: SectionConfig = {
       'DTO、校验、鉴权与数据库事务',
       '队列、定时任务与异步处理',
       '测试、发布与优雅退出',
+      'libuv / V8 / C++ Binding / Worker Threads 源码视角',
     ],
     docs: [
       { title: 'Node.js 专题总览', href: '/nodejs/', description: '先看服务端主线和推荐阅读顺序。' },
@@ -42,16 +43,19 @@ export const nodejsSection: SectionConfig = {
       { title: 'Node.js Webhook、回调与签名实践', href: '/nodejs/webhook-and-callback-practice', description: '围绕验签、重放防护、重复回调与异步解耦展开。' },
       { title: 'Node.js 秒杀 / 抢券系统实践', href: '/nodejs/seckill-and-coupon-claim-system-practice', description: '围绕资格校验、削峰、预扣减、异步排队与结果查询展开。' },
       { title: 'Node.js 幂等、状态机与 Outbox 实践', href: '/nodejs/idempotency-state-machine-and-outbox-practice', description: '围绕重复请求、状态推进、Outbox 与异步补偿展开。' },
+      { title: 'Node.js 数据库、事务与 ORM 实践', href: '/nodejs/database-transaction-and-orm-practice', description: '系统整理连接管理、事务边界、Repository 分层和 ORM 取舍。' },
+      { title: 'Node.js 队列、定时任务与 Worker 实战', href: '/nodejs/queue-scheduler-and-worker-practice', description: '把异步任务、重试、幂等、死信、定时调度和优雅关闭的工程边界收成一页。' },
+      { title: 'Node.js 导出、报表与大结果集实践', href: '/nodejs/export-report-and-large-result-practice', description: '围绕异步导出、流式读取、对象存储交付与清理回收展开。' },
       { title: 'Node.js 测试、Mock 与工程化实践', href: '/nodejs/testing-mock-and-engineering-practice', description: '整理项目结构、测试分层、Mock 策略与发布基线。' },
       { title: 'Node.js 配置、日志与可观测性', href: '/nodejs/config-logging-tracing-and-observability-practice', description: '把配置收口、结构化日志、trace 与指标观测整理成一条线。' },
       { title: 'Node.js 监控、告警与压测演练实践', href: '/nodejs/monitoring-alerting-and-pressure-drill-practice', description: '围绕 runtime 指标、告警分级、压测建模与故障演练展开。' },
       { title: 'Node.js Feature Flag 与灰度实践', href: '/nodejs/feature-flag-and-runtime-governance-practice', description: '围绕运行时开关分层、灰度放量、kill switch 与回退降级展开。' },
       { title: 'Node.js Secrets、密钥与凭证轮换实践', href: '/nodejs/secret-management-and-credential-rotation-practice', description: '围绕运行时注入、脱敏、轮换与外部凭证管理展开。' },
-      { title: 'Node.js 数据库、事务与 ORM 实践', href: '/nodejs/database-transaction-and-orm-practice', description: '系统整理连接管理、事务边界、Repository 分层和 ORM 取舍。' },
-      { title: 'Node.js 队列、定时任务与 Worker 实战', href: '/nodejs/queue-scheduler-and-worker-practice', description: '把异步任务、重试、幂等、死信、定时调度和优雅关闭的工程边界收成一页。' },
-      { title: 'Node.js 导出、报表与大结果集实践', href: '/nodejs/export-report-and-large-result-practice', description: '围绕异步导出、流式读取、对象存储交付与清理回收展开。' },
       { title: 'Express / Fastify 服务实践', href: '/nodejs/express-fastify-web-service-practice', description: '围绕路由、中间件、错误处理、分层与部署边界展开。' },
       { title: 'NestJS 实战指南', href: '/nodejs/nestjs-practice-guide', description: '整理项目结构、请求链路、数据边界与测试部署实践。' },
+      { title: '源码剖析：libuv 事件循环与线程池', href: '/nodejs/source-libuv-event-loop-and-thread-pool', description: '从 uv_run 入口逐阶段走读事件循环、线程池与 nextTick/microtask 的 C++ 落点。' },
+      { title: '源码剖析：I/O 多路复用与 net/http Binding', href: '/nodejs/source-io-multiplexing-and-net-http-binding', description: '讲清 epoll/kqueue/IOCP 抽象、TCP 到 JS 回调的完整调用栈与 llhttp 解析器接入。' },
+      { title: '源码剖析：Worker Threads 与 V8 Isolate', href: '/nodejs/source-worker-threads-and-v8-isolate', description: '从 Isolate/Context/Environment 三层模型到 MessagePort、transferList、SharedArrayBuffer 实现。' },
     ],
     order: [
       'Node.js 专题总览',
@@ -65,16 +69,19 @@ export const nodejsSection: SectionConfig = {
       'Node.js Webhook、回调与签名实践',
       'Node.js 秒杀 / 抢券系统实践',
       'Node.js 幂等、状态机与 Outbox 实践',
+      'Node.js 数据库、事务与 ORM 实践',
+      'Node.js 队列、定时任务与 Worker 实战',
+      'Node.js 导出、报表与大结果集实践',
       'Node.js 测试、Mock 与工程化实践',
       'Node.js 配置、日志与可观测性',
       'Node.js 监控、告警与压测演练实践',
       'Node.js Feature Flag 与灰度实践',
       'Node.js Secrets、密钥与凭证轮换实践',
-      'Node.js 数据库、事务与 ORM 实践',
-      'Node.js 队列、定时任务与 Worker 实战',
-      'Node.js 导出、报表与大结果集实践',
       'Express / Fastify 服务实践',
       'NestJS 实战指南',
+      '源码剖析：libuv 事件循环与线程池',
+      '源码剖析：I/O 多路复用与 net/http Binding',
+      '源码剖析：Worker Threads 与 V8 Isolate',
     ],
   },
   sidebar: [
@@ -82,26 +89,64 @@ export const nodejsSection: SectionConfig = {
       text: '核心入口',
       items: [
         { text: '专题总览', link: '/nodejs/' },
+      ],
+    },
+    {
+      text: '运行时基础',
+      items: [
         { text: '模块系统', link: '/nodejs/module-system-esm-commonjs-and-monorepo-boundaries' },
         { text: '事件循环', link: '/nodejs/runtime-event-loop-and-performance-troubleshooting' },
-        { text: '高并发', link: '/nodejs/high-concurrency-solution-practice' },
+      ],
+    },
+    {
+      text: '高并发与性能',
+      items: [
+        { text: '高并发方案', link: '/nodejs/high-concurrency-solution-practice' },
         { text: '缓存一致', link: '/nodejs/cache-hotkey-and-consistency-practice' },
         { text: 'Redis 实战', link: '/nodejs/redis-client-pipeline-and-lua-practice' },
         { text: '限流保护', link: '/nodejs/rate-limit-timeout-and-overload-protection-practice' },
+      ],
+    },
+    {
+      text: '一致性与幂等',
+      items: [
         { text: '重试熔断', link: '/nodejs/http-client-retry-circuit-breaker-and-backoff-practice' },
         { text: 'Webhook 回调', link: '/nodejs/webhook-and-callback-practice' },
         { text: '秒杀抢券', link: '/nodejs/seckill-and-coupon-claim-system-practice' },
         { text: '幂等状态', link: '/nodejs/idempotency-state-machine-and-outbox-practice' },
+      ],
+    },
+    {
+      text: '异步与数据',
+      items: [
+        { text: '数据库事务', link: '/nodejs/database-transaction-and-orm-practice' },
+        { text: '队列任务', link: '/nodejs/queue-scheduler-and-worker-practice' },
+        { text: '导出报表', link: '/nodejs/export-report-and-large-result-practice' },
+      ],
+    },
+    {
+      text: '工程化与运维',
+      items: [
         { text: '测试工程', link: '/nodejs/testing-mock-and-engineering-practice' },
         { text: '配置观测', link: '/nodejs/config-logging-tracing-and-observability-practice' },
         { text: '监控压测', link: '/nodejs/monitoring-alerting-and-pressure-drill-practice' },
         { text: '运行时开关', link: '/nodejs/feature-flag-and-runtime-governance-practice' },
         { text: 'Secrets 轮换', link: '/nodejs/secret-management-and-credential-rotation-practice' },
-        { text: '数据库事务', link: '/nodejs/database-transaction-and-orm-practice' },
-        { text: '队列任务', link: '/nodejs/queue-scheduler-and-worker-practice' },
-        { text: '导出报表', link: '/nodejs/export-report-and-large-result-practice' },
-        { text: 'Web 服务', link: '/nodejs/express-fastify-web-service-practice' },
+      ],
+    },
+    {
+      text: 'Web 框架',
+      items: [
+        { text: 'Express / Fastify', link: '/nodejs/express-fastify-web-service-practice' },
         { text: 'NestJS', link: '/nodejs/nestjs-practice-guide' },
+      ],
+    },
+    {
+      text: '源码专题',
+      items: [
+        { text: 'libuv 事件循环与线程池', link: '/nodejs/source-libuv-event-loop-and-thread-pool' },
+        { text: 'I/O 多路复用与 net/http Binding', link: '/nodejs/source-io-multiplexing-and-net-http-binding' },
+        { text: 'Worker Threads 与 V8 Isolate', link: '/nodejs/source-worker-threads-and-v8-isolate' },
       ],
     },
   ],
