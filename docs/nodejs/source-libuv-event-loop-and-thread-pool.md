@@ -463,5 +463,7 @@ libuv: 进入 uv__run_check / 下一轮
 ## 下一步
 
 - 想继续看"I/O 多路复用到底怎么把 socket 事件转成 JS 回调"，读 [I/O 多路复用与 net/http 底层 Binding](./source-io-multiplexing-and-net-http-binding.md)
+- 想看"JS 回调进 V8 之后那几行代码是怎么跑到 CPU 上的"，读 [V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md)
+- 想看"V8 怎么管内存、为什么 Full GC 会让 p99 抖"，读 [V8 内存布局与分代 GC](./source-v8-memory-and-gc.md)
 - 想继续看"Worker Threads 在 V8 层怎么隔离"，读 [Worker Threads、V8 Isolate 与 C++ 层交互](./source-worker-threads-and-v8-isolate.md)
 - 想回到应用层看"线上事件循环延迟怎么排"，回到 [Node.js 运行时、事件循环与性能排障](./runtime-event-loop-and-performance-troubleshooting.md)

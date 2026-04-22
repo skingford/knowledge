@@ -35,7 +35,7 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 
 ## 建议阅读顺序
 
-本专题按 **7 个分组**组织（Phase 1）；另有 **源码专题（3 篇）** 在后续接入，给想深挖底层原理的读者准备。建议先顺着分组主线读完应用层，再回头切进源码层。
+本专题按 **7 个分组**组织（Phase 1）；另有 **源码专题（5 篇）** 在后续接入，给想深挖底层原理的读者准备。建议先顺着分组主线读完应用层，再回头切进源码层。
 
 ### 分组 1：核心入口
 
@@ -85,10 +85,12 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 
 22. [Node.js 源码剖析：libuv 事件循环与线程池](./source-libuv-event-loop-and-thread-pool.md)，从 `uv_run` 入口逐阶段走读事件循环六阶段、线程池调度、`process.nextTick` 与 Promise microtask 的 C++ 落点
 23. [Node.js 源码剖析：I/O 多路复用与 net/http 底层 Binding](./source-io-multiplexing-and-net-http-binding.md)，讲清 epoll / kqueue / IOCP 抽象、TCP socket 从内核到 JS 的完整调用栈与 llhttp 解析器接入
-24. [Node.js 源码剖析：Worker Threads、V8 Isolate 与 C++ 层交互](./source-worker-threads-and-v8-isolate.md)，从 V8 Isolate / Context / Environment 三层模型到 MessagePort / transferList / SharedArrayBuffer 的 C++ 实现
+24. [Node.js 源码剖析：V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md)，从 Scanner / Parser 到 Ignition / Sparkplug / Maglev / TurboFan 五层执行管线，HiddenClass 对象模型、IC 四态与 Deoptimization 的完整生命周期
+25. [Node.js 源码剖析：V8 内存布局与分代 GC](./source-v8-memory-and-gc.md)，从 Tagged Pointer 对象表示、5 大堆空间，到 Scavenge、Mark-Compact、Incremental / Concurrent Marking 与 Node.js 内存治理的真正边界
+26. [Node.js 源码剖析：Worker Threads、V8 Isolate 与 C++ 层交互](./source-worker-threads-and-v8-isolate.md)，从 V8 Isolate / Context / Environment 三层模型到 MessagePort / transferList / SharedArrayBuffer 的 C++ 实现
 
 ::: tip 想直接跳源码？
-如果你已经熟悉 Node.js 应用层治理，想一步到位解答"为什么 Node.js 能扛高并发"，可以直接从分组 8 开始读。三篇彼此交叉引用，建议按 libuv → I/O 多路复用 → Worker Threads 顺序。
+如果你已经熟悉 Node.js 应用层治理，想一步到位解答"为什么 Node.js 能扛高并发 / 为什么 p99 会抖"，可以直接从分组 8 开始读。五篇彼此交叉引用，建议按 libuv → I/O 多路复用 → V8 执行管线 → V8 内存与 GC → Worker Threads 顺序：先看 I/O 侧怎么扛并发，再看 V8 侧怎么跑 JS 和管理内存，最后看 Worker 如何把两者组合成多线程。
 :::
 
 ## 这个专题的重点
@@ -110,7 +112,7 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 - 优先补齐最容易影响线上稳定性的几条线：事件循环、内存/CPU 排障、测试治理、队列消费和优雅退出
 - 不把 NestJS 当"会写装饰器就行"的框架，而是把它放回模块边界、依赖注入、HTTP 请求链路和工程交付里理解
 - 先把系统设计和项目结构讲清，再进入校验、鉴权、数据库、异步任务和测试这些高频实战问题
-- 保留一条从应用层向下沉的"源码视角"：libuv 事件循环与线程池、I/O 多路复用与 net/http Binding、Worker Threads 与 V8 Isolate
+- 保留一条从应用层向下沉的"源码视角"：libuv 事件循环与线程池、I/O 多路复用与 net/http Binding、V8 执行管线与 TurboFan、V8 内存与分代 GC、Worker Threads 与 V8 Isolate
 
 ## 当前内容结构
 
@@ -176,4 +178,6 @@ const { landing } = sections.find((section) => section.key === 'nodejs')!
 | --- | --- |
 | [Node.js 源码剖析：libuv 事件循环与线程池](./source-libuv-event-loop-and-thread-pool.md) | 重点补 `uv_run` 七阶段源码走读、timer 堆结构、`uv__io_poll` 心跳、`UV_THREADPOOL_SIZE` 调优真相、nextTick / microtask C++ 落点 |
 | [Node.js 源码剖析：I/O 多路复用与 net/http 底层 Binding](./source-io-multiplexing-and-net-http-binding.md) | 重点补 epoll / kqueue / IOCP 三平台对比、`uv__io_t` 统一抽象、TCP accept / read 到 JS 回调的完整调用栈、llhttp 解析器生命周期 |
+| [Node.js 源码剖析：V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md) | 重点补 Scanner / Parser / Ignition / Sparkplug / Maglev / TurboFan 五层管线、HiddenClass (Map) 转换、IC 四态状态机、Deoptimization 与 OSR、热路径治理清单 |
+| [Node.js 源码剖析：V8 内存布局与分代 GC](./source-v8-memory-and-gc.md) | 重点补 SMI / Tagged Pointer 对象表示、5 大堆空间、Scavenge 半空间拷贝、Mark-Compact 三阶段、Incremental / Concurrent Marking、write barrier 与 Node.js 内存治理边界 |
 | [Node.js 源码剖析：Worker Threads、V8 Isolate 与 C++ 层交互](./source-worker-threads-and-v8-isolate.md) | 重点补 V8 Isolate / Context / Environment 三层对象、Worker 启动与独立 event loop、MessagePort / transferList / SharedArrayBuffer、为什么 CPU 密集不能走线程池 |

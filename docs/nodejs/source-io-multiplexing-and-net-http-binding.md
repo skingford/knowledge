@@ -374,6 +374,8 @@ libuv: uv__io_start(POLLOUT) → 下一轮 uv__io_poll 写出
 
 ## 下一步
 
+- 想看"JS 回调进 V8 之后如何被 Ignition / TurboFan 执行"，读 [V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md)
+- 想看"每个连接的 buffer / parser 对象被 V8 怎么管理"，读 [V8 内存布局与分代 GC](./source-v8-memory-and-gc.md)
 - 想看"CPU 密集任务如何在 Worker Threads 里跑"，读 [Worker Threads、V8 Isolate 与 C++ 层交互](./source-worker-threads-and-v8-isolate.md)
 - 想看"事件循环六阶段和线程池源码"，读 [libuv 事件循环与线程池](./source-libuv-event-loop-and-thread-pool.md)
 - 想回到应用层看"HTTP 服务分层与错误处理"，读 [Express / Fastify Web 服务实践](./express-fastify-web-service-practice.md)

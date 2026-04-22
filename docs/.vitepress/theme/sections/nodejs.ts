@@ -55,6 +55,8 @@ export const nodejsSection: SectionConfig = {
       { title: 'NestJS 实战指南', href: '/nodejs/nestjs-practice-guide', description: '整理项目结构、请求链路、数据边界与测试部署实践。' },
       { title: '源码剖析：libuv 事件循环与线程池', href: '/nodejs/source-libuv-event-loop-and-thread-pool', description: '从 uv_run 入口逐阶段走读事件循环、线程池与 nextTick/microtask 的 C++ 落点。' },
       { title: '源码剖析：I/O 多路复用与 net/http Binding', href: '/nodejs/source-io-multiplexing-and-net-http-binding', description: '讲清 epoll/kqueue/IOCP 抽象、TCP 到 JS 回调的完整调用栈与 llhttp 解析器接入。' },
+      { title: '源码剖析：V8 执行管线与 TurboFan 优化', href: '/nodejs/source-v8-pipeline-ignition-turbofan-and-ic', description: '从 Scanner/Parser 到 Ignition/Sparkplug/Maglev/TurboFan 五层管线，以及 HiddenClass、IC 四态与 Deopt 的工程启示。' },
+      { title: '源码剖析：V8 内存布局与分代 GC', href: '/nodejs/source-v8-memory-and-gc', description: '从 Tagged Pointer 对象表示、5 大堆空间到 Scavenge、Mark-Compact、Incremental/Concurrent Marking 与 Node.js 内存治理。' },
       { title: '源码剖析：Worker Threads 与 V8 Isolate', href: '/nodejs/source-worker-threads-and-v8-isolate', description: '从 Isolate/Context/Environment 三层模型到 MessagePort、transferList、SharedArrayBuffer 实现。' },
     ],
     order: [
@@ -81,6 +83,8 @@ export const nodejsSection: SectionConfig = {
       'NestJS 实战指南',
       '源码剖析：libuv 事件循环与线程池',
       '源码剖析：I/O 多路复用与 net/http Binding',
+      '源码剖析：V8 执行管线与 TurboFan 优化',
+      '源码剖析：V8 内存布局与分代 GC',
       '源码剖析：Worker Threads 与 V8 Isolate',
     ],
   },
@@ -146,6 +150,8 @@ export const nodejsSection: SectionConfig = {
       items: [
         { text: 'libuv 事件循环与线程池', link: '/nodejs/source-libuv-event-loop-and-thread-pool' },
         { text: 'I/O 多路复用与 net/http Binding', link: '/nodejs/source-io-multiplexing-and-net-http-binding' },
+        { text: 'V8 执行管线与 TurboFan', link: '/nodejs/source-v8-pipeline-ignition-turbofan-and-ic' },
+        { text: 'V8 内存与分代 GC', link: '/nodejs/source-v8-memory-and-gc' },
         { text: 'Worker Threads 与 V8 Isolate', link: '/nodejs/source-worker-threads-and-v8-isolate' },
       ],
     },

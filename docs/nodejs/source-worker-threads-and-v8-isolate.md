@@ -23,6 +23,7 @@ search: false
 **前置阅读**：
 
 - [libuv 事件循环与线程池](./source-libuv-event-loop-and-thread-pool.md)——本篇会直接引用"线程池只处理可 IO 化的 syscall，不处理 JS 代码"这一结论
+- 强烈建议先读 [V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md) 与 [V8 内存布局与分代 GC](./source-v8-memory-and-gc.md)——本篇把 V8 的"执行"和"内存"当作已知概念，重点讲多 Isolate 如何隔离这两条主线
 - [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)——应用层的"怎么用 BullMQ / 怎么切 Worker"在那里，本篇只讲 **Worker Threads 本身** 在 C++/V8 层怎么跑
 
 **与队列任务文档的边界**：
@@ -62,6 +63,10 @@ class V8_EXPORT Isolate {
 - 两个 Isolate 之间想传数据，要么序列化（structured clone），要么 transfer 所有权，要么共享 SharedArrayBuffer
 
 这也是为什么 `new Worker('./worker.js')` 的冷启动比 `fork` 子进程快，但比 `new Function()` 慢——它要分配一整个 V8 堆。
+
+::: tip 每 Isolate 独立堆
+每个 Isolate 有**独立的 5 大 Space**（New / Old / Large Object / Code / Read-only），**GC 也独立触发**——主线程的 Full GC 不会 stop-the-world 到 Worker。详见 [V8 内存布局与分代 GC](./source-v8-memory-and-gc.md) 的"堆布局"章节。
+:::
 
 ### Context：同一 Isolate 内的执行环境
 
@@ -346,4 +351,6 @@ class AsyncWrap {
 
 - 回到"主线程事件循环和线程池到底怎么运作"，读 [libuv 事件循环与线程池](./source-libuv-event-loop-and-thread-pool.md)
 - 回到"TCP / HTTP 在内核到 JS 之间的 binding 链路"，读 [I/O 多路复用与 net/http 底层 Binding](./source-io-multiplexing-and-net-http-binding.md)
+- 想看"每个 Isolate 里 JS 怎么被编译执行"，读 [V8 执行管线、Ignition 字节码与 TurboFan 优化](./source-v8-pipeline-ignition-turbofan-and-ic.md)
+- 想看"每个 Isolate 独立堆独立 GC 的完整实现"，读 [V8 内存布局与分代 GC](./source-v8-memory-and-gc.md)
 - 回到应用层看"队列、Worker、异步任务怎么设计"，读 [Node.js 队列、定时任务与 Worker 实战](./queue-scheduler-and-worker-practice.md)
