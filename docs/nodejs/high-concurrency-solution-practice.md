@@ -3,6 +3,10 @@ title: Node.js 高并发解决方案实践
 description: 围绕事件循环、连接池、缓存、限流、异步削峰、Worker、队列与可观测性，系统整理 Node.js 服务的高并发治理方案。
 ---
 
+<script setup>
+import InlineSvg from '@docs-components/common/InlineSvg.vue'
+</script>
+
 # Node.js 高并发解决方案实践
 
 很多人一提到 Node.js 高并发，第一反应是：
@@ -225,17 +229,7 @@ Node.js 进程对“排队中的对象”很敏感。
 
 ## 一张够用的解决方案总图
 
-```text
-用户流量
-  -> CDN / WAF / Gateway / Rate Limit
-  -> Node.js Web / BFF / API 层
-       -> 本地缓存 / 参数校验 / 快速失败 / 请求并发控制
-       -> Redis / Cache Aside / 热点保护
-       -> Database / Search / Third-party API
-       -> Queue / Delay Job / Outbox / Worker
-       -> Worker Threads / 独立计算服务
-  -> Metrics / Logs / Tracing / Alerting / Capacity Review
-```
+<InlineSvg src="/images/nodejs/high-concurrency-solution-practice-architecture.svg" alt="Node.js 高并发底层解决方案总图" />
 
 这张图里最重要的不是组件名字，而是顺序：
 

@@ -1,0 +1,611 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-label="生命游戏 两轮遍历 + 原地状态编码动态图例" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>生命游戏：两轮遍历 + 原地状态编码</title>
+  <desc>以 board=[[0,1,0],[0,0,1],[1,1,1],[0,0,0]] 为例，动画循环演示第一轮扫描时如何用 2 / -1 编码中间状态，以及第二轮如何把 2 归并为 0、-1 归并为 1。</desc>
+
+  <!--
+    Pass 1 verified neighbor table:
+      (0,0)=0 live=1 → 0      (0,1)=1 live=1 → 2      (0,2)=0 live=2 → 0
+      (1,0)=0 live=3 → -1     (1,1)=0 live=5 → 0      (1,2)=1 live=3 → 1
+      (2,0)=1 live=1 → 2      (2,1)=1 live=3 → 1      (2,2)=1 live=2 → 1
+      (3,0)=0 live=2 → 0      (3,1)=0 live=3 → -1     (3,2)=0 live=2 → 0
+    Pass 2: 2 → 0, -1 → 1
+    Final: [[0,0,0],[1,0,1],[0,1,1],[0,1,0]]
+  -->
+
+  <defs>
+    <linearGradient id="gol-header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="gol-live" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bbf7d0" />
+      <stop offset="100%" stop-color="#86efac" />
+    </linearGradient>
+    <linearGradient id="gol-dead" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="gol-enc-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fed7aa" />
+      <stop offset="100%" stop-color="#fdba74" />
+    </linearGradient>
+    <linearGradient id="gol-enc-neg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bfdbfe" />
+      <stop offset="100%" stop-color="#93c5fd" />
+    </linearGradient>
+    <linearGradient id="gol-code" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="gol-shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <filter id="gol-soft-shadow" x="-6%" y="-6%" width="112%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#f97316" flood-opacity="0.18" />
+    </filter>
+    <style>
+      :root { --cycle: 18s; }
+      text { fill: #0f172a; }
+
+      .panel { fill: #ffffff; stroke: #dbe4f0; stroke-width: 1.5; filter: url(#gol-shadow); }
+      .card { fill: #ffffff; stroke: #dbe4f0; stroke-width: 1.5; }
+      .card-soft { fill: #f8fafc; stroke: #dbe4f0; stroke-width: 1.5; }
+
+      .title { font-size: 29px; font-weight: 700; fill: #ffffff; }
+      .subtitle { font-size: 14px; fill: #dbeafe; }
+      .section-title { font-size: 19px; font-weight: 700; }
+      .label { font-size: 13px; font-weight: 700; fill: #475569; }
+      .caption { font-size: 12px; fill: #64748b; }
+      .tiny { font-size: 12px; fill: #64748b; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+
+      /* Grid cells */
+      .axis-label { font-size: 11px; font-weight: 700; fill: #94a3b8; }
+      .cell { stroke-width: 2; }
+      .cell-dead { fill: url(#gol-dead); stroke: #cbd5e1; }
+      .cell-live { fill: url(#gol-live); stroke: #10b981; }
+      .cell-enc-2 { fill: url(#gol-enc-2); stroke: #ea580c; }
+      .cell-enc-neg1 { fill: url(#gol-enc-neg1); stroke: #2563eb; }
+      .cell-text { font-size: 22px; font-weight: 700; }
+      .cell-text-dead { fill: #94a3b8; }
+      .cell-text-live { fill: #065f46; }
+      .cell-text-enc-2 { fill: #9a3412; }
+      .cell-text-enc-neg1 { fill: #1e3a8a; }
+
+      /* Pass chips */
+      .chip { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.5; }
+      .chip-text { font-size: 13px; font-weight: 700; fill: #64748b; }
+      .chip-active { fill: #fff7ed; stroke: #f97316; stroke-width: 2; }
+      .chip-active-text { fill: #c2410c; }
+
+      /* Scan cursor and halos */
+      .scan-cursor { fill: none; stroke: #f97316; stroke-width: 3.5; stroke-dasharray: 9 6; animation: gol-dash 1.1s linear infinite; }
+      .neighbor-halo { fill: none; stroke: #60a5fa; stroke-width: 2.2; stroke-dasharray: 4 3; opacity: 0.75; }
+
+      /* Legend swatches */
+      .swatch-0 { fill: url(#gol-dead); stroke: #cbd5e1; stroke-width: 1.5; }
+      .swatch-1 { fill: url(#gol-live); stroke: #10b981; stroke-width: 1.5; }
+      .swatch-2 { fill: url(#gol-enc-2); stroke: #ea580c; stroke-width: 1.5; }
+      .swatch-neg1 { fill: url(#gol-enc-neg1); stroke: #2563eb; stroke-width: 1.5; }
+
+      /* Code / call pills */
+      .code-box { fill: url(#gol-code); stroke: #1e293b; stroke-width: 1.5; }
+      .code-text { font-size: 14px; fill: #dbeafe; }
+      .code-em { fill: #fb923c; font-weight: 700; }
+      .call-pill { fill: #0f172a; stroke: #1e293b; stroke-width: 1.5; }
+      .call-text { font-size: 15px; fill: #f8fafc; font-weight: 700; }
+
+      /* State pills */
+      .state-pill { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.5; }
+      .state-pill-em { fill: #fff7ed; stroke: #fdba74; stroke-width: 1.5; }
+      .state-pill-ok { fill: #ecfdf5; stroke: #6ee7b7; stroke-width: 1.5; }
+      .state-pill-text { font-size: 12px; font-weight: 700; }
+
+      .action-text { font-size: 13px; fill: #0f172a; }
+      .result-text { font-size: 12px; font-weight: 700; fill: #047857; }
+      .result-muted { fill: #64748b; }
+
+      /* Step cards */
+      .step-box { fill: #f8fafc; stroke: #dbe4f0; stroke-width: 1.5; }
+      .step-no { font-size: 22px; font-weight: 700; fill: #1d4ed8; }
+      .step-title { font-size: 14px; font-weight: 700; }
+      .step-desc { font-size: 11px; fill: #64748b; }
+      .step-active { fill: #fff7ed; stroke: #f97316; stroke-width: 2; }
+
+      .phase { opacity: 0; pointer-events: none; }
+      .phase .halo { fill: none; stroke: #fdba74; stroke-width: 4; opacity: 0.5; animation: gol-pulse 1.15s ease-in-out infinite; }
+      .phase .card-active { fill: none; stroke: #fb923c; stroke-width: 2.5; filter: url(#gol-soft-shadow); }
+
+      .reveal { opacity: 0; }
+      .reveal-final { opacity: 0; }
+
+      /* Phase reveal animations (total cycle 18s). boundaries are cumulative percentages. */
+      .phase-0  { animation: gol-p0  var(--cycle) linear infinite; }
+      .phase-1  { animation: gol-p1  var(--cycle) linear infinite; }
+      .phase-2  { animation: gol-p2  var(--cycle) linear infinite; }
+      .phase-3  { animation: gol-p3  var(--cycle) linear infinite; }
+      .phase-4  { animation: gol-p4  var(--cycle) linear infinite; }
+      .phase-5  { animation: gol-p5  var(--cycle) linear infinite; }
+      .phase-6  { animation: gol-p6  var(--cycle) linear infinite; }
+      .phase-7  { animation: gol-p7  var(--cycle) linear infinite; }
+      .phase-8  { animation: gol-p8  var(--cycle) linear infinite; }
+      .phase-9  { animation: gol-p9  var(--cycle) linear infinite; }
+      .phase-10 { animation: gol-p10 var(--cycle) linear infinite; }
+      .phase-11 { animation: gol-p11 var(--cycle) linear infinite; }
+
+      /* Cumulative reveals: encoded intermediate (2 / -1) shows from its phase through the end of Pass 1 */
+      .r-01-2    { animation: gol-r-01-2    var(--cycle) linear infinite; }
+      .r-10-neg1 { animation: gol-r-10-neg1 var(--cycle) linear infinite; }
+      .r-20-2    { animation: gol-r-20-2    var(--cycle) linear infinite; }
+      .r-31-neg1 { animation: gol-r-31-neg1 var(--cycle) linear infinite; }
+
+      /* Cumulative final reveals: normalized values show from Pass 2 through the end */
+      .r-01-0    { animation: gol-r-01-0    var(--cycle) linear infinite; }
+      .r-10-1    { animation: gol-r-10-1    var(--cycle) linear infinite; }
+      .r-20-0    { animation: gol-r-20-0    var(--cycle) linear infinite; }
+      .r-31-1    { animation: gol-r-31-1    var(--cycle) linear infinite; }
+
+      @keyframes gol-dash  { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -30; } }
+      @keyframes gol-pulse { 0%,100% { opacity: 0.35; transform: scale(1); transform-origin: center; } 50% { opacity: 0.9; transform: scale(1.05); transform-origin: center; } }
+
+      /* Phase boundaries (18s cycle). Each window: in at start, out at end. */
+      @keyframes gol-p0  { 0%,8.2%   { opacity: 1; } 8.34%,100% { opacity: 0; } }
+      @keyframes gol-p1  { 0%,8.2%   { opacity: 0; } 8.34%,16.55% { opacity: 1; } 16.67%,100% { opacity: 0; } }
+      @keyframes gol-p2  { 0%,16.55% { opacity: 0; } 16.67%,22.10% { opacity: 1; } 22.22%,100% { opacity: 0; } }
+      @keyframes gol-p3  { 0%,22.10% { opacity: 0; } 22.22%,30.44% { opacity: 1; } 30.56%,100% { opacity: 0; } }
+      @keyframes gol-p4  { 0%,30.44% { opacity: 0; } 30.56%,36.00% { opacity: 1; } 36.11%,100% { opacity: 0; } }
+      @keyframes gol-p5  { 0%,36.00% { opacity: 0; } 36.11%,44.32% { opacity: 1; } 44.44%,100% { opacity: 0; } }
+      @keyframes gol-p6  { 0%,44.32% { opacity: 0; } 44.44%,52.66% { opacity: 1; } 52.78%,100% { opacity: 0; } }
+      @keyframes gol-p7  { 0%,52.66% { opacity: 0; } 52.78%,59.32% { opacity: 1; } 59.44%,100% { opacity: 0; } }
+      @keyframes gol-p8  { 0%,59.32% { opacity: 0; } 59.44%,67.66% { opacity: 1; } 67.78%,100% { opacity: 0; } }
+      @keyframes gol-p9  { 0%,67.66% { opacity: 0; } 67.78%,76.00% { opacity: 1; } 76.11%,100% { opacity: 0; } }
+      @keyframes gol-p10 { 0%,76.00% { opacity: 0; } 76.11%,83.22% { opacity: 1; } 83.33%,100% { opacity: 0; } }
+      @keyframes gol-p11 { 0%,83.22% { opacity: 0; } 83.33%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      /* Encoded intermediate values: shown from their reveal phase through end of Pass 1 (59.44%), then hidden as Pass 2 takes over */
+      @keyframes gol-r-01-2    { 0%,16.55% { opacity: 0; } 16.67%,59.32% { opacity: 1; } 59.44%,100% { opacity: 0; } }
+      @keyframes gol-r-10-neg1 { 0%,30.44% { opacity: 0; } 30.56%,67.66% { opacity: 1; } 67.78%,100% { opacity: 0; } }
+      @keyframes gol-r-20-2    { 0%,44.32% { opacity: 0; } 44.44%,59.32% { opacity: 1; } 59.44%,100% { opacity: 0; } }
+      @keyframes gol-r-31-neg1 { 0%,44.32% { opacity: 0; } 44.44%,67.66% { opacity: 1; } 67.78%,100% { opacity: 0; } }
+
+      /* Normalized final values: (0,1)=0 and (2,0)=0 appear at Pass 2 start (59.44%), (1,0)=1 and (3,1)=1 appear at 67.78% */
+      @keyframes gol-r-01-0 { 0%,59.32% { opacity: 0; } 59.44%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes gol-r-20-0 { 0%,59.32% { opacity: 0; } 59.44%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes gol-r-10-1 { 0%,67.66% { opacity: 0; } 67.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes gol-r-31-1 { 0%,67.66% { opacity: 0; } 67.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .phase, .reveal, .reveal-final, .scan-cursor, .phase .halo { animation: none !important; }
+        .phase { opacity: 0; }
+        .phase-11, .r-01-0, .r-10-1, .r-20-0, .r-31-1 { opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" rx="24" fill="#f7f8fc" />
+
+  <!-- Header -->
+  <rect x="20" y="18" width="1160" height="68" rx="20" fill="url(#gol-header)" />
+  <text x="600" y="56" text-anchor="middle" class="title">生命游戏：两轮遍历 + 原地状态编码</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">以 board=[[0,1,0],[0,0,1],[1,1,1],[0,0,0]] 为例，动画依次演示"编码 2/-1 → 归并 0/1"</text>
+
+  <!-- Panels -->
+  <rect x="30" y="106" width="700" height="624" rx="24" class="panel" />
+  <rect x="750" y="106" width="420" height="624" rx="24" class="panel" />
+
+  <!-- =================== LEFT PANEL STATIC =================== -->
+  <text x="58" y="142" class="section-title">1. 矩阵状态随两轮扫描逐格变化</text>
+  <text x="58" y="162" class="caption">第一轮把"会变"的格子编码成 2 / -1；第二轮把 2→0、-1→1 统一归并为最终状态。</text>
+
+  <!-- Pass indicator chips -->
+  <g class="pass-chips">
+    <rect x="90" y="184" width="150" height="36" rx="18" class="chip" />
+    <text x="165" y="207" text-anchor="middle" class="chip-text">初始棋盘</text>
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text">Pass 1：编码</text>
+    <rect x="460" y="184" width="180" height="36" rx="18" class="chip" />
+    <text x="550" y="207" text-anchor="middle" class="chip-text">Pass 2：归并落盘</text>
+  </g>
+
+  <!-- Column labels (above grid) -->
+  <text x="310" y="254" text-anchor="middle" class="axis-label">c=0</text>
+  <text x="380" y="254" text-anchor="middle" class="axis-label">c=1</text>
+  <text x="450" y="254" text-anchor="middle" class="axis-label">c=2</text>
+
+  <!-- Row labels (left of grid) -->
+  <text x="262" y="305" text-anchor="end" class="axis-label">r=0</text>
+  <text x="262" y="375" text-anchor="end" class="axis-label">r=1</text>
+  <text x="262" y="445" text-anchor="end" class="axis-label">r=2</text>
+  <text x="262" y="515" text-anchor="end" class="axis-label">r=3</text>
+
+  <!-- Base grid (initial state) — always visible; reveals overlay on top where needed -->
+  <g class="base-grid">
+    <!-- Row 0 -->
+    <rect x="275" y="265" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="310" y="308" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <rect x="345" y="265" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="380" y="308" text-anchor="middle" class="cell-text cell-text-live">1</text>
+    <rect x="415" y="265" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="450" y="308" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <!-- Row 1 -->
+    <rect x="275" y="335" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="310" y="378" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <rect x="345" y="335" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="380" y="378" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <rect x="415" y="335" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="450" y="378" text-anchor="middle" class="cell-text cell-text-live">1</text>
+    <!-- Row 2 -->
+    <rect x="275" y="405" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="310" y="448" text-anchor="middle" class="cell-text cell-text-live">1</text>
+    <rect x="345" y="405" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="380" y="448" text-anchor="middle" class="cell-text cell-text-live">1</text>
+    <rect x="415" y="405" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="450" y="448" text-anchor="middle" class="cell-text cell-text-live">1</text>
+    <!-- Row 3 -->
+    <rect x="275" y="475" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="310" y="518" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <rect x="345" y="475" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="380" y="518" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+    <rect x="415" y="475" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="450" y="518" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+  </g>
+
+  <!-- Color legend -->
+  <g class="color-legend">
+    <rect x="70" y="580" width="600" height="48" rx="16" class="card-soft" />
+    <rect x="90" y="592" width="24" height="24" rx="6" class="swatch-0" />
+    <text x="122" y="609" class="tiny"><tspan font-weight="700" fill="#0f172a">0</tspan> 旧死（初始死）</text>
+
+    <rect x="240" y="592" width="24" height="24" rx="6" class="swatch-1" />
+    <text x="272" y="609" class="tiny"><tspan font-weight="700" fill="#0f172a">1</tspan> 旧活（初始活）</text>
+
+    <rect x="390" y="592" width="24" height="24" rx="6" class="swatch-2" />
+    <text x="422" y="609" class="tiny"><tspan font-weight="700" fill="#0f172a">2</tspan> 活→死（中间态）</text>
+
+    <rect x="548" y="592" width="24" height="24" rx="6" class="swatch-neg1" />
+    <text x="580" y="609" class="tiny"><tspan font-weight="700" fill="#0f172a">-1</tspan> 死→活（中间态）</text>
+  </g>
+
+  <text x="58" y="660" class="caption">扫描规则：数 (r,c) 的 8 邻居里"旧活"的个数——只要是 <tspan class="mono" font-weight="700">1</tspan> 或 <tspan class="mono" font-weight="700">2</tspan> 都算旧活。</text>
+  <text x="58" y="680" class="caption">活细胞活邻居 &lt;2 或 &gt;3 → 死（编码 2）；死细胞活邻居 =3 → 活（编码 -1）；其余维持不变。</text>
+  <text x="58" y="700" class="caption">第一轮结束后，棋盘同时存在 0 / 1 / 2 / -1 四种值——但统计邻居只需区分"旧活"还是"旧死"。</text>
+  <text x="58" y="720" class="caption">第二轮再把 2 统一写回 0，-1 统一写回 1，整个过程不需要额外的同规模矩阵，空间复杂度 O(1)。</text>
+
+  <!-- =================== RIGHT PANEL STATIC =================== -->
+  <text x="778" y="142" class="section-title">2. 右侧同步跟踪每一步的判定</text>
+  <text x="778" y="162" class="caption">看 3 件事：当前扫描位置、活邻居个数、规则判定出的编码值。</text>
+
+  <!-- Encoding table card (always visible) -->
+  <rect x="770" y="182" width="380" height="124" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="208" class="label">编码表（旧 → 新 = 编码值）</text>
+  <g font-size="13" class="mono">
+    <rect x="790" y="220" width="20" height="20" rx="5" class="swatch-0" />
+    <text x="818" y="235">0 → 0 = <tspan font-weight="700" fill="#0f172a">0</tspan>（不变）</text>
+    <rect x="980" y="220" width="20" height="20" rx="5" class="swatch-1" />
+    <text x="1008" y="235">1 → 1 = <tspan font-weight="700" fill="#0f172a">1</tspan>（不变）</text>
+    <rect x="790" y="256" width="20" height="20" rx="5" class="swatch-2" />
+    <text x="818" y="271">1 → 0 = <tspan font-weight="700" fill="#0f172a">2</tspan>（活→死）</text>
+    <rect x="980" y="256" width="20" height="20" rx="5" class="swatch-neg1" />
+    <text x="1008" y="271">0 → 1 = <tspan font-weight="700" fill="#0f172a">-1</tspan>（死→活）</text>
+  </g>
+  <text x="790" y="297" class="tiny">关键：统计邻居时 <tspan class="mono" font-weight="700">1</tspan> 和 <tspan class="mono" font-weight="700">2</tspan> 都算旧活；<tspan class="mono" font-weight="700">0</tspan> 和 <tspan class="mono" font-weight="700">-1</tspan> 都算旧死。</text>
+
+  <!-- Scan frame card (shell; inner content drawn per-phase) -->
+  <rect x="770" y="318" width="380" height="160" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="344" class="label">当前扫描帧</text>
+
+  <!-- Pass step card -->
+  <rect x="770" y="490" width="380" height="108" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="516" class="label">两轮遍历就是这样分工</text>
+  <rect x="788" y="530" width="168" height="56" rx="14" class="step-box" />
+  <text x="808" y="556" class="step-no">1</text>
+  <text x="828" y="552" class="step-title">编码中间态</text>
+  <text x="828" y="570" class="step-desc">1→2 / 0→-1</text>
+  <text x="828" y="584" class="step-desc">其他不变</text>
+  <rect x="964" y="530" width="168" height="56" rx="14" class="step-box" />
+  <text x="984" y="556" class="step-no">2</text>
+  <text x="1004" y="552" class="step-title">归并落盘</text>
+  <text x="1004" y="570" class="step-desc">2→0 / -1→1</text>
+  <text x="1004" y="584" class="step-desc">最终 0/1</text>
+
+  <!-- Invariant card -->
+  <rect x="770" y="610" width="380" height="108" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="636" class="label">不变式：邻居只看"旧状态"</text>
+  <g font-size="12">
+    <rect x="790" y="650" width="22" height="22" rx="6" class="swatch-1" />
+    <rect x="818" y="650" width="22" height="22" rx="6" class="swatch-2" />
+    <text x="848" y="666" class="tiny"><tspan font-weight="700" fill="#0f172a">1</tspan> 和 <tspan font-weight="700" fill="#0f172a">2</tspan> 都算"旧活"</text>
+
+    <rect x="790" y="682" width="22" height="22" rx="6" class="swatch-0" />
+    <rect x="818" y="682" width="22" height="22" rx="6" class="swatch-neg1" />
+    <text x="848" y="698" class="tiny"><tspan font-weight="700" fill="#0f172a">0</tspan> 和 <tspan font-weight="700" fill="#0f172a">-1</tspan> 都算"旧死"</text>
+  </g>
+
+  <!-- =================== CUMULATIVE CELL REVEALS =================== -->
+  <!-- Pass 1 intermediate: (0,1) 1→2 -->
+  <g class="reveal r-01-2">
+    <rect x="345" y="265" width="70" height="70" rx="12" class="cell cell-enc-2" />
+    <text x="380" y="308" text-anchor="middle" class="cell-text cell-text-enc-2">2</text>
+  </g>
+  <!-- Pass 1 intermediate: (1,0) 0→-1 -->
+  <g class="reveal r-10-neg1">
+    <rect x="275" y="335" width="70" height="70" rx="12" class="cell cell-enc-neg1" />
+    <text x="310" y="378" text-anchor="middle" class="cell-text cell-text-enc-neg1">-1</text>
+  </g>
+  <!-- Pass 1 intermediate: (2,0) 1→2 (fast-forward in phase 6) -->
+  <g class="reveal r-20-2">
+    <rect x="275" y="405" width="70" height="70" rx="12" class="cell cell-enc-2" />
+    <text x="310" y="448" text-anchor="middle" class="cell-text cell-text-enc-2">2</text>
+  </g>
+  <!-- Pass 1 intermediate: (3,1) 0→-1 (fast-forward in phase 6) -->
+  <g class="reveal r-31-neg1">
+    <rect x="345" y="475" width="70" height="70" rx="12" class="cell cell-enc-neg1" />
+    <text x="380" y="518" text-anchor="middle" class="cell-text cell-text-enc-neg1">-1</text>
+  </g>
+
+  <!-- Pass 2 normalized: (0,1) 2→0, (2,0) 2→0 -->
+  <g class="reveal-final r-01-0">
+    <rect x="345" y="265" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="380" y="308" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+  </g>
+  <g class="reveal-final r-20-0">
+    <rect x="275" y="405" width="70" height="70" rx="12" class="cell cell-dead" />
+    <text x="310" y="448" text-anchor="middle" class="cell-text cell-text-dead">0</text>
+  </g>
+  <!-- Pass 2 normalized: (1,0) -1→1, (3,1) -1→1 -->
+  <g class="reveal-final r-10-1">
+    <rect x="275" y="335" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="310" y="378" text-anchor="middle" class="cell-text cell-text-live">1</text>
+  </g>
+  <g class="reveal-final r-31-1">
+    <rect x="345" y="475" width="70" height="70" rx="12" class="cell cell-live" />
+    <text x="380" y="518" text-anchor="middle" class="cell-text cell-text-live">1</text>
+  </g>
+
+  <!-- =================== PHASE OVERLAYS =================== -->
+  <!-- Phase 0: initial state ready -->
+  <g class="phase phase-0">
+    <rect x="90" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="165" y="207" text-anchor="middle" class="chip-text chip-active-text">初始棋盘</text>
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">ready: scan from (0, 0)</text>
+    <rect x="790" y="392" width="96" height="28" rx="14" class="state-pill" />
+    <text x="838" y="411" text-anchor="middle" class="state-pill-text">m=4, n=3</text>
+    <rect x="894" y="392" width="120" height="28" rx="14" class="state-pill-em" />
+    <text x="954" y="411" text-anchor="middle" class="state-pill-text">8 个方向</text>
+    <text x="790" y="440" class="action-text">动作：外层双重循环从 (0,0) 开始遍历每一格。</text>
+    <text x="790" y="462" class="result-text result-muted">编码结果：—</text>
+  </g>
+
+  <!-- Phase 1: scan (0,1) live → dead (1 live neighbor) -->
+  <g class="phase phase-1">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+
+    <!-- Scan cursor on (0,1) -->
+    <rect x="341" y="261" width="78" height="78" rx="14" class="scan-cursor" />
+    <!-- 8-neighbor halos (only in-bounds): (0,0), (0,2), (1,0), (1,1), (1,2) -->
+    <rect x="278" y="268" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="418" y="268" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="278" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="418" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">scan(0, 1) &#160;// cell=1</text>
+    <rect x="790" y="392" width="96" height="28" rx="14" class="state-pill" />
+    <text x="838" y="411" text-anchor="middle" class="state-pill-text">r=0, c=1</text>
+    <rect x="894" y="392" width="96" height="28" rx="14" class="state-pill-em" />
+    <text x="942" y="411" text-anchor="middle" class="state-pill-text">live = 1</text>
+    <rect x="998" y="392" width="132" height="28" rx="14" class="state-pill" />
+    <text x="1064" y="411" text-anchor="middle" class="state-pill-text">规则：1 &amp;&amp; live&lt;2</text>
+    <text x="790" y="440" class="action-text">动作：活邻居只有 (1,2)=1，活细胞孤立 → 下一轮要死。</text>
+    <text x="790" y="462" class="result-text">编码结果：board[0][1] = 2（活 → 死）</text>
+  </g>
+
+  <!-- Phase 2: (0,1) flips to 2 -->
+  <g class="phase phase-2">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+    <circle cx="380" cy="300" r="44" class="halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">board[0][1] = 2</text>
+    <rect x="790" y="392" width="140" height="28" rx="14" class="state-pill-ok" />
+    <text x="860" y="411" text-anchor="middle" class="state-pill-text">已写入：2</text>
+    <rect x="938" y="392" width="192" height="28" rx="14" class="state-pill-em" />
+    <text x="1034" y="411" text-anchor="middle" class="state-pill-text">后面读时仍算旧活</text>
+    <text x="790" y="440" class="action-text">动作：(0,1) 填为 2，既记住了"下一轮要变 0"，又保留了"本轮是活的"。</text>
+    <text x="790" y="462" class="result-text">编码结果：中间态已落下。</text>
+  </g>
+
+  <!-- Phase 3: scan (1,0) dead → live (3 live neighbors) -->
+  <g class="phase phase-3">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+
+    <!-- Scan cursor on (1,0) -->
+    <rect x="271" y="331" width="78" height="78" rx="14" class="scan-cursor" />
+    <!-- Valid 8-neighbors: (0,0), (0,1), (1,1), (2,0), (2,1) -->
+    <rect x="278" y="268" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="268" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="278" y="408" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="408" width="64" height="64" rx="10" class="neighbor-halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">scan(1, 0) &#160;// cell=0</text>
+    <rect x="790" y="392" width="96" height="28" rx="14" class="state-pill" />
+    <text x="838" y="411" text-anchor="middle" class="state-pill-text">r=1, c=0</text>
+    <rect x="894" y="392" width="96" height="28" rx="14" class="state-pill-em" />
+    <text x="942" y="411" text-anchor="middle" class="state-pill-text">live = 3</text>
+    <rect x="998" y="392" width="132" height="28" rx="14" class="state-pill" />
+    <text x="1064" y="411" text-anchor="middle" class="state-pill-text">规则：0 &amp;&amp; live==3</text>
+    <text x="790" y="440" class="action-text">动作：邻居 (0,1)=2(旧活)、(2,0)=1、(2,1)=1，共 3 个旧活 → 复活。</text>
+    <text x="790" y="462" class="result-text">编码结果：board[1][0] = -1（死 → 活）</text>
+  </g>
+
+  <!-- Phase 4: (1,0) flips to -1 -->
+  <g class="phase phase-4">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+    <circle cx="310" cy="370" r="44" class="halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">board[1][0] = -1</text>
+    <rect x="790" y="392" width="140" height="28" rx="14" class="state-pill-ok" />
+    <text x="860" y="411" text-anchor="middle" class="state-pill-text">已写入：-1</text>
+    <rect x="938" y="392" width="192" height="28" rx="14" class="state-pill-em" />
+    <text x="1034" y="411" text-anchor="middle" class="state-pill-text">后面读时仍算旧死</text>
+    <text x="790" y="440" class="action-text">动作：(1,0) 填为 -1，"本轮死 → 下一轮活"被一个值同时记住。</text>
+    <text x="790" y="462" class="result-text">编码结果：中间态已落下。</text>
+  </g>
+
+  <!-- Phase 5: scan (2,1) live → live (3 live neighbors, unchanged) -->
+  <g class="phase phase-5">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+
+    <!-- Scan cursor on (2,1) -->
+    <rect x="341" y="401" width="78" height="78" rx="14" class="scan-cursor" />
+    <!-- All 8 neighbors valid: (1,0), (1,1), (1,2), (2,0), (2,2), (3,0), (3,1), (3,2) -->
+    <rect x="278" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="418" y="338" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="278" y="408" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="418" y="408" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="278" y="478" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="348" y="478" width="64" height="64" rx="10" class="neighbor-halo" />
+    <rect x="418" y="478" width="64" height="64" rx="10" class="neighbor-halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">scan(2, 1) &#160;// cell=1</text>
+    <rect x="790" y="392" width="96" height="28" rx="14" class="state-pill" />
+    <text x="838" y="411" text-anchor="middle" class="state-pill-text">r=2, c=1</text>
+    <rect x="894" y="392" width="96" height="28" rx="14" class="state-pill-em" />
+    <text x="942" y="411" text-anchor="middle" class="state-pill-text">live = 3</text>
+    <rect x="998" y="392" width="132" height="28" rx="14" class="state-pill-ok" />
+    <text x="1064" y="411" text-anchor="middle" class="state-pill-text">规则：1 &amp;&amp; live∈{2,3}</text>
+    <text x="790" y="440" class="action-text">动作：活细胞有 3 个活邻居，正好存活 → 值保持不变。</text>
+    <text x="790" y="462" class="result-text">编码结果：board[2][1] 保持 1（不写入中间态）</text>
+  </g>
+
+  <!-- Phase 6: fast-forward remaining cells (2,0) and (3,1) -->
+  <g class="phase phase-6">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+
+    <circle cx="310" cy="440" r="44" class="halo" />
+    <circle cx="380" cy="510" r="44" class="halo" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">scan remaining cells</text>
+    <rect x="790" y="392" width="180" height="28" rx="14" class="state-pill-em" />
+    <text x="880" y="411" text-anchor="middle" class="state-pill-text">(2,0): 1, live=1 → 2</text>
+    <rect x="978" y="392" width="152" height="28" rx="14" class="state-pill-em" />
+    <text x="1054" y="411" text-anchor="middle" class="state-pill-text">(3,1): 0, live=3 → -1</text>
+    <text x="790" y="440" class="action-text">动作：剩余 9 格按同样规则走完 —— 其中两格继续编码为 2 / -1。</text>
+    <text x="790" y="462" class="result-text">编码结果：(2,0)→2，(3,1)→-1；其他格维持不变。</text>
+  </g>
+
+  <!-- Phase 7: Pass 1 complete (full encoded board) -->
+  <g class="phase phase-7">
+    <rect x="275" y="184" width="150" height="36" rx="18" class="chip-active" />
+    <text x="350" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 1：编码</text>
+
+    <!-- Outline the whole grid as done -->
+    <rect x="271" y="261" width="218" height="288" rx="16" fill="none" stroke="#f97316" stroke-width="3" stroke-dasharray="8 6" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">Pass 1 done</text>
+    <rect x="790" y="392" width="168" height="28" rx="14" class="state-pill" />
+    <text x="874" y="411" text-anchor="middle" class="state-pill-text">4 格中间态已编码</text>
+    <rect x="966" y="392" width="164" height="28" rx="14" class="state-pill-em" />
+    <text x="1048" y="411" text-anchor="middle" class="state-pill-text">棋盘 4 种值共存</text>
+    <text x="790" y="440" class="action-text">动作：第一轮扫描结束；棋盘出现 0 / 1 / 2 / -1 四种值。</text>
+    <text x="790" y="462" class="result-text">下一步：Pass 2 统一把 2→0、-1→1 归并落盘。</text>
+  </g>
+
+  <!-- Phase 8: Pass 2 — 2 → 0 -->
+  <g class="phase phase-8">
+    <rect x="460" y="184" width="180" height="36" rx="18" class="chip-active" />
+    <text x="550" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 2：归并落盘</text>
+
+    <circle cx="380" cy="300" r="44" class="halo" />
+    <circle cx="310" cy="440" r="44" class="halo" />
+
+    <rect x="964" y="530" width="168" height="56" rx="14" class="step-active" />
+    <text x="984" y="556" class="step-no">2</text>
+    <text x="1004" y="552" class="step-title">归并落盘</text>
+    <text x="1004" y="570" class="step-desc">2→0 / -1→1</text>
+    <text x="1004" y="584" class="step-desc">最终 0/1</text>
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">if cell == 2: cell = 0</text>
+    <rect x="790" y="392" width="116" height="28" rx="14" class="state-pill-em" />
+    <text x="848" y="411" text-anchor="middle" class="state-pill-text">(0,1): 2 → 0</text>
+    <rect x="914" y="392" width="116" height="28" rx="14" class="state-pill-em" />
+    <text x="972" y="411" text-anchor="middle" class="state-pill-text">(2,0): 2 → 0</text>
+    <text x="790" y="440" class="action-text">动作：第二轮遇到 2 就写回 0 —— 原本的"活→死"格子正式死掉。</text>
+    <text x="790" y="462" class="result-text">编码结果：两个 2 都已归并为 0。</text>
+  </g>
+
+  <!-- Phase 9: Pass 2 — -1 → 1 -->
+  <g class="phase phase-9">
+    <rect x="460" y="184" width="180" height="36" rx="18" class="chip-active" />
+    <text x="550" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 2：归并落盘</text>
+
+    <circle cx="310" cy="370" r="44" class="halo" />
+    <circle cx="380" cy="510" r="44" class="halo" />
+
+    <rect x="964" y="530" width="168" height="56" rx="14" class="step-active" />
+    <text x="984" y="556" class="step-no">2</text>
+    <text x="1004" y="552" class="step-title">归并落盘</text>
+    <text x="1004" y="570" class="step-desc">2→0 / -1→1</text>
+    <text x="1004" y="584" class="step-desc">最终 0/1</text>
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">if cell == -1: cell = 1</text>
+    <rect x="790" y="392" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="852" y="411" text-anchor="middle" class="state-pill-text">(1,0): -1 → 1</text>
+    <rect x="922" y="392" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="984" y="411" text-anchor="middle" class="state-pill-text">(3,1): -1 → 1</text>
+    <text x="790" y="440" class="action-text">动作：遇到 -1 就写回 1 —— 原本"死→活"的格子正式复活。</text>
+    <text x="790" y="462" class="result-text">编码结果：两个 -1 都已归并为 1。</text>
+  </g>
+
+  <!-- Phase 10: final board -->
+  <g class="phase phase-10">
+    <rect x="460" y="184" width="180" height="36" rx="18" class="chip-active" />
+    <text x="550" y="207" text-anchor="middle" class="chip-text chip-active-text">Pass 2：归并落盘</text>
+
+    <rect x="271" y="261" width="218" height="288" rx="16" fill="none" stroke="#10b981" stroke-width="3.5" />
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">final board ready</text>
+    <rect x="790" y="392" width="340" height="28" rx="14" class="state-pill-ok" />
+    <text x="960" y="411" text-anchor="middle" class="state-pill-text mono">[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]</text>
+    <text x="790" y="440" class="action-text">动作：所有中间值都被归并，棋盘回到只含 0 / 1 的最终状态。</text>
+    <text x="790" y="462" class="result-text">整个过程原地完成，空间复杂度 O(1)。</text>
+  </g>
+
+  <!-- Phase 11: summary freeze frame -->
+  <g class="phase phase-11">
+    <rect x="460" y="184" width="180" height="36" rx="18" class="chip-active" />
+    <text x="550" y="207" text-anchor="middle" class="chip-text chip-active-text">完成</text>
+
+    <rect x="271" y="261" width="218" height="288" rx="16" fill="none" stroke="#10b981" stroke-width="3.5" />
+    <rect x="238" y="555" width="284" height="36" rx="18" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8" />
+    <text x="380" y="579" text-anchor="middle" class="result-text">两轮遍历完成，原地更新，空间 O(1)</text>
+
+    <rect x="790" y="356" width="340" height="28" rx="14" class="call-pill" />
+    <text x="960" y="375" text-anchor="middle" class="call-text mono">gameOfLife(board) — done</text>
+    <rect x="790" y="392" width="168" height="28" rx="14" class="state-pill-ok" />
+    <text x="874" y="411" text-anchor="middle" class="state-pill-text">时间 O(m·n)</text>
+    <rect x="966" y="392" width="164" height="28" rx="14" class="state-pill-ok" />
+    <text x="1048" y="411" text-anchor="middle" class="state-pill-text">空间 O(1)</text>
+    <text x="790" y="440" class="action-text">要点：Pass 1 编码中间态、Pass 2 归并落盘，邻居统计只看"旧活/旧死"。</text>
+    <text x="790" y="462" class="result-text">记住这个套路，矩阵原地模拟类题目就都能复用同一骨架。</text>
+  </g>
+</svg>

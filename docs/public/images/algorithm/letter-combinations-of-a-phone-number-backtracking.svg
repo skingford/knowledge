@@ -1,0 +1,967 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-label="电话号码的字母组合 DFS 与回溯动态图例" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>电话号码的字母组合：DFS + 回溯动态图例</title>
+  <desc>用 digits=23 演示电话号码字母组合的搜索树展开、dfs(index, path) 的状态变化，以及答案数组如何逐步累积。</desc>
+
+  <defs>
+    <linearGradient id="lc-header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="lc-root" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dbeafe" />
+      <stop offset="100%" stop-color="#bfdbfe" />
+    </linearGradient>
+    <linearGradient id="lc-node" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+    <linearGradient id="lc-active" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffedd5" />
+      <stop offset="100%" stop-color="#fdba74" />
+    </linearGradient>
+    <linearGradient id="lc-answer" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dcfce7" />
+      <stop offset="100%" stop-color="#86efac" />
+    </linearGradient>
+    <linearGradient id="lc-code" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="lc-shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <filter id="lc-soft-shadow" x="-6%" y="-6%" width="112%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#f97316" flood-opacity="0.18" />
+    </filter>
+    <style>
+      :root {
+        --cycle: 15s;
+      }
+
+      text {
+        fill: #0f172a;
+      }
+
+      .panel {
+        fill: #ffffff;
+        stroke: #dbe4f0;
+        stroke-width: 1.5;
+        filter: url(#lc-shadow);
+      }
+
+      .card {
+        fill: #ffffff;
+        stroke: #dbe4f0;
+        stroke-width: 1.5;
+      }
+
+      .title {
+        font-size: 29px;
+        font-weight: 700;
+        fill: #ffffff;
+      }
+
+      .subtitle {
+        font-size: 14px;
+        fill: #dbeafe;
+      }
+
+      .section-title {
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .label {
+        font-size: 13px;
+        font-weight: 700;
+        fill: #475569;
+      }
+
+      .caption {
+        font-size: 12px;
+        fill: #64748b;
+      }
+
+      .tiny {
+        font-size: 12px;
+        fill: #64748b;
+      }
+
+      .mono {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      .mapping-number {
+        font-size: 30px;
+        font-weight: 700;
+        fill: #1d4ed8;
+      }
+
+      .mapping-letters {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .edge {
+        fill: none;
+        stroke: #cbd5e1;
+        stroke-width: 3;
+      }
+
+      .node-root {
+        fill: url(#lc-root);
+        stroke: #2563eb;
+        stroke-width: 2.5;
+      }
+
+      .root-input-main {
+        font-size: 13px;
+        font-weight: 700;
+        fill: #1d4ed8;
+      }
+
+      .root-input-sub {
+        font-size: 11px;
+        fill: #475569;
+      }
+
+      .node-level,
+      .node-leaf {
+        fill: url(#lc-node);
+        stroke: #94a3b8;
+        stroke-width: 2;
+      }
+
+      .node-text {
+        font-size: 21px;
+        font-weight: 700;
+      }
+
+      .node-sub {
+        font-size: 11px;
+        fill: #64748b;
+      }
+
+      .legend-dot {
+        stroke: none;
+      }
+
+      .code-box {
+        fill: url(#lc-code);
+        stroke: #1e293b;
+        stroke-width: 1.5;
+      }
+
+      .code-text {
+        font-size: 15px;
+        fill: #dbeafe;
+      }
+
+      .code-em {
+        fill: #fb923c;
+        font-weight: 700;
+      }
+
+      .phase {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .phase .edge-active {
+        fill: none;
+        stroke: #f97316;
+        stroke-width: 4.5;
+        stroke-dasharray: 11 8;
+        animation: lc-dash 1.2s linear infinite;
+      }
+
+      .phase .node-active {
+        fill: url(#lc-active);
+        stroke: #ea580c;
+        stroke-width: 2.5;
+        fill-opacity: 0.72;
+        filter: url(#lc-soft-shadow);
+      }
+
+      .phase .leaf-done {
+        fill: url(#lc-answer);
+        stroke: #059669;
+        stroke-width: 2.5;
+        fill-opacity: 0.82;
+        filter: url(#lc-soft-shadow);
+      }
+
+      .phase .halo {
+        fill: none;
+        stroke: #fdba74;
+        stroke-width: 5;
+        opacity: 0.45;
+        animation: lc-pulse 1.15s ease-in-out infinite;
+      }
+
+      .phase .card-active {
+        fill: none;
+        stroke: #fb923c;
+        stroke-width: 2.5;
+        filter: url(#lc-soft-shadow);
+      }
+
+      .state-pill {
+        fill: #eff6ff;
+        stroke: #93c5fd;
+        stroke-width: 1.5;
+      }
+
+      .state-pill-em {
+        fill: #fff7ed;
+        stroke: #fdba74;
+        stroke-width: 1.5;
+      }
+
+      .state-pill-text {
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .call-pill {
+        fill: #0f172a;
+        stroke: #1e293b;
+        stroke-width: 1.5;
+      }
+
+      .call-text {
+        font-size: 16px;
+        fill: #f8fafc;
+        font-weight: 700;
+      }
+
+      .action-text {
+        font-size: 12px;
+        fill: #0f172a;
+      }
+
+      .result-text {
+        font-size: 11px;
+        font-weight: 700;
+        fill: #047857;
+      }
+
+      .phase .action-text {
+        transform: translateY(18px);
+      }
+
+      .phase .result-text {
+        transform: translateY(20px);
+      }
+
+      .phase-summary {
+        transform: none !important;
+      }
+
+      .result-muted {
+        fill: #64748b;
+      }
+
+      .answer-shell rect {
+        fill: #f1f5f9;
+        stroke: #cbd5e1;
+        stroke-width: 1.5;
+      }
+
+      .answer-shell text {
+        font-size: 16px;
+        font-weight: 700;
+        fill: #94a3b8;
+      }
+
+      .answer-fill {
+        opacity: 0;
+      }
+
+      .answer-fill rect {
+        fill: url(#lc-answer);
+        stroke: #10b981;
+        stroke-width: 1.5;
+      }
+
+      .answer-fill text {
+        font-size: 16px;
+        font-weight: 700;
+        fill: #065f46;
+      }
+
+      .step-box {
+        fill: #f8fafc;
+        stroke: #dbe4f0;
+        stroke-width: 1.5;
+      }
+
+      .step-no {
+        font-size: 24px;
+        font-weight: 700;
+        fill: #1d4ed8;
+      }
+
+      .step-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .step-desc {
+        font-size: 11px;
+        fill: #64748b;
+      }
+
+      .phase-0 {
+        animation: lc-phase-0 var(--cycle) linear infinite;
+      }
+
+      .phase-1 {
+        animation: lc-phase-1 var(--cycle) linear infinite;
+      }
+
+      .phase-2 {
+        animation: lc-phase-2 var(--cycle) linear infinite;
+      }
+
+      .phase-3 {
+        animation: lc-phase-3 var(--cycle) linear infinite;
+      }
+
+      .phase-4 {
+        animation: lc-phase-4 var(--cycle) linear infinite;
+      }
+
+      .phase-5 {
+        animation: lc-phase-5 var(--cycle) linear infinite;
+      }
+
+      .phase-6 {
+        animation: lc-phase-6 var(--cycle) linear infinite;
+      }
+
+      .phase-7 {
+        animation: lc-phase-7 var(--cycle) linear infinite;
+      }
+
+      .phase-8 {
+        animation: lc-phase-8 var(--cycle) linear infinite;
+      }
+
+      .phase-9 {
+        animation: lc-phase-9 var(--cycle) linear infinite;
+      }
+
+      .phase-10 {
+        animation: lc-phase-10 var(--cycle) linear infinite;
+      }
+
+      .phase-11 {
+        animation: lc-phase-11 var(--cycle) linear infinite;
+      }
+
+      .answer-1 {
+        animation: lc-reveal-1 var(--cycle) linear infinite;
+      }
+
+      .answer-2 {
+        animation: lc-reveal-2 var(--cycle) linear infinite;
+      }
+
+      .answer-3 {
+        animation: lc-reveal-3 var(--cycle) linear infinite;
+      }
+
+      .answer-4 {
+        animation: lc-reveal-4 var(--cycle) linear infinite;
+      }
+
+      .answer-5 {
+        animation: lc-reveal-5 var(--cycle) linear infinite;
+      }
+
+      .answer-6 {
+        animation: lc-reveal-6 var(--cycle) linear infinite;
+      }
+
+      .answer-7 {
+        animation: lc-reveal-7 var(--cycle) linear infinite;
+      }
+
+      .answer-8 {
+        animation: lc-reveal-8 var(--cycle) linear infinite;
+      }
+
+      .answer-9 {
+        animation: lc-reveal-9 var(--cycle) linear infinite;
+      }
+
+      @keyframes lc-dash {
+        from {
+          stroke-dashoffset: 0;
+        }
+        to {
+          stroke-dashoffset: -38;
+        }
+      }
+
+      @keyframes lc-pulse {
+        0%, 100% {
+          opacity: 0.35;
+          transform: scale(1);
+          transform-origin: center;
+        }
+        50% {
+          opacity: 0.95;
+          transform: scale(1.06);
+          transform-origin: center;
+        }
+      }
+
+      @keyframes lc-phase-0 {
+        0%, 8.2% { opacity: 1; }
+        8.34%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-1 {
+        0%, 8.2% { opacity: 0; }
+        8.34%, 16.5% { opacity: 1; }
+        16.67%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-2 {
+        0%, 16.5% { opacity: 0; }
+        16.67%, 24.8% { opacity: 1; }
+        25.01%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-3 {
+        0%, 24.8% { opacity: 0; }
+        25.01%, 33.1% { opacity: 1; }
+        33.34%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-4 {
+        0%, 33.1% { opacity: 0; }
+        33.34%, 41.5% { opacity: 1; }
+        41.67%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-5 {
+        0%, 41.5% { opacity: 0; }
+        41.67%, 49.8% { opacity: 1; }
+        50.01%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-6 {
+        0%, 49.8% { opacity: 0; }
+        50.01%, 58.1% { opacity: 1; }
+        58.34%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-7 {
+        0%, 58.1% { opacity: 0; }
+        58.34%, 66.5% { opacity: 1; }
+        66.67%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-8 {
+        0%, 66.5% { opacity: 0; }
+        66.67%, 74.8% { opacity: 1; }
+        75.01%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-9 {
+        0%, 74.8% { opacity: 0; }
+        75.01%, 83.1% { opacity: 1; }
+        83.34%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-10 {
+        0%, 83.1% { opacity: 0; }
+        83.34%, 91.5% { opacity: 1; }
+        91.67%, 100% { opacity: 0; }
+      }
+
+      @keyframes lc-phase-11 {
+        0%, 91.5% { opacity: 0; }
+        91.67%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-1 {
+        0%, 16.5% { opacity: 0; }
+        16.67%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-2 {
+        0%, 24.8% { opacity: 0; }
+        25.01%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-3 {
+        0%, 33.1% { opacity: 0; }
+        33.34%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-4 {
+        0%, 41.5% { opacity: 0; }
+        41.67%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-5 {
+        0%, 49.8% { opacity: 0; }
+        50.01%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-6 {
+        0%, 58.1% { opacity: 0; }
+        58.34%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-7 {
+        0%, 66.5% { opacity: 0; }
+        66.67%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-8 {
+        0%, 74.8% { opacity: 0; }
+        75.01%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @keyframes lc-reveal-9 {
+        0%, 83.1% { opacity: 0; }
+        83.34%, 99.8% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .phase,
+        .answer-fill,
+        .phase .edge-active,
+        .phase .halo {
+          animation: none !important;
+        }
+
+        .phase {
+          opacity: 0;
+        }
+
+        .phase-11,
+        .answer-fill {
+          opacity: 1;
+        }
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" rx="24" fill="#f7f8fc" />
+
+  <rect x="20" y="18" width="1160" height="68" rx="20" fill="url(#lc-header)" />
+  <text x="600" y="56" text-anchor="middle" class="title">电话号码的字母组合：DFS + 回溯动态图例</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">以 digits = "23" 为例，动画按 DFS 顺序循环演示“选字符 → 递归下一位 → 回溯撤销”</text>
+
+  <rect x="30" y="106" width="700" height="624" rx="24" class="panel" />
+  <rect x="750" y="106" width="420" height="624" rx="24" class="panel" />
+
+  <text x="58" y="142" class="section-title">1. 搜索树按数字位一层层展开</text>
+  <text x="58" y="164" class="caption">第 1 层只从 2 的映射里选；第 2 层只从 3 的映射里选；走到叶子才得到完整答案。</text>
+
+  <rect x="70" y="182" width="170" height="92" rx="18" class="card" />
+  <text x="100" y="220" class="mapping-number">2</text>
+  <text x="165" y="220" text-anchor="middle" class="mapping-letters" fill="#1d4ed8">abc</text>
+  <text x="155" y="246" text-anchor="middle" class="tiny">第 1 层：先选 a / b / c</text>
+
+  <rect x="260" y="182" width="170" height="92" rx="18" class="card" />
+  <text x="290" y="220" class="mapping-number">3</text>
+  <text x="355" y="220" text-anchor="middle" class="mapping-letters" fill="#1d4ed8">def</text>
+  <text x="345" y="246" text-anchor="middle" class="tiny">第 2 层：再选 d / e / f</text>
+
+  <rect x="450" y="182" width="240" height="92" rx="18" class="card" />
+  <text x="570" y="214" text-anchor="middle" class="label">回溯看懂三件事就够了</text>
+  <text x="570" y="236" text-anchor="middle" class="tiny">1. `path` 保存已经选中的字符</text>
+  <text x="570" y="254" text-anchor="middle" class="tiny">2. `index` 决定当前处理哪一位数字</text>
+  <text x="570" y="272" text-anchor="middle" class="tiny">3. 到叶子 append，回来后 pop</text>
+
+  <path d="M380 342 C380 348 160 348 160 357" class="edge" />
+  <path d="M380 342 L380 357" class="edge" />
+  <path d="M380 342 C380 348 600 348 600 357" class="edge" />
+
+  <path d="M160 399 C160 448 90 452 90 519" class="edge" />
+  <path d="M160 399 L160 519" class="edge" />
+  <path d="M160 399 C160 448 230 452 230 519" class="edge" />
+
+  <path d="M380 399 C380 448 310 452 310 519" class="edge" />
+  <path d="M380 399 L380 519" class="edge" />
+  <path d="M380 399 C380 448 450 452 450 519" class="edge" />
+
+  <path d="M600 399 C600 448 530 452 530 519" class="edge" />
+  <path d="M600 399 L600 519" class="edge" />
+  <path d="M600 399 C600 448 670 452 670 519" class="edge" />
+
+  <rect x="322" y="286" width="116" height="56" rx="22" class="node-root" />
+  <text x="380" y="309" text-anchor="middle" class="root-input-main mono">digits="23"</text>
+  <text x="380" y="329" text-anchor="middle" class="root-input-sub mono">path="" · root</text>
+
+  <rect x="122" y="357" width="76" height="42" rx="18" class="node-level" />
+  <text x="160" y="384" text-anchor="middle" class="node-text">a</text>
+
+  <rect x="342" y="357" width="76" height="42" rx="18" class="node-level" />
+  <text x="380" y="384" text-anchor="middle" class="node-text">b</text>
+
+  <rect x="562" y="357" width="76" height="42" rx="18" class="node-level" />
+  <text x="600" y="384" text-anchor="middle" class="node-text">c</text>
+
+  <rect x="54" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="90" y="545" text-anchor="middle" class="node-text">ad</text>
+
+  <rect x="124" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="160" y="545" text-anchor="middle" class="node-text">ae</text>
+
+  <rect x="194" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="230" y="545" text-anchor="middle" class="node-text">af</text>
+
+  <rect x="274" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="310" y="545" text-anchor="middle" class="node-text">bd</text>
+
+  <rect x="344" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="380" y="545" text-anchor="middle" class="node-text">be</text>
+
+  <rect x="414" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="450" y="545" text-anchor="middle" class="node-text">bf</text>
+
+  <rect x="494" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="530" y="545" text-anchor="middle" class="node-text">cd</text>
+
+  <rect x="564" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="600" y="545" text-anchor="middle" class="node-text">ce</text>
+
+  <rect x="634" y="519" width="72" height="40" rx="18" class="node-leaf" />
+  <text x="670" y="545" text-anchor="middle" class="node-text">cf</text>
+
+  <circle cx="82" cy="656" r="8" fill="#f97316" class="legend-dot" />
+  <text x="98" y="661" class="tiny">橙色分支：当前 DFS 正在探索的路径</text>
+  <circle cx="356" cy="656" r="8" fill="#10b981" class="legend-dot" />
+  <text x="372" y="661" class="tiny">绿色叶子：刚加入或已经保存在 `ans` 中的答案</text>
+  <text x="58" y="696" class="caption">输入如果再长一位，搜索树就会继续向下多长一层；本质上是在做按位字符集合的笛卡尔积枚举。</text>
+
+  <text x="778" y="142" class="section-title">2. 递归状态和答案会同步变化</text>
+  <text x="778" y="164" class="caption">右边同步看 3 个状态：当前层级、`path` 内容、`ans` 如何累积。</text>
+
+  <rect x="780" y="184" width="360" height="214" rx="20" class="card" fill="#f8fafc" />
+  <text x="804" y="212" class="label">当前递归帧</text>
+
+  <rect x="800" y="226" width="320" height="52" rx="14" class="code-box" />
+  <text x="820" y="246" class="code-text mono">for ch in mapping[digits[index]]:</text>
+  <text x="820" y="264" class="code-text mono"><tspan class="code-em">push(ch)</tspan> → dfs(next) → <tspan class="code-em">pop()</tspan></text>
+
+  <rect x="780" y="402" width="360" height="176" rx="20" class="card" fill="#f8fafc" />
+  <text x="804" y="430" class="label">`ans` 如何一点点累积</text>
+  <text x="804" y="450" class="tiny">绿色 pill 表示这个组合已经 append 进答案数组，后续会一直保留。</text>
+
+  <g class="answer-shell">
+    <rect x="802" y="466" width="88" height="32" rx="14" />
+    <text x="846" y="487" text-anchor="middle">ad</text>
+    <rect x="916" y="466" width="88" height="32" rx="14" />
+    <text x="960" y="487" text-anchor="middle">ae</text>
+    <rect x="1030" y="466" width="88" height="32" rx="14" />
+    <text x="1074" y="487" text-anchor="middle">af</text>
+
+    <rect x="802" y="508" width="88" height="32" rx="14" />
+    <text x="846" y="529" text-anchor="middle">bd</text>
+    <rect x="916" y="508" width="88" height="32" rx="14" />
+    <text x="960" y="529" text-anchor="middle">be</text>
+    <rect x="1030" y="508" width="88" height="32" rx="14" />
+    <text x="1074" y="529" text-anchor="middle">bf</text>
+
+    <rect x="802" y="550" width="88" height="32" rx="14" />
+    <text x="846" y="571" text-anchor="middle">cd</text>
+    <rect x="916" y="550" width="88" height="32" rx="14" />
+    <text x="960" y="571" text-anchor="middle">ce</text>
+    <rect x="1030" y="550" width="88" height="32" rx="14" />
+    <text x="1074" y="571" text-anchor="middle">cf</text>
+  </g>
+
+  <g class="answer-fill answer-1">
+    <rect x="802" y="466" width="88" height="32" rx="14" />
+    <text x="846" y="487" text-anchor="middle">ad</text>
+  </g>
+  <g class="answer-fill answer-2">
+    <rect x="916" y="466" width="88" height="32" rx="14" />
+    <text x="960" y="487" text-anchor="middle">ae</text>
+  </g>
+  <g class="answer-fill answer-3">
+    <rect x="1030" y="466" width="88" height="32" rx="14" />
+    <text x="1074" y="487" text-anchor="middle">af</text>
+  </g>
+  <g class="answer-fill answer-4">
+    <rect x="802" y="508" width="88" height="32" rx="14" />
+    <text x="846" y="529" text-anchor="middle">bd</text>
+  </g>
+  <g class="answer-fill answer-5">
+    <rect x="916" y="508" width="88" height="32" rx="14" />
+    <text x="960" y="529" text-anchor="middle">be</text>
+  </g>
+  <g class="answer-fill answer-6">
+    <rect x="1030" y="508" width="88" height="32" rx="14" />
+    <text x="1074" y="529" text-anchor="middle">bf</text>
+  </g>
+  <g class="answer-fill answer-7">
+    <rect x="802" y="550" width="88" height="32" rx="14" />
+    <text x="846" y="571" text-anchor="middle">cd</text>
+  </g>
+  <g class="answer-fill answer-8">
+    <rect x="916" y="550" width="88" height="32" rx="14" />
+    <text x="960" y="571" text-anchor="middle">ce</text>
+  </g>
+  <g class="answer-fill answer-9">
+    <rect x="1030" y="550" width="88" height="32" rx="14" />
+    <text x="1074" y="571" text-anchor="middle">cf</text>
+  </g>
+
+  <rect x="780" y="592" width="360" height="124" rx="20" class="card" fill="#f8fafc" />
+  <text x="804" y="618" class="label">回溯模板其实就是这 3 步</text>
+
+  <rect x="796" y="636" width="100" height="54" rx="16" class="step-box" />
+  <text x="846" y="658" text-anchor="middle" class="step-no">1</text>
+  <text x="846" y="674" text-anchor="middle" class="step-title">选字符</text>
+  <text x="846" y="687" text-anchor="middle" class="step-desc">当前位挑一个</text>
+
+  <rect x="910" y="636" width="100" height="54" rx="16" class="step-box" />
+  <text x="960" y="658" text-anchor="middle" class="step-no">2</text>
+  <text x="960" y="674" text-anchor="middle" class="step-title">递归</text>
+  <text x="960" y="687" text-anchor="middle" class="step-desc">处理下一位</text>
+
+  <rect x="1024" y="636" width="100" height="54" rx="16" class="step-box" />
+  <text x="1074" y="658" text-anchor="middle" class="step-no">3</text>
+  <text x="1074" y="674" text-anchor="middle" class="step-title">回退</text>
+  <text x="1074" y="687" text-anchor="middle" class="step-desc">pop 再试下个</text>
+
+  <text x="960" y="709" text-anchor="middle" class="tiny">这就是 LeetCode 回溯题里最常见、最稳定的骨架。</text>
+
+  <g class="phase phase-0">
+    <rect x="70" y="182" width="170" height="92" rx="18" class="card-active" />
+    <rect x="322" y="286" width="116" height="56" rx="22" class="card-active" />
+    <circle cx="380" cy="314" r="38" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(0, "")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=0</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path=""</text>
+    <text x="804" y="356" class="action-text">动作：从第 1 位开始，准备枚举 a / b / c。</text>
+    <text x="804" y="370" class="result-text result-muted">追加答案：-</text>
+  </g>
+
+  <g class="phase phase-1">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 160 348 160 357" class="edge-active" />
+    <rect x="322" y="286" width="116" height="56" rx="22" class="card-active" />
+    <rect x="122" y="357" width="76" height="42" rx="18" class="node-active" />
+    <circle cx="380" cy="314" r="38" class="halo" />
+    <circle cx="160" cy="378" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(1, "a")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=1</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="a"</text>
+    <text x="804" y="356" class="action-text">动作：先选 a，再递归处理第 2 位。</text>
+    <text x="804" y="370" class="result-text result-muted">追加答案：-</text>
+  </g>
+
+  <g class="phase phase-2">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 160 348 160 357" class="edge-active" />
+    <path d="M160 399 C160 448 90 452 90 519" class="edge-active" />
+    <rect x="122" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="54" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="90" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "ad")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="ad"</text>
+    <text x="804" y="356" class="action-text">动作：选 d 后，path 满长度，命中叶子。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 ad 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-3">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 160 348 160 357" class="edge-active" />
+    <path d="M160 399 L160 519" class="edge-active" />
+    <rect x="122" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="124" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="160" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "ae")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="ae"</text>
+    <text x="804" y="356" class="action-text">动作：回到 a，撤销 d，改选 e。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 ae 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-4">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 160 348 160 357" class="edge-active" />
+    <path d="M160 399 C160 448 230 452 230 519" class="edge-active" />
+    <rect x="122" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="194" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="230" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "af")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="af"</text>
+    <text x="804" y="356" class="action-text">动作：同一分支里继续试 f。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 af 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-5">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 L380 357" class="edge-active" />
+    <path d="M380 399 C380 448 310 452 310 519" class="edge-active" />
+    <rect x="342" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="274" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="310" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "bd")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="bd"</text>
+    <text x="804" y="356" class="action-text">动作：a 分支结束，回根后改选 b。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 bd 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-6">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 L380 357" class="edge-active" />
+    <path d="M380 399 L380 519" class="edge-active" />
+    <rect x="342" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="344" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="380" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "be")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="be"</text>
+    <text x="804" y="356" class="action-text">动作：回到 b，撤销 d，改选 e。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 be 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-7">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 L380 357" class="edge-active" />
+    <path d="M380 399 C380 448 450 452 450 519" class="edge-active" />
+    <rect x="342" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="414" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="450" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "bf")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="bf"</text>
+    <text x="804" y="356" class="action-text">动作：同一分支里继续试 f。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 bf 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-8">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 600 348 600 357" class="edge-active" />
+    <path d="M600 399 C600 448 530 452 530 519" class="edge-active" />
+    <rect x="562" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="494" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="530" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "cd")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="cd"</text>
+    <text x="804" y="356" class="action-text">动作：b 分支结束，回根后改选 c。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 cd 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-9">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 600 348 600 357" class="edge-active" />
+    <path d="M600 399 L600 519" class="edge-active" />
+    <rect x="562" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="564" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="600" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "ce")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="ce"</text>
+    <text x="804" y="356" class="action-text">动作：回到 c，撤销 d，改选 e。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 ce 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-10">
+    <rect x="260" y="182" width="170" height="92" rx="18" class="card-active" />
+    <path d="M380 342 C380 348 600 348 600 357" class="edge-active" />
+    <path d="M600 399 C600 448 670 452 670 519" class="edge-active" />
+    <rect x="562" y="357" width="76" height="42" rx="18" class="node-active" />
+    <rect x="634" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <circle cx="670" cy="539" r="30" class="halo" />
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">dfs(2, "cf")</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=2</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">path="cf"</text>
+    <text x="804" y="356" class="action-text">动作：c 分支里继续试 f。</text>
+    <text x="804" y="370" class="result-text">追加答案：把 cf 放进 ans。</text>
+  </g>
+
+  <g class="phase phase-11">
+    <rect x="54" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="124" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="194" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="274" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="344" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="414" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="494" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="564" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="634" y="519" width="72" height="40" rx="18" class="leaf-done" />
+    <rect x="238" y="598" width="284" height="38" rx="19" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8" />
+    <text x="380" y="622" text-anchor="middle" class="result-text phase-summary">整棵树遍历完成：一共收集到 9 个组合</text>
+
+    <rect x="800" y="288" width="210" height="30" rx="14" class="call-pill" />
+    <text x="905" y="308" text-anchor="middle" class="call-text mono">search done</text>
+    <rect x="800" y="326" width="92" height="28" rx="14" class="state-pill" />
+    <text x="846" y="344" text-anchor="middle" class="state-pill-text">index=0</text>
+    <rect x="904" y="326" width="104" height="28" rx="14" class="state-pill-em" />
+    <text x="956" y="344" text-anchor="middle" class="state-pill-text">len=9</text>
+    <text x="804" y="356" class="action-text">动作：所有分支走完，DFS 回到起点。</text>
+    <text x="804" y="370" class="result-text">最终结果：9 个组合，顺序就是 DFS 叶子访问顺序。</text>
+  </g>
+</svg>

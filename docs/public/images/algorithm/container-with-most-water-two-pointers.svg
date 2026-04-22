@@ -1,0 +1,733 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-label="盛最多水的容器 双指针动态图例" font-family="'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>盛最多水的容器：双指针收缩短板</title>
+  <desc>以 height=[1,8,6,2,5,4,8,3,7] 为例，动画循环演示每一步面积计算、ans 更新，以及为什么每次移动短板。</desc>
+
+  <!--
+    Verified iterations (input [1,8,6,2,5,4,8,3,7]):
+      iter 1: L=0 R=8 h=(1,7) min=1 w=8  area=8   ans=8   move L (new max 8)
+      iter 2: L=1 R=8 h=(8,7) min=7 w=7  area=49  ans=49  move R (new max 49)
+      iter 3: L=1 R=7 h=(8,3) min=3 w=6  area=18  ans=49  move R
+      iter 4: L=1 R=6 h=(8,8) min=8 w=5  area=40  ans=49  move L (tie)
+      iter 5: L=2 R=6 h=(6,8) min=6 w=4  area=24  ans=49  move L
+      iter 6: L=3 R=6 h=(2,8) min=2 w=3  area=6   ans=49  move L
+      iter 7: L=4 R=6 h=(5,8) min=5 w=2  area=10  ans=49  move L
+      iter 8: L=5 R=6 h=(4,8) min=4 w=1  area=4   ans=49  move L
+      exit:  L=R=6  return 49
+  -->
+
+  <defs>
+    <linearGradient id="cmw-header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+    <linearGradient id="cmw-bar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <linearGradient id="cmw-bar-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <linearGradient id="cmw-water" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bfdbfe" stop-opacity="0.55" />
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.85" />
+    </linearGradient>
+    <linearGradient id="cmw-water-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="cmw-L" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="cmw-R" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fcd34d" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="cmw-code" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="cmw-shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <filter id="cmw-soft-shadow" x="-6%" y="-6%" width="112%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#f97316" flood-opacity="0.20" />
+    </filter>
+    <style>
+      :root { --cycle: 18s; }
+      text { fill: #0f172a; }
+
+      .panel { fill: #ffffff; stroke: #dbe4f0; stroke-width: 1.5; filter: url(#cmw-shadow); }
+      .card { fill: #ffffff; stroke: #dbe4f0; stroke-width: 1.5; }
+      .card-soft { fill: #f8fafc; stroke: #dbe4f0; stroke-width: 1.5; }
+
+      .title { font-size: 29px; font-weight: 700; fill: #ffffff; }
+      .subtitle { font-size: 14px; fill: #dbeafe; }
+      .section-title { font-size: 19px; font-weight: 700; }
+      .label { font-size: 13px; font-weight: 700; fill: #475569; }
+      .caption { font-size: 12px; fill: #64748b; }
+      .tiny { font-size: 12px; fill: #64748b; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+
+      /* Bars */
+      .bar { fill: url(#cmw-bar); stroke: #64748b; stroke-width: 1.5; }
+      .bar-discard { fill: #e2e8f0; stroke: #cbd5e1; stroke-width: 1; opacity: 0.88; }
+      .bar-gold { fill: url(#cmw-bar-gold); stroke: #d97706; stroke-width: 2.2; }
+      .bar-label { font-size: 11px; fill: #475569; font-weight: 700; }
+      .idx-label { font-size: 12px; font-weight: 700; fill: #64748b; }
+      .axis-line { stroke: #334155; stroke-width: 2; }
+
+      /* Pointer badges */
+      .pointer-badge-L { fill: url(#cmw-L); stroke: #1d4ed8; stroke-width: 2; }
+      .pointer-badge-R { fill: url(#cmw-R); stroke: #b45309; stroke-width: 2; }
+      .pointer-text { font-size: 17px; font-weight: 700; fill: #ffffff; }
+      .pointer-line-L { stroke: #2563eb; stroke-width: 2; stroke-dasharray: 4 4; }
+      .pointer-line-R { stroke: #d97706; stroke-width: 2; stroke-dasharray: 4 4; }
+      .pointer-arrow-L { fill: #2563eb; }
+      .pointer-arrow-R { fill: #d97706; }
+      .bar-active-L { fill: none; stroke: #2563eb; stroke-width: 3; }
+      .bar-active-R { fill: none; stroke: #d97706; stroke-width: 3; }
+
+      /* Water */
+      .water { fill: url(#cmw-water); stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 5 4; }
+      .water-gold { fill: url(#cmw-water-gold); stroke: #d97706; stroke-width: 2; }
+      .water-text { font-size: 18px; font-weight: 700; fill: #0c4a6e; }
+      .water-text-gold { font-size: 22px; font-weight: 700; fill: #78350f; }
+
+      /* Chips */
+      .chip { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.5; }
+      .chip-text { font-size: 13px; font-weight: 700; fill: #64748b; }
+      .chip-active { fill: #fff7ed; stroke: #f97316; stroke-width: 2; }
+      .chip-active-text { fill: #c2410c; }
+      .chip-gold { fill: #fef3c7; stroke: #d97706; stroke-width: 2; }
+      .chip-gold-text { fill: #78350f; }
+
+      /* State and code pills */
+      .code-text { font-size: 14px; fill: #dbeafe; }
+      .call-pill { fill: #0f172a; stroke: #1e293b; stroke-width: 1.5; }
+      .call-text { font-size: 15px; fill: #f8fafc; font-weight: 700; }
+      .state-pill { fill: #eff6ff; stroke: #93c5fd; stroke-width: 1.5; }
+      .state-pill-em { fill: #fff7ed; stroke: #fdba74; stroke-width: 1.5; }
+      .state-pill-ok { fill: #ecfdf5; stroke: #6ee7b7; stroke-width: 1.5; }
+      .state-pill-gold { fill: #fef3c7; stroke: #fbbf24; stroke-width: 1.8; }
+      .state-pill-text { font-size: 12px; font-weight: 700; }
+
+      .action-text { font-size: 13px; fill: #0f172a; }
+      .result-text { font-size: 12px; font-weight: 700; fill: #047857; }
+      .result-muted { fill: #64748b; }
+
+      /* Area history pills */
+      .area-pill { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.5; }
+      .area-pill-best { fill: url(#cmw-bar-gold); stroke: #d97706; stroke-width: 2; }
+      .area-pill-text { font-size: 12px; font-weight: 700; }
+      .area-pill-text-gold { fill: #78350f; }
+
+      /* ans big number */
+      .ans-number { font-size: 36px; font-weight: 800; fill: #0f172a; }
+      .ans-number-new { fill: #b45309; }
+      .ans-label { font-size: 12px; font-weight: 700; fill: #64748b; }
+
+      .phase { opacity: 0; pointer-events: none; }
+      .phase .halo { fill: none; stroke: #fdba74; stroke-width: 4; opacity: 0.5; animation: cmw-pulse 1.15s ease-in-out infinite; }
+      .phase .gold-halo { fill: none; stroke: #f59e0b; stroke-width: 4; opacity: 0.6; animation: cmw-pulse 1.15s ease-in-out infinite; }
+
+      .reveal { opacity: 0; }
+
+      .phase-0 { animation: cmw-p0 var(--cycle) linear infinite; }
+      .phase-1 { animation: cmw-p1 var(--cycle) linear infinite; }
+      .phase-2 { animation: cmw-p2 var(--cycle) linear infinite; }
+      .phase-3 { animation: cmw-p3 var(--cycle) linear infinite; }
+      .phase-4 { animation: cmw-p4 var(--cycle) linear infinite; }
+      .phase-5 { animation: cmw-p5 var(--cycle) linear infinite; }
+      .phase-6 { animation: cmw-p6 var(--cycle) linear infinite; }
+      .phase-7 { animation: cmw-p7 var(--cycle) linear infinite; }
+      .phase-8 { animation: cmw-p8 var(--cycle) linear infinite; }
+
+      /* Area history reveals (persist through end) */
+      .r-area-1 { animation: cmw-r-area-1 var(--cycle) linear infinite; }
+      .r-area-2 { animation: cmw-r-area-2 var(--cycle) linear infinite; }
+      .r-area-3 { animation: cmw-r-area-3 var(--cycle) linear infinite; }
+      .r-area-4 { animation: cmw-r-area-4 var(--cycle) linear infinite; }
+      .r-area-5 { animation: cmw-r-area-5 var(--cycle) linear infinite; }
+      .r-area-6 { animation: cmw-r-area-6 var(--cycle) linear infinite; }
+      .r-area-7 { animation: cmw-r-area-7 var(--cycle) linear infinite; }
+      .r-area-8 { animation: cmw-r-area-8 var(--cycle) linear infinite; }
+
+      /* Discard overlays (cover bars that L/R has moved past) */
+      .r-discard-0 { animation: cmw-r-d0 var(--cycle) linear infinite; }
+      .r-discard-8 { animation: cmw-r-d8 var(--cycle) linear infinite; }
+      .r-discard-7 { animation: cmw-r-d7 var(--cycle) linear infinite; }
+      .r-discard-1 { animation: cmw-r-d1 var(--cycle) linear infinite; }
+      .r-discard-mid { animation: cmw-r-dmid var(--cycle) linear infinite; }
+
+      /* ans reveals (overlayed text with phase windows) */
+      .r-ans-0  { animation: cmw-r-a0  var(--cycle) linear infinite; }
+      .r-ans-8  { animation: cmw-r-a8  var(--cycle) linear infinite; }
+      .r-ans-49 { animation: cmw-r-a49 var(--cycle) linear infinite; }
+
+      /* Gold highlight for optimal pair (bars 1 and 8) in phase 7+ */
+      .r-gold { animation: cmw-r-gold var(--cycle) linear infinite; }
+
+      @keyframes cmw-pulse { 0%,100% { opacity: 0.35; transform: scale(1); transform-origin: center; } 50% { opacity: 0.95; transform: scale(1.06); transform-origin: center; } }
+      @keyframes cmw-dash  { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -18; } }
+
+      /* Phase boundaries (18s cycle) */
+      @keyframes cmw-p0 { 0%,8.7%  { opacity: 1; } 8.89%,100% { opacity: 0; } }
+      @keyframes cmw-p1 { 0%,8.7%  { opacity: 0; } 8.89%,19.82% { opacity: 1; } 20%,100% { opacity: 0; } }
+      @keyframes cmw-p2 { 0%,19.82% { opacity: 0; } 20%,32.6% { opacity: 1; } 32.78%,100% { opacity: 0; } }
+      @keyframes cmw-p3 { 0%,32.6% { opacity: 0; } 32.78%,42.6% { opacity: 1; } 42.78%,100% { opacity: 0; } }
+      @keyframes cmw-p4 { 0%,42.6% { opacity: 0; } 42.78%,52.6% { opacity: 1; } 52.78%,100% { opacity: 0; } }
+      @keyframes cmw-p5 { 0%,52.6% { opacity: 0; } 52.78%,64.82% { opacity: 1; } 65%,100% { opacity: 0; } }
+      @keyframes cmw-p6 { 0%,64.82% { opacity: 0; } 65%,72.6% { opacity: 1; } 72.78%,100% { opacity: 0; } }
+      @keyframes cmw-p7 { 0%,72.6% { opacity: 0; } 72.78%,83.7% { opacity: 1; } 83.89%,100% { opacity: 0; } }
+      @keyframes cmw-p8 { 0%,83.7% { opacity: 0; } 83.89%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @keyframes cmw-r-area-1 { 0%,8.7%  { opacity: 0; } 8.89%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-2 { 0%,19.82% { opacity: 0; } 20%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-3 { 0%,32.6% { opacity: 0; } 32.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-4 { 0%,42.6% { opacity: 0; } 42.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-5 { 0%,52.6% { opacity: 0; } 52.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-6 { 0%,55.7% { opacity: 0; } 55.83%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-7 { 0%,58.7% { opacity: 0; } 58.89%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-area-8 { 0%,61.8% { opacity: 0; } 61.94%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @keyframes cmw-r-d0 { 0%,19.82% { opacity: 0; } 20%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-d8 { 0%,32.6% { opacity: 0; } 32.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-d7 { 0%,42.6% { opacity: 0; } 42.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-d1 { 0%,52.6% { opacity: 0; } 52.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes cmw-r-dmid { 0%,64.82% { opacity: 0; } 65%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @keyframes cmw-r-a0  { 0%,8.7%  { opacity: 1; } 8.89%,100% { opacity: 0; } }
+      @keyframes cmw-r-a8  { 0%,8.7%  { opacity: 0; } 8.89%,19.82% { opacity: 1; } 20%,100% { opacity: 0; } }
+      @keyframes cmw-r-a49 { 0%,19.82% { opacity: 0; } 20%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @keyframes cmw-r-gold { 0%,72.6% { opacity: 0; } 72.78%,99.8% { opacity: 1; } 100% { opacity: 0; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .phase, .reveal, .phase .halo, .phase .gold-halo { animation: none !important; }
+        .phase { opacity: 0; }
+        .phase-8,
+        .r-area-1, .r-area-2, .r-area-3, .r-area-4, .r-area-5, .r-area-6, .r-area-7, .r-area-8,
+        .r-discard-0, .r-discard-8, .r-discard-7, .r-discard-mid,
+        .r-ans-49, .r-gold { opacity: 1; }
+        .r-discard-1 { opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" rx="24" fill="#f7f8fc" />
+
+  <!-- Header -->
+  <rect x="20" y="18" width="1160" height="68" rx="20" fill="url(#cmw-header)" />
+  <text x="600" y="56" text-anchor="middle" class="title">盛最多水的容器：双指针收缩短板</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">以 height=[1,8,6,2,5,4,8,3,7] 为例，动画演示每步面积、ans 更新，以及为什么每次移动短板</text>
+
+  <!-- Panels -->
+  <rect x="30" y="106" width="700" height="624" rx="24" class="panel" />
+  <rect x="750" y="106" width="420" height="624" rx="24" class="panel" />
+
+  <!-- =================== LEFT PANEL STATIC =================== -->
+  <text x="58" y="142" class="section-title">1. 柱状图随两指针收缩逐步演化</text>
+  <text x="58" y="162" class="caption">蓝色水体的宽 = R − L，高 = min(h[L], h[R])；每轮先结算面积，再移动较短那侧。</text>
+
+  <!-- Base bars (neutral color) -->
+  <g class="base-bars">
+    <rect x="91"  y="520" width="50" height="30"  rx="4" class="bar" />
+    <rect x="157" y="310" width="50" height="240" rx="4" class="bar" />
+    <rect x="223" y="370" width="50" height="180" rx="4" class="bar" />
+    <rect x="289" y="490" width="50" height="60"  rx="4" class="bar" />
+    <rect x="355" y="400" width="50" height="150" rx="4" class="bar" />
+    <rect x="421" y="430" width="50" height="120" rx="4" class="bar" />
+    <rect x="487" y="310" width="50" height="240" rx="4" class="bar" />
+    <rect x="553" y="460" width="50" height="90"  rx="4" class="bar" />
+    <rect x="619" y="340" width="50" height="210" rx="4" class="bar" />
+
+    <!-- Height labels above each bar -->
+    <text x="116" y="514" text-anchor="middle" class="bar-label">1</text>
+    <text x="182" y="304" text-anchor="middle" class="bar-label">8</text>
+    <text x="248" y="364" text-anchor="middle" class="bar-label">6</text>
+    <text x="314" y="484" text-anchor="middle" class="bar-label">2</text>
+    <text x="380" y="394" text-anchor="middle" class="bar-label">5</text>
+    <text x="446" y="424" text-anchor="middle" class="bar-label">4</text>
+    <text x="512" y="304" text-anchor="middle" class="bar-label">8</text>
+    <text x="578" y="454" text-anchor="middle" class="bar-label">3</text>
+    <text x="644" y="334" text-anchor="middle" class="bar-label">7</text>
+  </g>
+
+  <!-- X-axis baseline and index labels -->
+  <line x1="80" y1="550" x2="680" y2="550" class="axis-line" />
+  <g class="idx-labels">
+    <text x="116" y="572" text-anchor="middle" class="idx-label">0</text>
+    <text x="182" y="572" text-anchor="middle" class="idx-label">1</text>
+    <text x="248" y="572" text-anchor="middle" class="idx-label">2</text>
+    <text x="314" y="572" text-anchor="middle" class="idx-label">3</text>
+    <text x="380" y="572" text-anchor="middle" class="idx-label">4</text>
+    <text x="446" y="572" text-anchor="middle" class="idx-label">5</text>
+    <text x="512" y="572" text-anchor="middle" class="idx-label">6</text>
+    <text x="578" y="572" text-anchor="middle" class="idx-label">7</text>
+    <text x="644" y="572" text-anchor="middle" class="idx-label">8</text>
+  </g>
+  <text x="702" y="572" class="idx-label">i</text>
+
+  <!-- Legend -->
+  <g class="legend">
+    <rect x="70" y="596" width="600" height="40" rx="14" class="card-soft" />
+    <rect x="90" y="606" width="22" height="22" rx="5" class="bar" />
+    <text x="120" y="623" class="tiny">柱子：竖线高度 h[i]</text>
+
+    <circle cx="238" cy="617" r="11" class="pointer-badge-L" />
+    <text x="238" y="621" text-anchor="middle" class="pointer-text" font-size="11">L</text>
+    <text x="256" y="623" class="tiny">左指针</text>
+
+    <circle cx="328" cy="617" r="11" class="pointer-badge-R" />
+    <text x="328" y="621" text-anchor="middle" class="pointer-text" font-size="11">R</text>
+    <text x="346" y="623" class="tiny">右指针</text>
+
+    <rect x="408" y="606" width="22" height="22" rx="5" class="water" />
+    <text x="438" y="623" class="tiny">水体：宽 × min(h)</text>
+
+    <rect x="568" y="606" width="22" height="22" rx="5" class="bar-discard" />
+    <text x="598" y="623" class="tiny">指针已越过</text>
+  </g>
+
+  <text x="58" y="664" class="caption">关键观察：宽度每轮必然 −1；要让面积可能更大，只能把"短板"换成一根更高的线。</text>
+  <text x="58" y="684" class="caption">所以每轮移动 h[L] 与 h[R] 中较小的那一侧；若相等，移谁都行（不破坏正确性）。</text>
+  <text x="58" y="704" class="caption">注意：移动较长的一侧，宽度会 −1 而高度最多仍被原短板限制 ⇒ 面积一定更小，不可能更优。</text>
+  <text x="58" y="722" class="caption">最终遍历一轮 O(n)，返回过程中见到的最大面积。</text>
+
+  <!-- =================== RIGHT PANEL STATIC =================== -->
+  <text x="778" y="142" class="section-title">2. 右侧同步跟踪每步状态</text>
+  <text x="778" y="162" class="caption">看 4 件事：当前 L/R、短板是谁、本轮面积、以及 ans 是否刷新。</text>
+
+  <!-- Current iteration card shell -->
+  <rect x="770" y="178" width="380" height="200" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="204" class="label">当前迭代</text>
+
+  <!-- Running max (ans) card -->
+  <rect x="770" y="390" width="380" height="86" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="416" class="ans-label">当前最大面积 ans</text>
+
+  <!-- ans reveals: overlaid at same position (x=790, y=460) -->
+  <g class="reveal r-ans-0">
+    <text x="790" y="460" class="ans-number result-muted mono">0</text>
+    <text x="1120" y="460" text-anchor="end" class="tiny">初始</text>
+  </g>
+  <g class="reveal r-ans-8">
+    <text x="790" y="460" class="ans-number mono">8</text>
+    <rect x="980" y="434" width="140" height="30" rx="14" class="state-pill-em" />
+    <text x="1050" y="454" text-anchor="middle" class="state-pill-text">首次更新：0 → 8</text>
+  </g>
+  <g class="reveal r-ans-49">
+    <text x="790" y="460" class="ans-number ans-number-new mono">49</text>
+    <rect x="980" y="434" width="140" height="30" rx="14" class="state-pill-gold" />
+    <text x="1050" y="454" text-anchor="middle" class="state-pill-text" fill="#78350f">✨ 新最大：8 → 49</text>
+  </g>
+
+  <!-- Area history card -->
+  <rect x="770" y="488" width="380" height="120" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="514" class="label">面积历史（每步结算值）</text>
+
+  <!-- Area history shell: 8 slots (placeholders, dim) -->
+  <g class="area-shell" opacity="0.35">
+    <rect x="786" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="825" y="545" text-anchor="middle" class="area-pill-text">#1</text>
+    <rect x="874" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="913" y="545" text-anchor="middle" class="area-pill-text">#2</text>
+    <rect x="962" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1001" y="545" text-anchor="middle" class="area-pill-text">#3</text>
+    <rect x="1050" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1089" y="545" text-anchor="middle" class="area-pill-text">#4</text>
+    <rect x="786" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="825" y="583" text-anchor="middle" class="area-pill-text">#5</text>
+    <rect x="874" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="913" y="583" text-anchor="middle" class="area-pill-text">#6</text>
+    <rect x="962" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1001" y="583" text-anchor="middle" class="area-pill-text">#7</text>
+    <rect x="1050" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1089" y="583" text-anchor="middle" class="area-pill-text">#8</text>
+  </g>
+
+  <!-- Area history reveals -->
+  <g class="reveal r-area-1">
+    <rect x="786" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="825" y="545" text-anchor="middle" class="area-pill-text">#1 · 8</text>
+  </g>
+  <g class="reveal r-area-2">
+    <rect x="874" y="524" width="78" height="32" rx="10" class="area-pill-best" />
+    <text x="913" y="545" text-anchor="middle" class="area-pill-text area-pill-text-gold">#2 · 49 ⭐</text>
+  </g>
+  <g class="reveal r-area-3">
+    <rect x="962" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1001" y="545" text-anchor="middle" class="area-pill-text">#3 · 18</text>
+  </g>
+  <g class="reveal r-area-4">
+    <rect x="1050" y="524" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1089" y="545" text-anchor="middle" class="area-pill-text">#4 · 40</text>
+  </g>
+  <g class="reveal r-area-5">
+    <rect x="786" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="825" y="583" text-anchor="middle" class="area-pill-text">#5 · 24</text>
+  </g>
+  <g class="reveal r-area-6">
+    <rect x="874" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="913" y="583" text-anchor="middle" class="area-pill-text">#6 · 6</text>
+  </g>
+  <g class="reveal r-area-7">
+    <rect x="962" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1001" y="583" text-anchor="middle" class="area-pill-text">#7 · 10</text>
+  </g>
+  <g class="reveal r-area-8">
+    <rect x="1050" y="562" width="78" height="32" rx="10" class="area-pill" />
+    <text x="1089" y="583" text-anchor="middle" class="area-pill-text">#8 · 4</text>
+  </g>
+
+  <!-- Key insight card -->
+  <rect x="770" y="620" width="380" height="100" rx="18" class="card" fill="#f8fafc" />
+  <text x="790" y="646" class="label">为什么每次只能移动短板</text>
+  <text x="790" y="666" class="tiny">宽度每轮 −1；若移动长板：</text>
+  <text x="790" y="684" class="tiny">• 宽 ↓，高 ≤ 原短板 ⇒ 面积必更小</text>
+  <text x="790" y="702" class="tiny">只有移动短板，才可能遇到更高的线，</text>
+  <text x="790" y="718" class="tiny">弥补宽度损失。这就是剪枝的依据。</text>
+
+  <!-- =================== CUMULATIVE DISCARD OVERLAYS =================== -->
+  <!-- Bar 0 discarded after iter 1 (L++: 0→1), shown phase 2 onward -->
+  <g class="reveal r-discard-0">
+    <rect x="91" y="520" width="50" height="30" rx="4" class="bar-discard" />
+    <text x="116" y="514" text-anchor="middle" class="bar-label" fill="#94a3b8">1</text>
+  </g>
+  <!-- Bar 8 discarded after iter 2 (R moves 8 to 7), shown phase 3 onward -->
+  <g class="reveal r-discard-8">
+    <rect x="619" y="340" width="50" height="210" rx="4" class="bar-discard" />
+    <text x="644" y="334" text-anchor="middle" class="bar-label" fill="#94a3b8">7</text>
+  </g>
+  <!-- Bar 7 discarded after iter 3 (R moves 7 to 6), shown phase 4 onward -->
+  <g class="reveal r-discard-7">
+    <rect x="553" y="460" width="50" height="90" rx="4" class="bar-discard" />
+    <text x="578" y="454" text-anchor="middle" class="bar-label" fill="#94a3b8">3</text>
+  </g>
+  <!-- Bar 1 discarded after iter 4 (L++: 1→2), shown phase 5 onward (gold covers in phase 7+) -->
+  <g class="reveal r-discard-1">
+    <rect x="157" y="310" width="50" height="240" rx="4" class="bar-discard" />
+    <text x="182" y="304" text-anchor="middle" class="bar-label" fill="#94a3b8">8</text>
+  </g>
+  <!-- Bars 2,3,4,5 discarded during phase 5 fast-forward, all shown phase 6 onward -->
+  <g class="reveal r-discard-mid">
+    <rect x="223" y="370" width="50" height="180" rx="4" class="bar-discard" />
+    <text x="248" y="364" text-anchor="middle" class="bar-label" fill="#94a3b8">6</text>
+    <rect x="289" y="490" width="50" height="60" rx="4" class="bar-discard" />
+    <text x="314" y="484" text-anchor="middle" class="bar-label" fill="#94a3b8">2</text>
+    <rect x="355" y="400" width="50" height="150" rx="4" class="bar-discard" />
+    <text x="380" y="394" text-anchor="middle" class="bar-label" fill="#94a3b8">5</text>
+    <rect x="421" y="430" width="50" height="120" rx="4" class="bar-discard" />
+    <text x="446" y="424" text-anchor="middle" class="bar-label" fill="#94a3b8">4</text>
+  </g>
+
+  <!-- =================== GOLD HIGHLIGHT (optimal pair in phase 7+) =================== -->
+  <g class="reveal r-gold">
+    <rect x="157" y="310" width="50" height="240" rx="4" class="bar-gold" />
+    <text x="182" y="304" text-anchor="middle" class="bar-label" fill="#78350f">8</text>
+    <rect x="619" y="340" width="50" height="210" rx="4" class="bar-gold" />
+    <text x="644" y="334" text-anchor="middle" class="bar-label" fill="#78350f">7</text>
+  </g>
+
+  <!-- =================== PHASE OVERLAYS =================== -->
+  <!-- Phase 0: initial state, pointers at both ends -->
+  <g class="phase phase-0">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text">准备开始：L=0，R=8</text>
+
+    <!-- Pointer L at bar 0 -->
+    <circle cx="116" cy="250" r="18" class="pointer-badge-L" />
+    <text x="116" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="116" y1="268" x2="116" y2="515" class="pointer-line-L" />
+    <polygon points="112,515 120,515 116,522" class="pointer-arrow-L" />
+    <!-- Pointer R at bar 8 -->
+    <circle cx="644" cy="250" r="18" class="pointer-badge-R" />
+    <text x="644" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="644" y1="268" x2="644" y2="335" class="pointer-line-R" />
+    <polygon points="640,335 648,335 644,342" class="pointer-arrow-R" />
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">maxArea(height)</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L = 0</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R = 8</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">ans = 0</text>
+    <text x="790" y="305" class="action-text">准备：两指针就位，从最宽的容器开始试。</text>
+    <text x="790" y="325" class="action-text">循环条件：while L &lt; R。</text>
+    <text x="790" y="353" class="result-text result-muted">本步未结算。</text>
+  </g>
+
+  <!-- Phase 1: iter 1 — L=0, R=8, area=8 -->
+  <g class="phase phase-1">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-active" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-active-text">迭代 1/8：L=0, R=8 → area = 8 × 1 = 8</text>
+
+    <!-- Active bars outline -->
+    <rect x="89.5" y="518.5" width="53" height="33" rx="4" class="bar-active-L" />
+    <rect x="617.5" y="338.5" width="53" height="213" rx="4" class="bar-active-R" />
+
+    <!-- Pointer L at bar 0 -->
+    <circle cx="116" cy="250" r="18" class="pointer-badge-L" />
+    <text x="116" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="116" y1="268" x2="116" y2="515" class="pointer-line-L" />
+    <polygon points="112,515 120,515 116,522" class="pointer-arrow-L" />
+    <!-- Pointer R at bar 8 -->
+    <circle cx="644" cy="250" r="18" class="pointer-badge-R" />
+    <text x="644" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="644" y1="268" x2="644" y2="335" class="pointer-line-R" />
+    <polygon points="640,335 648,335 644,342" class="pointer-arrow-R" />
+
+    <!-- Water: L=0 (right edge 141), R=8 (left edge 619), min=1 → y=520, height=30 -->
+    <rect x="141" y="520" width="478" height="30" class="water" />
+    <text x="380" y="540" text-anchor="middle" class="water-text">width=8 × h=1 = 8</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">step 1: area = 8 × 1 = 8</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L = 0</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R = 8</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">width = 8</text>
+    <rect x="790" y="290" width="124" height="28" rx="14" class="state-pill" />
+    <text x="852" y="309" text-anchor="middle" class="state-pill-text">h[L]=1, h[R]=7</text>
+    <rect x="922" y="290" width="100" height="28" rx="14" class="state-pill-em" />
+    <text x="972" y="309" text-anchor="middle" class="state-pill-text">min = 1</text>
+    <rect x="1030" y="290" width="100" height="28" rx="14" class="state-pill-ok" />
+    <text x="1080" y="309" text-anchor="middle" class="state-pill-text">area = 8</text>
+    <text x="790" y="338" class="action-text">h[L]=1 &lt; h[R]=7 ⇒ 短板是 L，移动 L++（0 → 1）。</text>
+    <text x="790" y="358" class="result-text">ans 首次更新：0 → 8。</text>
+  </g>
+
+  <!-- Phase 2: iter 2 — L=1, R=8, area=49 NEW MAX -->
+  <g class="phase phase-2">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-gold" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-gold-text">迭代 2/8：L=1, R=8 → area = 7 × 7 = 49 ⭐ 新最大</text>
+
+    <rect x="155.5" y="308.5" width="53" height="243" rx="4" class="bar-active-L" />
+    <rect x="617.5" y="338.5" width="53" height="213" rx="4" class="bar-active-R" />
+    <circle cx="182" cy="380" r="46" class="gold-halo" />
+
+    <!-- Pointer L at bar 1 -->
+    <circle cx="182" cy="250" r="18" class="pointer-badge-L" />
+    <text x="182" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="182" y1="268" x2="182" y2="305" class="pointer-line-L" />
+    <polygon points="178,305 186,305 182,312" class="pointer-arrow-L" />
+    <!-- Pointer R at bar 8 -->
+    <circle cx="644" cy="250" r="18" class="pointer-badge-R" />
+    <text x="644" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="644" y1="268" x2="644" y2="335" class="pointer-line-R" />
+    <polygon points="640,335 648,335 644,342" class="pointer-arrow-R" />
+
+    <!-- Water: L=1 (right edge 207), R=8 (left edge 619), min=7 → y=340, height=210 -->
+    <rect x="207" y="340" width="412" height="210" class="water-gold" />
+    <text x="413" y="455" text-anchor="middle" class="water-text-gold">width=7 × h=7 = 49</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">step 2: area = 7 × 7 = 49 ⭐</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L = 1</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R = 8</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">width = 7</text>
+    <rect x="790" y="290" width="124" height="28" rx="14" class="state-pill" />
+    <text x="852" y="309" text-anchor="middle" class="state-pill-text">h[L]=8, h[R]=7</text>
+    <rect x="922" y="290" width="100" height="28" rx="14" class="state-pill-em" />
+    <text x="972" y="309" text-anchor="middle" class="state-pill-text">min = 7</text>
+    <rect x="1030" y="290" width="100" height="28" rx="14" class="state-pill-gold" />
+    <text x="1080" y="309" text-anchor="middle" class="state-pill-text" fill="#78350f">area = 49</text>
+    <text x="790" y="338" class="action-text">h[R]=7 &lt; h[L]=8 ⇒ 短板是 R，移动 R--（8 → 7）。</text>
+    <text x="790" y="358" class="result-text">✨ ans 刷新：8 → 49（本题最终答案已被捕获）。</text>
+  </g>
+
+  <!-- Phase 3: iter 3 — L=1, R=7, area=18 -->
+  <g class="phase phase-3">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-active" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-active-text">迭代 3/8：L=1, R=7 → area = 6 × 3 = 18</text>
+
+    <rect x="155.5" y="308.5" width="53" height="243" rx="4" class="bar-active-L" />
+    <rect x="551.5" y="458.5" width="53" height="93" rx="4" class="bar-active-R" />
+
+    <circle cx="182" cy="250" r="18" class="pointer-badge-L" />
+    <text x="182" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="182" y1="268" x2="182" y2="305" class="pointer-line-L" />
+    <polygon points="178,305 186,305 182,312" class="pointer-arrow-L" />
+    <circle cx="578" cy="250" r="18" class="pointer-badge-R" />
+    <text x="578" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="578" y1="268" x2="578" y2="455" class="pointer-line-R" />
+    <polygon points="574,455 582,455 578,462" class="pointer-arrow-R" />
+
+    <!-- Water: L=1 (right edge 207), R=7 (left edge 553), min=3 → y=460, height=90 -->
+    <rect x="207" y="460" width="346" height="90" class="water" />
+    <text x="380" y="510" text-anchor="middle" class="water-text">width=6 × h=3 = 18</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">step 3: area = 6 × 3 = 18</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L = 1</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R = 7</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">width = 6</text>
+    <rect x="790" y="290" width="124" height="28" rx="14" class="state-pill" />
+    <text x="852" y="309" text-anchor="middle" class="state-pill-text">h[L]=8, h[R]=3</text>
+    <rect x="922" y="290" width="100" height="28" rx="14" class="state-pill-em" />
+    <text x="972" y="309" text-anchor="middle" class="state-pill-text">min = 3</text>
+    <rect x="1030" y="290" width="100" height="28" rx="14" class="state-pill" />
+    <text x="1080" y="309" text-anchor="middle" class="state-pill-text">area = 18</text>
+    <text x="790" y="338" class="action-text">h[R]=3 &lt; h[L]=8 ⇒ 短板是 R，移动 R--（7 → 6）。</text>
+    <text x="790" y="358" class="result-text result-muted">18 &lt; 49，ans 不变。</text>
+  </g>
+
+  <!-- Phase 4: iter 4 — L=1, R=6, area=40 -->
+  <g class="phase phase-4">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-active" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-active-text">迭代 4/8：L=1, R=6 → area = 5 × 8 = 40（平局）</text>
+
+    <rect x="155.5" y="308.5" width="53" height="243" rx="4" class="bar-active-L" />
+    <rect x="485.5" y="308.5" width="53" height="243" rx="4" class="bar-active-R" />
+
+    <circle cx="182" cy="250" r="18" class="pointer-badge-L" />
+    <text x="182" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="182" y1="268" x2="182" y2="305" class="pointer-line-L" />
+    <polygon points="178,305 186,305 182,312" class="pointer-arrow-L" />
+    <circle cx="512" cy="250" r="18" class="pointer-badge-R" />
+    <text x="512" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="512" y1="268" x2="512" y2="305" class="pointer-line-R" />
+    <polygon points="508,305 516,305 512,312" class="pointer-arrow-R" />
+
+    <!-- Water: L=1 (right 207), R=6 (left 487), min=8 → y=310, height=240 -->
+    <rect x="207" y="310" width="280" height="240" class="water" />
+    <text x="347" y="440" text-anchor="middle" class="water-text">width=5 × h=8 = 40</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">step 4: area = 5 × 8 = 40</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L = 1</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R = 6</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill-em" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">width = 5</text>
+    <rect x="790" y="290" width="124" height="28" rx="14" class="state-pill" />
+    <text x="852" y="309" text-anchor="middle" class="state-pill-text">h[L]=8, h[R]=8</text>
+    <rect x="922" y="290" width="100" height="28" rx="14" class="state-pill-em" />
+    <text x="972" y="309" text-anchor="middle" class="state-pill-text">min = 8</text>
+    <rect x="1030" y="290" width="100" height="28" rx="14" class="state-pill" />
+    <text x="1080" y="309" text-anchor="middle" class="state-pill-text">area = 40</text>
+    <text x="790" y="338" class="action-text">h[L]=h[R]=8，平局：按 &lt;= 规则移动 L++（1 → 2），移 R 也同样正确。</text>
+    <text x="790" y="358" class="result-text result-muted">40 &lt; 49，ans 不变。</text>
+  </g>
+
+  <!-- Phase 5: iter 5 — L=2, R=6, area=24 (representative of fast-forward) -->
+  <g class="phase phase-5">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-active" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-active-text">迭代 5/8：L=2, R=6 → area = 4 × 6 = 24（以及之后的 6 / 10 / 4）</text>
+
+    <rect x="221.5" y="368.5" width="53" height="183" rx="4" class="bar-active-L" />
+    <rect x="485.5" y="308.5" width="53" height="243" rx="4" class="bar-active-R" />
+
+    <circle cx="248" cy="250" r="18" class="pointer-badge-L" />
+    <text x="248" y="256" text-anchor="middle" class="pointer-text">L</text>
+    <line x1="248" y1="268" x2="248" y2="365" class="pointer-line-L" />
+    <polygon points="244,365 252,365 248,372" class="pointer-arrow-L" />
+    <circle cx="512" cy="250" r="18" class="pointer-badge-R" />
+    <text x="512" y="256" text-anchor="middle" class="pointer-text">R</text>
+    <line x1="512" y1="268" x2="512" y2="305" class="pointer-line-R" />
+    <polygon points="508,305 516,305 512,312" class="pointer-arrow-R" />
+
+    <!-- Water: L=2 (right 273), R=6 (left 487), min=6 → y=370, height=180 -->
+    <rect x="273" y="370" width="214" height="180" class="water" />
+    <text x="380" y="470" text-anchor="middle" class="water-text">width=4 × h=6 = 24</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">steps 5–8: 24, 6, 10, 4</text>
+    <rect x="790" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="840" y="275" text-anchor="middle" class="state-pill-text">L 跨度 2→6</text>
+    <rect x="898" y="256" width="100" height="28" rx="14" class="state-pill" />
+    <text x="948" y="275" text-anchor="middle" class="state-pill-text">R 不动</text>
+    <rect x="1006" y="256" width="124" height="28" rx="14" class="state-pill" />
+    <text x="1068" y="275" text-anchor="middle" class="state-pill-text">width 4 → 1</text>
+    <rect x="790" y="290" width="160" height="28" rx="14" class="state-pill-em" />
+    <text x="870" y="309" text-anchor="middle" class="state-pill-text">max(24, 6, 10, 4) = 24</text>
+    <rect x="958" y="290" width="172" height="28" rx="14" class="state-pill" />
+    <text x="1044" y="309" text-anchor="middle" class="state-pill-text">24 &lt; 49，ans 不变</text>
+    <text x="790" y="338" class="action-text">剩余 4 步每轮都有 h[R]=8 = 长板，始终移动 L++。</text>
+    <text x="790" y="358" class="result-text result-muted">所有候选都 ≤ 49，最优解其实早在第 2 步被捕获。</text>
+  </g>
+
+  <!-- Phase 6: loop exit L=R=6 -->
+  <g class="phase phase-6">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-active" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-active-text">循环退出：L = R = 6，while L &lt; R 不成立</text>
+
+    <rect x="485.5" y="308.5" width="53" height="243" rx="4" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="6 4" />
+    <circle cx="512" cy="250" r="18" fill="#475569" stroke="#1e293b" stroke-width="2" />
+    <text x="512" y="256" text-anchor="middle" class="pointer-text">L=R</text>
+    <line x1="512" y1="268" x2="512" y2="305" stroke="#64748b" stroke-width="2" stroke-dasharray="4 4" />
+    <polygon points="508,305 516,305 512,312" fill="#64748b" />
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">while L &lt; R → false</text>
+    <rect x="790" y="256" width="160" height="28" rx="14" class="state-pill" />
+    <text x="870" y="275" text-anchor="middle" class="state-pill-text">指针相遇：L = R = 6</text>
+    <rect x="958" y="256" width="172" height="28" rx="14" class="state-pill-ok" />
+    <text x="1044" y="275" text-anchor="middle" class="state-pill-text">return ans = 49</text>
+    <text x="790" y="305" class="action-text">两指针已经贴到一起，再没有候选容器了。</text>
+    <text x="790" y="325" class="action-text">一共做了 8 次结算，整体 O(n) 遍历。</text>
+    <text x="790" y="353" class="result-text">已收集到最大面积 49。</text>
+  </g>
+
+  <!-- Phase 7: final answer with gold highlight -->
+  <g class="phase phase-7">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-gold" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-gold-text">最优解：L=1 与 R=8 之间的容器（高亮金色）</text>
+
+    <!-- Gold water rect (iter 2 state) -->
+    <rect x="207" y="340" width="412" height="210" class="water-gold" />
+    <text x="413" y="455" text-anchor="middle" class="water-text-gold">最终答案：49</text>
+
+    <!-- Pointer L at bar 1 and R at bar 8 (gold) -->
+    <circle cx="182" cy="250" r="18" fill="url(#cmw-bar-gold)" stroke="#b45309" stroke-width="2" />
+    <text x="182" y="256" text-anchor="middle" class="pointer-text" fill="#78350f">★</text>
+    <line x1="182" y1="268" x2="182" y2="305" stroke="#d97706" stroke-width="2" stroke-dasharray="4 4" />
+    <circle cx="644" cy="250" r="18" fill="url(#cmw-bar-gold)" stroke="#b45309" stroke-width="2" />
+    <text x="644" y="256" text-anchor="middle" class="pointer-text" fill="#78350f">★</text>
+    <line x1="644" y1="268" x2="644" y2="335" stroke="#d97706" stroke-width="2" stroke-dasharray="4 4" />
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">optimal pair: (i=1, j=8)</text>
+    <rect x="790" y="256" width="160" height="28" rx="14" class="state-pill-gold" />
+    <text x="870" y="275" text-anchor="middle" class="state-pill-text" fill="#78350f">h[1]=8, h[8]=7</text>
+    <rect x="958" y="256" width="172" height="28" rx="14" class="state-pill-gold" />
+    <text x="1044" y="275" text-anchor="middle" class="state-pill-text" fill="#78350f">width=7, min=7 ⇒ 49</text>
+    <text x="790" y="305" class="action-text">这正是第 2 步就计算到的值 —— 双指针贪心一次性把它锁定。</text>
+    <text x="790" y="325" class="action-text">后面 6 步无论怎么走，都不可能超过 49（因为宽度只会更小）。</text>
+    <text x="790" y="353" class="result-text">时间复杂度 O(n)，空间复杂度 O(1)。</text>
+  </g>
+
+  <!-- Phase 8: summary freeze -->
+  <g class="phase phase-8">
+    <rect x="70" y="180" width="580" height="34" rx="17" class="chip-gold" />
+    <text x="360" y="202" text-anchor="middle" class="chip-text chip-gold-text">完成：maxArea(height) = 49</text>
+
+    <rect x="207" y="340" width="412" height="210" class="water-gold" />
+    <text x="413" y="455" text-anchor="middle" class="water-text-gold">49</text>
+    <rect x="238" y="478" width="350" height="34" rx="17" fill="#fef3c7" stroke="#d97706" stroke-width="1.8" />
+    <text x="413" y="501" text-anchor="middle" class="state-pill-text" fill="#78350f">短板决定容量 · 每步只能移动短板一侧</text>
+
+    <rect x="790" y="218" width="340" height="30" rx="14" class="call-pill" />
+    <text x="960" y="238" text-anchor="middle" class="call-text mono">return 49</text>
+    <rect x="790" y="256" width="160" height="28" rx="14" class="state-pill-ok" />
+    <text x="870" y="275" text-anchor="middle" class="state-pill-text">时间 O(n)</text>
+    <rect x="958" y="256" width="172" height="28" rx="14" class="state-pill-ok" />
+    <text x="1044" y="275" text-anchor="middle" class="state-pill-text">空间 O(1)</text>
+    <text x="790" y="305" class="action-text">要点：每轮先结算，再移动短板那一侧；宽必减，只能去追更高的线。</text>
+    <text x="790" y="325" class="action-text">这不是凭感觉，而是对"移动长板不可能更优"的严格剪枝。</text>
+    <text x="790" y="353" class="result-text">相向双指针题的标准骨架，接雨水 / 三数之和也都用得上。</text>
+  </g>
+</svg>
