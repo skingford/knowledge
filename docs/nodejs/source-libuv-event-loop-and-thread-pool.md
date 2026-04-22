@@ -39,6 +39,28 @@ search: false
 
 两篇互补，线上排障优先看 runtime-event-loop，想解释"为什么会这样"回到本篇。
 
+## Node.js 运行时组件全景
+
+在进 libuv 之前先放远一档，看看 Node.js 进程里一共住着哪些"房客"。
+
+<NodejsLibuvDiagram kind="runtime-components" />
+
+| 组件 | 主要语言 | 职责 |
+| --- | --- | --- |
+| Node Standard Library | JavaScript | 提供给开发者使用的 API：`fs` / `http` / `net` / `stream` / `crypto` |
+| C++ Bindings | C++ | 胶水层：把 JS 调用翻译成原生调用，管理参数、回调和资源生命周期 |
+| V8 引擎 | C++ | JS 代码解析与执行、GC、Isolate、Promise microtask |
+| libuv | C / C++ | 异步 I/O、事件循环、线程池、timer、跨平台抽象 |
+
+几个容易踩的点：
+
+- **V8 不懂文件也不懂网络**——它只认 JS 字节码。`fs.readFile` 真正的文件读是 libuv 的事
+- **libuv 不执行任何 JS**——它只负责把"某个 fd 可读了"通知回 Bindings，再由 Bindings 回调 V8 跑 JS
+- **C++ Bindings 是唯一跨界的角色**——同时下探 V8（创建 Local&lt;Object&gt;、调 JS 回调）和 libuv（提交 work、注册 handle）
+- **Promise microtask 归 V8 管，nextTick 归 Node.js 自己管**——这就是后文"nextTick 与 microtask 的 C++ 落点"要讲的分界线
+
+本文接下来的全部内容都聚焦在**左下角的 libuv 方块里**：打开它看 loop / handle / request / threadpool 这四类对象是怎么组织的，以及事件循环那七个阶段在 C 层到底做了什么。
+
 ## libuv 架构全图
 
 libuv 给 Node.js 提供的核心对象只有四类：
@@ -50,7 +72,11 @@ libuv 给 Node.js 提供的核心对象只有四类：
 | request | `uv_req_t` 及其子类 | 一次性，完成即释放 | `uv_work_t`、`uv_fs_t`、`uv_write_t` |
 | threadpool | 一组 worker 线程 | 全进程共享 | 处理 `uv_queue_work` / `fs` / `dns` / `crypto` |
 
-这四类对象都挂在 `uv_loop_t` 上。源码里 loop 的定义大致是：
+这四类对象都挂在 `uv_loop_t` 上，整体结构如下：
+
+<NodejsLibuvDiagram kind="architecture-overview" />
+
+源码里 loop 的定义大致是：
 
 ```c
 // src/uv-common.h (libuv)
@@ -109,6 +135,8 @@ int uv_run(uv_loop_t* loop, uv_run_mode mode) {
 
 这就是"事件循环六阶段"真正的样子（加上 idle 和 closing 实际是 7 个阶段，应用层通常合并讲）。
 
+<NodejsLibuvDiagram kind="uv-run-phases" />
+
 下面逐阶段走读。
 
 ### 阶段 1：uv__run_timers — 到期定时器
@@ -130,6 +158,8 @@ void uv__run_timers(uv_loop_t* loop) {
   }
 }
 ```
+
+<NodejsLibuvDiagram kind="timer-heap" />
 
 关键点：
 
@@ -190,6 +220,8 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
   }
 }
 ```
+
+<NodejsLibuvDiagram kind="io-poll-flow" />
 
 这里有几条经常被问到的细节：
 
@@ -267,6 +299,8 @@ function processTicksAndRejections() {
 3. 先清空本次累积的 `nextTick` 队列（**nextTick 永远先于 Promise**）
 4. 每个 `nextTick` 回调跑完再 `MicrotasksScope::PerformCheckpoint` 清 Promise microtask
 5. 回到 libuv 下一阶段
+
+<NodejsLibuvDiagram kind="nexttick-microtask" />
 
 这解释了三件事：
 
@@ -353,6 +387,8 @@ static void worker(void* arg) {
 }
 ```
 
+<NodejsLibuvDiagram kind="threadpool-dispatch" />
+
 关键点：
 
 - worker 完成后**不直接回调 JS**，而是通过 `uv_async_send` 通知主 loop
@@ -370,6 +406,8 @@ static void worker(void* arg) {
 | 大量 TCP/HTTP 连接 | **没用**——TCP 是 `uv__io_poll` 走 epoll，不进线程池 |
 | 大量 `dns.lookup` | 有用但建议切换到 `dns.resolve*`（后者走异步不占线程池） |
 | CPU 核数 2 核，改到 128 | **反而变慢**——线程切换开销大于收益 |
+
+<NodejsLibuvDiagram kind="threadpool-size-scenarios" />
 
 经验值：
 
@@ -405,6 +443,8 @@ JS:   processTicksAndRejections (nextTick + microtask)
   ↓
 libuv: 进入 uv__run_check / 下一轮
 ```
+
+<NodejsLibuvDiagram kind="settimeout-call-chain" />
 
 这条链能说清楚，事件循环的故事基本就完整了。
 

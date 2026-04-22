@@ -41,6 +41,8 @@ const asyncGlobalComponents = {
   GoAdvancedConcurrencyDiagram: () => import('@docs-components/go/GoAdvancedConcurrencyDiagram.vue'),
   GoSyncPrimitiveDiagram: () => import('@docs-components/go/GoSyncPrimitiveDiagram.vue'),
   GoSourceReadingDiagram: () => import('@docs-components/go/GoSourceReadingDiagram.vue'),
+  // Node.js diagrams
+  NodejsLibuvDiagram: () => import('@docs-components/nodejs/NodejsLibuvDiagram.vue'),
   // High-concurrency diagrams
   HighConcurrencyOverviewDiagram: () => import('@docs-components/hc/HighConcurrencyOverviewDiagram.vue'),
   HcScaleOutDiagram: () => import('@docs-components/hc/HcScaleOutDiagram.vue'),

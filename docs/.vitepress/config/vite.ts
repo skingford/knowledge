@@ -20,6 +20,7 @@ const docsViteConfig: UserConfig = {
           // Group diagram components by domain subdirectory for better parallelism and caching
           if (id.includes('/theme/components/')) {
             if (id.includes('/components/go/')) return 'diagrams-go'
+            if (id.includes('/components/nodejs/')) return 'diagrams-nodejs'
             if (id.includes('/components/hc/')) return 'diagrams-hc'
             if (id.includes('/components/mysql/')) return 'diagrams-mysql'
             if (id.includes('/components/emqx/')) return 'diagrams-emqx'
