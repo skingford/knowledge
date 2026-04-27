@@ -25,6 +25,7 @@ import InlineSvg from '@docs-components/common/InlineSvg.vue'
 
 ## 快速导航
 
+- [先看错误关键字，别急着全链路乱查](#先看错误关键字别急着全链路乱查)
 - [先确定问题发生在哪一层](#先确定问题发生在哪一层)
 - [DNS 问题怎么查](#dns-问题怎么查)
 - [连通性和路由问题怎么查](#连通性和路由问题怎么查)
@@ -32,6 +33,25 @@ import InlineSvg from '@docs-components/common/InlineSvg.vue'
 - [HTTP 和 HTTPS 问题怎么查](#http-和-https-问题怎么查)
 - [什么时候该抓包](#什么时候该抓包)
 - [一套通用排障顺序](#一套通用排障顺序)
+
+## 先看错误关键字，别急着全链路乱查
+
+很多排障时间，其实不是浪费在不会命令，而是浪费在第一步方向错了。
+
+可以先把错误文案粗分一轮：
+
+| 错误 / 现象 | 更可能卡在哪 | 第一轮建议 |
+| --- | --- | --- |
+| `no such host` | DNS | `dig`、`nslookup` |
+| `connection refused` | 端口没监听或被 RST | `ss -ltn`、`lsof -i` |
+| `i/o timeout` | 网络不可达、对端太慢、代理超时 | `ping`、`traceroute`、`curl -v` |
+| `connection reset by peer` | 对端主动断开 | 服务日志、代理超时、协议不匹配 |
+| `tls: handshake failure` | TLS 协商失败 | `openssl s_client`、TLS 配置 |
+| `x509: certificate signed by unknown authority` | 证书链 / 信任库问题 | 证书链、根 CA、客户端环境 |
+| `502` | 网关拿到的是坏响应或上游连不上 | 网关日志、上游监听、协议匹配 |
+| `504` | 上游超时没返回 | 上游耗时、依赖、超时配置 |
+
+如果第一眼就能把问题压缩到一层，后面的命令量会少很多。
 
 ## 先确定问题发生在哪一层
 
@@ -48,6 +68,7 @@ import InlineSvg from '@docs-components/common/InlineSvg.vue'
 | IP 不通 / 丢包高 | 路由、ACL、安全组、网络质量 |
 | 能通但端口不通 | 防火墙、监听、LB、服务未启动 |
 | TCP 能连上但 HTTP 超时 | 网关、应用、下游依赖 |
+| 出现大量 `TIME_WAIT` / `CLOSE_WAIT` | 连接复用、连接泄漏、关闭流程 |
 | HTTP 正常但 HTTPS 异常 | TLS 版本、证书链、SNI |
 
 ## DNS 问题怎么查
@@ -113,6 +134,7 @@ mtr example.com
 ```bash
 ss -ltn
 ss -tanp | head
+ss -s
 ```
 
 重点关注：
@@ -120,6 +142,13 @@ ss -tanp | head
 - 目标端口是否在监听
 - `ESTAB`、`TIME-WAIT`、`CLOSE-WAIT` 是否异常偏多
 - 是否存在连接堆积
+
+::: tip 看到 `TIME-WAIT` 和 `CLOSE-WAIT` 时怎么快速判断
+- `TIME-WAIT` 多：先怀疑短连接多、连接没复用好
+- `CLOSE-WAIT` 多：先怀疑应用没及时关闭连接
+
+如果你总是看到这些状态却很难讲清含义，可以配合读 [Socket、端口与连接状态](./socket-and-connection-state.md)。
+:::
 
 ### lsof
 
@@ -151,6 +180,8 @@ curl -I https://example.com
 curl -v --resolve example.com:443:1.2.3.4 https://example.com
 ```
 
+如果问题已经明显落在代理、上游转发或 `502` / `504` 这层，建议继续看 [代理、反向代理、网关与隧道](./proxy-gateway-and-tunnel.md)。
+
 ### openssl
 
 当你怀疑 HTTPS 证书链、SNI、TLS 版本时，`openssl s_client` 很有用：
@@ -164,6 +195,8 @@ openssl s_client -connect example.com:443 -servername example.com
 - 返回的证书链是否完整
 - 证书域名是否匹配
 - 是否握手成功
+
+如果问题更偏证书、mTLS 或 `x509` 错误，建议继续看 [TLS、证书与 mTLS](./tls-and-certificates.md)。
 
 ## 什么时候该抓包
 
@@ -187,6 +220,8 @@ tcpdump -i any host example.com and port 443
 - 我要验证什么现象
 - 我要看哪条连接
 - 我要抓客户端、服务端还是中间代理节点
+
+如果你想把抓包从“会敲一条 `tcpdump` 命令”升级成“能看懂三次握手、RST、重传和 TLS Alert”，建议继续看 [抓包、tcpdump 与 Wireshark](./packet-capture-and-tcpdump.md)。
 
 ## 一套通用排障顺序
 
@@ -214,4 +249,8 @@ tcpdump -i any host example.com and port 443
 ## 延伸阅读
 
 - 想先建整体框架和协议链路：读 [网络必备知识](./essential-knowledge.md)
+- 想补端口、Socket 和连接状态：读 [Socket、端口与连接状态](./socket-and-connection-state.md)
+- 想专门补 TLS、证书、SNI 和 mTLS：读 [TLS、证书与 mTLS](./tls-and-certificates.md)
+- 想补代理、反向代理、网关和 `502` / `504`：读 [代理、反向代理、网关与隧道](./proxy-gateway-and-tunnel.md)
 - 想补入口设施链路：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
+- 想把抓包真正练起来：读 [抓包、tcpdump 与 Wireshark](./packet-capture-and-tcpdump.md)

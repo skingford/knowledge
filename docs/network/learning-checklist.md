@@ -348,8 +348,13 @@ description: 面向 Go 后端和实战排障场景的网络学习清单，覆盖
 ## 15. 专题内配套阅读
 
 - 想先建立总地图和协议主线：读 [网络必备知识](./essential-knowledge.md)
+- 想补 IP、网关、ARP、TTL 和 MTU：读 [IP 与路由](./ip-and-routing.md)
+- 想补端口、Socket、监听、TIME_WAIT 和 CLOSE_WAIT：读 [Socket、端口与连接状态](./socket-and-connection-state.md)
+- 想专门补 TLS、证书、SNI 和 mTLS：读 [TLS、证书与 mTLS](./tls-and-certificates.md)
+- 想把正向代理、反向代理、网关、Upgrade 和 `502` / `504` 讲成一条线：读 [代理、反向代理、网关与隧道](./proxy-gateway-and-tunnel.md)
 - 想补 DNS、CDN 和负载均衡：读 [DNS、CDN 与负载均衡](./dns-cdn-and-load-balancing.md)
 - 想补 NAT、防火墙和访问边界：读 [NAT、防火墙、内网穿透与 VPN](./nat-firewall-and-vpn.md)
 - 想固定排障动作：读 [网络排障与常用命令](./troubleshooting-and-commands.md)
+- 想把抓包真正用起来：读 [抓包、tcpdump 与 Wireshark](./packet-capture-and-tcpdump.md)
 - 想同步练 Go 服务端和客户端：读 [HTTP 服务端、客户端与 TCP/UDP](/golang/guide/04-http-server-client-tcp-udp)
 - 想把反向代理、`502` / `504`、负载均衡补到线上链路：读 [Nginx 配置、Location 匹配与反向代理](/nginx/config-and-reverse-proxy) 和 [Nginx 上游、负载均衡与失败处理](/nginx/upstream-load-balancing-and-failure-handling)
