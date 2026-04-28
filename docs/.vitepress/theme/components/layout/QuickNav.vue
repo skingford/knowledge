@@ -310,6 +310,13 @@ const categories: Category[] = [
         fallback: "📘",
         url: "https://github.com/slavingia/skills",
       },
+      {
+        name: "Andrej Karpathy Skills",
+        desc: "基于 Andrej Karpathy 对 LLM 编码误区观察整理的 Claude Code 行为增强 CLAUDE.md",
+        domain: "github.com",
+        fallback: "🧭",
+        url: "https://github.com/forrestchang/andrej-karpathy-skills",
+      },
     ],
   },
   {
