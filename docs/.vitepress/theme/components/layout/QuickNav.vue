@@ -228,6 +228,13 @@ const categories: Category[] = [
         fallback: "🪐",
         url: "https://antigravity.google/",
       },
+      {
+        name: "Clawd on Desk",
+        desc: "桌面像素宠物，实时响应 Claude Code、Codex、Cursor 等 AI 编码 Agent 状态",
+        domain: "github.com",
+        fallback: "🦀",
+        url: "https://github.com/rullerzhou-afk/clawd-on-desk",
+      },
     ],
   },
   {
