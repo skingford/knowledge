@@ -367,6 +367,13 @@ const categories: Category[] = [
         url: "https://github.com/Yeachan-Heo/oh-my-claudecode",
       },
       {
+        name: "oh-my-openagent",
+        desc: "OpenAgent 增强框架",
+        domain: "github.com",
+        fallback: "🧩",
+        url: "https://github.com/code-yeongyu/oh-my-openagent",
+      },
+      {
         name: "gstack",
         desc: "Claude Code 虚拟工程团队工作流",
         domain: "github.com",
