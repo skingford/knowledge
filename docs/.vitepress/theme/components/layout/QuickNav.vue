@@ -228,6 +228,13 @@ const categories: Category[] = [
         fallback: "🪐",
         url: "https://antigravity.google/",
       },
+      {
+        name: "Clawd on Desk",
+        desc: "桌面像素宠物，实时响应 Claude Code、Codex、Cursor 等 AI 编码 Agent 状态",
+        domain: "github.com",
+        fallback: "🦀",
+        url: "https://github.com/rullerzhou-afk/clawd-on-desk",
+      },
     ],
   },
   {
@@ -309,6 +316,13 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "📘",
         url: "https://github.com/slavingia/skills",
+      },
+      {
+        name: "Andrej Karpathy Skills",
+        desc: "基于 Andrej Karpathy 对 LLM 编码误区观察整理的 Claude Code 行为增强 CLAUDE.md",
+        domain: "github.com",
+        fallback: "🧭",
+        url: "https://github.com/forrestchang/andrej-karpathy-skills",
       },
     ],
   },
