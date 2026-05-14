@@ -220,7 +220,8 @@ export default defineConfig({
           { text: 'Ghostty', link: '/tools/ghostty' },
           { text: 'Mac', link: '/tools/mac' },
         ]
-      }
+      },
+      { text: 'Claude', link: 'https://ip.net.coffee/claude/' },
     ],
 
     sidebar,
