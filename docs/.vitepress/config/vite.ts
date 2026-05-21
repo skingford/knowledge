@@ -5,6 +5,7 @@ const docsViteConfig: UserConfig = {
   build: {
     target: 'es2022',
     modulePreload: { polyfill: false },
+    reportCompressedSize: false,
     // Local search index is emitted as a lazy-loaded chunk and is expected to be larger than
     // regular route assets for this knowledge base.
     chunkSizeWarningLimit: 5000,

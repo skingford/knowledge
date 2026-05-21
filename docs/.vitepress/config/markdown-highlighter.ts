@@ -5,10 +5,52 @@ import {
   transformerNotationFocus,
   transformerNotationHighlight,
 } from '@shikijs/transformers'
-import { bundledLanguagesInfo, createHighlighter, isSpecialLang, type Highlighter } from 'shiki'
-import type { MarkdownOptions } from 'vitepress'
+import { createHighlighter, isSpecialLang, type Highlighter, type ShikiTransformer, type ShikiTransformerContext } from 'shiki'
+import type { MarkdownOptions, ThemeOptions } from 'vitepress'
 
-const bundledLanguageIds = [...new Set(bundledLanguagesInfo.map((info) => info.id))]
+const usedLanguageIds: string[] = [
+  'applescript',
+  'bash',
+  'c',
+  'cpp',
+  'css',
+  'diff',
+  'dockerfile',
+  'go',
+  'hcl',
+  'html',
+  'ini',
+  'java',
+  'javascript',
+  'js',
+  'json',
+  'json5',
+  'jsonc',
+  'lua',
+  'makefile',
+  'markdown',
+  'md',
+  'nginx',
+  'powershell',
+  'protobuf',
+  'python',
+  'ruby',
+  'rust',
+  'sh',
+  'shellscript',
+  'sql',
+  'svelte',
+  'swift',
+  'toml',
+  'ts',
+  'tsx',
+  'typescript',
+  'vim',
+  'vue',
+  'xml',
+  'yaml',
+  'txt',
+]
 const sharedHighlighterKey = '__knowledgeMarkdownHighlighterPromise__'
 const vueRE = /-vue(?=:|$)/
 const lineNoStartRE = /=(\d*)/
@@ -25,10 +67,11 @@ type SharedGlobal = typeof globalThis & {
   __knowledgeMarkdownHighlighterPromise__?: Promise<Highlighter>
 }
 
-function resolveThemeList(theme: MarkdownTheme) {
-  return typeof theme === 'object' && 'light' in theme && 'dark' in theme
-    ? [theme.light, theme.dark]
-    : [theme]
+function resolveThemeList(theme: ThemeOptions): (string | object)[] {
+  if (typeof theme === 'object' && theme !== null && 'light' in theme && 'dark' in theme) {
+    return [theme.light, theme.dark]
+  }
+  return [theme]
 }
 
 function attrsToLines(attrs: string) {
@@ -68,12 +111,12 @@ function normalizeLanguage(lang: string, defaultLang: string, languageAlias: Lan
   return defaultLang
 }
 
-async function getSharedHighlighter(theme: MarkdownTheme, languageAlias: LanguageAlias) {
+async function getSharedHighlighter(theme: ThemeOptions | undefined, languageAlias: LanguageAlias) {
   const sharedGlobal = globalThis as SharedGlobal
 
   sharedGlobal[sharedHighlighterKey] ??= createHighlighter({
-    themes: resolveThemeList(theme),
-    langs: bundledLanguageIds,
+    themes: theme ? resolveThemeList(theme) : [],
+    langs: usedLanguageIds,
     langAlias: languageAlias,
   })
 
@@ -106,7 +149,7 @@ export async function createMarkdownHighlight({
     }),
     {
       name: 'knowledge:add-class',
-      pre(node: { properties: Record<string, unknown> }) {
+      pre(this: ShikiTransformerContext, node: Parameters<NonNullable<ShikiTransformer['pre']>>[0]) {
         this.addClassToHast(node, 'vp-code')
       },
     },
@@ -147,15 +190,15 @@ export async function createMarkdownHighlight({
       return value
     }
 
-    const highlighted = highlighter.codeToHtml(removeMustache(source).trimEnd(), {
+    const commonOptions = {
       lang: resolvedLang,
       transformers: [
         ...transformers,
         transformerCompactLineOptions(lineOptions),
         {
           name: 'knowledge:v-pre',
-          pre(node: { properties: Record<string, unknown> }) {
-            if (vPre) {
+          pre(node: Parameters<NonNullable<ShikiTransformer['pre']>>[0]) {
+            if (vPre && node.properties) {
               node.properties['v-pre'] = ''
             }
           },
@@ -185,10 +228,21 @@ export async function createMarkdownHighlight({
         ...codeTransformers,
       ],
       meta: { __raw: attrs },
-      ...(typeof theme === 'object' && 'light' in theme && 'dark' in theme
-        ? { themes: theme, defaultColor: false }
-        : { theme }),
-    })
+    }
+
+    let highlighted: string
+    if (typeof theme === 'object' && theme !== null && 'light' in theme && 'dark' in theme) {
+      highlighted = highlighter.codeToHtml(removeMustache(source).trimEnd(), {
+        ...commonOptions,
+        themes: theme,
+        defaultColor: false,
+      })
+    } else {
+      highlighted = highlighter.codeToHtml(removeMustache(source).trimEnd(), {
+        ...commonOptions,
+        theme: theme || 'github-dark',
+      })
+    }
 
     return restoreMustache(highlighted)
   }
