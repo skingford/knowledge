@@ -56,3 +56,5 @@ AGENTS.md
 scripts/
 plans/
 .codex.env.example
+
+.antigravitycli

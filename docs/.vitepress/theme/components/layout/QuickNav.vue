@@ -678,6 +678,26 @@ const categories: Category[] = [
     ],
   },
   {
+    title: "出海与订阅",
+    icon: "guide",
+    sites: [
+      {
+        name: "土区 ChatGPT 订阅",
+        desc: "注册土耳其区 Apple ID 订阅 ChatGPT Plus 详细教程",
+        domain: "xiaojun.uk",
+        fallback: "🍎",
+        url: "https://xiaojun.uk/posts/turkey-apple-id-chatgpt-plus/",
+      },
+      {
+        name: "App Store Price",
+        desc: "查看 ChatGPT 全球各地区 App Store 的价格对比与低价渠道",
+        domain: "appstoreprice.org",
+        fallback: "🏷️",
+        url: "https://appstoreprice.org/zh/apps/6448311069",
+      },
+    ],
+  },
+  {
     title: "网站排行",
     icon: "ranking",
     sites: [
