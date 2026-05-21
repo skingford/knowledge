@@ -121,7 +121,7 @@ onUnmounted(() => {
 
 const categories: Category[] = [
   {
-    title: "AI Talk",
+    title: "AI 对话与模型",
     icon: "talk",
     sites: [
       {
@@ -176,7 +176,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "AI 编程工具",
+    title: "AI 编程与助手",
     icon: "code",
     sites: [
       {
@@ -238,12 +238,12 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "Agent",
+    title: "AI 智能体",
     icon: "workflow",
     sites: [
       {
         name: "Hermes Agent",
-        desc: "Nous Research 的开源个人 Agent，支持持续学习、技能沉淀与跨会话记忆",
+        desc: "Nous Research 的开源个人 Agent，支持持续 learning、技能沉淀与跨会话记忆",
         domain: "hermes-agent.nousresearch.com",
         fallback: "🧠",
         url: "https://hermes-agent.nousresearch.com",
@@ -258,12 +258,12 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "AI 研究工具",
+    title: "AI 搜索与研究",
     icon: "research",
     sites: [
       {
         name: "NotebookLM",
-        desc: "Google 出品，基于文档的 AI 问答与播客生成",
+        desc: "Google 出品，基于文档 of AI 问答与播客生成",
         domain: "notebooklm.google.com",
         fallback: "📓",
         url: "https://notebooklm.google.com",
@@ -293,7 +293,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "AI Skill",
+    title: "AI 技能与指令",
     icon: "skill",
     sites: [
       {
@@ -327,7 +327,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "GitHub Workflow",
+    title: "AI 开发与工作流",
     icon: "workflow",
     sites: [
       {
@@ -365,7 +365,6 @@ const categories: Category[] = [
         fallback: "🦌",
         url: "https://github.com/bytedance/deer-flow",
       },
-      // Framework
       {
         name: "oh-my-codex",
         desc: "Codex 增强框架",
@@ -401,7 +400,6 @@ const categories: Category[] = [
         fallback: "🚀",
         url: "https://github.com/obra/superpowers",
       },
-      // Spec
       {
         name: "OpenSpec",
         desc: "AI 规格定义协作工具",
@@ -412,7 +410,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "GitHub Guide",
+    title: "AI 实践与指南",
     icon: "guide",
     sites: [
       {
@@ -443,38 +441,10 @@ const categories: Category[] = [
         fallback: "🗺️",
         url: "https://github.com/adongwanai/AgentGuide",
       },
-      {
-        name: "Awesome System Design Resources",
-        desc: "系统设计学习与面试资源集合",
-        domain: "github.com",
-        fallback: "🏛️",
-        url: "https://github.com/ashishps1/awesome-system-design-resources",
-      },
-      {
-        name: "system-design-notes",
-        desc: "《System Design Interview》读书笔记整理",
-        domain: "github.com",
-        fallback: "📝",
-        url: "https://github.com/liquidslr/system-design-notes",
-      },
-      {
-        name: "interview-company-wise-problems",
-        desc: "按公司整理的 LeetCode 面试题单",
-        domain: "github.com",
-        fallback: "🏢",
-        url: "https://github.com/liquidslr/interview-company-wise-problems",
-      },
-      {
-        name: "leetcode-master",
-        desc: "《代码随想录》LeetCode 刷题攻略",
-        domain: "github.com",
-        fallback: "📚",
-        url: "https://github.com/youngyangyang04/leetcode-master",
-      },
     ],
   },
   {
-    title: "AI 设计",
+    title: "AI 视觉与设计",
     icon: "design",
     sites: [
       {
@@ -536,7 +506,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "AI 音频",
+    title: "AI 音频与视频",
     icon: "audio",
     sites: [
       {
@@ -558,7 +528,7 @@ const categories: Category[] = [
         desc: "AI 音乐生成平台，擅长生成高完成度歌曲与旋律片段",
         domain: "udio.com",
         fallback: "🎶",
-        url: "https://www.udio.com/home",
+        url: "https://udio.com/home",
       },
       {
         name: "ElevenLabs",
@@ -570,7 +540,27 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "开发者工具",
+    title: "出海与付费订阅",
+    icon: "guide",
+    sites: [
+      {
+        name: "土区 ChatGPT 订阅",
+        desc: "注册土耳其区 Apple ID 订阅 ChatGPT Plus 详细教程",
+        domain: "xiaojun.uk",
+        fallback: "🍎",
+        url: "https://xiaojun.uk/posts/turkey-apple-id-chatgpt-plus/",
+      },
+      {
+        name: "App Store Price",
+        desc: "查看 ChatGPT 全球各地区 App Store 的价格对比与低价渠道",
+        domain: "appstoreprice.org",
+        fallback: "🏷️",
+        url: "https://appstoreprice.org/zh/apps/6448311069",
+      },
+    ],
+  },
+  {
+    title: "开发者常用工具",
     icon: "tools",
     sites: [
       {
@@ -618,20 +608,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "学习工具",
-    icon: "tools",
-    sites: [
-      {
-        name: "新概念英语 NCE",
-        desc: "新概念英语在线学习与听力练习工具",
-        domain: "nce.ichochy.com",
-        fallback: "🎧",
-        url: "https://nce.ichochy.com/",
-      },
-    ],
-  },
-  {
-    title: "环境管理",
+    title: "环境与版本管理",
     icon: "tools",
     sites: [
       {
@@ -665,7 +642,7 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "Mac 工具",
+    title: "系统与效率工具",
     icon: "tools",
     sites: [
       {

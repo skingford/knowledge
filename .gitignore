@@ -58,3 +58,5 @@ plans/
 .codex.env.example
 
 .antigravitycli
+
+/**/*.bak
