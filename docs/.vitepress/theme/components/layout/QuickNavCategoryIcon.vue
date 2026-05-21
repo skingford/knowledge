@@ -9,7 +9,9 @@ type CategoryIconName =
   | "design"
   | "audio"
   | "tools"
-  | "ranking";
+  | "ranking"
+  | "pay"
+  | "career";
 
 defineProps<{
   name: CategoryIconName;
@@ -82,6 +84,19 @@ defineProps<{
     <path d="M4.5 9.5h15V17a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V9.5Z" />
     <path d="M4.5 12h15" />
     <path d="M10 12v2h4v-2" />
+  </svg>
+
+  <svg v-else-if="name === 'pay'" class="quick-nav-category-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 10h18" />
+    <path d="M7 15h.01" />
+    <path d="M11 15h.01" />
+  </svg>
+
+  <svg v-else-if="name === 'career'" class="quick-nav-category-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3" y="7" width="18" height="13" rx="2" />
+    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+    <path d="M12 12v3" />
   </svg>
 
   <svg v-else class="quick-nav-category-icon" viewBox="0 0 24 24" aria-hidden="true">

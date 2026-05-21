@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import QuickNavCategoryIcon from "./QuickNavCategoryIcon.vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 interface Site {
   name: string;
@@ -21,7 +21,9 @@ type CategoryIconName =
   | "design"
   | "audio"
   | "tools"
-  | "ranking";
+  | "ranking"
+  | "pay"
+  | "career";
 
 interface Category {
   title: string;
@@ -40,6 +42,11 @@ const onImgError = (e: Event) => {
 };
 
 const activeCategory = ref("");
+const searchQuery = ref("");
+
+const clearSearch = () => {
+  searchQuery.value = "";
+};
 
 const getCategoryId = (title: string) =>
   title.replace(/\s+/g, "-").toLowerCase();
@@ -109,13 +116,21 @@ const onScroll = () => {
   rafId = requestAnimationFrame(updateActiveOnScroll);
 };
 
+const handleGlobalKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Escape" && searchQuery.value) {
+    clearSearch();
+  }
+};
+
 onMounted(() => {
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("keydown", handleGlobalKeydown);
   updateActiveOnScroll();
 });
 
 onUnmounted(() => {
   window.removeEventListener("scroll", onScroll);
+  window.removeEventListener("keydown", handleGlobalKeydown);
   cancelAnimationFrame(rafId);
 });
 
@@ -243,7 +258,7 @@ const categories: Category[] = [
     sites: [
       {
         name: "Hermes Agent",
-        desc: "Nous Research 的开源个人 Agent，支持持续 learning、技能沉淀与跨会话记忆",
+        desc: "Nous Research 的开源个人 Agent，支持持续学习、技能沉淀与跨会话记忆",
         domain: "hermes-agent.nousresearch.com",
         fallback: "🧠",
         url: "https://hermes-agent.nousresearch.com",
@@ -263,7 +278,7 @@ const categories: Category[] = [
     sites: [
       {
         name: "NotebookLM",
-        desc: "Google 出品，基于文档 of AI 问答与播客生成",
+        desc: "Google 出品，基于文档的 AI 问答与播客生成",
         domain: "notebooklm.google.com",
         fallback: "📓",
         url: "https://notebooklm.google.com",
@@ -319,7 +334,7 @@ const categories: Category[] = [
       },
       {
         name: "Andrej Karpathy Skills",
-        desc: "基于 Andrej Karpathy 对 LLM 编码误区观察整理的 Claude Code 行为增强 CLAUDE.md",
+        desc: "基于 Andrej Karpathy 对 LLM 编码误区观察整理 of Claude Code 行为增强 CLAUDE.md",
         domain: "github.com",
         fallback: "🧭",
         url: "https://github.com/forrestchang/andrej-karpathy-skills",
@@ -528,7 +543,7 @@ const categories: Category[] = [
         desc: "AI 音乐生成平台，擅长生成高完成度歌曲与旋律片段",
         domain: "udio.com",
         fallback: "🎶",
-        url: "https://udio.com/home",
+        url: "https://www.udio.com/home",
       },
       {
         name: "ElevenLabs",
@@ -541,7 +556,7 @@ const categories: Category[] = [
   },
   {
     title: "出海与付费订阅",
-    icon: "guide",
+    icon: "pay",
     sites: [
       {
         name: "土区 ChatGPT 订阅",
@@ -655,27 +670,54 @@ const categories: Category[] = [
     ],
   },
   {
-    title: "出海与订阅",
-    icon: "guide",
+    title: "求职与系统设计",
+    icon: "career",
     sites: [
       {
-        name: "土区 ChatGPT 订阅",
-        desc: "注册土耳其区 Apple ID 订阅 ChatGPT Plus 详细教程",
-        domain: "xiaojun.uk",
-        fallback: "🍎",
-        url: "https://xiaojun.uk/posts/turkey-apple-id-chatgpt-plus/",
+        name: "Awesome System Design Resources",
+        desc: "系统设计学习与面试资源集合",
+        domain: "github.com",
+        fallback: "🏛️",
+        url: "https://github.com/ashishps1/awesome-system-design-resources",
       },
       {
-        name: "App Store Price",
-        desc: "查看 ChatGPT 全球各地区 App Store 的价格对比与低价渠道",
-        domain: "appstoreprice.org",
-        fallback: "🏷️",
-        url: "https://appstoreprice.org/zh/apps/6448311069",
+        name: "system-design-notes",
+        desc: "《System Design Interview》读书笔记整理",
+        domain: "github.com",
+        fallback: "📝",
+        url: "https://github.com/liquidslr/system-design-notes",
+      },
+      {
+        name: "interview-company-wise-problems",
+        desc: "按公司整理的 LeetCode 面试题单",
+        domain: "github.com",
+        fallback: "🏢",
+        url: "https://github.com/liquidslr/interview-company-wise-problems",
+      },
+      {
+        name: "leetcode-master",
+        desc: "《代码随想录》LeetCode 刷题攻略",
+        domain: "github.com",
+        fallback: "📚",
+        url: "https://github.com/youngyangyang04/leetcode-master",
       },
     ],
   },
   {
-    title: "网站排行",
+    title: "外语学习与提升",
+    icon: "tools",
+    sites: [
+      {
+        name: "新概念英语 NCE",
+        desc: "新概念英语在线学习与听力练习工具",
+        domain: "nce.ichochy.com",
+        fallback: "🎧",
+        url: "https://nce.ichochy.com/",
+      },
+    ],
+  },
+  {
+    title: "趋势与排行榜单",
     icon: "ranking",
     sites: [
       {
@@ -709,54 +751,114 @@ const categories: Category[] = [
     ],
   },
 ];
+
+const filteredCategories = computed(() => {
+  if (!searchQuery.value.trim()) return categories;
+  const query = searchQuery.value.trim().toLowerCase();
+  return categories
+    .map((cat) => {
+      const isTitleMatch = cat.title.toLowerCase().includes(query);
+      const matchedSites = cat.sites.filter((site) => {
+        return (
+          site.name.toLowerCase().includes(query) ||
+          site.desc.toLowerCase().includes(query) ||
+          site.domain.toLowerCase().includes(query)
+        );
+      });
+      return { ...cat, sites: isTitleMatch ? cat.sites : matchedSites };
+    })
+    .filter((cat) => cat.sites.length > 0);
+});
 </script>
 
 <template>
   <div class="quick-nav-layout">
     <div class="quick-nav">
-      <div
-        v-for="cat in categories"
-        :key="cat.title"
-        :id="getCategoryId(cat.title)"
-        class="nav-category"
-      >
-        <h2 class="cat-title">
-          <span class="cat-icon" aria-hidden="true">
-            <QuickNavCategoryIcon :name="cat.icon" />
+      <!-- Search Input Container -->
+      <div class="search-wrapper">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
           </span>
-          <span class="cat-title-text">{{ cat.title }}</span>
-        </h2>
-        <div class="sites-grid">
-          <a
-            v-for="site in cat.sites"
-            :key="site.name"
-            :href="site.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="site-card"
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索站点名称、描述或域名... (Esc 清空)"
+            class="search-input"
+            @keydown.esc="clearSearch"
+          />
+          <button
+            v-if="searchQuery"
+            class="search-clear-btn"
+            title="清空搜索 (Esc)"
+            @click="clearSearch"
           >
-            <div class="site-icon-wrap" :class="{ 'light-bg': site.lightBg }">
-              <img
-                :src="getFavicon(site.domain)"
-                :alt="site.name"
-                class="site-favicon"
-                @error="onImgError"
-              />
-              <span class="site-icon-fallback">{{ site.fallback }}</span>
-            </div>
-            <span class="site-name">{{ site.name }}</span>
-            <span class="site-desc">{{ site.desc }}</span>
-            <span class="site-link-icon">↗</span>
-          </a>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
+      </div>
+
+      <!-- Main Sites Loop -->
+      <div v-if="filteredCategories.length > 0">
+        <div
+          v-for="cat in filteredCategories"
+          :key="cat.title"
+          :id="getCategoryId(cat.title)"
+          class="nav-category"
+        >
+          <h2 class="cat-title">
+            <span class="cat-icon" aria-hidden="true">
+              <QuickNavCategoryIcon :name="cat.icon" />
+            </span>
+            <span class="cat-title-text">{{ cat.title }}</span>
+          </h2>
+          <div class="sites-grid">
+            <a
+              v-for="site in cat.sites"
+              :key="site.name"
+              :href="site.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="site-card"
+            >
+              <div class="site-icon-wrap" :class="{ 'light-bg': site.lightBg }">
+                <img
+                  :src="getFavicon(site.domain)"
+                  :alt="site.name"
+                  class="site-favicon"
+                  @error="onImgError"
+                />
+                <span class="site-icon-fallback">{{ site.fallback }}</span>
+              </div>
+              <span class="site-name">{{ site.name }}</span>
+              <span class="site-desc">{{ site.desc }}</span>
+              <span class="site-link-icon">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="search-empty">
+        <div class="empty-icon">🔍</div>
+        <p class="empty-title">未找到相关站点</p>
+        <p class="empty-desc">尝试输入其他关键词，或按 <kbd>Esc</kbd> 清除过滤</p>
+        <button class="empty-reset-btn" @click="clearSearch">重置搜索</button>
       </div>
     </div>
 
+    <!-- Side Navigation -->
     <nav class="side-nav">
       <div class="side-nav-inner">
         <p class="side-nav-title">分类导航</p>
         <a
-          v-for="cat in categories"
+          v-for="cat in filteredCategories"
           :key="cat.title"
           class="side-nav-item"
           :class="{ active: activeCategory === getCategoryId(cat.title) }"
@@ -844,6 +946,157 @@ const categories: Category[] = [
   gap: 16px;
 }
 
+/* Search Wrapper & Box */
+.search-wrapper {
+  margin-bottom: 32px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 0 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.search-box:hover {
+  border-color: rgba(196, 104, 73, 0.4);
+  box-shadow: 0 4px 12px rgba(196, 104, 73, 0.06);
+}
+
+.search-box:focus-within {
+  border-color: #c46849;
+  box-shadow: 
+    0 0 0 3px rgba(196, 104, 73, 0.15),
+    0 4px 16px rgba(196, 104, 73, 0.08);
+  transform: translateY(-1px);
+}
+
+.search-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--vp-c-text-3);
+  margin-right: 12px;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.search-box:focus-within .search-icon {
+  color: #c46849;
+}
+
+.search-input {
+  flex: 1;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: var(--vp-c-text-1);
+  font-size: 15px;
+  outline: none;
+  padding: 0;
+}
+
+.search-input::placeholder {
+  color: var(--vp-c-text-3);
+}
+
+.search-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--vp-c-text-3);
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.dark .search-clear-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-clear-btn:hover {
+  background: rgba(196, 104, 73, 0.15);
+  color: #c46849;
+  transform: scale(1.05);
+}
+
+/* Empty State */
+.search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 60%, transparent);
+  margin: 32px 0 64px;
+}
+
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 8px rgba(196, 104, 73, 0.15));
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  margin: 0 0 8px;
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: var(--vp-c-text-3);
+  margin: 0 0 20px;
+}
+
+.empty-desc kbd {
+  font-family: inherit;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.empty-reset-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: #c46849;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(196, 104, 73, 0.2);
+}
+
+.empty-reset-btn:hover {
+  background: #b3593a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(196, 104, 73, 0.3);
+}
+
+.empty-reset-btn:active {
+  transform: translateY(0);
+}
+
+/* Site Card Enhancements */
 .site-card {
   position: relative;
   display: flex;
@@ -853,16 +1106,23 @@ const categories: Category[] = [
   padding: 16px;
   background: var(--vp-c-bg-elv);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
+  border-radius: 12px;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .site-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: #c46849;
-  box-shadow: 0 4px 24px rgba(196, 104, 73, 0.1);
+  box-shadow: 
+    0 12px 28px -8px rgba(196, 104, 73, 0.16),
+    0 4px 12px -4px rgba(196, 104, 73, 0.08),
+    inset 0 0 12px rgba(196, 104, 73, 0.02);
+}
+
+.site-card:hover .site-name {
+  color: #c46849;
 }
 
 .site-card:focus-visible,
@@ -877,8 +1137,15 @@ const categories: Category[] = [
 }
 
 .dark .site-card:hover {
-  border-color: #c46849;
-  box-shadow: 0 4px 24px rgba(196, 104, 73, 0.15);
+  border-color: #e08c6f;
+  box-shadow: 
+    0 16px 36px -12px rgba(196, 104, 73, 0.28),
+    0 4px 12px -4px rgba(196, 104, 73, 0.16),
+    inset 0 0 16px rgba(196, 104, 73, 0.04);
+}
+
+.dark .site-card:hover .site-name {
+  color: #e08c6f;
 }
 
 .site-icon-wrap {
@@ -914,6 +1181,7 @@ const categories: Category[] = [
   font-weight: 600;
   color: var(--vp-c-text-1);
   letter-spacing: -0.01em;
+  transition: color 0.2s ease;
 }
 
 .site-desc {
@@ -929,14 +1197,16 @@ const categories: Category[] = [
   right: 14px;
   font-size: 14px;
   color: var(--vp-c-text-3);
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .site-card:hover .site-link-icon {
   color: #c46849;
-  transform: translate(1px, -1px);
+  transform: translate(2px, -2px) scale(1.1);
+}
+
+.dark .site-card:hover .site-link-icon {
+  color: #e08c6f;
 }
 
 /* Side Navigation */
