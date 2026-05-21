@@ -57,6 +57,8 @@ const lineNoStartRE = /=(\d*)/
 const lineNoRE = /:(no-)?line-numbers(=\d*)?$/
 const mustacheRE = /\{\{.*?\}\}/g
 
+let loadedLanguagesSetCache: Set<string> | null = null
+
 type MarkdownTheme = NonNullable<MarkdownOptions['theme']>
 type LanguageAlias = NonNullable<MarkdownOptions['languageAlias']>
 type MarkdownHighlightOptions = Pick<
@@ -104,7 +106,11 @@ function normalizeLanguage(lang: string, defaultLang: string, languageAlias: Lan
     .toLowerCase() || defaultLang
   const aliasedLang = languageAlias[strippedLang] ?? strippedLang
 
-  if (isSpecialLang(aliasedLang) || highlighter.getLoadedLanguages().includes(aliasedLang)) {
+  if (!loadedLanguagesSetCache) {
+    loadedLanguagesSetCache = new Set(highlighter.getLoadedLanguages())
+  }
+
+  if (isSpecialLang(aliasedLang) || loadedLanguagesSetCache.has(aliasedLang)) {
     return aliasedLang
   }
 

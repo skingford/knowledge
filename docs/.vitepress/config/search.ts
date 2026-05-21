@@ -4,12 +4,7 @@ const headingRegex = /<h(\d*).*?>(.*?<a.*? href="#.*?".*?>.*?<\/a>)<\/h\1>/gi
 const headingContentRegex = /(.*?)<a.*? href="#(.*?)".*?>.*?<\/a>/i
 const maxSectionTextLength = 200
 const maxIndexedHeadingDepth = 1
-const searchNoisePatterns = [
-  /<svg\b[\s\S]*?<\/svg>/gi,
-  /<pre\b[\s\S]*?<\/pre>/gi,
-  /<style\b[\s\S]*?<\/style>/gi,
-  /<table\b[\s\S]*?<\/table>/gi,
-]
+const searchNoiseRegex = /<(svg|pre|style|table)\b[\s\S]*?<\/\1>/gi
 
 function clearHtmlTags(value: string) {
   return value.replace(/<[^>]*>/g, ' ')
@@ -32,16 +27,12 @@ function normalizeSearchText(value: string) {
 }
 
 function getSearchableText(content: string) {
-  const sanitized = searchNoisePatterns.reduce(
-    (current, pattern) => current.replace(pattern, ''),
-    content,
-  )
-
-  return normalizeSearchText(sanitized).slice(0, maxSectionTextLength)
+  return normalizeSearchText(content).slice(0, maxSectionTextLength)
 }
 
 async function* splitSearchPageIntoSections(_path: string, html: string) {
-  const result = html.split(headingRegex)
+  const cleanHtml = html.replace(searchNoiseRegex, '')
+  const result = cleanHtml.split(headingRegex)
   result.shift()
 
   let parentTitles: string[] = []
