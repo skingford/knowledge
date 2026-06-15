@@ -346,11 +346,25 @@ const categories: Category[] = [
     icon: "workflow",
     sites: [
       {
-        name: "Everything Claude Code",
-        desc: "Claude Code 组合技",
+        name: "ECC",
+        desc: "Everything Claude Code 工具与工作流集合",
         domain: "github.com",
         fallback: "📦",
-        url: "https://github.com/affaan-m/everything-claude-code",
+        url: "https://github.com/affaan-m/ECC",
+      },
+      {
+        name: "Claude-Mem 中文文档",
+        desc: "Claude Code 持久化记忆与跨会话上下文保留工具",
+        domain: "github.com",
+        fallback: "🧠",
+        url: "https://github.com/thedotmack/claude-mem/blob/main/docs/i18n/README.zh.md",
+      },
+      {
+        name: "GSD Core 中文文档",
+        desc: "面向 AI Agent 的上下文工程与规范驱动开发框架",
+        domain: "github.com",
+        fallback: "📐",
+        url: "https://github.com/open-gsd/gsd-core/blob/next/README.zh-CN.md",
       },
       {
         name: "ccg-workflow",
