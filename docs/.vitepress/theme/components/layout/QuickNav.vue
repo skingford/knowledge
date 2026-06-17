@@ -319,6 +319,20 @@ const categories: Category[] = [
         url: "https://skills.sh/",
       },
       {
+        name: "Anthropic Skills",
+        desc: "Anthropic 官方 skills 仓库，收录可复用的 Agent 能力包",
+        domain: "github.com",
+        fallback: "🧰",
+        url: "https://github.com/anthropics/skills",
+      },
+      {
+        name: "SkillHub",
+        desc: "AI skills 收藏与发现平台，适合查找可复用工作流",
+        domain: "skillhub.club",
+        fallback: "🗂️",
+        url: "https://skillhub.club/",
+      },
+      {
         name: "Tessl",
         desc: "Agent skills 与 context 的注册表与包管理平台",
         domain: "tessl.io",
@@ -455,6 +469,13 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "🧭",
         url: "https://github.com/luongnv89/claude-howto",
+      },
+      {
+        name: "Claude Code Tips",
+        desc: "Claude Code 使用技巧与实践建议集合",
+        domain: "github.com",
+        fallback: "💡",
+        url: "https://github.com/ykdojo/claude-code-tips",
       },
       {
         name: "claude-code-best-practice",
