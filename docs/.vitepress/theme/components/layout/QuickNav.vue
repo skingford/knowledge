@@ -326,6 +326,13 @@ const categories: Category[] = [
         url: "https://github.com/anthropics/skills",
       },
       {
+        name: "Emil Kowalski Skills",
+        desc: "面向设计工程师的 UI 设计、交互与动效 skills 集",
+        domain: "github.com",
+        fallback: "🎨",
+        url: "https://github.com/emilkowalski/skills",
+      },
+      {
         name: "SkillHub",
         desc: "AI skills 收藏与发现平台，适合查找可复用工作流",
         domain: "skillhub.club",
@@ -365,6 +372,13 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "📦",
         url: "https://github.com/affaan-m/ECC",
+      },
+      {
+        name: "cc-pocket",
+        desc: "通过手机远程续接并控制 Claude Code 与 Codex 会话",
+        domain: "github.com",
+        fallback: "📱",
+        url: "https://github.com/heypandax/cc-pocket",
       },
       {
         name: "Claude-Mem 中文文档",
@@ -701,6 +715,13 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "🐹",
         url: "https://github.com/tw93/mole",
+      },
+      {
+        name: "MacKed",
+        desc: "Mac 软件资源分享与下载站，使用前注意授权来源与安全校验",
+        domain: "macked.app",
+        fallback: "🖥️",
+        url: "https://macked.app/",
       },
     ],
   },
