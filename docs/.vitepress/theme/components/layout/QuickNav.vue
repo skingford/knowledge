@@ -533,6 +533,13 @@ const categories: Category[] = [
         url: "https://github.com/VoltAgent/awesome-design-md",
       },
       {
+        name: "Vibe Designing Playbook",
+        desc: "阿里云设计中心出品的 AI 生成系统实践设计指南，覆盖设计工程、动态交互与自我进化",
+        domain: "alibaba-cloud-design.github.io",
+        fallback: "📖",
+        url: "https://alibaba-cloud-design.github.io/vibe-designing-playbook/",
+      },
+      {
         name: "Figma",
         desc: "主流协作式界面设计平台，支持设计、原型与开发交付",
         domain: "figma.com",
