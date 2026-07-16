@@ -577,6 +577,47 @@ const categories: Category[] = [
     ],
   },
   {
+    title: "前端动效与组件",
+    icon: "design",
+    sites: [
+      {
+        name: "Motion",
+        desc: "面向现代 Web 的开源动效库，支持 JavaScript、React 与 Vue",
+        domain: "motion.dev",
+        fallback: "M",
+        url: "https://motion.dev/",
+      },
+      {
+        name: "GSAP",
+        desc: "成熟的专业级 JavaScript 动画平台，适合复杂时间轴与交互动效",
+        domain: "gsap.com",
+        fallback: "G",
+        url: "https://gsap.com/",
+      },
+      {
+        name: "React Bits",
+        desc: "可直接复用的 React 动画组件集合，覆盖文字、背景与交互效果",
+        domain: "reactbits.dev",
+        fallback: "R",
+        url: "https://reactbits.dev/",
+      },
+      {
+        name: "Oscar Hernandez",
+        desc: "设计工程师 Oscar Hernandez 的作品集与精致交互动效案例",
+        domain: "oscarhernandez.vercel.app",
+        fallback: "O",
+        url: "https://oscarhernandez.vercel.app/",
+      },
+      {
+        name: "Anime.js",
+        desc: "轻量灵活的 JavaScript 动画引擎，支持 DOM、SVG 与时间轴编排",
+        domain: "animejs.com",
+        fallback: "A",
+        url: "https://animejs.com/",
+      },
+    ],
+  },
+  {
     title: "AI 音频与视频",
     icon: "audio",
     sites: [

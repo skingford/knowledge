@@ -8,6 +8,7 @@
     "vitepress-plugin-tabs": "^0.8.0"
   },
   "scripts": {
+    "test": "node --test",
     "docs:dev": "vitepress dev docs --host 0.0.0.0",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
