@@ -19,6 +19,12 @@ const expectedSites = [
   { name: "Anime.js", domain: "animejs.com", url: "https://animejs.com/" },
 ];
 
+const appleDesignSkill = {
+  name: "Apple Design Skill",
+  domain: "github.com",
+  url: "https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
+};
+
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 test("QuickNav includes the frontend animation favorites", () => {
@@ -41,4 +47,29 @@ test("QuickNav includes the frontend animation favorites", () => {
       `${site.url} should appear exactly once`,
     );
   }
+});
+
+test("QuickNav includes the Apple Design skill", () => {
+  const categoryMatch = quickNavSource.match(
+    /title: "AI 技能与指令"([\s\S]*?)title: "AI 开发与工作流"/,
+  );
+  assert.ok(categoryMatch, "AI skill category should exist");
+
+  const siteMatch = categoryMatch[1].match(
+    new RegExp(`name: "${escapeRegExp(appleDesignSkill.name)}"([\\s\\S]*?)\\n\\s*},`),
+  );
+  assert.ok(siteMatch, `${appleDesignSkill.name} should exist in the category`);
+  assert.match(
+    siteMatch[1],
+    new RegExp(`domain: "${escapeRegExp(appleDesignSkill.domain)}"`),
+  );
+  assert.match(
+    siteMatch[1],
+    new RegExp(`url: "${escapeRegExp(appleDesignSkill.url)}"`),
+  );
+  assert.equal(
+    quickNavSource.split(`url: "${appleDesignSkill.url}"`).length - 1,
+    1,
+    `${appleDesignSkill.url} should appear exactly once`,
+  );
 });
