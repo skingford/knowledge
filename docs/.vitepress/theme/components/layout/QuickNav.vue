@@ -333,13 +333,6 @@ const categories: Category[] = [
         url: "https://github.com/emilkowalski/skills",
       },
       {
-        name: "Apple Design Skill",
-        desc: "将 Apple 的流体交互、物理动效与界面设计原则转译为 Web 实践",
-        domain: "github.com",
-        fallback: "🍎",
-        url: "https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
-      },
-      {
         name: "SkillHub",
         desc: "AI skills 收藏与发现平台，适合查找可复用工作流",
         domain: "skillhub.club",
@@ -545,6 +538,13 @@ const categories: Category[] = [
         domain: "alibaba-cloud-design.github.io",
         fallback: "📖",
         url: "https://alibaba-cloud-design.github.io/vibe-designing-playbook/",
+      },
+      {
+        name: "Apple Design Skill",
+        desc: "将 Apple 的流体交互、物理动效与界面设计原则转译为 Web 实践",
+        domain: "github.com",
+        fallback: "🍎",
+        url: "https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
       },
       {
         name: "Figma",

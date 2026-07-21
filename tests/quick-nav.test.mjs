@@ -49,11 +49,11 @@ test("QuickNav includes the frontend animation favorites", () => {
   }
 });
 
-test("QuickNav includes the Apple Design skill", () => {
+test("QuickNav classifies the Apple Design skill under AI visual design", () => {
   const categoryMatch = quickNavSource.match(
-    /title: "AI 技能与指令"([\s\S]*?)title: "AI 开发与工作流"/,
+    /title: "AI 视觉与设计"([\s\S]*?)title: "前端动效与组件"/,
   );
-  assert.ok(categoryMatch, "AI skill category should exist");
+  assert.ok(categoryMatch, "AI visual design category should exist");
 
   const siteMatch = categoryMatch[1].match(
     new RegExp(`name: "${escapeRegExp(appleDesignSkill.name)}"([\\s\\S]*?)\\n\\s*},`),
