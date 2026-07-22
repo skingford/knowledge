@@ -25,6 +25,20 @@ const appleDesignSkill = {
   url: "https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md",
 };
 
+const orcaSite = {
+  name: "Orca",
+  domain: "www.onorca.dev",
+  url: "https://www.onorca.dev/",
+};
+
+const terminalSetupSite = {
+  name: "terminal-setup",
+  desc: "以 macOS 为主的一键终端配置，实验性支持 Debian/Ubuntu 与 WSL",
+  domain: "github.com",
+  fallback: ">_",
+  url: "https://github.com/lewislulu/terminal-setup",
+};
+
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 test("QuickNav includes the frontend animation favorites", () => {
@@ -71,5 +85,59 @@ test("QuickNav classifies the Apple Design skill under AI visual design", () => 
     quickNavSource.split(`url: "${appleDesignSkill.url}"`).length - 1,
     1,
     `${appleDesignSkill.url} should appear exactly once`,
+  );
+});
+
+test("QuickNav classifies Orca under AI development workflows", () => {
+  const categoryMatch = quickNavSource.match(
+    /title: "AI 开发与工作流"([\s\S]*?)title: "AI 实践与指南"/,
+  );
+  assert.ok(categoryMatch, "AI development workflow category should exist");
+
+  const siteMatch = categoryMatch[1].match(
+    new RegExp(`name: "${escapeRegExp(orcaSite.name)}"([\\s\\S]*?)\\n\\s*},`),
+  );
+  assert.ok(siteMatch, `${orcaSite.name} should exist in the category`);
+  assert.match(siteMatch[1], new RegExp(`domain: "${escapeRegExp(orcaSite.domain)}"`));
+  assert.match(siteMatch[1], new RegExp(`url: "${escapeRegExp(orcaSite.url)}"`));
+  assert.equal(
+    quickNavSource.split(`url: "${orcaSite.url}"`).length - 1,
+    1,
+    `${orcaSite.url} should appear exactly once`,
+  );
+});
+
+test("QuickNav classifies terminal-setup under environment management", () => {
+  const categoryMatch = quickNavSource.match(
+    /title: "环境与版本管理"([\s\S]*?)title: "系统与效率工具"/,
+  );
+  assert.ok(categoryMatch, "environment management category should exist");
+
+  const siteMatch = categoryMatch[1].match(
+    new RegExp(
+      `name: "${escapeRegExp(terminalSetupSite.name)}"([\\s\\S]*?)\\n\\s*},`,
+    ),
+  );
+  assert.ok(siteMatch, `${terminalSetupSite.name} should exist in the category`);
+  assert.match(
+    siteMatch[1],
+    new RegExp(`desc: "${escapeRegExp(terminalSetupSite.desc)}"`),
+  );
+  assert.match(
+    siteMatch[1],
+    new RegExp(`domain: "${escapeRegExp(terminalSetupSite.domain)}"`),
+  );
+  assert.match(
+    siteMatch[1],
+    new RegExp(`fallback: "${escapeRegExp(terminalSetupSite.fallback)}"`),
+  );
+  assert.match(
+    siteMatch[1],
+    new RegExp(`url: "${escapeRegExp(terminalSetupSite.url)}"`),
+  );
+  assert.equal(
+    quickNavSource.split(`url: "${terminalSetupSite.url}"`).length - 1,
+    1,
+    `${terminalSetupSite.url} should appear exactly once`,
   );
 });

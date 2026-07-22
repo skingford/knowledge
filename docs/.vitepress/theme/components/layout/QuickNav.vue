@@ -381,6 +381,13 @@ const categories: Category[] = [
         url: "https://github.com/heypandax/cc-pocket",
       },
       {
+        name: "Orca",
+        desc: "开源 Agent 开发环境，支持隔离 worktree 并行运行编码 Agent 与远程开发",
+        domain: "www.onorca.dev",
+        fallback: "O",
+        url: "https://www.onorca.dev/",
+      },
+      {
         name: "Claude-Mem 中文文档",
         desc: "Claude Code 持久化记忆与跨会话上下文保留工具",
         domain: "github.com",
@@ -757,6 +764,13 @@ const categories: Category[] = [
         domain: "github.com",
         fallback: "⚡",
         url: "https://github.com/astral-sh/uv",
+      },
+      {
+        name: "terminal-setup",
+        desc: "以 macOS 为主的一键终端配置，实验性支持 Debian/Ubuntu 与 WSL",
+        domain: "github.com",
+        fallback: ">_",
+        url: "https://github.com/lewislulu/terminal-setup",
       },
     ],
   },
