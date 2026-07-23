@@ -31,6 +31,14 @@ const orcaSite = {
   url: "https://www.onorca.dev/",
 };
 
+const paseoSite = {
+  name: "Paseo",
+  desc: "自托管编码 Agent 控制台，可从手机、桌面或 Web 远程运行 Claude Code、Codex 等工具",
+  domain: "paseo.sh",
+  fallback: "P",
+  url: "https://paseo.sh/",
+};
+
 const terminalSetupSite = {
   name: "terminal-setup",
   desc: "以 macOS 为主的一键终端配置，实验性支持 Debian/Ubuntu 与 WSL",
@@ -104,6 +112,45 @@ test("QuickNav classifies Orca under AI development workflows", () => {
     quickNavSource.split(`url: "${orcaSite.url}"`).length - 1,
     1,
     `${orcaSite.url} should appear exactly once`,
+  );
+});
+
+test("QuickNav places Orca immediately after cc-pocket", () => {
+  const categoryMatch = quickNavSource.match(
+    /title: "AI 开发与工作流"([\s\S]*?)title: "AI 实践与指南"/,
+  );
+  assert.ok(categoryMatch, "AI development workflow category should exist");
+
+  const siteNames = Array.from(
+    categoryMatch[1].matchAll(/name: "([^"]+)"/g),
+    (match) => match[1],
+  );
+  const ccPocketIndex = siteNames.indexOf("cc-pocket");
+  assert.notEqual(ccPocketIndex, -1, "cc-pocket should exist in the category");
+  assert.equal(siteNames[ccPocketIndex + 1], "Orca");
+});
+
+test("QuickNav classifies Paseo under AI development workflows", () => {
+  const categoryMatch = quickNavSource.match(
+    /title: "AI 开发与工作流"([\s\S]*?)title: "AI 实践与指南"/,
+  );
+  assert.ok(categoryMatch, "AI development workflow category should exist");
+
+  const siteMatch = categoryMatch[1].match(
+    new RegExp(`name: "${escapeRegExp(paseoSite.name)}"([\\s\\S]*?)\\n\\s*},`),
+  );
+  assert.ok(siteMatch, `${paseoSite.name} should exist in the category`);
+  assert.match(siteMatch[1], new RegExp(`desc: "${escapeRegExp(paseoSite.desc)}"`));
+  assert.match(siteMatch[1], new RegExp(`domain: "${escapeRegExp(paseoSite.domain)}"`));
+  assert.match(
+    siteMatch[1],
+    new RegExp(`fallback: "${escapeRegExp(paseoSite.fallback)}"`),
+  );
+  assert.match(siteMatch[1], new RegExp(`url: "${escapeRegExp(paseoSite.url)}"`));
+  assert.equal(
+    quickNavSource.split(`url: "${paseoSite.url}"`).length - 1,
+    1,
+    `${paseoSite.url} should appear exactly once`,
   );
 });
 

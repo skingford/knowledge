@@ -388,6 +388,13 @@ const categories: Category[] = [
         url: "https://www.onorca.dev/",
       },
       {
+        name: "Paseo",
+        desc: "自托管编码 Agent 控制台，可从手机、桌面或 Web 远程运行 Claude Code、Codex 等工具",
+        domain: "paseo.sh",
+        fallback: "P",
+        url: "https://paseo.sh/",
+      },
+      {
         name: "Claude-Mem 中文文档",
         desc: "Claude Code 持久化记忆与跨会话上下文保留工具",
         domain: "github.com",
